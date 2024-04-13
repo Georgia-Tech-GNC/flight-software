@@ -3,6 +3,8 @@
     "cortex-debug.openocdPath": "/usr/bin/openocd",
     "files.associations": {
         "stm32h745xx.h": "c",
-        "ringbuff.h": "c"
+        "ringbuff.h": "c",
+        "xbeeinit.h": "c",
+        "stm32h7xx_hal_uart.h": "c"
     }
 }

@@ -13,6 +13,92 @@
 #include <lapacke.h>
 #include "ekf.h"
 
+void initialize_ekf(ekf *ekf){
+
+    ekf->time_step = 0.02; //TODO: implement variable time step
+    ekf->x_n = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    ekf->u = 0;
+    ekf->G = 0;
+    ekf->z = {0.0, 0.0, 0.0};
+
+    ekf->x_prev = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    ekf->P_prev = {{0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+                    {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+                    {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+                    {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+                    {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+                    {0.0, 0.0, 0.0, 0.0, 0.0, 0.0}};
+
+    ekf->n_next = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    ekf->P_next = {{0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+                    {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+                    {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+                    {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+                    {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+                    {0.0, 0.0, 0.0, 0.0, 0.0, 0.0}};
+
+    ekf->K_n = {{0.0, 0.0, 0.0},
+                {0.0, 0.0, 0.0},
+                {0.0, 0.0, 0.0},
+                {0.0, 0.0, 0.0},
+                {0.0, 0.0, 0.0},
+                {0.0, 0.0, 0.0}};
+
+    ekf->f = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    ekf->dfdx = {{0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+                {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+                {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+                {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+                {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+                {0.0, 0.0, 0.0, 0.0, 0.0, 0.0}};
+
+    ekf->h = {0.0, 0.0, 0.0};
+    ekf->dhdx = {{0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+                {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+                {0.0, 0.0, 0.0, 0.0, 0.0, 0.0}};
+
+    ekf->P_n = {{1.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+                {0.0, 1.0, 0.0, 0.0, 0.0, 0.0},
+                {0.0, 0.0, 1.0, 0.0, 0.0, 0.0},
+                {0.0, 0.0, 0.0, 1.0, 0.0, 0.0},
+                {0.0, 0.0, 0.0, 0.0, 1.0, 0.0},
+                {0.0, 0.0, 0.0, 0.0, 0.0, 1.0}};
+
+    ekf->Q = {{0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+                {0.0, 2.0, 0.0, 0.0, 0.0, 0.0},
+                {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+                {0.0, 0.0, 0.0, 2.0, 0.0, 0.0},
+                {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+                {0.0, 0.0, 0.0, 0.0, 0.0, 2.0}}; 
+
+    ekf->R = {{1.0, 0.0, 0.0},
+            {0.0, 1.0, 0.0},
+            {0.0, 0.0, 1.0}}; //Dagonal should be GPS stdev squared
+
+    ekf->gps = {0.0, 0.0, 0.0};
+    ekf->accelerometer = {0.0, 0.0, 0.0};
+    ekf->barometer = 0.0;
+
+    ekf->prev_time_millis = currentTimeMillis();
+}
+
+int64_t currentTimeMillis(){
+    struct timeval time;
+    gettimeofday(&time, NULL);
+    int64_t s1 = (int64_t)(time.tv_sec) * 1000;
+    int64_t s2 = (time.tv_usec / 1000);
+    return s1 + s2;
+}
+
+void update_time_step(ekf *ekf){
+
+    int64_t curr_time_millis = currentTimeMillis();
+    float dt_millis = (float)(curr_time_millis - ekf->prev_time_millis);
+    ekf->time_step = dt_millis / 1000;
+    ekf->prev_time_millis = curr_time_millis;
+
+}
+
 void observation_function(ekf *ekf){
     float h1 = ekf->x_n[0]; //x position
     float h2 = ekf->x_n[2]; //y position
@@ -240,9 +326,59 @@ void predict_covariance(ekf *ekf){
     free(temp2);
 }
 
+void correct_accelerometer_coriolis(ekf *ekf, float* com_to_imu, float wx, float wy, float wz, float wx_dot, float wy_dot, float wz_dot){
+    
+    https://physics.stackexchange.com/questions/222947/calculating-acceleration-offset-by-center-of-gravity-c-g
+
+    //com_to_imu[0] is x distance from center of mass to imu in meters
+    //com_to_imu[1] is y distance from center of mass to imu in meters
+    //com_to_imu[2] is z distance from center of mass to imu in meters
+
+    //Correct x-accel
+    ekf->accelerometer[0] = ekf->accelerometer[0] + (-(wy*wy) - (wz*wz))*com_to_imu[0] + (wx*wy - wz_dot*wz_dot)(com_to_imu[1]) + (wx*wz+wy_dot)*com_to_imu[2];
+
+    //Correct y-accel
+    ekf->accelerometer[1] = ekf->accelerometer[1] + (wx*wy+wz_dot)*com_to_imu[0] + (-(wx*wx) - (wz*wz))*com_to_imu[1] + (wy*wz - wx_dot)*com_to_imu[2];
+
+    //Correct z-accel
+    ekf->accelerometer[2] = ekf->accelerometer[2] + (wx*wz-wy_dot)*com_to_imu[0] + (wy*wz+wx_dot)*com_to_imu[1] + (-(wx*wx) - (wy*wy))*com_to_imu[2];
+}
+
 void acknowledge_time_passed(ekf *ekf){
 
     ekf->x_prev = ekf->x_next;
     ekf->P_prev = ekf->P_next;
 
 }
+
+float *run_ekf(ekf *ekf, float *com_to_imu, float wx, float wy, float wz, float wx_dot, float wy_dot, float wz_dot, float *GPS_sensor, float *IMU_sensor){
+
+    //GPS_sensor: 3-element array with position relative to starting position
+    //IMU_sensor: 3-element array with x, y, and z accelerations
+
+    update_time_step(ekf);
+
+    ekf->gps = GPS_sensor;
+    ekf->accelerometer = IMU_sensor;
+
+    //Measurement function
+    ekf->z = ekf->gps;
+    correct_accelerometer_coriolis(ekf, com_to_imu, wx, wy, wz, wx_dot, wy_dot, wz_dot);
+
+    //Update
+    observation_function(ekf);
+    observation_jacobian(ekf);
+    kalman_gain(ekf);
+    update_state(ekf);
+    update_covariance(ekf);
+
+    //Predict
+    state_transition_function(ekf);
+    state_transition_jacobian(ekf);
+    predict_state(ekf);
+    predict_covariance(ekf);
+
+    acknowledge_time_passed(ekf);
+    return ekf->x_n;
+}
+

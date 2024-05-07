@@ -115,6 +115,9 @@ int main(void)
 //SETUP
 /*
 Wait for Xbee signal to start the sensor calibration
+
+//Alternative to the below, we can write an EKF to do the sensor calibration.
+
 1. Determine sensor turn-on bias.
     a. Initialize arrays of 1000 elements
     b. Run a while loop - condition is while arrays are not yet filled
@@ -132,11 +135,11 @@ Wait for Xbee signal to start the sensor calibration
     g. Once while loop has terminated, take average value of arrays from (a) and take this as de/dt for each sensor measurement.
     h. Store the de/dt of each sensor measurement in the struct for that sensor.
 3. Determine initial attitude.
-    a. Accelerometer gives roll and pitch, magnetometer gives yaw. Covnert this to initial quaternion.
+    a. Accelerometer gives roll and pitch, magnetometer gives yaw. Convert this to initial quaternion.
     b. Store initial attitude quaternion in attitude struct.
 Ground calibration is now complete. Send Xbee signal to ground station that calibration is complete and rocket is ready to be launched.
 */
- 
+  initialize_ekf(); //Initialize the in-flight EKF
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -145,6 +148,8 @@ Ground calibration is now complete. Send Xbee signal to ground station that cali
   {
     /* USER CODE END WHILE */
     //Collect sensor data. Run EKF. Run in-flight attitude estimation. Collect a state vector. Send this state vector to the controls MCU.
+    translational_states = run_ekf(ekf, com_to_imu, wx, wy, wz, wx_dot, wy_dot, wz_dot, GPS_readings, IMU_readings);
+      //run_ekf returns ekf->x_n, which is a six-element array: x_pos, y_pos, z_pos, x_vel, y_vel, z_vel
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */

@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <lapacke.h>
+#include <sys/time.h>
 #include "ekf.h"
 
 void initialize_ekf(ekf *ekf){

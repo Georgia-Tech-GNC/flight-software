@@ -13,28 +13,40 @@
 #ifndef __ATTITUDE_H__
 #define __ATTITUDE_H__
 
-#define DT 0.02f //Should be the amount of time between gyro measurements. May be variable.
-
 typedef struct { 
     /*Assumes q_current is knownf rom ground calibration*/
     float q_current_s; 
     float q_current_x;
     float q_current_y;
     float q_current_z;
+
     float gyro_x;
     float gyro_y;
     float gyro_z;
+
     float q_delt_s;
     float q_delt_x;
     float q_delt_y;
     float q_delt_z;
+
+    float time_step;
+    float prev_time_millis;
+
+    float phi;
+    float theta;
+    float psi;
 } rocket_attitude;
 
-
-void set_gyro_x(rocket_attitude *rocket_atd);
-void set_gyro_y(rocket_attitude *rocket_atd);
-void set_gyro_z(rocket_attitude *rocket_atd);
+int64_t currentTimeMillis_att();
+void update_time_step(rocket_attitude *rocket_atd);
+void initialize_rocket_attitude(rocket_attitude *rocket_atd, float qs, float qx, float qy, float qz);
+void set_gyro_x(rocket_attitude *rocket_atd, float wx);
+void set_gyro_y(rocket_attitude *rocket_atd, float wy);
+void set_gyro_z(rocket_attitude *rocket_atd, float wz);
 void gyro_to_rotation_quat(rocket_attitude *rocket_atd);
 void quat_update(rocket_attitude *rocket_atd);
- 
+void quat_to_euler_angs(rocket_attitude *rocket_atd);
+float *run_attitude_estimation(rocket_attitude *rocket_atd, float wx, float wy, float wz);
+
+
 #endif

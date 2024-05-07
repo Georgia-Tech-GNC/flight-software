@@ -18,6 +18,9 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "ekf.h"
+#include "attitude.h"
+#include "state_est_helpers.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -139,7 +142,14 @@ Wait for Xbee signal to start the sensor calibration
     b. Store initial attitude quaternion in attitude struct.
 Ground calibration is now complete. Send Xbee signal to ground station that calibration is complete and rocket is ready to be launched.
 */
-  initialize_ekf(); //Initialize the in-flight EKF
+  initialize_ekf(ekf); //Initialize the in-flight EKF
+  initialize_rocket_attitude(rocket_atd, 0.7071, 0.0, 0.7071, 0.0); //Initialize attitude estimation
+
+  float center_of_mass_to_imu_vector[3];
+  float seconds_since_launch = 0.0;
+  int launch_has_occurred = 0;
+  float euler_angs[3]; //phi, theta, psi. Christopher Lum/MATLAB conventions
+  float translational_states[6]; 
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -147,9 +157,15 @@ Ground calibration is now complete. Send Xbee signal to ground station that cali
   while (1)
   {
     /* USER CODE END WHILE */
-    //Collect sensor data. Run EKF. Run in-flight attitude estimation. Collect a state vector. Send this state vector to the controls MCU.
-    translational_states = run_ekf(ekf, com_to_imu, wx, wy, wz, wx_dot, wy_dot, wz_dot, GPS_readings, IMU_readings);
+    //Collect sensor data.Run in-flight attitude estimation. Collect a state vector. Send this state vector to the controls MCU.
+    center_of_mass_to_imu_vector = com_to_imu(seconds_since_launch, launch_has_occurred);
+    translational_states = run_ekf(ekf, center_of_mass_to_imu_vector, wx, wy, wz, wx_dot, wy_dot, wz_dot, GPS_readings, IMU_readings);
       //run_ekf returns ekf->x_n, which is a six-element array: x_pos, y_pos, z_pos, x_vel, y_vel, z_vel
+    euler_angs = run_attitude_estimation(rocket_atd, wx, wy, wz);
+      //run_attitude_estimation returns a three-element array with Euler angles phi, theta, and psi.
+
+    //Form a state vector. Send to controls MCU.
+    //Seek launch detection. (for corilois effects calculation, need distance from center of mass to IMU). IF launch detected, set launch_has_occurred to 1.
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */

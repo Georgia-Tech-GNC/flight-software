@@ -116,9 +116,12 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
 //SETUP
+
+
 /*
 Wait for Xbee signal to start the sensor calibration
 
+//Initialize sensors
 //Alternative to the below, we can write an EKF to do the sensor calibration.
 
 1. Determine sensor turn-on bias.
@@ -148,8 +151,14 @@ Ground calibration is now complete. Send Xbee signal to ground station that cali
   float center_of_mass_to_imu_vector[3];
   float seconds_since_launch = 0.0;
   int launch_has_occurred = 0;
+  float millis_at_launch;
+  float millis_since_launch;
+  float current_millis;
+
   float euler_angs[3]; //phi, theta, psi. Christopher Lum/MATLAB conventions
   float translational_states[6]; 
+
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -157,7 +166,9 @@ Ground calibration is now complete. Send Xbee signal to ground station that cali
   while (1)
   {
     /* USER CODE END WHILE */
-    //Collect sensor data.Run in-flight attitude estimation. Collect a state vector. Send this state vector to the controls MCU.
+    
+    //Read sensors (GPS, IMU, Barometer)
+
     center_of_mass_to_imu_vector = com_to_imu(seconds_since_launch, launch_has_occurred);
     translational_states = run_ekf(ekf, center_of_mass_to_imu_vector, wx, wy, wz, wx_dot, wy_dot, wz_dot, GPS_readings, IMU_readings);
       //run_ekf returns ekf->x_n, which is a six-element array: x_pos, y_pos, z_pos, x_vel, y_vel, z_vel
@@ -165,7 +176,18 @@ Ground calibration is now complete. Send Xbee signal to ground station that cali
       //run_attitude_estimation returns a three-element array with Euler angles phi, theta, and psi.
 
     //Form a state vector. Send to controls MCU.
-    //Seek launch detection. (for corilois effects calculation, need distance from center of mass to IMU). IF launch detected, set launch_has_occurred to 1.
+    //Launch detection
+    if (launch_has_occurred == 0 && translational_states[4] >= 1.5 && translational_states[5] >= 0.2){
+      //TODO: Make sure the above line is utilizing the correct states (is it z? x? y?)
+      launch_has_occurred = 1; //Say that launch has occurred, which now allows
+      millis_at_launch = currentTimeMillis();
+    }
+    //Update time since launch
+    if (launch_has_occurred == 1){
+      current_millis = currentTimeMillis();
+      millis_since_launch = (float)(current_millis - millis_at_launch);
+      seconds_since_launch = millis_since_launch/1000.0;
+    }
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */

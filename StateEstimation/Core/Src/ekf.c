@@ -95,7 +95,7 @@ void update_time_step(ekf *ekf){
 
     int64_t curr_time_millis = currentTimeMillis();
     float dt_millis = (float)(curr_time_millis - ekf->prev_time_millis);
-    ekf->time_step = dt_millis / 1000;
+    ekf->time_step = dt_millis / 1000.0;
     ekf->prev_time_millis = curr_time_millis;
 
 }

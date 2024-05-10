@@ -21,6 +21,8 @@
 #include "ekf.h"
 #include "attitude.h"
 #include "state_est_helpers.h"
+#include <stdio.h>
+#include <string.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -117,34 +119,26 @@ int main(void)
 
 //SETUP
 
+//Wait for signal to start sensor calibration.
+  char signal_received[] = "NO";
+  while (1){
 
-/*
-Wait for Xbee signal to start the sensor calibration
+    signal_received = ;//TODO: HAL and receiving through UART
 
-//Initialize sensors
-//Alternative to the below, we can write an EKF to do the sensor calibration.
+    if (signal_received == "GO"){
+      break;
+    }
+  }
 
-1. Determine sensor turn-on bias.
-    a. Initialize arrays of 1000 elements
-    b. Run a while loop - condition is while arrays are not yet filled
-        c. Fill arrays with latest sensor measurements
-    d. Once while loop terminates, take average of each array. This is the turn-on bias.
-    e. Add the turn-on bias for each sensor measurement to each sensor measurement's struct.
-    f. Log the global time at which the turn-on bias was determined.
-2. Determine sensor run-on bias.
-    a. Initialize arrays to store values of average slope of sensor measurement error with respect to time.
-    b. while loop for one minute (condition is that current time is one minute beyond time of turn-on bias determination)
-    c. Read each sensor.
-    d. Determine instantaneous slope of sensor measurements with respect to time.
-    e. Store slope value from (c) in the circular buffer for each sensor measurement.
-    f. At intervals in the while loop, append the current average circular buffer slope to the arrays declared in (a).
-    g. Once while loop has terminated, take average value of arrays from (a) and take this as de/dt for each sensor measurement.
-    h. Store the de/dt of each sensor measurement in the struct for that sensor.
-3. Determine initial attitude.
-    a. Accelerometer gives roll and pitch, magnetometer gives yaw. Convert this to initial quaternion.
-    b. Store initial attitude quaternion in attitude struct.
-Ground calibration is now complete. Send Xbee signal to ground station that calibration is complete and rocket is ready to be launched.
-*/
+  //TODO: Initialize sensors
+  //TODO: Write an EKF to do the sensor calibration.
+
+  //Ground calibration is now complete. Send Xbee signal to ground station that calibration is complete and rocket is ready to be launched.
+  char message_for_launch_readiness[] = "GOFORLAUNCH";
+  //TODO: Line of code that transmits through HAL UART to controls MCU that vehicle is launch ready.
+
+  ekf *ekf;
+  rocket_attitude *rocket_atd;
   initialize_ekf(ekf); //Initialize the in-flight EKF
   initialize_rocket_attitude(rocket_atd, 0.7071, 0.0, 0.7071, 0.0); //Initialize attitude estimation
 
@@ -157,8 +151,6 @@ Ground calibration is now complete. Send Xbee signal to ground station that cali
 
   float euler_angs[3]; //phi, theta, psi. Christopher Lum/MATLAB conventions
   float translational_states[6]; 
-
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -167,7 +159,7 @@ Ground calibration is now complete. Send Xbee signal to ground station that cali
   {
     /* USER CODE END WHILE */
     
-    //Read sensors (GPS, IMU, Barometer)
+    //TODO: Read sensors (GPS, IMU, Barometer)
 
     center_of_mass_to_imu_vector = com_to_imu(seconds_since_launch, launch_has_occurred);
     translational_states = run_ekf(ekf, center_of_mass_to_imu_vector, wx, wy, wz, wx_dot, wy_dot, wz_dot, GPS_readings, IMU_readings);
@@ -175,11 +167,15 @@ Ground calibration is now complete. Send Xbee signal to ground station that cali
     euler_angs = run_attitude_estimation(rocket_atd, wx, wy, wz);
       //run_attitude_estimation returns a three-element array with Euler angles phi, theta, and psi.
 
-    //Form a state vector. Send to controls MCU.
+
+    //TODO: Form a state vector. Send to controls MCU via HAL UART.
+    //TODO: Transmit to the controls MCU via HAL UART the stage of flight from the state machine.
+
+    //TODO: Write full state machine
     //Launch detection
     if (launch_has_occurred == 0 && translational_states[4] >= 1.5 && translational_states[5] >= 0.2){
       //TODO: Make sure the above line is utilizing the correct states (is it z? x? y?)
-      launch_has_occurred = 1; //Say that launch has occurred, which now allows
+      launch_has_occurred = 1; //Say that launch has occurred, which now allows seconds_since_launch to be updated
       millis_at_launch = currentTimeMillis();
     }
     //Update time since launch

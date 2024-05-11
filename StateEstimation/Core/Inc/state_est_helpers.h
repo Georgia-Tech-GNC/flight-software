@@ -1,6 +1,6 @@
 /**
  * @file state_est_helpers.h
- * @author Patrick Barry, 
+ * @author Patrick Barry 
  * @brief This contains the function definitions for helper functions for the state estimation MCU
  * 
  * Copyright 2024 Georgia Tech. All rights reserved.
@@ -21,6 +21,13 @@ const float com_to_imu_z = 0.005; //z-distance from center of mass to IMU in met
 float *com_to_imu(float seconds_since_launch, int launch_has_occurred);
     //launch_has_occurred = 1 if launch has occurred, =0 if launch has not occurred.
 
+float *multiply_matrices(float *matA, float *matB);
+float *transpose_matrix(float *matA);
+float *inverse_matrix(float *matA);
+float *add_matrices(float *matA, float *matB);
+float *subtract_matrices(float *matA, float *matB);
+
+
+
 
 #endif
-

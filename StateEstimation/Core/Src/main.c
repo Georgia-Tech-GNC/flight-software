@@ -137,9 +137,9 @@ int main(void)
   char message_for_launch_readiness[] = "GOFORLAUNCH";
   //TODO: Line of code that transmits through HAL UART to controls MCU that vehicle is launch ready.
 
-  ekf *ekf;
+  ekf *fekf;
   rocket_attitude *rocket_atd;
-  initialize_ekf(ekf); //Initialize the in-flight EKF
+  initialize_ekf(fekf); //Initialize the in-flight EKF
   initialize_rocket_attitude(rocket_atd, 0.7071, 0.0, 0.7071, 0.0); //Initialize attitude estimation
 
   float center_of_mass_to_imu_vector[3];
@@ -162,7 +162,7 @@ int main(void)
     //TODO: Read sensors (GPS, IMU, Barometer)
 
     center_of_mass_to_imu_vector = com_to_imu(seconds_since_launch, launch_has_occurred);
-    translational_states = run_ekf(ekf, center_of_mass_to_imu_vector, wx, wy, wz, wx_dot, wy_dot, wz_dot, GPS_readings, IMU_readings);
+    translational_states = run_ekf(fekf, center_of_mass_to_imu_vector, wx, wy, wz, wx_dot, wy_dot, wz_dot, GPS_readings, IMU_readings);
       //run_ekf returns ekf->x_n, which is a six-element array: x_pos, y_pos, z_pos, x_vel, y_vel, z_vel
     euler_angs = run_attitude_estimation(rocket_atd, wx, wy, wz);
       //run_attitude_estimation returns a three-element array with Euler angles phi, theta, and psi.

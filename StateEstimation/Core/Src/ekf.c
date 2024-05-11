@@ -13,6 +13,7 @@
 #include <lapacke.h>
 #include <sys/time.h>
 #include "ekf.h"
+#include "state_est_helpers.h"
 
 void initialize_ekf(ekf *ekf){
 

@@ -1,87 +1,70 @@
 /**
- * @file attitude.c
- * @author Patrick Barry, Ishan Swali
+ * @file ekf.c
+ * @author Patrick Barry
  * @brief Source file for in-flight EKF for position, velocity
  * 
  * Copyright 2024 Georgia Tech. All rights reserved.
  * Copyrighted materials may not be further disseminated.
  * This file must not be made publicly available anywhere.
 */
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <lapacke.h>
-#include <sys/time.h>
+
 #include "ekf.h"
-#include "state_est_helpers.h"
 
-void initialize_ekf(ekf *ekf){
+//See https://github.com/ramblinrocketclub/flight-computer/blob/master/Core/Src/rocket.c for initializing process
+arm_status initialize_ekf(ExtKalmanFilter *ekf, uint16_t num_states, uint16_t num_inputs, uint16_t num_measurements, 
+float32_t *dfdx_f32, float32_t *dhdx_f32, float32_t *G_f32, float32_t *Q_f32, float32_t *K_f32, float32_t *R_f32,
+float32_t *x_p, float32_t *P_p, float32_t *x_init, float32_t *P_init, float32_t *x_f, float32_t *P_f,
+float32_t *f_f32, float32_t *h_f32, float32_t *z_f32, float32_t *state_stddevs){
 
-    ekf->time_step = 0.02; //TODO: implement variable time step
-    ekf->x_n = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    ekf->u = 0;
-    ekf->G = 0;
-    ekf->z = {0.0, 0.0, 0.0};
+    arm_status result = ARM_MATH_SUCCESS;
 
-    ekf->x_prev = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    ekf->P_prev = {{0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-                    {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-                    {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-                    {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-                    {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-                    {0.0, 0.0, 0.0, 0.0, 0.0, 0.0}};
+    float32_t wnT_f32[num_states];
 
-    ekf->n_next = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    ekf->P_next = {{0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-                    {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-                    {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-                    {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-                    {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-                    {0.0, 0.0, 0.0, 0.0, 0.0, 0.0}};
+    ekf->nx = num_states;
+    ekf->nu = num_inputs;
+    ekf->nz = num_measurements;
 
-    ekf->K_n = {{0.0, 0.0, 0.0},
-                {0.0, 0.0, 0.0},
-                {0.0, 0.0, 0.0},
-                {0.0, 0.0, 0.0},
-                {0.0, 0.0, 0.0},
-                {0.0, 0.0, 0.0}};
+    arm_mat_init_f32(&ekf->dfdx, ekf->nx, ekf->nx, dfdx_f32);
+    arm_mat_init_f32(&ekf->G, ekf->nu, ekf->nu, G_f32);
+    arm_mat_init_f32(&ekf->Q, ekf->nx, ekf->nx, Q_f32);
+    arm_mat_init_f32(&ekf->R, ekf->nz, ekf->nz, R_f32);
+    arm_mat_init_f32(&ekf->dhdx, ekf->nz, ekf->nx, dhdx_f32);
+    arm_mat_init_f32(&ekf->K_n, ekf->nx, ekf->nz, K_f32);
 
-    ekf->f = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    ekf->dfdx = {{0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-                {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-                {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-                {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-                {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-                {0.0, 0.0, 0.0, 0.0, 0.0, 0.0}};
+    arm_mat_init_f32(&ekf->x_prev, ekf->nx, 1, x_p);
+    arm_mat_init_f32(&ekf->x_n, ekf->nx, 1, x_init);
+    arm_mat_init_f32(&ekf->x_next, ekf->nx, 1, x_f);
 
-    ekf->h = {0.0, 0.0, 0.0};
-    ekf->dhdx = {{0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-                {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-                {0.0, 0.0, 0.0, 0.0, 0.0, 0.0}};
+    arm_mat_init_f32(&ekf->P_prev, ekf->nx, ekf->nx, P_p);
+    arm_mat_init_f32(&ekf->P_n, ekf->nx, ekf->nx, P_init);
+    arm_mat_init_f32(&ekf->P_next, ekf->nx, ekf->nx, P_f);
 
-    ekf->P_n = {{1.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-                {0.0, 1.0, 0.0, 0.0, 0.0, 0.0},
-                {0.0, 0.0, 1.0, 0.0, 0.0, 0.0},
-                {0.0, 0.0, 0.0, 1.0, 0.0, 0.0},
-                {0.0, 0.0, 0.0, 0.0, 1.0, 0.0},
-                {0.0, 0.0, 0.0, 0.0, 0.0, 1.0}};
+    arm_mat_init_f32(&ekf->f, ekf->nx, 1, f_f32);
+    arm_mat_init_f32(&ekf->h, ekf->nz, 1, h_f32);
+    arm_mat_init_f32(&ekf->z, ekf->nz, 1, z_f32);
 
-    ekf->Q = {{0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-                {0.0, 2.0, 0.0, 0.0, 0.0, 0.0},
-                {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-                {0.0, 0.0, 0.0, 2.0, 0.0, 0.0},
-                {0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-                {0.0, 0.0, 0.0, 0.0, 0.0, 2.0}}; 
+    arm_matrix_instance_f32 wn;
+    arm_matrix_instance_f32 wnT;
 
-    ekf->R = {{1.0, 0.0, 0.0},
-            {0.0, 1.0, 0.0},
-            {0.0, 0.0, 1.0}}; //Dagonal should be GPS stdev squared
+    arm_mat_init_f32(&wn, ekf->nx, 1, state_stddevs);
+    arm_mat_init_f32(&wnT, 1, ekf->nx, wnT_f32);
 
-    ekf->gps = {0.0, 0.0, 0.0};
-    ekf->accelerometer = {0.0, 0.0, 0.0};
+    result |= arm_mat_trans_f32(&wn, &wnT);
+    result |= arm_mat_mult_f32(&wn, &wnT, &ekf->Q); //Compute process noise matrix
+
+    ekf->gps[0] = 0.0;
+    ekf->gps[1] = 0.0;
+    ekf->gps[2] = 0.0;
+
+    ekf->accelerometer[0] = 0.0;
+    ekf->accelerometer[1] = 0.0;
+    ekf->accelerometer[2] = 0.0;
+
     ekf->barometer = 0.0;
 
-    ekf->prev_time_millis = currentTimeMillis();
+    ekf->time_step = 0.02; //initial time step
+
+    return result;
 }
 
 int64_t currentTimeMillis(){
@@ -92,280 +75,366 @@ int64_t currentTimeMillis(){
     return s1 + s2;
 }
 
-void update_time_step(ekf *ekf){
+void update_time_step(ExtKalmanFilter *ekf){
 
     int64_t curr_time_millis = currentTimeMillis();
-    float dt_millis = (float)(curr_time_millis - ekf->prev_time_millis);
+    float32_t dt_millis = (float32_t)(curr_time_millis - ekf->prev_time_millis);
     ekf->time_step = dt_millis / 1000.0;
     ekf->prev_time_millis = curr_time_millis;
 
 }
 
-void observation_function(ekf *ekf){
-    float h1 = ekf->x_n[0]; //x position
-    float h2 = ekf->x_n[2]; //y position
-    float h3 = ekf->x_n[4]; //z position
+void observation_function(ExtKalmanFilter *ekf){
 
-    ekf->h[0] = h1;
-    ekf->h[1] = h2;
-    ekf->h[2] = h3; 
+    float h_new_data[ekf->nz];
+    
+    h_new_data[0] = ekf->x_n.pData[0];
+    h_new_data[1] = ekf->x_n.pData[2];
+    h_new_data[2] = ekf->x_n.pData[4];
+
+    arm_matrix_instance_f32 h_new = {ekf->nz, 1, h_new_data};
+    ekf->h = h_new;
 
 }
 
-void observation_jacobian(ekf *ekf){
+void observation_jacobian(ExtKalmanFilter *ekf){
+
+    float32_t dhdx_new[ekf->nz][ekf->nx];
+    memset(dhdx_new, 0.0, sizeof dhdx_new);
+
     //x position, velocity
-    ekf->dfdx[0][0] = 1.0;
-    ekf->dfdx[0][1] = ekf->time_step;
-    ekf->dfdx[1][0] = 0.0;
-    ekf->dfdx[1][1] = 1.0;
+    dhdx_new[0][0] = 1.0;
+    dhdx_new[1][2] = 1.0;
+    dhdx_new[2][4] = 1.0;
+
+    arm_mat_init_f32(&ekf->dhdx, ekf->nx, ekf->nx, dhdx_new);
+
+}
+
+void kalman_gain(ExtKalmanFilter *ekf){
+
+    //K = PHt(HPHt + R)i
+
+    //1. Find HP
+    //2. Find Ht
+    //3. Find HPHt
+    //4. Find HPHt + R
+    //5. Find (HPHt + R)^-1
+    //6. Find PHt
+    //7. Find K = step6*step5;
+
+    arm_status result = ARM_MATH_SUCCESS;
+
+    float32_t HP_f32[ekf->nz * ekf->nx];
+    float32_t Ht_f32[ekf->nx * ekf->nz];
+    float32_t HPHt_f32[ekf->nz * ekf->nz];
+    
+    arm_matrix_instance_f32 R_mat = ekf->R;
+    float32_t HPHtR_f32[ekf->nz * ekf->nz];
+    float32_t HPHtRi_f32[ekf->nz * ekf->nz];
+
+    float32_t PHt_f32[ekf->nx * ekf->nz];
+    float32_t K_f32[ekf->nx * ekf->nz];
+
+    arm_matrix_instance_f32 HP;
+    arm_matrix_instance_f32 Ht;
+    arm_matrix_instance_f32 HPHt;
+    arm_matrix_instance_f32 HPHtR;
+    arm_matrix_instance_f32 HPHtRi;
+    arm_matrix_instance_f32 PHt;
+    arm_matrix_instance_f32 K_new;
+
+    arm_mat_init_f32(&HP, ekf->nz, ekf->nx, HP_f32);
+    arm_mat_init_f32(&Ht, ekf->nx, ekf->nz, Ht_f32);
+    arm_mat_init_f32(&HPHt, ekf->nz, ekf->nz, HPHt_f32);
+    arm_mat_init_f32(&HPHtR, ekf->nz, ekf->nz, HPHtR_f32);
+    arm_mat_init_f32(&HPHtRi, ekf->nz, ekf->nz, HPHtRi_f32);
+    arm_mat_init_f32(&PHt, ekf->nx, ekf->nz, PHt_f32);
+    arm_mat_init_f32(&K_new, ekf->nx, ekf->nz, K_f32);
+
+    arm_matrix_instance_f32 H = ekf->dhdx;
+    arm_matrix_instance_f32 P = ekf->P_prev;
+    
+    //Compute HP
+    result |= arm_mat_mult_f32(&H, &P, &HP);
+
+    //Compute Ht
+    result |= arm_mat_trans_f32(&H, &Ht);
+
+    //Compute HPHt
+    result |= arm_mat_mult_f32(&HP, &Ht, &HPHt);
+
+    //Compute HPHt + R
+    result |= arm_mat_add_f32(&HPHt, &R_mat, &HPHtR);
+
+    //Compute (HPHt + R)^-1
+    result |= arm_mat_inverse_f32(&HPHtR, &HPHtRi);
+
+    //Compute PHt
+    result |= arm_mat_mult_f32(&P, &Ht, &PHt);
+
+    //Compute K
+    result |= arm_mat_mult_f32(&PHt, &HPHtRi, &K_new);
+
+    //Set K to new value in the ekf struct
+    ekf->K_n = K_new;
+
+}
+void update_state(ExtKalmanFilter *ekf){
+
+    //x_n = x_prev + K*(z-h)
+
+    arm_status result = ARM_MATH_SUCCESS;
+    float32_t zh_f32[ekf->nz];
+    float32_t Kzh_f32[ekf->nx];
+    float32_t x_updated_f32[ekf->nx];
+
+    arm_matrix_instance_f32 zh;
+    arm_matrix_instance_f32 Kzh;
+    arm_matrix_instance_f32 x_updated;
+
+    arm_mat_init_f32(&zh, ekf->nz, 1, zh_f32);
+    arm_mat_init_f32(&Kzh, ekf->nx, 1, Kzh_f32);
+    arm_mat_init_f32(&x_updated, ekf->nx, 1, x_updated_f32);
+
+    arm_matrix_instance_f32 z_vec = ekf->z;
+    arm_matrix_instance_f32 h_vec = ekf->h;
+    arm_matrix_instance_f32 x_vec = ekf->x_prev;
+    arm_matrix_instance_f32 K = ekf->K_n;
+
+    //Compute (z-h)
+    result |= arm_mat_sub_f32(&z_vec, &h_vec, &zh);
+    
+    //Compute K(z-h)
+    result |= arm_mat_mult_f32(&K, &zh, &Kzh);
+
+    //Compute x_n = x_prev + K*(z-h)
+    result |= arm_mat_add_f32(&x_vec, &Kzh, &x_updated);
+
+    //Update x_n in ekf struct
+    ekf->x_n = x_updated;
+}
+
+void update_covariance(ExtKalmanFilter *ekf){
+
+    //P_n = (I - KH)P_prev(I - KH)t + KRKt
+
+    //1. Find I - KH
+    //2. Find (I - KH)t
+    //3. Find (I - KH)P_prev(I - KH)t
+    //4. Find KRKt
+    //5. Find Pn
+
+    arm_status result = ARM_MATH_SUCCESS;
+
+    float32_t I_f32[ekf->nx * ekf->nx];
+    for (uint16_t y = 0; y < ekf->nx; y++){ //Construct identity matrix
+        for (uint16_t x = 0; x < ekf->nx; x++){
+            if (x == y){
+                I_f32[x + y*ekf->nx] = 1.0;
+            }
+            else{
+                I_f32[x + y*ekf->nx] = 0.0;
+            }
+        }
+    }
+    arm_matrix_instance_f32 I;
+    arm_mat_init_f32(&I, ekf->nx, ekf->nx, I_f32);
+
+    arm_matrix_instance_f32 K = ekf->K_n;
+    arm_matrix_instance_f32 H = ekf->dhdx;
+    arm_matrix_instance_f32 P_ = ekf->P_prev;
+    arm_matrix_instance_f32 R = ekf->R;
+
+    float32_t KH_f32[ekf->nx * ekf->nx];
+    float32_t IKH_f32[ekf->nx * ekf->nx];
+    float32_t IKHt_f32[ekf->nx * ekf->nx];
+    float32_t IKHP_f32[ekf->nx * ekf->nx];
+    float32_t IKHPIKHt_f32[ekf->nx * ekf->nx];
+    float32_t KR_f32[ekf->nx * ekf->nz];
+    float32_t KRKt_f32[ekf->nx * ekf->nx];
+    float32_t P_result_f32[ekf->nx * ekf->nx];
+    float32_t Kt_f32[ekf->nz * ekf->nx];
+
+    arm_matrix_instance_f32 KH;
+    arm_matrix_instance_f32 IKH;
+    arm_matrix_instance_f32 IKHt;
+    arm_matrix_instance_f32 IKHP;
+    arm_matrix_instance_f32 IKHPIKHt;
+    arm_matrix_instance_f32 KR;
+    arm_matrix_instance_f32 KRKt;
+    arm_matrix_instance_f32 P_result;
+    arm_matrix_instance_f32 Kt;
+
+    arm_mat_init(&KH, ekf->nx, ekf->nx, KH_f32);
+    arm_mat_init(&IKH, ekf->nx, ekf->nx, IKH_f32);
+    arm_mat_init(&IKHt, ekf->nx, ekf->nx, IKHt_f32);
+    arm_mat_init(&IKHP, ekf->nx, ekf->nx, IKHP_f32);
+    arm_mat_init(&IKHPIKHt, ekf->nx, ekf->nx, IKHPIKHt_f32);
+    arm_mat_init(&KR, ekf->nx, ekf->nz, KR_f32);
+    arm_mat_init(&KRKt, ekf->nx, ekf->nx, KRKt_f32);
+    arm_mat_init(&P_result, ekf->nx, ekf->nx, P_result_f32);
+    arm_mat_init(&Kt, ekf->nz, ekf->nx, Kt_f32);
+
+    //Compute KH
+    result |= arm_mat_mult_f32(&K, &H, &KH);
+
+    //Compute (I - KH)
+    result |= arm_mat_sub_f32(&I, &KH, &IKH);
+
+    //Compute (I - KH)P_
+    result |= arm_mat_mult_f32(&IKH, &P_, &IKHP);
+
+    //Compute (I - KH)t
+    result |= arm_mat_trans_f32(&IKH, &IKHt);
+
+    //Compute (I - KH)P_(I - KH)t
+    result |= arm_mat_mult_f32(&IKHP, &IKHt, &IKHPIKHt);
+
+    //Compute KR
+    result |= arm_mat_mult_f32(&K, &R, &KR);
+
+    //Compute Kt
+    result |= arm_mat_trans_f32(&K, &Kt);
+
+    //Compute KRKt
+    result |= arm_mat_mult_f32(&KR, &Kt, &KRKt);
+
+    //Compute P_n
+    result |= arm_mat_add_f32(&IKHPIKHt, &KRKt, &P_result);
+
+    //Update P_n in ekf struct
+    ekf->P_n = P_result;
+}
+
+void state_transition_function(ExtKalmanFilter *ekf){
+
+    float f_new_data[ekf->nx];
+    f_new_data[0] = ekf->x_n.pData[0] + ekf->x_n.pData[1]*ekf->time_step + 0.5*(ekf->time_step * ekf->time_step)*ekf->accelerometer[0];
+    f_new_data[1] = ekf->x_n.pData[1] + ekf->accelerometer[0]*ekf->time_step;
+
+    f_new_data[2] = ekf->x_n.pData[2] + ekf->x_n.pData[3]*ekf->time_step + 0.5*(ekf->time_step * ekf->time_step)*ekf->accelerometer[1];
+    f_new_data[3] = ekf->x_n.pData[3] + ekf->accelerometer[1]*ekf->time_step;
+
+    f_new_data[4] = ekf->x_n.pData[4] + ekf->x_n.pData[5]*ekf->time_step + 0.5*(ekf->time_step * ekf->time_step)*ekf->accelerometer[2];
+    f_new_data[5] = ekf->x_n.pData[5] + ekf->accelerometer[2]*ekf->time_step;
+
+    arm_matrix_instance_f32 f_new = {ekf->nx, 1, f_new_data};
+    ekf->f = f_new;
+}
+
+void state_transition_jacobian(ExtKalmanFilter *ekf){
+
+    float32_t dfdx_new[ekf->nx][ekf->nx];
+    memset(dfdx_new, 0.0, sizeof dfdx_new);
+
+    //x position, velocity
+    dfdx_new[0][0] = 1.0;
+    dfdx_new[0][1] = ekf->time_step;
+    dfdx_new[1][0] = 0.0;
+    dfdx_new[1][1] = 1.0;
 
     //y position, velocity
-    ekf->dfdx[2][2] = 1.0;
-    ekf->dfdx[2][3] = ekf->time_step;
-    ekf->dfdx[3][2] = 0.0;
-    ekf->dfdx[3][3] = 1.0;
+    dfdx_new[2][2] = 1.0;
+    dfdx_new[2][3] = ekf->time_step;
+    dfdx_new[3][2] = 0.0;
+    dfdx_new[3][3] = 1.0;
 
     //z position, velocity
-    ekf->dfdx[4][4] = 1.0;
-    ekf->dfdx[4][5] = ekf->time_step;
-    ekf->dfdx[5][4] = 0.0;
-    ekf->dfdx[5][5] = 1.0;
+    dfdx_new[4][4] = 1.0;
+    dfdx_new[4][5] = ekf->time_step;
+    dfdx_new[5][4] = 0.0;
+    dfdx_new[5][5] = 1.0;
+
+    arm_matrix_instance_f32 F;
+    arm_mat_init_f32(&F, ekf->nx, ekf->nx, dfdx_new);
+
+    ekf->dfdx = F;
+
 }
 
-void kalman_gain(ekf *ekf){
-    double *temp1 = malloc(nx * nz * sizeof(float));
-    double *temp2 = malloc(nx * nz * sizeof(float));
-    double *temp3 = malloc(nx * nz * sizeof(float));
+void predict_state(ExtKalmanFilter *ekf){
 
-    for (int i = 0; i < nx; i++){
-        for (int j = 0; j < nz; j++){
-            temp1[j*nx + i] = ekf->dhdx[i*nz + j];
-        }
-    }
+    ekf->x_next = ekf->f;
+    //This is technically f + Gu, but we are letting u = [0], so this is just to say x_next = f;
 
-    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, nz, nx, nx, 1.0, ekf->dhdx, nx, ekf->P_prev, nx, 0.0, temp2, nx);
-
-    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasTrans, nz, nz, nx, 1.0, temp2, nx, temp1, nx, 0.0, temp3, nz);
-
-    for (int i = 0; i < nz; i++) {
-        for (int j = 0; j < nz; j++) {
-            temp3[i * nz + j] += ekf->R[i * nz + j];
-        }
-    }
-
-    int ipiv[nz];
-    int info = LAPACKE_dgetrf(LAPACK_ROW_MAJOR, nz, nz, temp3, nz, ipiv);
-    if (info == 0) {
-        info = LAPACKE_dgetri(LAPACK_ROW_MAJOR, nz, temp3, nz, ipiv);
-        if (info == 0) {
-            cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasTrans, nx, nz, nz, 1.0, ekf->P_prev, nx, temp1, nx, 0.0, temp2, nz);
-            cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, nx, nz, nz, 1.0, temp2, nz, temp3, nz, 0.0, K_n, nz);
-        } else {
-            printf("Error: LAPACKE_dgetri failed\n");
-        }
-    } else {
-        printf("Error: LAPACKE_dgetrf failed\n");
-    }
-
-    free(temp1);
-    free(temp2);
-    free(temp3);
 }
 
-void update_state(ekf *ekf){
+void predict_covariance(ExtKalmanFilter *ekf){
 
-    for (int i = 0; i < nx; i++){
-        ekf->x_n[i] = ekf->x_n[i] + ekf->K_n[i]*(ekf->z[i] - ekf->h[i]);
-    }
+    //P_next = FPFt + Q
+
+    arm_status result = ARM_MATH_SUCCESS;
+
+    arm_matrix_instance_f32 P = ekf->P_n;
+    arm_matrix_instance_f32 F = ekf->dfdx;
+    arm_matrix_instance_f32 Q_mat = ekf->Q;
+
+    float32_t Ft_f32[ekf->nx * ekf->nx];
+    arm_matrix_instance_f32 Ft;
+    arm_mat_init_f32(&Ft, ekf->nx, ekf->nx, Ft_f32);
+
+    float32_t FP_f32[ekf->nx * ekf->nx];
+    arm_matrix_instance_f32 FP;
+    arm_mat_init_f32(&FP, ekf->nx, ekf->nx, FP_f32);
+
+    float32_t FPFt_f32[ekf->nx * ekf->nx];
+    arm_matrix_instance_f32 FPFt;
+    arm_mat_init_f32(&FPFt, ekf->nx, ekf->nx, FPFt_f32);
+
+    float32_t P_future_f32[ekf->nx * ekf->nx];
+    arm_matrix_instance_f32 P_future;
+    arm_mat_init_f32(&P_future, ekf->nx, ekf->nx, P_future_f32);
+
+    //Compute FP
+    result |= arm_mat_mult_f32(&F, &P, &FP);
+
+    //Compute Ft
+    result = arm_mat_trans_f32(&F, &Ft);
+
+    //Compute FPFt
+    result |= arm_mat_mult_f32(&FP, &Ft, &FPFt);
+
+    //Compute P_next = FPFt + Q
+    result |= arm_mat_add_f32(&FPFt, &Q_mat, &P_future);
+
+    //Update the value of P_next in the ekf struct
+    ekf->P_next = P_future;
 }
 
-void update_covariance(ekf *ekf){
-    // Temporary variables for matrix operations
-    double *P_n_temp = (double *)malloc(ekf->nx * ekf->nx * sizeof(double));
-    double *temp1 = (double *)malloc(ekf->nx * ekf->nx * sizeof(double));
-    double *temp2 = (double *)malloc(ekf->nx * ekf->nx * sizeof(double));
-    
-    // Compute (eye(ekf.nx) - ekf.K_n * ekf.dhdx)
-    for (int i = 0; i < ekf->nx; i++) {
-        for (int j = 0; j < ekf->nx; j++) {
-            temp1[i * ekf->nx + j] = (i == j) ? 1.0 : 0.0;
-            for (int k = 0; k < ekf->nx; k++) {
-                temp1[i * ekf->nx + j] -= ekf->K_n[i * ekf->nx + k] * ekf->dhdx[k * ekf->nx + j];
-            }
-        }
-    }
-    
-    // Compute (eye(ekf.nx) - ekf.K_n * ekf.dhdx)' and store it in temp2
-    for (int i = 0; i < ekf->nx; i++) {
-        for (int j = 0; j < ekf->nx; j++) {
-            temp2[i * ekf->nx + j] = temp1[j * ekf->nx + i];
-        }
-    }
-    
-    // Compute P_n_temp = (eye(ekf.nx) - ekf.K_n * ekf.dhdx) * ekf.P_prev
-    for (int i = 0; i < ekf->nx; i++) {
-        for (int j = 0; j < ekf->nx; j++) {
-            P_n_temp[i * ekf->nx + j] = 0.0;
-            for (int k = 0; k < ekf->nx; k++) {
-                P_n_temp[i * ekf->nx + j] += temp1[i * ekf->nx + k] * ekf->P_prev[k * ekf->nx + j];
-            }
-        }
-    }
-    
-    // Compute P_n_temp = (eye(ekf.nx) - ekf.K_n * ekf.dhdx) * ekf.P_prev * (eye(ekf.nx) - ekf.K_n * ekf.dhdx)'
-    for (int i = 0; i < ekf->nx; i++) {
-        for (int j = 0; j < ekf->nx; j++) {
-            ekf->P_n[i * ekf->nx + j] = 0.0;
-            for (int k = 0; k < ekf->nx; k++) {
-                ekf->P_n[i * ekf->nx + j] += P_n_temp[i * ekf->nx + k] * temp2[k * ekf->nx + j];
-            }
-        }
-    }
+void make_measurement(ExtKalmanFilter *ekf){
 
-    // Add ekf.K_n * ekf.R * ekf.K_n' to P_n
-    for (int i = 0; i < ekf->nx; i++) {
-        for (int j = 0; j < ekf->nx; j++) {
-            temp1[i * ekf->nx + j] = 0.0;
-            for (int k = 0; k < ekf->nx; k++) {
-                temp1[i * ekf->nx + j] += ekf->K_n[i * ekf->nx + k] * ekf->R[k * ekf->nx + j];
-            }
-        }
-    }
-    
-    for (int i = 0; i < ekf->nx; i++) {
-        for (int j = 0; j < ekf->nx; j++) {
-            ekf->P_n[i * ekf->nx + j] += temp1[i * ekf->nx + j];
-        }
-    }
-    
-    free(P_n_temp);
-    free(temp1);
-    free(temp2);
+    float32_t z_new_f32[ekf->nz];
+    z_new_f32[0] = ekf->gps[0];
+    z_new_f32[1] = ekf->gps[1];
+    z_new_f32[2] = ekf->gps[2];
+
+    arm_matrix_instance_f32 z_new;
+    arm_mat_init_f32(&z_new, ekf->nz, 1, z_new_f32);
+    ekf->z = z_new;
+
 }
 
-void state_transition_function(ekf *ekf){
-
-    //x
-    float f1 = ekf->x_n[0] + ekf->x_n[1]*ekf->time_step + 0.5*(ekf->time_step*ekf->time_step)*ekf->accelerometer[0];
-    float f2 = ekf->x_n[1] + ekf->accelerometer[0]*ekf->time_step;
-
-    //y
-    float f3 = ekf->x_n[2] + ekf->x_n[3]*ekf->time_step + 0.5*(ekf->time_step*ekf->time_step)*ekf->accelerometer[1];
-    float f4 = ekf->x_n[3] + ekf->accelerometer[1]*ekf->time_step;
-
-    //z
-    float f5 = ekf->x_n[4] + ekf->x_n[5]*ekf->time_step + 0.5*(ekf->time_step*ekf->time_step)*ekf->accelerometer[2];
-    float f6 = ekf->x_n[5] + ekf->accelerometer[2]*ekf->time_step;
-
-    ekf->f[0] = f1;
-    ekf->f[1] = f2;
-    ekf->f[2] = f3;
-    ekf->f[3] = f4;
-    ekf->f[4] = f5;
-    ekf->f[5] = f6;
-}
-
-void state_transition_jacobian(ekf *ekf){
-
-    ekf->dfdx[0][0] = 1.0;
-    ekf->dfdx[0][1] = ekf->time_step;
-    ekf->dfdx[1][0] = 0.0;
-    ekf->dfdx[1][1] = 1.0;
-
-    ekf->dfdx[2][2] = 1.0;
-    ekf->dfdx[2][3] = ekf->time_step;
-    ekf->dfdx[3][2] = 0.0;
-    ekf->dfdx[3][3] = 1.0;
-
-    ekf->dfdx[4][4] = 1.0;
-    ekf->dfdx[4][5] = ekf->time_step;
-    ekf->dfdx[5][4] = 0.0;
-    ekf->dfdx[5][5] = 1.0;
-}
-
-void predict_state(ekf *ekf){
-
-    for(int i = 0; i < nx; i++){
-        ekf.x_next[i] = ekf->f[i] + ekf->G*ekf->u;
-    }
-}
-
-void predict_covariance(ekf *ekf){
-
-    // Temporary variables for matrix operations
-    double *temp1 = (double *)malloc(ekf->nx * ekf->nx * sizeof(double));
-    double *temp2 = (double *)malloc(ekf->nx * ekf->nx * sizeof(double));
-    
-    // Compute ekf.dfdx * ekf.P_n
-    for (int i = 0; i < ekf->nx; i++) {
-        for (int j = 0; j < ekf->nx; j++) {
-            temp1[i * ekf->nx + j] = 0.0;
-            for (int k = 0; k < ekf->nx; k++) {
-                temp1[i * ekf->nx + j] += ekf->dfdx[i * ekf->nx + k] * ekf->P_n[k * ekf->nx + j];
-            }
-        }
-    }
-    
-    // Compute ekf.dfdx' and store it in temp2
-    for (int i = 0; i < ekf->nx; i++) {
-        for (int j = 0; j < ekf->nx; j++) {
-            temp2[i * ekf->nx + j] = ekf->dfdx[j * ekf->nx + i];
-        }
-    }
-    
-    // Compute P_next = ekf.dfdx * ekf.P_n * ekf.dfdx' + ekf.Q
-    for (int i = 0; i < ekf->nx; i++) {
-        for (int j = 0; j < ekf->nx; j++) {
-            ekf->P_next[i * ekf->nx + j] = 0.0;
-            for (int k = 0; k < ekf->nx; k++) {
-                ekf->P_next[i * ekf->nx + j] += temp1[i * ekf->nx + k] * temp2[k * ekf->nx + j];
-            }
-            ekf->P_next[i * ekf->nx + j] += ekf->Q[i * ekf->nx + j];
-        }
-    }
-
-    free(temp1);
-    free(temp2);
-}
-
-void correct_accelerometer_coriolis(ekf *ekf, float* com_to_imu, float wx, float wy, float wz, float wx_dot, float wy_dot, float wz_dot){
-    
-    https://physics.stackexchange.com/questions/222947/calculating-acceleration-offset-by-center-of-gravity-c-g
-
-    //com_to_imu[0] is x distance from center of mass to imu in meters
-    //com_to_imu[1] is y distance from center of mass to imu in meters
-    //com_to_imu[2] is z distance from center of mass to imu in meters
-
-    //Correct x-accel
-    ekf->accelerometer[0] = ekf->accelerometer[0] + (-(wy*wy) - (wz*wz))*com_to_imu[0] + (wx*wy - wz_dot*wz_dot)(com_to_imu[1]) + (wx*wz+wy_dot)*com_to_imu[2];
-
-    //Correct y-accel
-    ekf->accelerometer[1] = ekf->accelerometer[1] + (wx*wy+wz_dot)*com_to_imu[0] + (-(wx*wx) - (wz*wz))*com_to_imu[1] + (wy*wz - wx_dot)*com_to_imu[2];
-
-    //Correct z-accel
-    ekf->accelerometer[2] = ekf->accelerometer[2] + (wx*wz-wy_dot)*com_to_imu[0] + (wy*wz+wx_dot)*com_to_imu[1] + (-(wx*wx) - (wy*wy))*com_to_imu[2];
-}
-
-void acknowledge_time_passed(ekf *ekf){
+void acknowledge_time_passed(ExtKalmanFilter *ekf){
 
     ekf->x_prev = ekf->x_next;
     ekf->P_prev = ekf->P_next;
 
 }
-
-float *run_ekf(ekf *ekf, float *com_to_imu, float wx, float wy, float wz, float wx_dot, float wy_dot, float wz_dot, float *GPS_sensor, float *IMU_sensor){
-
-    //GPS_sensor: 3-element array with position relative to starting position
-    //IMU_sensor: 3-element array with x, y, and z accelerations
+float *run_ekf(ExtKalmanFilter *ekf, float *GPS_sensor, float *IMU_sensor){
 
     update_time_step(ekf);
 
-    ekf->gps = GPS_sensor;
-    ekf->accelerometer = IMU_sensor;
+    ekf->gps[0] = GPS_sensor[0];
+    ekf->gps[1] = GPS_sensor[1];
+    ekf->gps[2] = GPS_sensor[2];
+
+    ekf->accelerometer[0] = IMU_sensor[0];
+    ekf->accelerometer[1] = IMU_sensor[1];
+    ekf->accelerometer[2] = IMU_sensor[2];
 
     //Measurement function
-    ekf->z = ekf->gps;
-    correct_accelerometer_coriolis(ekf, com_to_imu, wx, wy, wz, wx_dot, wy_dot, wz_dot);
+    make_measurement(ekf);
 
     //Update
     observation_function(ekf);
@@ -381,6 +450,7 @@ float *run_ekf(ekf *ekf, float *com_to_imu, float wx, float wy, float wz, float 
     predict_covariance(ekf);
 
     acknowledge_time_passed(ekf);
-    return ekf->x_n;
-}
 
+    arm_matrix_instance_f32 curr_state = ekf->x_n;
+    return curr_state.pData;
+}

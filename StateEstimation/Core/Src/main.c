@@ -166,7 +166,7 @@ int main(void)
       //run_ekf returns ekf->x_n, which is a six-element array: x_pos, y_pos, z_pos, x_vel, y_vel, z_vel
     euler_angs = run_attitude_estimation(rocket_atd, wx, wy, wz);
       //run_attitude_estimation returns a three-element array with Euler angles phi, theta, and psi.
-
+    
 
     //TODO: Form a state vector. Send to controls MCU via HAL UART.
     //TODO: Transmit to the controls MCU via HAL UART the stage of flight from the state machine.

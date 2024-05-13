@@ -1,6 +1,6 @@
 /**
  * @file ekf.h
- * @author Patrick Barry, Ishan Swali
+ * @author Patrick Barry
  * @brief This contains the function definitions for the EKF that governs position/velocity
  * 
  * Copyright 2024 Georgia Tech. All rights reserved.
@@ -8,78 +8,70 @@
  * This file must not be made publicly available anywhere.
 */
 
-#ifndef __EKF_H__
-#define __EKF_H__
+#ifndef __EKF2_H__
+#define __EKF2_H__
 
-const int nx = 6;
-const int nz = 3;
-const int nu = 0;
-typedef struct {
+#include "arm_math.h"
+#include <sys/time.h>
 
-    float time_step;
-    //Core variables
-    float x_n[nx]; //Curent state x_n,n
-    float u; //Control input (nu by 1)
-    float G; //Control matrix G (nu by nu)
 
-    float z[nz]; //Measurement z_n (nz by 1)
+typedef struct ExtKalmanFilter {
+    uint16_t nx;
+    uint16_t nu;
+    uint16_t nz;
 
-    float x_prev[nx]; //Previously predicted state x_n,n-1 (nx by 1)
-    float P_prev[nx][nx]; //Previously predicted estimate covariance P_n,n-1 (nx by nx)
+    arm_matrix_instance_f32 x_n; //current state x_n,n (nx by 1)
+    arm_matrix_instance_f32 u; //control input (nu by 1)
 
-    float x_next[nx]; //Predicted future state x_n,n-1 (nx by 1)
-    float P_next[nx][nx]; //Predicted future estimate covariance P_n,n-1 (nx by nx)
+    arm_matrix_instance_f32 G; //control matrix G (nu by nu)
 
-    //Intermediate Variables
-    float K_n[nx][nz]; //Kalman gain Kn (nx by nz)
+    arm_matrix_instance_f32 z; //measurement z_n (nz by 1)
+    arm_matrix_instance_f32 f;
+    arm_matrix_instance_f32 h;
 
-    float f[nx]; //State transition function (nx by 1)
-    float dfdx[nx][nx]; //Linearized state transition function (nx by nx)
+    arm_matrix_instance_f32 x_prev; //previously predicted state x_n,n-1 (nx by 1)
+    arm_matrix_instance_f32 P_prev; //previously predicted estimate covariance P_n,n-1 (nx by nx)
 
-    float h[nz]; //Observation function (nz by 1)
-    float dhdx[nz][nx]; //Linearized observation function (nz by nx)
+    arm_matrix_instance_f32 x_next; //predicted future state x_n,n+1 (nx by 1)
+    arm_matrix_instance_f32 P_next; //predicted future estimate covariance P_n,n+1 (nx by nx)
 
-    float P_n[nx][nx]; //Current estimate covariance P_n,n (nx by nx)
+    arm_matrix_instance_f32 K_n; //Kalman gain K_n (nx by nz)
 
-    float Q[nx][nx]; //Process noise covariance Q (nx by nx)
+    arm_matrix_instance_f32 dfdx; //Linearized state transition function (nx by nx)
+    arm_matrix_instance_f32 dhdx; //Linearized observation function (nz by nx)
 
-    float R[nz][nz]; //Measurement covariance R (nz by nz)
+    arm_matrix_instance_f32 P_n; //estimate covariance P_n,n (nx by nx)
+    arm_matrix_instance_f32 Q; //process noise covariance Q (nx by nx)
 
-    float gps[nz]; //GPS reading relative to starting location (x, y, z)
-    float accelerometer[nz]; //Accelerometer readings (x, y, z)
-    float barometer; //Barometer altitude reading
+    arm_matrix_instance_f32 R; //measurement covariance R (nz by nz)
 
-    int64_t prev_time_millis;
-} ekf;
+    float32_t gps[3]; //GPS position reading relative to starting location (x, y, z)
+    float32_t accelerometer[3]; //Accelerometer readings (x, y, z)
+    float32_t barometer; //barometer altitude reading
 
-void initialize_ekf(ekf *ekf);
+    float32_t time_step; //time in seconds
+    int64_t prev_time_millis; //previous milliseconds
+
+} ExtKalmanFilter;
+
+arm_status initialize_ekf(ExtKalmanFilter *ekf, uint16_t num_states, uint16_t num_inputs, uint16_t num_measurements, 
+float32_t *dfdx_f32, float32_t *dhdx_f32, float32_t *G_f32, float32_t *Q_f32, float32_t *K_f32, float32_t *R_f32,
+float32_t *x_prev, float32_t *P_prev, float32_t *x_init, float32_t *P_init, float32_t *x_next, float32_t *P_next,
+float32_t *f_f32, float32_t *h_f32, float32_t *z_f32, float32_t *state_stddevs);
 
 int64_t currentTimeMillis();
-
-void update_time_step(ekf *ekf);
-
-void observation_function(ekf *ekf);
-
-void observation_jacobian(ekf *ekf);
-
-void kalman_gain(ekf *ekf);
-
-void update_state(ekf *ekf);
-
-void update_covariance(ekf *ekf);
-
-void state_transition_function(ekf *ekf);
-
-void state_transition_jacobian(ekf *ekf);
-
-void predict_state(ekf *ekf);
-
-void predict_covariance(ekf *ekf);
-
-void correct_accelerometer_coriolis(ekf *ekf, float *com_to_imu, float wx, float wy, float wz, float wx_dot, float wy_dot, float wz_dot);
-
-void acknowledge_time_passed(ekf *ekf);
-
-float *run_ekf(ekf *ekf, float *com_to_imu, float wx, float wy, float wz, float wx_dot, float wy_dot, float wz_dot, float *GPS_sensor, float *IMU_sensor);
+void update_time_step(ExtKalmanFilter *ekf);
+void observation_function(ExtKalmanFilter *ekf);
+void observation_jacobian(ExtKalmanFilter *ekf);
+void kalman_gain(ExtKalmanFilter *ekf);
+void update_state(ExtKalmanFilter *ekf);
+void update_covariance(ExtKalmanFilter *ekf);
+void state_transition_function(ExtKalmanFilter *ekf);
+void state_transition_jacobian(ExtKalmanFilter *ekf);
+void predict_state(ExtKalmanFilter *ekf);
+void predict_covariance(ExtKalmanFilter *ekf);
+void make_measurement(ExtKalmanFilter *ekf);
+void acknowledge_time_passed(ExtKalmanFilter *ekf);
+float *run_ekf(ExtKalmanFilter *ekf, float *GPS_sensor, float *IMU_sensor);
 
 #endif

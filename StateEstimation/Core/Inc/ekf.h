@@ -72,6 +72,6 @@ void predict_state(ExtKalmanFilter *ekf);
 void predict_covariance(ExtKalmanFilter *ekf);
 void make_measurement(ExtKalmanFilter *ekf);
 void acknowledge_time_passed(ExtKalmanFilter *ekf);
-float *run_ekf(ExtKalmanFilter *ekf, float *GPS_sensor, float *IMU_sensor);
+void run_ekf(ExtKalmanFilter *ekf, float *GPS_sensor, float *IMU_sensor);
 
 #endif

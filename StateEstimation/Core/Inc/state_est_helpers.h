@@ -10,6 +10,10 @@
 #ifndef __STATE_EST_HELPERS_H__
 #define __STATE_EST_HELPERS_H__
 
+#include "ekf.h";
+#include "attitude.h";
+
+const int state_vec_length = 9;
 
 const float burn_time = 12.0; //motor burn time, in seconds
 const float com_dist_start = 1.0; //distance in meters along the rocket's axis from center of mass with full tank to the IMU
@@ -21,11 +25,8 @@ const float com_to_imu_z = 0.005; //z-distance from center of mass to IMU in met
 float *com_to_imu(float seconds_since_launch, int launch_has_occurred);
     //launch_has_occurred = 1 if launch has occurred, =0 if launch has not occurred.
 
-float *multiply_matrices(float *pA, int rowsA, int colsA, float *pB, int rowsB, int colsB);
-float *transpose_matrix(float *matA);
-float *inverse_matrix(float *matA);
-float *add_matrices(float *matA, float *matB);
-float *subtract_matrices(float *matA, float *matB);
+float *run_fast_ascent(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, float *GPS_data, float *accel_data, float *gyro_data);
+
 
 
 

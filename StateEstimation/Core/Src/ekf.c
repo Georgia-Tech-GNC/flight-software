@@ -421,7 +421,7 @@ void acknowledge_time_passed(ExtKalmanFilter *ekf){
     ekf->P_prev = ekf->P_next;
 
 }
-float *run_ekf(ExtKalmanFilter *ekf, float *GPS_sensor, float *IMU_sensor){
+void run_ekf(ExtKalmanFilter *ekf, float *GPS_sensor, float *IMU_sensor){
 
     update_time_step(ekf);
 
@@ -452,5 +452,4 @@ float *run_ekf(ExtKalmanFilter *ekf, float *GPS_sensor, float *IMU_sensor){
     acknowledge_time_passed(ekf);
 
     arm_matrix_instance_f32 curr_state = ekf->x_n;
-    return curr_state.pData;
 }

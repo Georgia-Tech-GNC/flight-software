@@ -13,6 +13,9 @@
 #ifndef __ATTITUDE_H__
 #define __ATTITUDE_H__
 
+#include <stdint.h>
+#include <sys/time.h>
+
 typedef struct { 
     /*Assumes q_current is knownf rom ground calibration*/
     float q_current_s; 
@@ -46,7 +49,7 @@ void set_gyro_z(rocket_attitude *rocket_atd, float wz);
 void gyro_to_rotation_quat(rocket_attitude *rocket_atd);
 void quat_update(rocket_attitude *rocket_atd);
 void quat_to_euler_angs(rocket_attitude *rocket_atd);
-float *run_attitude_estimation(rocket_attitude *rocket_atd, float wx, float wy, float wz);
+void run_attitude_estimation(rocket_attitude *rocket_atd, float wx, float wy, float wz);
 
 
 #endif

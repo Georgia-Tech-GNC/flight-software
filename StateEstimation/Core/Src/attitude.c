@@ -115,7 +115,7 @@ void gyro_to_rotation_quat(rocket_attitude *rocket_atd){
     axis[1] /= norm;
     axis[2] /= norm;
 
-    float angle = DT*norm; //Find the angle that the rocket rotates about the axis of instantaneous rotation.
+    float angle = rocket_atd->time_step*norm; //Find the angle that the rocket rotates about the axis of instantaneous rotation.
 
     rocket_atd->q_delt_s = cos(angle/2.0f); //Definition of quaternion elements... simply forming the instantaneous rotation quat from axis-angle representation
     rocket_atd->q_delt_x = axis[0]*sin(angle/2.0f);
@@ -183,7 +183,7 @@ void quat_to_euler_angs(rocket_attitude *rocket_atd){
 
 }
 
-float *run_attitude_estimation(rocket_attitude *rocket_atd, float wx, float wy, float wz){
+void run_attitude_estimation(rocket_attitude *rocket_atd, float wx, float wy, float wz){
 
     set_gyro_x(rocket_atd, wx);
     set_gyro_y(rocket_atd, wy);
@@ -194,5 +194,4 @@ float *run_attitude_estimation(rocket_attitude *rocket_atd, float wx, float wy, 
     gyro_to_rotation_quat(rocket_atd);
     quat_update(rocket_atd);
     quat_to_euler_angs(rocket_atd);
-    return {rocket_atd->phi, rocket_atd->theta, rocket_atd->psi};
 }

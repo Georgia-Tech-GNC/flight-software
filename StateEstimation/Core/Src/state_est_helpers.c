@@ -32,87 +32,29 @@ float *com_to_imu(float seconds_since_launch, int launch_has_occurred){
 
 }
 
-float *multiply_matrices(float A_0_0, int rowsA, int colsA, float B_0_0, int rowsB, int colsB){
-    arm_matrix_instance_f32 matA_inst;
-    arm_matrix_instance_f32 matB_inst;
-    arm_matrix_instance_f32 matAB_inst;
+float *run_fast_ascent(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, float *GPS_data, float *accel_data, float *gyro_data){
 
-    float matAB[rowsA][colsB];
-
-    arm_mat_init_f32(&matA_inst, rowsA, colsA, &A_0_0);
-    arm_mat_init_f32(&matB_inst, rowsB, colsB, &B_0_0);
-    arm_mat_init_f32(&matAB_inst, rowsA, colsB, &matAB[0][0]);
-    arm_status_temp = arm_mat_mult_f32(&matA_inst, &matB_inst, &matAB_inst);
-}
-
-float *transpose_matrix(float *matA){
-    arm_matrix_instance_f32 matA_inst;
-    arm_matrix_instance_f32 matB_inst; //B is A'
     
-    int rowsA = sizeof(matA) / sizeof(matA[0]);
-    int colsA = sizeof(matA[0]);
 
-    float matB[colsA][rowsA];
+    float wx = gyro_data[0];
+    float wy = gyro_data[1];
+    float wz = gyro_data[2];
 
-    float matB[colsA][rowsA]; //Transpose has dimensions c x r if original has dimensions r x c
-    arm_mat_init_f32(&matA_inst, rowsA, colsA, matA);
-    arm_mat_init_f32(&matB_inst, colsA, rowsA, matB);
+    run_attitude_estimation(&rocket_atd, wx, wy, wz);
+    run_ekf(&ekf, GPS_data, accel_data);
 
-    arm_mat_trans_f32(&matA_inst, &matB_inst);
-    
-    return matB; //Not sure if this is correct
-}
+    float phi = rocket_atd->phi;
+    float theta = rocket_atd->theta;
+    float psi = rocket_atd->psi;
 
-float *inverse_matrix(float *matA){
-    arm_matrix_instance_f32 matA_inst;
-    arm_matrix_instance_f32 matB_inst; //B is A^-1
-    
-    int rowsA = sizeof(matA) / sizeof(matA[0]);
-    int colsA = sizeof(matA[0]);
+    float x = ekf->x_n.pData[0];
+    float vx = ekf->x_n.pData[1];
+    float y = ekf->x_n.pData[2];
+    float vy = ekf->x_n.pData[3];
+    float z = ekf->x_n.pData[4];
+    float vz = ekf->x_n.pData[5];
 
-    float matB[rowsA][colsA];
+    float state_vector[9] = {x, vx, y, vy, z, vz, phi, theta, psi};
+    return state_vector;
 
-    arm_mat_init_f32(&matA_inst, rowsA, colsA, matA);
-    arm_mat_init_f32(&matB_inst, rowsA, colsA, matB);
-
-    arm_mat_inverse_f32(&matA_inst, &matB_inst);
-
-    return matB; //Not sure if this is correct
-
-}
-
-float *add_matrices(float *matA, float *matB){
-    arm_matrix_instance_f32 matA_inst;
-    arm_matrix_instance_f32 matB_inst;
-    arm_matrix_instance_f32 matAplusB_inst;
-
-    int rowsA = sizeof(matA) / sizeof(matA[0]);
-    int colsA = sizeof(matA[0]);
-
-    float matAplusB[rowsA][colsA];
-
-    arm_mat_init_f32(&matA_inst, rowsA, colsA, matA);
-    arm_mat_init_f32(&matB_inst, rowsA, colsA, matB);
-    arm_mat_init_f32(&matAplusB_inst, rowsA, colsA, matAplusB);
-
-    arm_mat_add_f32(&matA_inst, &matB_inst, &matAplusB_inst);
-    return matAplusB; //Not sure if this is correct
-}
-
-float *subtract_matrices(float *matA, float *matB){ //Subtract matrix B from matrix A
-    arm_matrix_instance_f32 matA_inst;
-    arm_matrix_instance_f32 matB_inst;
-    arm_matrix_instance_f32 matAminusB_inst;
-
-    int rowsA = sizeof(matA) / sizeof(matA[0]);
-    int colsA = sizeof(matA[0]);
-
-    float matAminusB[rowsA][colsA];
-
-    arm_mat_init_f32(&matA_inst, rowsA, colsA, matA);
-    arm_mat_init_f32(&matB_inst, rowsA, colsA, matB);
-    arm_mat_init_f32(&matAminusB_inst, rowsA, colsA, matAminusB);
-
-    arm_mat_add_f32(&matA_inst, &matB_inst, &matAminusB_inst);
-    return matAminusB; //Not sure if this is correct
 }

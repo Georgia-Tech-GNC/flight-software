@@ -47,6 +47,8 @@ typedef struct ExtKalmanFilter {
 
     float32_t gps[3]; //GPS position reading relative to starting location (x, y, z)
     float32_t accelerometer[3]; //Accelerometer readings (x, y, z)
+    float32_t gyro[3];
+    float32_t magneto[3];
     float32_t barometer; //barometer altitude reading
 
     float32_t time_step; //time in seconds

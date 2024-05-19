@@ -58,3 +58,9 @@ float *run_fast_ascent(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, float 
     return state_vector;
 
 }
+
+float pressure2altitude (float pressure) {
+
+    float altitude = 44330 * (1.0 - pow( (pressure/100) / 1013.25, 0.1903)); // (sealvlhpa = 1013.25)
+    return altitude
+}

@@ -17,15 +17,17 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
-#include "ekf.h"
-#include "attitude.h"
-#include "state_est_helpers.h"
-#include <stdio.h>
-#include <string.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdio.h>
+#include <string.h>
+
+#include "../Inc/main.h"
+#include "../Inc/Utils/ekf.h"
+#include "../Inc/Utils/attitude.h"
+#include "../Inc/Utils/state_est_helpers.h"
+#include "../Inc/States/StateMachine.h"
 
 /* USER CODE END Includes */
 
@@ -78,6 +80,32 @@ static void MX_USB_OTG_HS_PCD_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+// initialize serial data to be sent to controls MCU
+SerialData *serial_data = {0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.7071, 0.0, 0.7071, 0.0, 0.0, 0.0, 0.0};
+
+// initialize logged data to be logged to flash chip/SD card
+LoggedData *logged_data = {};
+
+int first_iter = 0; // check if current state is running its first iteration
+
+SensorComps *sensor_comps; // used for compensation during in flight navigation
+
+float32_t GlobalTime;
+
+// Initialize drivers
+adis_init(*adis_imu);
+ADIS16500_Data *imu_data;
+
+struct lis3mdl_device *lis_mag;
+int status = lis3mdl_initialize(lis_mag);
+
+struct promData promData_baro;
+struct MS5607UncompensatedValues uncomp_vals_baro;
+struct MS5607Readings readings_baro;
+int status = MS5607_Init(*hspix, *GPIOx, GPIO_Pin);
+
+
+
 /* USER CODE END 0 */
 
 /**
@@ -117,73 +145,54 @@ int main(void)
   MX_USB_OTG_HS_PCD_Init();
   /* USER CODE BEGIN 2 */
 
-//SETUP
 
-//Wait for signal to start sensor calibration.
-  char signal_received[] = "NO";
-  while (1){
 
-    signal_received = ;//TODO: HAL and receiving through UART
-
-    if (signal_received == "GO"){
-      break;
-    }
-  }
-
-  //TODO: Initialize sensors
-  //TODO: Write an EKF to do the sensor calibration.
-
-  //Ground calibration is now complete. Send Xbee signal to ground station that calibration is complete and rocket is ready to be launched.
-  char message_for_launch_readiness[] = "GOFORLAUNCH";
-  //TODO: Line of code that transmits through HAL UART to controls MCU that vehicle is launch ready.
-
-  ekf *fekf;
-  rocket_attitude *rocket_atd;
-  initialize_ekf(fekf); //Initialize the in-flight EKF
-  initialize_rocket_attitude(rocket_atd, 0.7071, 0.0, 0.7071, 0.0); //Initialize attitude estimation
-
-  float center_of_mass_to_imu_vector[3];
-  float seconds_since_launch = 0.0;
-  int launch_has_occurred = 0;
-  float millis_at_launch;
-  float millis_since_launch;
-  float current_millis;
-
-  float euler_angs[3]; //phi, theta, psi. Christopher Lum/MATLAB conventions
-  float translational_states[6]; 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+
+    // Get current time
+    GlobalTime = (float32_t)currentTimeMillis()/1000.0;
+
+    // State machine manager
+    switch (STATE_MACHINE) {
+        case GROUND {
+            run_ground(gekf);
+            break;
+        }
+        case FASTASCENT {
+            run_fast_ascent(ekf,rocket_atd);
+            break;
+        }
+        case SLOWASCENT {
+            run_slow_ascent(ekf,rocket_atd);
+            break;
+        }
+        case FREEFALL {
+            run_freefall(ekf,rocket_atd);
+            break;
+        }
+        case LANDED {
+            run_landed(ekf,rocket_atd);
+            break;
+        }
+        default {
+            printf('Invalid state reached');
+            break;
+        }
+    }
+
+    // Transmit to controls MCU
+    send_serial_data(serial_data);
+
+    // Log data to flash
+    log_data(logged_data);
+
     /* USER CODE END WHILE */
-    
-    //TODO: Read sensors (GPS, IMU, Barometer)
 
-    center_of_mass_to_imu_vector = com_to_imu(seconds_since_launch, launch_has_occurred);
-    translational_states = run_ekf(fekf, center_of_mass_to_imu_vector, wx, wy, wz, wx_dot, wy_dot, wz_dot, GPS_readings, IMU_readings);
-      //run_ekf returns ekf->x_n, which is a six-element array: x_pos, y_pos, z_pos, x_vel, y_vel, z_vel
-    euler_angs = run_attitude_estimation(rocket_atd, wx, wy, wz);
-      //run_attitude_estimation returns a three-element array with Euler angles phi, theta, and psi.
-    
-
-    //TODO: Form a state vector. Send to controls MCU via HAL UART.
-    //TODO: Transmit to the controls MCU via HAL UART the stage of flight from the state machine.
-
-    //TODO: Write full state machine
-    //Launch detection
-    if (launch_has_occurred == 0 && translational_states[4] >= 1.5 && translational_states[5] >= 0.2){
-      //TODO: Make sure the above line is utilizing the correct states (is it z? x? y?)
-      launch_has_occurred = 1; //Say that launch has occurred, which now allows seconds_since_launch to be updated
-      millis_at_launch = currentTimeMillis();
-    }
-    //Update time since launch
-    if (launch_has_occurred == 1){
-      current_millis = currentTimeMillis();
-      millis_since_launch = (float)(current_millis - millis_at_launch);
-      seconds_since_launch = millis_since_launch/1000.0;
-    }
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */

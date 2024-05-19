@@ -60,6 +60,14 @@ float32_t *f_f32, float32_t *h_f32, float32_t *z_f32, float32_t *state_stddevs){
     ekf->accelerometer[1] = 0.0;
     ekf->accelerometer[2] = 0.0;
 
+    ekf->gyro[0] = 0.0;
+    ekf->gyro[1] = 0.0;
+    ekf->gyro[2] = 0.0;
+
+    ekf->magneto[0] = 0.0;
+    ekf->magneto[1] = 0.0;
+    ekf->magneto[2] = 0.0;
+
     ekf->barometer = 0.0;
 
     ekf->time_step = 0.02; //initial time step

@@ -331,7 +331,7 @@ void run_ground() {
             sensor_comps->gps_offset_z = gekf->x_n.pData[15];
 
             // Switch states
-            STATE_MACHINE = FASTSACENT;
+            STATE_MACHINE = FASTASCENT;
             first_iter = 0;
         }
 

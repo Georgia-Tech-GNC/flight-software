@@ -24,10 +24,11 @@
 #include <string.h>
 
 #include "../Inc/main.h"
-#include "../Inc/Utils/ekf.h"
-#include "../Inc/Utils/attitude.h"
-#include "../Inc/Utils/state_est_helpers.h"
+#include "../Inc/ekf.h"
+#include "../Inc/attitude.h"
+#include "../Inc/state_est_helpers.h"
 #include "../Inc/States/StateMachine.h"
+#include "../Inc/data_handling.h"
 
 /* USER CODE END Includes */
 
@@ -145,7 +146,10 @@ int main(void)
   MX_USB_OTG_HS_PCD_Init();
   /* USER CODE BEGIN 2 */
 
-
+  ExtKalmanFilter *fekf;
+  rocket_attitude *rocket_atd;
+  int has_run_fast_ascent = 0;
+  float state_vec[10] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
   /* USER CODE END 2 */
 
@@ -164,19 +168,24 @@ int main(void)
             break;
         }
         case FASTASCENT {
-            run_fast_ascent(ekf,rocket_atd);
+            if (has_run_fast_ascent == 0){
+              initialize_ekf(fekf); //Initialize in-flight EKF
+              initialize_rocket_attitude(rocket_atd, 0.7071, 0, 0.7071, 0); //Initialize in-flight attitude estimation
+              has_run_fast_ascent = 1;
+            }
+            state_vec = run_fast_ascent(fekf,rocket_atd); //TODO: Need to also transmit GPS data, accelerometer data, and gyro data per the function definition
             break;
         }
         case SLOWASCENT {
-            run_slow_ascent(ekf,rocket_atd);
+            run_slow_ascent(fekf,rocket_atd); //TODO: Need to also transmit GPS data, accelerometer data, and gyro data per the function definition
             break;
         }
         case FREEFALL {
-            run_freefall(ekf,rocket_atd);
+            run_freefall(fekf,rocket_atd); //TODO: Need to also transmit GPS data, accelerometer data, and gyro data per the function definition
             break;
         }
         case LANDED {
-            run_landed(ekf,rocket_atd);
+            state_vec = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0}; //Nominal state vector for landed rocket, since sensor reading and math is not necessary upon landing
             break;
         }
         default {
@@ -184,7 +193,7 @@ int main(void)
             break;
         }
     }
-
+    //TODO: Make state_vec a part of serial data, and update the state in the state machine that serial data possesses
     // Transmit to controls MCU
     send_serial_data(serial_data);
 

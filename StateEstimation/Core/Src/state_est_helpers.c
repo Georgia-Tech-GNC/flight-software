@@ -32,35 +32,8 @@ float *com_to_imu(float seconds_since_launch, int launch_has_occurred){
 
 }
 
-float *run_fast_ascent(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, float *GPS_data, float *accel_data, float *gyro_data){
-
-    
-
-    float wx = gyro_data[0];
-    float wy = gyro_data[1];
-    float wz = gyro_data[2];
-
-    run_attitude_estimation(&rocket_atd, wx, wy, wz);
-    run_ekf(&ekf, GPS_data, accel_data);
-
-    float phi = rocket_atd->phi;
-    float theta = rocket_atd->theta;
-    float psi = rocket_atd->psi;
-
-    float x = ekf->x_n.pData[0];
-    float vx = ekf->x_n.pData[1];
-    float y = ekf->x_n.pData[2];
-    float vy = ekf->x_n.pData[3];
-    float z = ekf->x_n.pData[4];
-    float vz = ekf->x_n.pData[5];
-
-    float state_vector[9] = {x, vx, y, vy, z, vz, phi, theta, psi};
-    return state_vector;
-
-}
-
 float pressure2altitude (float pressure) {
 
     float altitude = 44330 * (1.0 - pow( (pressure/100) / 1013.25, 0.1903)); // (sealvlhpa = 1013.25)
-    return altitude
+    return altitude;
 }

@@ -50,8 +50,6 @@ typedef struct SensorComps {
 float *com_to_imu(float seconds_since_launch, int launch_has_occurred);
     //launch_has_occurred = 1 if launch has occurred, =0 if launch has not occurred.
 
-float *run_fast_ascent(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, float *GPS_data, float *accel_data, float *gyro_data);
-
 float pressure2altitude (float pressure);
 
 

@@ -177,11 +177,11 @@ int main(void)
             break;
         }
         case SLOWASCENT {
-            run_slow_ascent(fekf,rocket_atd); //TODO: Need to also transmit GPS data, accelerometer data, and gyro data per the function definition
+            state_vec = run_slow_ascent(fekf,rocket_atd); //TODO: Need to also transmit GPS data, accelerometer data, and gyro data per the function definition
             break;
         }
         case FREEFALL {
-            run_freefall(fekf,rocket_atd); //TODO: Need to also transmit GPS data, accelerometer data, and gyro data per the function definition
+            state_vec = run_freefall(fekf,rocket_atd); //TODO: Need to also transmit GPS data, accelerometer data, and gyro data per the function definition
             break;
         }
         case LANDED {

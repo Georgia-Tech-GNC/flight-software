@@ -29,11 +29,11 @@ typedef struct SerialData {
   float wy;
   float wz;
 
-  float32_t t; // time
+  float t; // time
 
 } SerialData;
 
-typedef SerialDataPacket {
+typedef struct SerialDataPacket {
     SerialData data;
     uint8_t bytes[sizeof(SerialData)];
 } SerialDataPacket;
@@ -56,9 +56,23 @@ typedef struct LoggedData {
   float wy;
   float wz;
 
+  float accelerometerx;
+  float accelerometery;
+  float accelerometerz;
+  float gyrox;
+  float gyroy;
+  float gyroz;
+  float magnetox;
+  float magnetoy;
+  float magnetoz;
+  float gpsx;
+  float gpsy;
+  float gpsz;
+  float baro;
+
 } LoggedData;
 
-typedef LoggedDataPacket {
+typedef struct LoggedDataPacket {
     LoggedData data;
     uint8_t bytes[sizeof(LoggedData)];
 } LoggedDataPacket;

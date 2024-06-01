@@ -82,12 +82,14 @@ static void MX_USB_OTG_HS_PCD_Init(void);
 /* USER CODE BEGIN 0 */
 
 // initialize serial data to be sent to controls MCU
-SerialData *serial_data = {0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.7071, 0.0, 0.7071, 0.0, 0.0, 0.0, 0.0};
+SerialData *serial_data;
 
 // initialize logged data to be logged to flash chip/SD card
-LoggedData *logged_data = {};
+LoggedData *logged_data;
 
 int first_iter = 0; // check if current state is running its first iteration
+
+int STATE_MACHINE = GROUND;
 
 SensorComps *sensor_comps; // used for compensation during in flight navigation
 
@@ -100,10 +102,10 @@ ADIS16500_Data *imu_data;
 struct lis3mdl_device *lis_mag;
 int status = lis3mdl_initialize(lis_mag);
 
-struct promData promData_baro;
-struct MS5607UncompensatedValues uncomp_vals_baro;
-struct MS5607Readings readings_baro;
-int status = MS5607_Init(*hspix, *GPIOx, GPIO_Pin);
+// struct promData promData_baro;
+// struct MS5607UncompensatedValues uncomp_vals_baro;
+// struct MS5607Readings readings_baro;
+int status = MS5607_Init(*hspi6, *GPIOH, GPIO_PIN_3);
 
 
 
@@ -146,6 +148,7 @@ int main(void)
   MX_USB_OTG_HS_PCD_Init();
   /* USER CODE BEGIN 2 */
 
+  ExtKalmanFilter* gekf;
   ExtKalmanFilter *fekf;
   rocket_attitude *rocket_atd;
   int has_run_fast_ascent = 0;
@@ -163,11 +166,11 @@ int main(void)
 
     // State machine manager
     switch (STATE_MACHINE) {
-        case GROUND {
+        case GROUND: {
             run_ground(gekf);
             break;
         }
-        case FASTASCENT {
+        case FASTASCENT: {
             if (has_run_fast_ascent == 0){
               initialize_ekf(fekf); //Initialize in-flight EKF
               initialize_rocket_attitude(rocket_atd, 0.7071, 0, 0.7071, 0); //Initialize in-flight attitude estimation
@@ -176,15 +179,15 @@ int main(void)
             state_vec = run_fast_ascent(fekf,rocket_atd); //TODO: Need to also transmit GPS data, accelerometer data, and gyro data per the function definition
             break;
         }
-        case SLOWASCENT {
+        case SLOWASCENT: {
             state_vec = run_slow_ascent(fekf,rocket_atd); //TODO: Need to also transmit GPS data, accelerometer data, and gyro data per the function definition
             break;
         }
-        case FREEFALL {
+        case FREEFALL: {
             state_vec = run_freefall(fekf,rocket_atd); //TODO: Need to also transmit GPS data, accelerometer data, and gyro data per the function definition
             break;
         }
-        case LANDED {
+        case LANDED: {
             state_vec = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0}; //Nominal state vector for landed rocket, since sensor reading and math is not necessary upon landing
             break;
         }

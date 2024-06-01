@@ -19,7 +19,7 @@ void send_serial_data(SerialData *serial_data) {
     }
 
     // Create serial data packet
-    SerialData packet;
+    SerialDataPacket packet;
     packet.data = *serial_data;
 
     // Transmit packet

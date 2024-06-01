@@ -14,7 +14,7 @@
 #include <lapacke.h>
 #include <sys/time.h>
 
-#include "../../Inc/Utils/ekf.h"
+#include "../../Inc/ekf.h"
 #include "../../Inc/States/Ground.h"
 
 void state_transition_ground(ExtKalmanFilter *gekf) {
@@ -23,37 +23,23 @@ void state_transition_ground(ExtKalmanFilter *gekf) {
     float f_new_data[gekf->nx];
 
     // accelo bias
-    f_new_data[0] = gekf->x_n.pData[0] + gekf->time_step * gekf->x_n.pData[3];
-    f_new_data[1] = gekf->x_n.pData[1] + gekf->time_step * gekf->x_n.pData[4];
-    f_new_data[2] = gekf->x_n.pData[2] + gekf->time_step * gekf->x_n.pData[5];
+    f_new_data[0] = gekf->x_n.pData[0];
+    f_new_data[1] = gekf->x_n.pData[1];
+    f_new_data[2] = gekf->x_n.pData[2];
 
-    // accelo bias rate 
+    // gyro bias
     f_new_data[3] = gekf->x_n.pData[3];
     f_new_data[4] = gekf->x_n.pData[4];
     f_new_data[5] = gekf->x_n.pData[5];
 
-    // gyro bias
-    f_new_data[6] = gekf->x_n.pData[6] + gekf->time_step * gekf->x_n.pData[9];
-    f_new_data[7] = gekf->x_n.pData[7] + gekf->time_step * gekf->x_n.pData[10];
-    f_new_data[8] = gekf->x_n.pData[8] + gekf->time_step * gekf->x_n.pData[11];
+    //gps offset
+    f_new_data[6] = gekf->x_n.pData[6];
+    f_new_data[7] = gekf->x_n.pData[7];
+    f_new_data[8] = gekf->x_n.pData[8];
 
-    // gyro bias rate
+    // baro offset
     f_new_data[9] = gekf->x_n.pData[9];
-    f_new_data[10] = gekf->x_n.pData[10];
-    f_new_data[11] = gekf->x_n.pData[11];
 
-    //magneto bias
-    f_new_data[12] = gekf->x_n.pData[12] + gekf->time_step * gekf->x_n.pData[15];
-    f_new_data[13] = gekf->x_n.pData[13] + gekf->time_step * gekf->x_n.pData[16];
-    f_new_data[14] = gekf->x_n.pData[14] + gekf->time_step * gekf->x_n.pData[17];
-
-    // magneto bias rate
-    f_new_data[15] = gekf->x_n.pData[15];
-    f_new_data[16] = gekf->x_n.pData[16];
-    f_new_data[17] = gekf->x_n.pData[17];
-
-    // baro bias
-    f_new_data[18] = gekf->x_n.pData[18];
 
     arm_matrix_instance_f32 f_new = {gekf->nx, 1, f_new_data};
     gekf->f = f_new;
@@ -65,24 +51,16 @@ void state_transition_jacob_ground(ExtKalmanFilter *gekf) {
     // Calculates state transition jacobian for ground EKF
 
     // TODO may need to update as gnd sims progresses
-    float dfdx_new_data[gekf->nx][gekf->nx] = {{1, 0, 0, gekf.time_step,  0,  0, 0, 0, 0,  0,  0,  0, 0, 0, 0,  0,  0,  0},
-                                                {0, 1, 0,  0, gekf.time_step,  0, 0, 0, 0,  0,  0,  0, 0, 0, 0,  0,  0,  0},
-                                                {0, 0, 1,  0,  0, gekf.time_step, 0, 0, 0,  0,  0,  0, 0, 0, 0,  0,  0,  0},
-                                                {0, 0, 0,  1,  0,  0, 0, 0, 0,  0,  0,  0, 0, 0, 0,  0,  0,  0},
-                                                {0, 0, 0,  0,  1,  0, 0, 0, 0,  0,  0,  0, 0, 0, 0,  0,  0,  0},
-                                                {0, 0, 0,  0,  0,  1, 0, 0, 0,  0,  0,  0, 0, 0, 0,  0,  0,  0},
-                                                {0, 0, 0,  0,  0,  0, 1, 0, 0, gekf.time_step,  0,  0, 0, 0, 0,  0,  0,  0},
-                                                {0, 0, 0,  0,  0,  0, 0, 1, 0,  0, gekf.time_step,  0, 0, 0, 0,  0,  0,  0},
-                                                {0, 0, 0,  0,  0,  0, 0, 0, 1,  0,  0, gekf.time_step, 0, 0, 0,  0,  0,  0},
-                                                {0, 0, 0,  0,  0,  0, 0, 0, 0,  1,  0,  0, 0, 0, 0,  0,  0,  0},
-                                                {0, 0, 0,  0,  0,  0, 0, 0, 0,  0,  1,  0, 0, 0, 0,  0,  0,  0},
-                                                {0, 0, 0,  0,  0,  0, 0, 0, 0,  0,  0,  1, 0, 0, 0,  0,  0,  0},
-                                                {0, 0, 0,  0,  0,  0, 0, 0, 0,  0,  0,  0, 1, 0, 0, gekf.time_step,  0,  0},
-                                                {0, 0, 0,  0,  0,  0, 0, 0, 0,  0,  0,  0, 0, 1, 0,  0, gekf.time_step,  0},
-                                                {0, 0, 0,  0,  0,  0, 0, 0, 0,  0,  0,  0, 0, 0, 1,  0,  0, gekf.time_step},
-                                                {0, 0, 0,  0,  0,  0, 0, 0, 0,  0,  0,  0, 0, 0, 0,  1,  0,  0},
-                                                {0, 0, 0,  0,  0,  0, 0, 0, 0,  0,  0,  0, 0, 0, 0,  0,  1,  0},
-                                                {0, 0, 0,  0,  0,  0, 0, 0, 0,  0,  0,  0, 0, 0, 0,  0,  0,  1}};
+    float dfdx_new_data[gekf->nx][gekf->nx] = {1,0,0,0,0,0,0,0,0,0,
+                                               0,1,0,0,0,0,0,0,0,0,
+                                               0,0,1,0,0,0,0,0,0,0,
+                                               0,0,0,1,0,0,0,0,0,0,
+                                               0,0,0,0,1,0,0,0,0,0,
+                                               0,0,0,0,0,1,0,0,0,0,
+                                               0,0,0,0,0,0,1,0,0,0,
+                                               0,0,0,0,0,0,0,1,0,0,
+                                               0,0,0,0,0,0,0,0,1,0,
+                                               0,0,0,0,0,0,0,0,0,1};
 
     arm_matrix_instance_f32 dfdx_new = {gekf->nx,gekf->nx,dfdx_new_data};
     gekf->dfdx = dfdx_new;
@@ -99,13 +77,14 @@ void observation_ground(ExtKalmanFilter *gekf) {
     h_new_data[0] = gekf->x_n.pData[0];
     h_new_data[1] = gekf->x_n.pData[1],
     h_new_data[2] = 9.81 + gekf->x_n.pData[2],
-    h_new_data[3] = gekf->x_n.pData[6];
-    h_new_data[4] = gekf->x_n.pData[7];
-    h_new_data[5] = gekf->x_n.pData[8];
-    h_new_data[6] = gekf->mx0 + gekf->x_n.pData[12];
-    h_new_data[7] = gekf->my0 + gekf->x_n.pData[13];
-    h_new_data[8] = gekf->mz0 + gekf->x_n.pData[14];
-    h_new_data[9] = gekf->x_n.pData[18];
+    h_new_data[3] = gekf->x_n.pData[3];
+    h_new_data[4] = gekf->x_n.pData[4];
+    h_new_data[5] = gekf->x_n.pData[5];
+
+    h_new_data[6] = gekf->x_n.pData[6];
+    h_new_data[7] = gekf->x_n.pData[7];
+    h_new_data[8] = gekf->x_n.pData[8];
+    h_new_data[9] = gekf->x_n.pData[9];
 
     arm_matrix_instance_f32 h_new = {gekf->nz, 1, h_new_data};
     gekf->h = h_new;
@@ -116,17 +95,18 @@ void observation_ground(ExtKalmanFilter *gekf) {
 void observation_jacob_ground(ExtKalmanFilter *gekf) {
     // Calculates observation jacobian for ground EKF
 
-    float dhdx_new_data[gekf->nz][gekf->nx] = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                                                0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                                                0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                                                0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                                                0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                                                0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                                                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0,
-                                                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
-                                                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0};
+    float dhdx_new_data[gekf->nz][gekf->nx] = {1,0,0,0,0,0,0,0,0,0,
+                                               0,1,0,0,0,0,0,0,0,0,
+                                               0,0,1,0,0,0,0,0,0,0,
+                                               0,0,0,1,0,0,0,0,0,0,
+                                               0,0,0,0,1,0,0,0,0,0,
+                                               0,0,0,0,0,1,0,0,0,0,
+                                               0,0,0,0,0,0,1,0,0,0,
+                                               0,0,0,0,0,0,0,1,0,0,
+                                               0,0,0,0,0,0,0,0,1,0,
+                                               0,0,0,0,0,0,0,0,0,1};
 
-    arm_matrix_instance_f32 dhdx_new = {gekf->nx,gekf->nx,dhdx_new_data};
+    arm_matrix_instance_f32 dhdx_new = {gekf->nz,gekf->nx,dhdx_new_data};
     gekf->dhdx = dhdx_new;
 
 }
@@ -135,7 +115,7 @@ int check_gekf_convergence(ExtKalmanFilter *gekf) {
 
     for (int i=0; i<=gekf->nx; i++) {
 
-        if (gekf->P_n.pData[i][i] > 0.01) {
+        if (gekf->P_n.pData[i][i] > 0.1) {
 
             return 0;
 
@@ -162,20 +142,7 @@ void GPS2ECEF(float lat, float lon, float alt, float* x, float* y, float* z) {
     *z = (N * (1.0 - e**2) + alt) * sinlat;
 }
 
-
-void get_ground_attitude(ExtKalmanFilter *gekf) {
-
-
-
-}
-
 void run_ground() {
-
-    // Setup
-    if (first_iter) {
-        static ExtKalmanFilter* gekf;
-        static float ground_quat[4];
-    }
 
     // Loop
     while (STATE_MACHINE == GROUND) {
@@ -189,7 +156,7 @@ void run_ground() {
 
         MS5607Update(); // read from baro
 
-        float gps_reading = ?;
+        float gps_reading = 0; //TODO
         float gps_ecef_x, gps_ecef_y, gps_ecef_z;
         GPS2ECEF(gps_reading[0],gps_reading[1],gps_reading[2],&gps_ecef_x,&gps_ecef_y,&gps_ecef_z);
 
@@ -237,8 +204,6 @@ void run_ground() {
 
         acknowledge_time_passed(gekf);
 
-        // Calculate initial attitude using fused magneto-accelo readings
-        get_init_attitude(gekf,ground_quat);
 
         int gekf_has_converged = check_gekf_convergence(gekf);
 
@@ -270,10 +235,10 @@ void run_ground() {
         serial_data->velx = 0.0;
         serial_data->vely = 0.0;
         serial_data->velz = 0.0;
-        serial_data->q0 = ground_quat.pData[0];
-        serial_data->q1 = ground_quat.pData[1];
-        serial_data->q2 = ground_quat.pData[2];
-        serial_data->q3 = ground_quat.pData[3];
+        serial_data->q0 = 1.0;
+        serial_data->q1 = 0.0;
+        serial_data->q2 = 0.0;
+        serial_data->q3 = 0.0;
         serial_data->wx = 0.0;
         serial_data->wy = 0.0;
         serial_data->wz = 0.0;
@@ -287,10 +252,10 @@ void run_ground() {
         logged_data->velx = 0.0;
         logged_data->vely = 0.0;
         logged_data->velz = 0.0;
-        logged_data->q0 = ground_quat.pData[0];
-        logged_data->q1 = ground_quat.pData[1];
-        logged_data->q2 = ground_quat.pData[2];
-        logged_data->q3 = ground_quat.pData[3];
+        logged_data->q0 = 0.0;
+        logged_data->q1 = 0.0;
+        logged_data->q2 = 0.0;
+        logged_data->q3 = 0.0;
         logged_data->wx = 0.0;
         logged_data->wy = 0.0;
         logged_data->wz = 0.0;
@@ -316,19 +281,13 @@ void run_ground() {
             sensor_comps->accelo_bias_x = gekf->x_n.pData[0];
             sensor_comps->accelo_bias_y = gekf->x_n.pData[1];
             sensor_comps->accelo_bias_z = gekf->x_n.pData[2];
-            sensor_comps->accelo_bias_rate_x = gekf->x_n.pData[3];
-            sensor_comps->accelo_bias_rate_y = gekf->x_n.pData[4];
-            sensor_comps->accelo_bias_rate_z = gekf->x_n.pData[5];
-            sensor_comps->gyro_bias_x = gekf->x_n.pData[6];
-            sensor_comps->gyro_bias_y = gekf->x_n.pData[7];
-            sensor_comps->gyro_bias_z = gekf->x_n.pData[8];
-            sensor_comps->gyro_bias_rate_x = gekf->x_n.pData[9];
-            sensor_comps->gyro_bias_rate_y = gekf->x_n.pData[10];
-            sensor_comps->gyro_bias_rate_z = gekf->x_n.pData[11];
-            sensor_comps->baro_offset = gekf->x_n.pData[12];
-            sensor_comps->gps_offset_x = gekf->x_n.pData[13];
-            sensor_comps->gps_offset_y = gekf->x_n.pData[14];
-            sensor_comps->gps_offset_z = gekf->x_n.pData[15];
+            sensor_comps->gyro_bias_x = gekf->x_n.pData[3];
+            sensor_comps->gyro_bias_y = gekf->x_n.pData[4];
+            sensor_comps->gyro_bias_z = gekf->x_n.pData[5];
+            sensor_comps->gps_offset_x = gekf->x_n.pData[6];
+            sensor_comps->gps_offset_y = gekf->x_n.pData[7];
+            sensor_comps->gps_offset_z = gekf->x_n.pData[8];
+            sensor_comps->baro_offset = gekf->x_n.pData[9];
 
             // Switch states
             STATE_MACHINE = FASTASCENT;

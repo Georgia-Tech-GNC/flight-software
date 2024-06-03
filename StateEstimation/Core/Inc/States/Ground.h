@@ -1,5 +1,5 @@
 /**
- * @file ground_ekf.h
+ * @file Ground.h
  * @author Albert Zheng
  * @brief Header file for ground state
  * 
@@ -25,7 +25,7 @@ void check_gekf_convergence(ExtKalmanFilter *gekf);
 
 void GPS2ECEF(float* gps_reading, float* posn_ecef);
 
-void run_ground();
+void run_ground(ExtKalmanFilter *gekf, Sensors *sensors, SerialData *serial_data);
 
 
 #endif

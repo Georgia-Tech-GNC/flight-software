@@ -9,11 +9,12 @@
     #define STATEMACHINE_H
 
 // Define states
-#define GROUND 0
-#define FASTASCENT 1
-#define SLOWASCENT 2
-#define FREEFALL 3
-#define CHUTE 4
-#define LANDED 5
+#define IDLE 0
+#define GROUND 1
+#define FASTASCENT 2
+#define SLOWASCENT 3
+#define FREEFALL 4
+#define CHUTE 5
+#define LANDED 6
 
 #endif

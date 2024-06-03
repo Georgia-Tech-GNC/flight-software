@@ -16,6 +16,7 @@
 
 #include "../../Inc/ekf.h"
 #include "../../Inc/States/Ground.h"
+#include "../../Inc/data_handling.h"
 
 void state_transition_ground(ExtKalmanFilter *gekf) {
     // Calculates next state for ground EKF
@@ -142,7 +143,7 @@ void GPS2ECEF(float lat, float lon, float alt, float* x, float* y, float* z) {
     *z = (N * (1.0 - e**2) + alt) * sinlat;
 }
 
-void run_ground() {
+void run_ground(ExtKalmanFilter* gekf, Sensors* sensors, SerialData *serial_data) {
 
     // Loop
     while (STATE_MACHINE == GROUND) {
@@ -157,37 +158,32 @@ void run_ground() {
         MS5607Update(); // read from baro
 
         float gps_reading = 0; //TODO
-        float gps_ecef_x, gps_ecef_y, gps_ecef_z;
-        GPS2ECEF(gps_reading[0],gps_reading[1],gps_reading[2],&gps_ecef_x,&gps_ecef_y,&gps_ecef_z);
+        float gps_world_x, gps_world_y, gps_world_z;
 
         // Read sensor data
-        gekf->accelerometer[0] = imu_data->x_accl_out;
-        gekf->accelerometer[1] = imu_data->y_accl_out;
-        gekf->accelerometer[2] = imu_data->z_accl_out;
-        gekf->gyro[0] = imu_data->x_gyro_out;
-        gekf->gyro[1] = imu_data->y_gyro_out;
-        gekf->gyro[2] = imu_data->z_gyro_out;
-        gekf->magneto[0] = mag_reading[0];
-        gekf->magneto[1] = mag_reading[1];
-        gekf->magneto[2] = mag_reading[2];
-        gekf->baro = pressure2altitude(float(reading_baro->pressure));
-        gekf->gps[0] = gps_ecef_x;
-        gekf->gps[1] = gps_ecef_y;
-        gekf->gps[2] = gps_ecef_z;
+        sensors->accelerometer_x = imu_data->x_accl_out;
+        sensors->accelerometer_y = imu_data->y_accl_out;
+        sensors->accelerometer_z = imu_data->z_accl_out;
+        sensors->gyro_x = imu_data->x_gyro_out;
+        sensors->gyro_y = imu_data->y_gyro_out;
+        sensors->gyro_z = imu_data->z_gyro_out;
+        sensors->magneto_x = mag_reading[0];
+        sensors->magneto_y = mag_reading[1];
+        sensors->magneto_z = mag_reading[2];
+        sensors->baro = pressure2altitude(float(reading_baro->pressure));
+        GPS2World(sensors->gps_x,sensors->gps_y,sensors->gps_z,&gps_world_x,&gps_world_y,&gps_world_z);
 
         //Measurement function
-        gekf->z[0] = gekf->accelerometer[0];
-        gekf->z[1] = gekf->accelerometer[1];
-        gekf->z[2] = gekf->accelerometer[2];
-        gekf->z[3] = gekf->gyro[0];
-        gekf->z[4] = gekf->gyro[1];
-        gekf->z[5] = gekf->gyro[2];
-        gekf->z[6] = gekf->magneto[0];
-        gekf->z[7] = gekf->magneto[1];
-        gekf->z[8] = gekf->magneto[2];
-        gekf->z[9] = gekf->gps[0];
-        gekf->z[10] = gekf->gps[1];
-        gekf->z[11] = gekf->gps[2];
+        gekf->z[0] = sensors->accelerometer_x;
+        gekf->z[1] = sensors->accelerometer_y;
+        gekf->z[2] = sensors->accelerometer_z;
+        gekf->z[3] = sensors->gyro_x;
+        gekf->z[4] = sensors->gyro_y;
+        gekf->z[5] = sensors->gyro_z;
+        gekf->z[6] = gps_world_x;
+        gekf->z[7] = gps_world_y;
+        gekf->z[8] = gps_world_z;
+        gekf->z[9] = sensors->baro;
 
         //Update
         observation_function(gekf);
@@ -207,26 +203,6 @@ void run_ground() {
 
         int gekf_has_converged = check_gekf_convergence(gekf);
 
-        // Check for arming signal
-        
-        //Wait for signal to start sensor calibration.
-        char signal_received[] = "NO";
-        while (1){
-            signal_received = ;//TODO: HAL and receiving through UART
-
-            if (signal_received == "GO"){
-            break;
-            }
-        }
-
-        //TODO: Initialize sensors
-        //TODO: Write an EKF to do the sensor calibration.
-
-        //Ground calibration is now complete. Send Xbee signal to ground station that calibration is complete and rocket is ready to be launched.
-        char message_for_launch_readiness[] = "GOFORLAUNCH";
-        //TODO: Line of code that transmits through HAL UART to controls MCU that vehicle is launch ready.
-
-
         // Update SerialData packet
         serial_data->state = STATE_MACHINE;
         serial_data->posx = 0.0;
@@ -244,50 +220,20 @@ void run_ground() {
         serial_data->wz = 0.0;
         serial_data->t = GlobalTime;
 
-        // Update LoggedData packet
-        logged_data->state = STATE_MACHINE;
-        logged_data->posx = 0.0;
-        logged_data->posy = 0.0;
-        logged_data->posz = 0.0;
-        logged_data->velx = 0.0;
-        logged_data->vely = 0.0;
-        logged_data->velz = 0.0;
-        logged_data->q0 = 0.0;
-        logged_data->q1 = 0.0;
-        logged_data->q2 = 0.0;
-        logged_data->q3 = 0.0;
-        logged_data->wx = 0.0;
-        logged_data->wy = 0.0;
-        logged_data->wz = 0.0;
-        logged_data->t = GlobalTime;
-        logged_data->accelerometerx = gekf->accelerometer[0];
-        logged_data->accelerometery = gekf->accelerometer[1];
-        logged_data->accelerometerz = gekf->accelerometer[2];
-        logged_data->gyrox = gekf->gyro[0];
-        logged_data->gyroy = gekf->gyro[1];
-        logged_data->gyroz = gekf->gyro[2];
-        logged_data->magnetox = gekf->magneto[0];
-        logged_data->magnetoy = gekf->magneto[1];
-        logged_data->magnetoz = gekf->magneto[2];
-        logged_data->gpsx = gekf->gps[0];
-        logged_data->gpsy = gekf->gps[1];
-        logged_data->gpsz = gekf->gps[2];
-        //TODO log to flash chip/sd card
-
         // State transition conditions
         if (gekf_has_converged && signal_received) {
 
             // Upload sensor compensations
-            sensor_comps->accelo_bias_x = gekf->x_n.pData[0];
-            sensor_comps->accelo_bias_y = gekf->x_n.pData[1];
-            sensor_comps->accelo_bias_z = gekf->x_n.pData[2];
-            sensor_comps->gyro_bias_x = gekf->x_n.pData[3];
-            sensor_comps->gyro_bias_y = gekf->x_n.pData[4];
-            sensor_comps->gyro_bias_z = gekf->x_n.pData[5];
-            sensor_comps->gps_offset_x = gekf->x_n.pData[6];
-            sensor_comps->gps_offset_y = gekf->x_n.pData[7];
-            sensor_comps->gps_offset_z = gekf->x_n.pData[8];
-            sensor_comps->baro_offset = gekf->x_n.pData[9];
+            sensors->accel_bias_x = gekf->x_n.pData[0];
+            sensors->accel_bias_y = gekf->x_n.pData[1];
+            sensors->accel_bias_z = gekf->x_n.pData[2];
+            sensors->gyro_bias_x = gekf->x_n.pData[3];
+            sensors->gyro_bias_y = gekf->x_n.pData[4];
+            sensors->gyro_bias_z = gekf->x_n.pData[5];
+            sensors->gps_offset_x = gekf->x_n.pData[6];
+            sensors->gps_offset_y = gekf->x_n.pData[7];
+            sensors->gps_offset_z = gekf->x_n.pData[8];
+            sensors->baro_offset = gekf->x_n.pData[9];
 
             // Switch states
             STATE_MACHINE = FASTASCENT;

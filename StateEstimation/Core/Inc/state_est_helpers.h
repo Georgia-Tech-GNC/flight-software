@@ -26,27 +26,6 @@ const float com_dist_end = 0.2; //distance in meters along the rocket's axis fro
 const float com_to_imu_y = 0.01; //y-distance from center of mass to IMU in meters
 const float com_to_imu_z = 0.005; //z-distance from center of mass to IMU in meters
 
-typedef struct SensorComps {
-
-    float accelo_bias_x;
-    float accelo_bias_y;
-    float accelo_bias_z;
-    float accelo_bias_rate_x;
-    float accelo_bias_rate_y;
-    float accelo_bias_rate_z;
-    float gyro_bias_x;
-    float gyro_bias_y;
-    float gyro_bias_z;
-    float gyro_bias_rate_x;
-    float gyro_bias_rate_y;
-    float gyro_bias_rate_z;
-    float gps_offset_x;
-    float gps_offset_y;
-    float gps_offset_z;
-    float baro_offset;
-
-} SensorComps;
-
 float *com_to_imu(float seconds_since_launch, int launch_has_occurred);
     //launch_has_occurred = 1 if launch has occurred, =0 if launch has not occurred.
 

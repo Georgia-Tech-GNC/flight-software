@@ -11,8 +11,7 @@
 #ifndef __EKF2_H__
 #define __EKF2_H__
 
-// #include "arm_math.h"
-#include "../../Drivers/CMSIS/DSP/Include/arm_math.h"
+#include "arm_math.h"
 #include <sys/time.h>
 
 

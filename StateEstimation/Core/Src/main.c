@@ -81,18 +81,8 @@ static void MX_USB_OTG_HS_PCD_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-// initialize serial data to be sent to controls MCU
-SerialData *serial_data;
-
-// initialize logged data to be logged to flash chip/SD card
-LoggedData *logged_data;
-
-int first_iter = 0; // check if current state is running its first iteration
-
+// Global variables
 int STATE_MACHINE = GROUND;
-
-SensorComps *sensor_comps; // used for compensation during in flight navigation
-
 float32_t GlobalTime;
 
 // Initialize drivers
@@ -148,6 +138,8 @@ int main(void)
   MX_USB_OTG_HS_PCD_Init();
   /* USER CODE BEGIN 2 */
 
+  SerialData *serial_data;
+  Sensors *sensors;
   ExtKalmanFilter* gekf;
   ExtKalmanFilter *fekf;
   rocket_attitude *rocket_atd;
@@ -166,8 +158,12 @@ int main(void)
 
     // State machine manager
     switch (STATE_MACHINE) {
+        case IDLE: {
+          run_idle();
+          break;
+        }
         case GROUND: {
-            run_ground(gekf);
+            run_ground(gekf, sensors, serial_data);
             break;
         }
         case FASTASCENT: {

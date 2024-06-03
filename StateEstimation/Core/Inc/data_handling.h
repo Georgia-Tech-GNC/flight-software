@@ -15,13 +15,13 @@
 typedef struct SerialData {
   int state; // current state machine state
 
-  float posx; // ecef frame
-  float posy;
-  float posz;
-  float velx; // ecef frame
-  float vely;
-  float velz;
-  float q0; // ned to body
+  float pos_x; // ecef frame
+  float pos_y;
+  float pos_z;
+  float vel_x; // ecef frame
+  float vel_y;
+  float vel_z;
+  float q0; // world to body
   float q1;
   float q2;
   float q3;
@@ -33,52 +33,44 @@ typedef struct SerialData {
 
 } SerialData;
 
+// Sensor readings
+typedef struct Sensors {
+  float accelerometer_x;
+  float accelerometer_y;
+  float accelerometer_z;
+  float gyro_x;
+  float gyro_y;
+  float gyro_z;
+  float magneto_x;
+  float magneto_y;
+  float magneto_z;
+  float gps_x;
+  float gps_y;
+  float gps_z;
+  float baro;
+  float accel_bias_x;
+  float accel_bias_y;
+  float accel_bias_z;
+  float gyro_bias_x;
+  float gyro_bias_y;
+  float gyro_bias_z;
+  float gps_offset_x; // subtract this offset to get GPS posn in World frame
+  float gps_offset_y;
+  float gps_offset_z;
+  float baro_offset; // subtract this offset to get baro reading relative to World
+} Sensors;
+
 typedef struct SerialDataPacket {
     SerialData data;
     uint8_t bytes[sizeof(SerialData)];
 } SerialDataPacket;
 
-typedef struct LoggedData {
-  
-  int state; // current state machine state
-
-  float posx; // ecef frame
-  float posy;
-  float posz;
-  float velx; // ecef frame
-  float vely;
-  float velz;
-  float q0; // ned to body
-  float q1;
-  float q2;
-  float q3;
-  float wx; // body frame
-  float wy;
-  float wz;
-
-  float accelerometerx;
-  float accelerometery;
-  float accelerometerz;
-  float gyrox;
-  float gyroy;
-  float gyroz;
-  float magnetox;
-  float magnetoy;
-  float magnetoz;
-  float gpsx;
-  float gpsy;
-  float gpsz;
-  float baro;
-
-} LoggedData;
-
-typedef struct LoggedDataPacket {
-    LoggedData data;
-    uint8_t bytes[sizeof(LoggedData)];
-} LoggedDataPacket;
 
 void send_serial_data(SerialData* serial_data);
 
-void log_data(LoggedData* log_data);
+void log_data(SerialData* serial_data, Sensors* sensors);
+
+void read_compensated_sensors(Sensors* sensors);
+
 
 #endif

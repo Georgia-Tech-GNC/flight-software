@@ -71,16 +71,4 @@ void read_compensated_sensors(Sensors* sensors) {
   sensors->magneto_y = //TODO
   sensors->magneto_z = //TODO
 
-  // Apply compensations
-  sensors->accelerometer_x -= sensors->accelo_bias_x;
-  sensors->accelerometer_y = sensors->accelo_bias_y;
-  sensors->accelerometer_z = sensors->accelo_bias_z;
-  sensors->gyro_x = sensors->gyro_bias_x;
-  sensors->gyro_y = sensors->gyro_bias_x;
-  sensors->gyro_z = sensors->gyro_bias_x;
-  sensors->gps_x = sensors->gps_offset_x;
-  sensors->gps_y = sensors->gps_offset_y;
-  sensors->gps_z = sensors->gps_offset_z;
-  sensors->baro = sensors->baro_offset;
-
 }

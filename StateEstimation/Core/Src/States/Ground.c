@@ -150,27 +150,29 @@ void run_ground(ExtKalmanFilter* gekf, Sensors* sensors, SerialData *serial_data
 
         update_time_step(gekf);
 
-        adis_get_data(imu_data); // read from imu
+        // adis_get_data(imu_data); // read from imu
 
-        double mag_reading[3]; // read from mag
-        int status = lis3mdl_read_mag(lis_mag,mag_reading);
+        // double mag_reading[3]; // read from mag
+        // int status = lis3mdl_read_mag(lis_mag,mag_reading);
 
-        MS5607Update(); // read from baro
-
-        float gps_reading = 0; //TODO
-        float gps_world_x, gps_world_y, gps_world_z;
+        // MS5607Update(); // read from baro
 
         // Read sensor data
-        sensors->accelerometer_x = imu_data->x_accl_out;
-        sensors->accelerometer_y = imu_data->y_accl_out;
-        sensors->accelerometer_z = imu_data->z_accl_out;
-        sensors->gyro_x = imu_data->x_gyro_out;
-        sensors->gyro_y = imu_data->y_gyro_out;
-        sensors->gyro_z = imu_data->z_gyro_out;
-        sensors->magneto_x = mag_reading[0];
-        sensors->magneto_y = mag_reading[1];
-        sensors->magneto_z = mag_reading[2];
-        sensors->baro = pressure2altitude(float(reading_baro->pressure));
+        // sensors->accelerometer_x = imu_data->x_accl_out;
+        // sensors->accelerometer_y = imu_data->y_accl_out;
+        // sensors->accelerometer_z = imu_data->z_accl_out;
+        // sensors->gyro_x = imu_data->x_gyro_out;
+        // sensors->gyro_y = imu_data->y_gyro_out;
+        // sensors->gyro_z = imu_data->z_gyro_out;
+        // sensors->magneto_x = mag_reading[0];
+        // sensors->magneto_y = mag_reading[1];
+        // sensors->magneto_z = mag_reading[2];
+        // sensors->baro = pressure2altitude(float(reading_baro->pressure));
+        // GPS2World(sensors->gps_x,sensors->gps_y,sensors->gps_z,&gps_world_x,&gps_world_y,&gps_world_z);
+
+        // Read sensors
+        read_sensors(sensors);
+        float gps_world_x, gps_world_y, gps_world_z;
         GPS2World(sensors->gps_x,sensors->gps_y,sensors->gps_z,&gps_world_x,&gps_world_y,&gps_world_z);
 
         //Measurement function

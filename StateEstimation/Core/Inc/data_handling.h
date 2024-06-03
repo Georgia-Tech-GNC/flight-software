@@ -70,7 +70,7 @@ void send_serial_data(SerialData* serial_data);
 
 void log_data(SerialData* serial_data, Sensors* sensors);
 
-void read_compensated_sensors(Sensors* sensors);
+void read_sensors(Sensors* sensors);
 
 
 #endif

@@ -172,19 +172,32 @@ int main(void)
               initialize_rocket_attitude(rocket_atd, 0.7071, 0, 0.7071, 0); //Initialize in-flight attitude estimation
               has_run_fast_ascent = 1;
             }
-            state_vec = run_fast_ascent(fekf,rocket_atd); //TODO: Need to also transmit GPS data, accelerometer data, and gyro data per the function definition
+            run_fast_ascent(fekf,rocket_atd, sensors, serial_data); 
             break;
         }
         case SLOWASCENT: {
-            state_vec = run_slow_ascent(fekf,rocket_atd); //TODO: Need to also transmit GPS data, accelerometer data, and gyro data per the function definition
+            run_slow_ascent(fekf,rocket_atd, sensors, serial_data);
             break;
         }
         case FREEFALL: {
-            state_vec = run_freefall(fekf,rocket_atd); //TODO: Need to also transmit GPS data, accelerometer data, and gyro data per the function definition
+            run_freefall(fekf,rocket_atd, sensors, serial_data); 
             break;
         }
         case LANDED: {
-            state_vec = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0}; //Nominal state vector for landed rocket, since sensor reading and math is not necessary upon landing
+            serial_data->state = 5; //Landed is 5
+            serial_data->pos_x = 0.0;
+            serial_data->pos_y = 0.0;
+            serial_data->pos_z = 0.0;
+            serial_data->vel_x = 0.0;
+            serial_data->vel_y = 0.0;
+            serial_data->vel_z = 0.0;
+            serial_data->q0 = 1.0;
+            serial_data->q1 = 0.0;
+            serial_data->q2 = 0.0;
+            serial_data->q3 = 0.0;
+            serial_data->wx = 0.0;
+            serial_data->wy = 0.0;
+            serial_data->wz = 0.0;
             break;
         }
         default {

@@ -13,34 +13,36 @@
 #include <string.h>
 #include <sys/time.h>
 
-#include "../../Inc/ekf.h"
-#include "../../Inc/attitude.h"
-#include "../../Inc/States/Ground.h"
+void run_slow_ascent(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors *sensors, SerialData *serial_data){
 
-float *run_slow_ascent(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, float *GPS_data, float *accel_data, float *gyro_data){
+    float GPS_data[3] = {sensors->gps_x, sensors->gps_y, sensors->gps_z};
+    float accel_data[3] = {sensors->accelerometer_x, sensors->accelerometer_y, sensors->accelerometer_z};
 
-    float wx = gyro_data[0];
-    float wy = gyro_data[1];
-    float wz = gyro_data[2];
-
-    run_attitude_estimation(&rocket_atd, wx, wy, wz);
+    run_attitude_estimation(rocket_atd, sensors->gyro_x, sensors->gyro_y, sensors->gyro_z);
     run_ekf(&ekf, GPS_data, accel_data);
 
-    float phi = rocket_atd->phi;
-    float theta = rocket_atd->theta;
-    float psi = rocket_atd->psi;
+    //float phi = rocket_atd->phi;
+    //float theta = rocket_atd->theta;
+    //float psi = rocket_atd->psi;
 
-    float x = ekf->x_n.pData[0];
-    float vx = ekf->x_n.pData[1];
-    float y = ekf->x_n.pData[2];
-    float vy = ekf->x_n.pData[3];
-    float z = ekf->x_n.pData[4];
-    float vz = ekf->x_n.pData[5];
+    serial_data->state = 3; //Idle = 0, Ground = 1, Fast Ascent = 2, Slow Ascent = 3, Freefall = 4, Landed = 5
+    serial_data->pos_x = ekf->x_n.pData[0];
+    serial_data->pos_y = ekf->x_n.pData[2];
+    serial_data->pos_z = ekf->x_n.pData[4];
+    serial_data->vel_x = ekf->x_n.pData[1];
+    serial_data->vel_y = ekf->x_n.pData[3];
+    serial_data->vel_z = ekf->x_n.pData[5];
+    serial_data->q0 = rocket_atd->q_current_s;  
+    serial_data->q1 = rocket_atd->q_current_x;
+    serial_data->q2 = rocket_atd->q_current_y;
+    serial_data->q3 = rocket_atd->q_current_z;
+    serial_data->wx = sensors->gyro_x;
+    serial_data->wy = sensors->gyro_y;
+    serial_data->wz = sensors->gyro_z;
 
-    float state_vector[9] = {x, vx, y, vy, z, vz, phi, theta, psi};
 
     //TODO: State transition check to free fall
 
-    return state_vector;
+    
 
 }

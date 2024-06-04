@@ -207,12 +207,12 @@ void run_ground(ExtKalmanFilter* gekf, Sensors* sensors, SerialData *serial_data
 
         // Update SerialData packet
         serial_data->state = STATE_MACHINE;
-        serial_data->posx = 0.0;
-        serial_data->posy = 0.0;
-        serial_data->posz = 0.0;
-        serial_data->velx = 0.0;
-        serial_data->vely = 0.0;
-        serial_data->velz = 0.0;
+        serial_data->pos_x = 0.0;
+        serial_data->pos_y = 0.0;
+        serial_data->pos_z = 0.0;
+        serial_data->vel_x = 0.0;
+        serial_data->vel_y = 0.0;
+        serial_data->vel_z = 0.0;
         serial_data->q0 = 1.0;
         serial_data->q1 = 0.0;
         serial_data->q2 = 0.0;
@@ -220,7 +220,7 @@ void run_ground(ExtKalmanFilter* gekf, Sensors* sensors, SerialData *serial_data
         serial_data->wx = 0.0;
         serial_data->wy = 0.0;
         serial_data->wz = 0.0;
-        serial_data->t = GlobalTime;
+        
 
         // State transition conditions
         if (gekf_has_converged && signal_received) {

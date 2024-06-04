@@ -1,6 +1,8 @@
 {
     "C_Cpp.default.compilerPath": "c:\\MinGW\\bin\\gcc.exe",
     "files.associations": {
-        "ekf.h": "c"
-    }
+        "ekf.h": "c",
+        "ground.h": "c"
+    },
+    "C_Cpp.errorSquiggles": "enabled"
 }

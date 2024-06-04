@@ -40,8 +40,6 @@ typedef struct {
     float psi;
 } rocket_attitude;
 
-int64_t currentTimeMillis_att();
-void update_time_step(rocket_attitude *rocket_atd);
 void initialize_rocket_attitude(rocket_attitude *rocket_atd, float qs, float qx, float qy, float qz);
 void set_gyro_x(rocket_attitude *rocket_atd, float wx);
 void set_gyro_y(rocket_attitude *rocket_atd, float wy);

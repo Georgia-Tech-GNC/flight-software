@@ -11,7 +11,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <lapacke.h>
 #include <sys/time.h>
 
 #include "../../Inc/ekf.h"

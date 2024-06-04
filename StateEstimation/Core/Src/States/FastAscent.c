@@ -32,9 +32,9 @@ void run_fast_ascent(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors 
     serial_data->vel_y = ekf->x_n.pData[3];
     serial_data->vel_z = ekf->x_n.pData[5];
     serial_data->q0 = rocket_atd->q_current_s;  
-    serial_data->q1 = rocket_atd->q_current_x
+    serial_data->q1 = rocket_atd->q_current_x;
     serial_data->q2 = rocket_atd->q_current_y;
-    serial_data->q3 = rocket_atd->q_current_z
+    serial_data->q3 = rocket_atd->q_current_z;
     serial_data->wx = sensors->gyro_x;
     serial_data->wy = sensors->gyro_y;
     serial_data->wz = sensors->gyro_z;

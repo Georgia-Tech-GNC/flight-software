@@ -11,23 +11,6 @@
 #include <math.h>
 #include "attitude.h"
 
-int64_t currentTimeMillis_att(){
-    struct timeval time;
-    gettimeofday(&time, NULL);
-    int64_t s1 = (int64_t)(time.tv_sec) * 1000;
-    int64_t s2 = (time.tv_usec / 1000);
-    return s1 + s2;
-}
-
-void update_time_step(rocket_attitude *rocket_atd){
-
-    int64_t curr_time_millis = currentTimeMillis_att();
-    float dt_millis = (float)(curr_time_millis - rocket_atd->prev_time_millis);
-    rocket_atd->time_step = dt_millis / 1000;
-    rocket_atd->prev_time_millis = curr_time_millis;
-
-}
-
 void initialize_rocket_attitude(rocket_attitude *rocket_atd, float qs, float qx, float qy, float qz){
 
     rocket_atd->q_current_s = qs;
@@ -188,8 +171,6 @@ void run_attitude_estimation(rocket_attitude *rocket_atd, float wx, float wy, fl
     set_gyro_x(rocket_atd, wx);
     set_gyro_y(rocket_atd, wy);
     set_gyro_z(rocket_atd, wz);
-
-    update_time_step(rocket_atd);
 
     gyro_to_rotation_quat(rocket_atd);
     quat_update(rocket_atd);

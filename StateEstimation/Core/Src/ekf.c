@@ -75,23 +75,6 @@ float32_t *f_f32, float32_t *h_f32, float32_t *z_f32, float32_t *state_stddevs){
     return result;
 }
 
-int64_t currentTimeMillis(){
-    struct timeval time;
-    gettimeofday(&time, NULL);
-    int64_t s1 = (int64_t)(time.tv_sec) * 1000;
-    int64_t s2 = (time.tv_usec / 1000);
-    return s1 + s2;
-}
-
-void update_time_step(ExtKalmanFilter *ekf){
-
-    int64_t curr_time_millis = currentTimeMillis();
-    float32_t dt_millis = (float32_t)(curr_time_millis - ekf->prev_time_millis);
-    ekf->time_step = dt_millis / 1000.0;
-    ekf->prev_time_millis = curr_time_millis;
-
-}
-
 void observation_function(ExtKalmanFilter *ekf){
 
     float h_new_data[ekf->nz];
@@ -430,8 +413,6 @@ void acknowledge_time_passed(ExtKalmanFilter *ekf){
 
 }
 void run_ekf(ExtKalmanFilter *ekf, float *GPS_sensor, float *IMU_sensor){
-
-    update_time_step(ekf);
 
     ekf->gps[0] = GPS_sensor[0];
     ekf->gps[1] = GPS_sensor[1];

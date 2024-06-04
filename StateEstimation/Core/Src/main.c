@@ -83,8 +83,8 @@ static void MX_USB_OTG_HS_PCD_Init(void);
 
 // Global variables
 int STATE_MACHINE = GROUND;
-float32_t GlobalTime;
-
+uint32_t GlobalTime;
+uint32_t prevGlobalTime;
 // Initialize drivers
 adis_init(*adis_imu);
 ADIS16500_Data *imu_data;
@@ -144,7 +144,9 @@ int main(void)
   ExtKalmanFilter *fekf;
   rocket_attitude *rocket_atd;
   int has_run_fast_ascent = 0;
-  float state_vec[10] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+  int first_time = 0;
+
+  uint32_t start = HAL_GetTick(); //number of milliseconds since start
 
   /* USER CODE END 2 */
 
@@ -152,9 +154,10 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-
-    // Get current time
-    GlobalTime = (float32_t)currentTimeMillis()/1000.0;
+    if (first_time == 0){
+      prevGlobalTime = start;
+      first_time = 1;
+    }
 
     // State machine manager
     switch (STATE_MACHINE) {
@@ -200,7 +203,7 @@ int main(void)
             serial_data->wz = 0.0;
             break;
         }
-        default {
+        default: {
             printf('Invalid state reached');
             break;
         }
@@ -210,7 +213,14 @@ int main(void)
     send_serial_data(serial_data);
 
     // Log data to flash
-    log_data(logged_data);
+    log_data(serial_data, sensors);
+
+    //Update time step(s)
+    GlobalTime = HAL_GetTick();
+    uint32_t global_time_step = ((float32_t)(GlobalTime - prevGlobalTime))/1000.0;
+    gekf->time_step = global_time_step;
+    fekf->time_step = global_time_step;
+    rocket_atd->time_step = global_time_step;
 
     /* USER CODE END WHILE */
 

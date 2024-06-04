@@ -8,6 +8,8 @@
  * This file must not be made publicly available anywhere.
 */
 
+#include "../../Inc/States/Freefall.h"
+
 void run_freefall(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors *sensors, SerialData *serial_data){
 
     float GPS_data[3] = {sensors->gps_x, sensors->gps_y, sensors->gps_z};

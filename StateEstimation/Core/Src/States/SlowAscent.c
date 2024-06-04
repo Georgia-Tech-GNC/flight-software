@@ -13,6 +13,8 @@
 #include <string.h>
 #include <sys/time.h>
 
+#include "../../Inc/States/SlowAscent.h"
+
 void run_slow_ascent(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors *sensors, SerialData *serial_data){
 
     float GPS_data[3] = {sensors->gps_x, sensors->gps_y, sensors->gps_z};

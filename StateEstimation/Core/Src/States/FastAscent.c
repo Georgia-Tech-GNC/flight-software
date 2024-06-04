@@ -8,7 +8,7 @@
  * This file must not be made publicly available anywhere.
 */
 
-
+#include "../../Inc/States/FastAscent.h"
 
 void run_fast_ascent(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors *sensors, SerialData *serial_data){
 

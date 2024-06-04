@@ -147,8 +147,6 @@ void run_ground(ExtKalmanFilter* gekf, Sensors* sensors, SerialData *serial_data
     // Loop
     while (STATE_MACHINE == GROUND) {
 
-        update_time_step(gekf);
-
         // adis_get_data(imu_data); // read from imu
 
         // double mag_reading[3]; // read from mag

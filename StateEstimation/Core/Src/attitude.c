@@ -8,7 +8,7 @@
  * Copyrighted course materials may not be further disseminated.
  * This file must not be made publicly available anywhere.
 */
-#include <math.h>
+
 #include "attitude.h"
 
 void initialize_rocket_attitude(rocket_attitude *rocket_atd, float qs, float qx, float qy, float qz){

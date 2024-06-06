@@ -15,6 +15,7 @@
 
 #include <stdint.h>
 #include <sys/time.h>
+#include <math.h>
 
 typedef struct { 
     /*Assumes q_current is knownf rom ground calibration*/

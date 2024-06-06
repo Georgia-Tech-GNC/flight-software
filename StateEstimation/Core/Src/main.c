@@ -175,14 +175,17 @@ int main(void)
               initialize_rocket_attitude(rocket_atd, 0.7071, 0, 0.7071, 0); //Initialize in-flight attitude estimation
               has_run_fast_ascent = 1;
             }
+            read_sensors(sensors);
             run_fast_ascent(fekf,rocket_atd, sensors, serial_data); 
             break;
         }
         case SLOWASCENT: {
+            read_sensors(sensors);
             run_slow_ascent(fekf,rocket_atd, sensors, serial_data);
             break;
         }
         case FREEFALL: {
+            read_sensors(sensors);
             run_freefall(fekf,rocket_atd, sensors, serial_data); 
             break;
         }

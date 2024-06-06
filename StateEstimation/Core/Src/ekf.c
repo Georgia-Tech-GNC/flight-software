@@ -11,14 +11,85 @@
 #include "ekf.h"
 
 //See https://github.com/ramblinrocketclub/flight-computer/blob/master/Core/Src/rocket.c for initializing process
-arm_status initialize_ekf(ExtKalmanFilter *ekf, uint16_t num_states, uint16_t num_inputs, uint16_t num_measurements, 
-float32_t *dfdx_f32, float32_t *dhdx_f32, float32_t *G_f32, float32_t *Q_f32, float32_t *K_f32, float32_t *R_f32,
-float32_t *x_p, float32_t *P_p, float32_t *x_init, float32_t *P_init, float32_t *x_f, float32_t *P_f,
-float32_t *f_f32, float32_t *h_f32, float32_t *z_f32, float32_t *state_stddevs){
+arm_status initialize_ekf(ExtKalmanFilter *ekf){
 
     arm_status result = ARM_MATH_SUCCESS;
 
-    float32_t wnT_f32[num_states];
+    ekf->time_step = 0.02; //initial time step
+
+    uint16_t num_states = 6;
+    uint16_t num_inputs = 1;
+    uint16_t num_measurements = 3;
+
+    //EKF state vector is x, vx, y, vy, z, vz
+    float32_t dfdx_f32[6*6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                                 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                                 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                                 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                                 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                                 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+
+    float32_t dhdx_f32[6*3] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                                 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                                 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+
+    float32_t G_f32[3*3] = {0.0, 0.0, 0.0,
+                                              0.0, 0.0, 0.0,
+                                              0.0, 0.0, 0.0};
+
+    float32_t Q_f32[6*6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                              0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                              0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                              0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                              0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                              0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; //Right now is based off of state stddevs but tuning may be needed
+
+    float32_t K_f32[6*3] = {0.0, 0.0, 0.0,
+                                              0.0, 0.0, 0.0,
+                                              0.0, 0.0, 0.0,
+                                              0.0, 0.0, 0.0,
+                                              0.0, 0.0, 0.0,
+                                              0.0, 0.0, 0.0};
+
+    float32_t R_f32[3*3] = {5.0, 0.0, 0.0,
+                                              0.0, 5.0, 0.0,
+                                              0.0, 0.0, 5.0}; //Needs to be tuned. Cannot be nonzero
+
+    float32_t x_p[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+
+    float32_t P_p[6*6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                            0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                            0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                            0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                            0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                            0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+
+    float32_t x_init[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+
+    float32_t P_init[6*6] = {10.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                               0.0, 10.0, 0.0, 0.0, 0.0, 0.0,
+                                               0.0, 0.0, 10.0, 0.0, 0.0, 0.0,
+                                               0.0, 0.0, 0.0, 10.0, 0.0, 0.0,
+                                               0.0, 0.0, 0.0, 0.0, 10.0, 0.0,
+                                               0.0, 0.0, 0.0, 0.0, 0.0, 10.0}; //Define as arbitrary nonzero diagonal matrix
+
+    float32_t x_f[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+
+    float32_t P_f[6*6] = {10.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                            0.0, 10.0, 0.0, 0.0, 0.0, 0.0,
+                                            0.0, 0.0, 10.0, 0.0, 0.0, 0.0,
+                                            0.0, 0.0, 0.0, 10.0, 0.0, 0.0,
+                                            0.0, 0.0, 0.0, 0.0, 10.0, 0.0,
+                                            0.0, 0.0, 0.0, 0.0, 0.0, 10.0}; //Define as arbitrary nonzero diagonal matrix
+
+    float32_t f_f32[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    float32_t h_f32[3] = {0.0, 0.0, 0.0};
+    float32_t z_f32[3] = {0.0, 0.0, 0.0};
+
+    float32_t state_stddevs[6] = {3.0, 5.0, 3.0, 5.0, 3.0, 5.0}; //x_stddev, vx_stddev, y_stddev, vy_stddev, z_stddev, vz_stddev
+    //THE ABOVE LINE NEEDS TO BE MODIFIED WITH CORRECT VALUES
+
+    float32_t wnT_f32[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; //Placeholder values
 
     ekf->nx = num_states;
     ekf->nu = num_inputs;
@@ -50,7 +121,7 @@ float32_t *f_f32, float32_t *h_f32, float32_t *z_f32, float32_t *state_stddevs){
     arm_mat_init_f32(&wnT, 1, ekf->nx, wnT_f32);
 
     result |= arm_mat_trans_f32(&wn, &wnT);
-    result |= arm_mat_mult_f32(&wn, &wnT, &ekf->Q); //Compute process noise matrix
+    result |= arm_mat_mult_f32(&wn, &wnT, &ekf->Q); //Compute process noise matrix 
 
     ekf->gps[0] = 0.0;
     ekf->gps[1] = 0.0;
@@ -69,8 +140,6 @@ float32_t *f_f32, float32_t *h_f32, float32_t *z_f32, float32_t *state_stddevs){
     ekf->magneto[2] = 0.0;
 
     ekf->barometer = 0.0;
-
-    ekf->time_step = 0.02; //initial time step
 
     return result;
 }

@@ -56,10 +56,7 @@ typedef struct ExtKalmanFilter {
 
 } ExtKalmanFilter;
 
-arm_status initialize_ekf(ExtKalmanFilter *ekf, uint16_t num_states, uint16_t num_inputs, uint16_t num_measurements, 
-float32_t *dfdx_f32, float32_t *dhdx_f32, float32_t *G_f32, float32_t *Q_f32, float32_t *K_f32, float32_t *R_f32,
-float32_t *x_prev, float32_t *P_prev, float32_t *x_init, float32_t *P_init, float32_t *x_next, float32_t *P_next,
-float32_t *f_f32, float32_t *h_f32, float32_t *z_f32, float32_t *state_stddevs);
+arm_status initialize_ekf(ExtKalmanFilter *ekf);
 
 void observation_function(ExtKalmanFilter *ekf);
 void observation_jacobian(ExtKalmanFilter *ekf);

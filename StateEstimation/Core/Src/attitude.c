@@ -142,7 +142,13 @@ void quat_update(rocket_attitude *rocket_atd){
     rocket_atd->q_current_z = q_new_z;
 
 }
-
+/**
+ * @brief This function, when called, updates the euler angles in the rocket_atd struct based on the current quaternion in the rocket_atd struct
+ * @param rocket_atd (rocket attitude struct)
+ * @return None
+ * @note This is not strictly necessary as our present control algorithm uses quaternion attitude representation. However, it may be helpful
+ * if controls need to be based off of Euler angles or for debugging. 
+*/
 void quat_to_euler_angs(rocket_attitude *rocket_atd){
 
     float qs = rocket_atd->q_current_s;
@@ -166,6 +172,12 @@ void quat_to_euler_angs(rocket_attitude *rocket_atd){
 
 }
 
+/**
+ * @brief This function runs one loop of attitude estimation, taking in gyro measurements and updating the rocket quaternion
+ * @param rocket_atd (rocket attitude struct) and gyro measurements wx, wy, wz
+ * @return
+ * @note
+*/
 void run_attitude_estimation(rocket_attitude *rocket_atd, float wx, float wy, float wz){
 
     set_gyro_x(rocket_atd, wx);
@@ -174,5 +186,5 @@ void run_attitude_estimation(rocket_attitude *rocket_atd, float wx, float wy, fl
 
     gyro_to_rotation_quat(rocket_atd);
     quat_update(rocket_atd);
-    quat_to_euler_angs(rocket_atd);
+    quat_to_euler_angs(rocket_atd); //Not necessary to include right now but if not too slow then may still be included
 }

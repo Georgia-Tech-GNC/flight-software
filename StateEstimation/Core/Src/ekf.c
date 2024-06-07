@@ -10,6 +10,15 @@
 
 #include "ekf.h"
 
+/**
+ * @brief This function should only be called once at the beginning of flight; it initializes the ekf, putting all the matrices and vectors
+ * into arm matrix instances so matrix operations can be performed from arm_math.h
+ * @param ekf, the struct representing the Extended Kalman Filter which contains translational state estimates
+ * @return
+ * @note See https://github.com/ramblinrocketclub/flight-computer/blob/master/Core/Src/rocket.c for initializing process
+ * This also may be rearranged to define initial matrices and vectors in another file to make the code cleaner. That is left
+ * up to the software team.
+*/
 //See https://github.com/ramblinrocketclub/flight-computer/blob/master/Core/Src/rocket.c for initializing process
 arm_status initialize_ekf(ExtKalmanFilter *ekf){
 
@@ -143,7 +152,13 @@ arm_status initialize_ekf(ExtKalmanFilter *ekf){
 
     return result;
 }
-
+/**
+ * @brief This function establishes the EKF's "observation" function,
+ *      which takes in the state estimate and converts it to the form of the measurements.
+ * @param ekf, the rocket's EKF struct
+ * @return
+ * @note
+*/
 void observation_function(ExtKalmanFilter *ekf){
 
     float h_new_data[ekf->nz];
@@ -157,6 +172,12 @@ void observation_function(ExtKalmanFilter *ekf){
 
 }
 
+/**
+ * @brief This function puts the observation function in jacobian form, forming the "H" matrix
+ * @param ekf, the rocket's EKF struct
+ * @return
+ * @note
+*/
 void observation_jacobian(ExtKalmanFilter *ekf){
 
     float32_t dhdx_new[ekf->nz][ekf->nx];
@@ -171,6 +192,13 @@ void observation_jacobian(ExtKalmanFilter *ekf){
 
 }
 
+/**
+ * @brief This function computes the Kalman gain, which is a relative measure of trust between the measurements and the dynamics;
+ *  in this case, the Kalman gain weighs the accelerometer against the GPS
+ * @param ekf, the rocket's EKF struct
+ * @return
+ * @note A more robust equation for the Kalman gain is used per the suggestion of the rlabbe Kalman-and-Bayesian-Filters-in-Python GitHub tutorial
+*/
 void kalman_gain(ExtKalmanFilter *ekf){
 
     //K = PHt(HPHt + R)i
@@ -240,6 +268,13 @@ void kalman_gain(ExtKalmanFilter *ekf){
     ekf->K_n = K_new;
 
 }
+
+/**
+ * @brief Form a new state estimate in the "Update" step of the Kalman filter
+ * @param ekf, the EKF struct
+ * @return
+ * @note
+*/
 void update_state(ExtKalmanFilter *ekf){
 
     //x_n = x_prev + K*(z-h)
@@ -275,6 +310,12 @@ void update_state(ExtKalmanFilter *ekf){
     ekf->x_n = x_updated;
 }
 
+/**
+ * @brief Update the covariance matrix as part of the "Update" step of the Kalman filter
+ * @param ekf, the EKF struct
+ * @return
+ * @note
+*/
 void update_covariance(ExtKalmanFilter *ekf){
 
     //P_n = (I - KH)P_prev(I - KH)t + KRKt
@@ -367,6 +408,12 @@ void update_covariance(ExtKalmanFilter *ekf){
     ekf->P_n = P_result;
 }
 
+/**
+ * @brief Form the state transition function for the EKF, which propagates the states forward in time based on measurements.
+ * @param ekf, the EKF struct
+ * @return
+ * @note
+*/
 void state_transition_function(ExtKalmanFilter *ekf){
 
     float f_new_data[ekf->nx];
@@ -383,6 +430,12 @@ void state_transition_function(ExtKalmanFilter *ekf){
     ekf->f = f_new;
 }
 
+/**
+ * @brief Form the Jacobian for the state transition function "F".
+ * @param ekf, the EKF struct
+ * @return
+ * @note
+*/
 void state_transition_jacobian(ExtKalmanFilter *ekf){
 
     float32_t dfdx_new[ekf->nx][ekf->nx];
@@ -413,6 +466,12 @@ void state_transition_jacobian(ExtKalmanFilter *ekf){
 
 }
 
+/**
+ * @brief Perform the prediction step of the EKF based on accelerometer measurements.
+ * @param ekf, the EKF struct
+ * @return
+ * @note Not considered a control matrix here since vehicle dynamics are reduced to hgh frequency accelerometer measurements.
+*/
 void predict_state(ExtKalmanFilter *ekf){
 
     ekf->x_next = ekf->f;
@@ -420,6 +479,12 @@ void predict_state(ExtKalmanFilter *ekf){
 
 }
 
+/**
+ * @brief Perform the predict step to form a covariance prediction for the EKF.
+ * @param ekf, the EKF struct
+ * @return
+ * @note Q is based on MATLAB tuning.
+*/
 void predict_covariance(ExtKalmanFilter *ekf){
 
     //P_next = FPFt + Q
@@ -462,6 +527,12 @@ void predict_covariance(ExtKalmanFilter *ekf){
     ekf->P_next = P_future;
 }
 
+/**
+ * @brief This function takes in measurements for the "Update" step of the EKF; the measurements are GPS.
+ * @param ekf, the EKF struct
+ * @return
+ * @note
+*/
 void make_measurement(ExtKalmanFilter *ekf){
 
     float32_t z_new_f32[ekf->nz];
@@ -475,12 +546,25 @@ void make_measurement(ExtKalmanFilter *ekf){
 
 }
 
+/**
+ * @brief This function represents the passage of one (variable) time step.
+ * @param ekf, the EKF struct
+ * @return
+ * @note
+*/
 void acknowledge_time_passed(ExtKalmanFilter *ekf){
 
     ekf->x_prev = ekf->x_next;
     ekf->P_prev = ekf->P_next;
 
 }
+
+/**
+ * @brief This function runs one step, predict and update, of the EKF
+ * @param ekf, the EKF struct
+ * @return
+ * @note Should be run once per time step.
+*/
 void run_ekf(ExtKalmanFilter *ekf, float *GPS_sensor, float *IMU_sensor){
 
     ekf->gps[0] = GPS_sensor[0];

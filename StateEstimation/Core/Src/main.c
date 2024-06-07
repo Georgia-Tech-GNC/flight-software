@@ -158,7 +158,7 @@ int main(void)
       prevGlobalTime = start;
       first_time = 1;
     }
-
+    //TODO: Implement com_to_imu() function in state_est_helpers to take into account Coriolis effects on accelerometer measurements
     // State machine manager
     switch (STATE_MACHINE) {
         case IDLE: {

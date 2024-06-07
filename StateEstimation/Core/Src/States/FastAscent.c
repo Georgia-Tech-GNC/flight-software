@@ -10,6 +10,12 @@
 
 #include "../../Inc/States/FastAscent.h"
 
+/**
+ * @brief This function contains all of the operations that occur specifically during fast ascent, when the motor is propelling the rocket upward.
+ * @param ekf, the EKF struct; rocket_atd, the rocket attitude struct; sensors, a struct of most recent sensor measurements; serial_data, the data logging/transmitting struct
+ * @return
+ * @note Transmitting data to the main MCU and logging data are not unique fast ascent operations so are not included here.
+*/
 void run_fast_ascent(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors *sensors, SerialData *serial_data){
 
     float GPS_data[3] = {sensors->gps_x, sensors->gps_y, sensors->gps_z};
@@ -41,5 +47,7 @@ void run_fast_ascent(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors 
 
 
     //TODO: State transition check to slow ascent
+
+    
 
 }

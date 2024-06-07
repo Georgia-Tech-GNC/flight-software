@@ -10,6 +10,12 @@
 
 #include "../../Inc/States/Freefall.h"
 
+/**
+ * @brief This function contains all of the operations that occur specifically during freefall, when the rocket is falling to the ground.
+ * @param ekf, the EKF struct; rocket_atd, the rocket attitude struct; sensors, a struct of most recent sensor measurements; serial_data, the data logging/transmitting struct
+ * @return
+ * @note Transmitting data to the main MCU and logging data are not unique freefall operations so are not included here.
+*/
 void run_freefall(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors *sensors, SerialData *serial_data){
 
     float GPS_data[3] = {sensors->gps_x, sensors->gps_y, sensors->gps_z};

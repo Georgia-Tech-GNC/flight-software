@@ -18,6 +18,11 @@
 */
 void run_freefall(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors *sensors, SerialData *serial_data){
 
+    if (first_iter) {
+        static int activatedTOV = 0;
+        first_iter = 0;
+    }
+
     float GPS_data[3] = {sensors->gps_x, sensors->gps_y, sensors->gps_z};
     float accel_data[3] = {sensors->accelerometer_x, sensors->accelerometer_y, sensors->accelerometer_z};
 
@@ -45,6 +50,27 @@ void run_freefall(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors *se
 
 
     //TODO: State transition check to landed
+    // TOV - time of validity
+    if (ekf->x_n.pData[0] < 5.0 && ekf->x_n.pData[1] > -0.1){
+
+        if (activatedTOV) {
+
+            float TOV = GlobalTimeSeconds - startTOV;
+
+            if (TOV > 3.0) {
+                // Switch states
+                STATE_MACHINE = LANDED;
+                first_iter = 1;
+            }
+
+        } else {
+            static float startTOV = GlobalTimeSeconds;
+            static int activatedTOV = 1;
+        }
+    } else {
+        startTOV = GlobalTimeSeconds;
+        activatedTOV = 0;
+    }
 
 
 }

@@ -24,11 +24,6 @@
 #include <string.h>
 
 #include "../Inc/main.h"
-#include "../Inc/ekf.h"
-#include "../Inc/attitude.h"
-#include "../Inc/state_est_helpers.h"
-#include "../Inc/States/StateMachine.h"
-#include "../Inc/data_handling.h"
 
 /* USER CODE END Includes */
 
@@ -84,7 +79,9 @@ static void MX_USB_OTG_HS_PCD_Init(void);
 // Global variables
 int STATE_MACHINE = GROUND;
 uint32_t GlobalTime;
+float GlobalTimeSeconds;
 uint32_t prevGlobalTime;
+int first_iter;
 // Initialize drivers
 adis_init(*adis_imu);
 ADIS16500_Data *imu_data;
@@ -220,6 +217,7 @@ int main(void)
 
     //Update time step(s)
     GlobalTime = HAL_GetTick();
+    GlobalTimeSeconds = (float)GlobalTime/1000.0;
     uint32_t global_time_step = ((float32_t)(GlobalTime - prevGlobalTime))/1000.0;
     gekf->time_step = global_time_step;
     fekf->time_step = global_time_step;

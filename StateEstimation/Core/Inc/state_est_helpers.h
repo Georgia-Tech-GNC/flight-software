@@ -10,8 +10,8 @@
 #ifndef __STATE_EST_HELPERS_H__
 #define __STATE_EST_HELPERS_H__
 
-#include "ekf.h";
-#include "attitude.h";
+#include "ekf.h"
+#include "attitude.h"
 
 // GPS params
 #define WGS84_A 6378137.0   // Semi-major axis of WGS 84 ellipsoid (meters)

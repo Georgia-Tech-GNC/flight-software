@@ -8,8 +8,8 @@
  * This file must not be made publicly available anywhere.
 */
 
-#ifndef __GROUND_H__
-    #define __GROUND_H__
+#ifndef __IDLE_H__
+    #define __IDLE_H__
 
 void run_idle();
 

@@ -129,12 +129,12 @@ void GPS2ECEF(float lat, float lon, float alt, float* x, float* y, float* z) {
     // Converts from WGS84 to ECEF
 
     // Convert latitude and longitude from degrees to radians
-    double coslat = cos(lat * (M_PI / 180.0));
-    double sinlat = sin(lat * (M_PI / 180.0));
-    double coslon = cos(lon * (M_PI / 180.0));
-    double sinlon = sin(lon * (M_PI / 180.0));
+    double coslat = cos(lat * (3.14 / 180.0));
+    double sinlat = sin(lat * (3.14 / 180.0));
+    double coslon = cos(lon * (3.14 / 180.0));
+    double sinlon = sin(lon * (3.14 / 180.0));
 
-    double e = sqrt(1 - (WGS84_B**2/WGS84_A**2))
+    double e = sqrt(1 - (WGS84_B**2/WGS84_A**2));
     double N = WGS84_A / sqrt(1.0 - e * e * sinlat * sinlat);
 
     *x = (N + alt) * coslat * coslon;
@@ -220,7 +220,7 @@ void run_ground(ExtKalmanFilter* gekf, Sensors* sensors, SerialData *serial_data
         
 
         // State transition conditions
-        if (gekf_has_converged && signal_received) {
+        if (gekf_has_converged) {
 
             // Upload sensor compensations
             sensors->accel_bias_x = gekf->x_n.pData[0];
@@ -234,10 +234,15 @@ void run_ground(ExtKalmanFilter* gekf, Sensors* sensors, SerialData *serial_data
             sensors->gps_offset_z = gekf->x_n.pData[8];
             sensors->baro_offset = gekf->x_n.pData[9];
 
-            // Switch states
-            STATE_MACHINE = FASTASCENT;
-            first_iter = 0;
+            // detect 1 m/s^2 acceleration
+            if (sensors->accelerometer_x - sensors->accel_bias_x - 9.81 > 1.0) {
+                // Switch states
+                STATE_MACHINE = FASTASCENT;
+                first_iter = 1;
+            }
+
         }
+
 
     }
 

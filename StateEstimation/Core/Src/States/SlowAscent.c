@@ -23,6 +23,12 @@
 */
 void run_slow_ascent(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors *sensors, SerialData *serial_data){
 
+    if (first_iter) {
+        static int activatedTOV = 0;
+        static float prevAlt;
+        first_iter = 0;
+    }
+
     float GPS_data[3] = {sensors->gps_x, sensors->gps_y, sensors->gps_z};
     float accel_data[3] = {sensors->accelerometer_x, sensors->accelerometer_y, sensors->accelerometer_z};
 
@@ -50,7 +56,30 @@ void run_slow_ascent(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors 
 
 
     //TODO: State transition check to free fall
+    // TOV - time of validity
+    if (ekf->x_n.pData[0] < prevAlt){
 
+        if (activatedTOV) {
+
+            float TOV = GlobalTimeSeconds - startTOV;
+
+            // detect if rocket has been falling for 3 seconds straight
+            // note: this assumes altitude is posn of cg of rocket (EKF needs to account for GPS lever arm)
+            if (TOV > 3.0) {
+                // Switch states
+                STATE_MACHINE = FREEFALL;
+                first_iter = 1;
+            }
+
+        } else {
+            static float startTOV = GlobalTimeSeconds;
+            static int activatedTOV = 1;
+        }
+    } else {
+        startTOV = GlobalTimeSeconds;
+        activatedTOV = 0;
+    }
+    static float prevAlt = ekf->x_n.pData[0];
     
 
 }

@@ -32,8 +32,26 @@ extern "C" {
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+#include "attitude.h"
+#include "state_est_helpers.h"
 #include "data_handling.h"
 #include "ekf.h"
+
+#include "States/Idle.h"
+#include "States/Ground.h"
+#include "States/FastAscent.h"
+#include "States/SlowAscent.h"
+#include "States/FreeFall.h"
+#include "States/Chute.h"
+#include "States/Landed.h"
+
+#define IDLE 0
+#define GROUND 1
+#define FASTASCENT 2
+#define SLOWASCENT 3
+#define FREEFALL 4
+#define CHUTE 5
+#define LANDED 6
 
 /* USER CODE END Includes */
 

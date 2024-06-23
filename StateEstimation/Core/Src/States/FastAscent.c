@@ -18,6 +18,11 @@
 */
 void run_fast_ascent(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors *sensors, SerialData *serial_data){
 
+    if (first_iter) {
+        static float fast_ascent_start_time = (float)(GlobalTime)/1000.0;
+        first_iter = 0;
+    }
+
     float GPS_data[3] = {sensors->gps_x, sensors->gps_y, sensors->gps_z};
     float accel_data[3] = {sensors->accelerometer_x, sensors->accelerometer_y, sensors->accelerometer_z};
 
@@ -47,7 +52,13 @@ void run_fast_ascent(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors 
 
 
     //TODO: State transition check to slow ascent
-
+    // can't detect filtered acceleration
+    float burn_time = 10;
+    if (GlobalTimeSeconds - fast_ascent_start_time > burn_time){
+        // Switch states
+        STATE_MACHINE = SLOWASCENT;
+        first_iter = 1;
+    }
     
 
 }

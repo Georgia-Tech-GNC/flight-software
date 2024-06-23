@@ -2,7 +2,7 @@
     "cortex-debug.armToolchainPath": "/usr/bin",
     "cortex-debug.openocdPath": "/usr/bin/openocd",
     "files.associations": {
-        "gnss.h": "c",
-        "basic_types.h": "c"
+        // "ekf.h": "c",
+        // "arm_math.h": "c"
     }
 }

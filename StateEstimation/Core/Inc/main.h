@@ -32,6 +32,9 @@ extern "C" {
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+#include "data_handling.h"
+#include "ekf.h"
+
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/

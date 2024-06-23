@@ -8,6 +8,8 @@
  * This file must not be made publicly available anywhere.
 */
 
+#include "main.h"
+
 #ifndef __GROUND_H__
     #define __GROUND_H__
 

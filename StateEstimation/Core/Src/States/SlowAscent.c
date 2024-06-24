@@ -24,7 +24,7 @@
 void run_slow_ascent(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors *sensors, SerialData *serial_data){
 
     if (first_iter) {
-        static int activatedTOV = 0;
+        static int activatedTOV = 0; // activated time of validity
         static float prevAlt;
         first_iter = 0;
     }
@@ -79,6 +79,7 @@ void run_slow_ascent(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors 
         startTOV = GlobalTimeSeconds;
         activatedTOV = 0;
     }
+    
     static float prevAlt = ekf->x_n.pData[0];
     
 

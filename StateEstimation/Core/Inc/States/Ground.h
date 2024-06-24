@@ -25,7 +25,7 @@ void get_ground_attitude(ExtKalmanFilter *gekf);
 
 void check_gekf_convergence(ExtKalmanFilter *gekf);
 
-void GPS2ECEF(float* gps_reading, float* posn_ecef);
+void GPS2World(float* gps_reading, float* posn_ecef);
 
 void run_ground(ExtKalmanFilter *gekf, Sensors *sensors, SerialData *serial_data);
 

@@ -51,7 +51,7 @@ void run_freefall(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors *se
 
     //TODO: State transition check to landed
     // TOV - time of validity
-    if (ekf->x_n.pData[0] < 5.0 && ekf->x_n.pData[1] > -0.1){
+    if (ekf->x_n.pData[1] > -0.2 && ekf->x_n.pData[1] < 0.2){ //Check if global x velocity is within bound. Could also check y and z velocities
 
         if (activatedTOV) {
 

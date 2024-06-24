@@ -25,12 +25,15 @@ void run_slow_ascent(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors 
 
     if (first_iter) {
         static int activatedTOV = 0;
-        static float prevAlt;
+        float prevAlt;
         first_iter = 0;
     }
 
+    float gps_world_x, gps_world_y, gps_world_z;   
+    GPS2World(sensors->gps_x,sensors->gps_y,sensors->gps_z,&gps_world_x,&gps_world_y,&gps_world_z);
+
     float GPS_data[3] = {sensors->gps_x, sensors->gps_y, sensors->gps_z};
-    float accel_data[3] = {sensors->accelerometer_x, sensors->accelerometer_y, sensors->accelerometer_z};
+    float accel_data[3] = {sensors->accelerometer_x, sensors->accelerometer_y, sensors->accelerometer_z}; //TODO: Remove acceleration biases
 
     run_attitude_estimation(rocket_atd, sensors->gyro_x, sensors->gyro_y, sensors->gyro_z);
     run_ekf(&ekf, GPS_data, accel_data);
@@ -54,11 +57,10 @@ void run_slow_ascent(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors 
     serial_data->wy = sensors->gyro_y;
     serial_data->wz = sensors->gyro_z;
 
-
-    //TODO: State transition check to free fall
     // TOV - time of validity
-    if (ekf->x_n.pData[0] < prevAlt){
-
+    int counter = 0;
+    int num_loops_before_check = 10; //TODO: Tune this value so that the condition below is checked every 1.0 seconds
+    if ((ekf->x_n.pData[0] < prevAlt) && (counter % num_loops_before_check == 0)){ 
         if (activatedTOV) {
 
             float TOV = GlobalTimeSeconds - startTOV;
@@ -79,7 +81,9 @@ void run_slow_ascent(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors 
         startTOV = GlobalTimeSeconds;
         activatedTOV = 0;
     }
-    static float prevAlt = ekf->x_n.pData[0];
-    
+    counter = counter + 1;
+    if (counter % num_loops_before_check == 0){ 
+        float prevAlt = ekf->x_n.pData[0];
+    }
 
 }

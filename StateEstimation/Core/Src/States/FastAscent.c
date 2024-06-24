@@ -23,8 +23,12 @@ void run_fast_ascent(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors 
         first_iter = 0;
     }
 
+
+    float gps_world_x, gps_world_y, gps_world_z;   
+    GPS2World(sensors->gps_x,sensors->gps_y,sensors->gps_z,&gps_world_x,&gps_world_y,&gps_world_z);
+
     float GPS_data[3] = {sensors->gps_x, sensors->gps_y, sensors->gps_z};
-    float accel_data[3] = {sensors->accelerometer_x, sensors->accelerometer_y, sensors->accelerometer_z};
+    float accel_data[3] = {sensors->accelerometer_x, sensors->accelerometer_y, sensors->accelerometer_z}; //TODO: Remove acceleration biases
 
     run_attitude_estimation(rocket_atd, sensors->gyro_x, sensors->gyro_y, sensors->gyro_z);
     run_ekf(ekf, GPS_data, accel_data);
@@ -53,7 +57,7 @@ void run_fast_ascent(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors 
 
     //TODO: State transition check to slow ascent
     // can't detect filtered acceleration
-    float burn_time = 10;
+    float burn_time = 10.0; //TODO: Confirm actual rocket burn time in seconds
     if (GlobalTimeSeconds - fast_ascent_start_time > burn_time){
         // Switch states
         STATE_MACHINE = SLOWASCENT;

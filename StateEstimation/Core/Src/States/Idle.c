@@ -10,8 +10,8 @@
 
 #include "../../Inc/States/Idle.h"
 
-#ifndef __GROUND_H__
-    #define __GROUND_H__
+#ifndef __IDLE_H__
+    #define __IDLE_H__
 
 void run_idle() {
         // Check for arming signal
@@ -24,14 +24,9 @@ void run_idle() {
             if (signal_received == "GO"){
             break;
             }
+
+            //TODO: Vane Alignment Calibration upon receipt of another specified Xbee signal
         }
-
-        //TODO: Initialize sensors
-        //TODO: Write an EKF to do the sensor calibration.
-
-        //Ground calibration is now complete. Send Xbee signal to ground station that calibration is complete and rocket is ready to be launched.
-        char message_for_launch_readiness[] = "GOFORLAUNCH";
-        //TODO: Line of code that transmits through HAL UART to controls MCU that vehicle is launch ready.
 
     if (signal_received) {
         STATEMACHINE = GROUND;

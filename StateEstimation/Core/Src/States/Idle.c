@@ -10,8 +10,11 @@
 
 #include "../../Inc/States/Idle.h"
 
+<<<<<<< HEAD
 #ifndef __IDLE_H__
     #define __IDLE_H__
+=======
+>>>>>>> 70d328d11b7681ae405b01e8fe40bd24ff6d0163
 
 void run_idle() {
         // Check for arming signal
@@ -30,9 +33,10 @@ void run_idle() {
 
     if (signal_received) {
         STATEMACHINE = GROUND;
+        first_iter = 1;
     }
 
 }
 
 
-#endif
+#end

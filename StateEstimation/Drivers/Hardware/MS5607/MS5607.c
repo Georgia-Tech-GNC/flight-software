@@ -167,7 +167,7 @@ void MS5607Convert(struct MS5607UncompensatedValues *sample, struct MS5607Readin
 /**
  * @brief 
 */
-void MS5607Update(void){
+void MS5607Update(void) {
   MS5607UncompensatedRead(&uncompValues);
   MS5607Convert(&uncompValues, &readings);
 }
@@ -176,7 +176,7 @@ void MS5607Update(void){
  * @brief
  * @returns
 */
-double MS5607GetTemperatureC(void){
+double MS5607GetTemperatureC(void) {
   return (double)readings.temperature/(double)100.0;
 }
 
@@ -184,7 +184,7 @@ double MS5607GetTemperatureC(void){
  * @brief
  * @returns
 */
-int32_t MS5607GetPressurePa(void){
+int32_t MS5607GetPressurePa(void) {
   return readings.pressure;
 }
 

@@ -2,120 +2,156 @@
  ******************************************************************************
  * @file    ADIS16500.c
  * @author  Kanav Chugh
- * @brief   ADIS16500 driver
+ * @brief   ADIS16500 source file
  ******************************************************************************
  * @attention
  *
  ******************************************************************************
  */
 
-#include "stdio.h"
+
 #include "ADIS16500.h"
 
-#define UNUSED __attribute__((unused))
-
-#define WRITE_ADDR(addr) ((addr) |	0x80)
-#define READ_ADDR(addr)  ((addr) & ~0x80)
-
-typedef enum {
-	SPI_SLOW = SPI_BAUDRATEPRESCALER_64,
-	SPI_MEDIUM = SPI_BAUDRATEPRESCALER_8,
-    SPI_FAST = SPI_BAUDRATEPRESCALER_2
-} SPI_Speed;
-
-
-#define BURST_EXCHANGE_LEN (sizeof(ADIS16500_Data)+ 2) //+2 for initial addr
-uint8_t adis_raw_in[BURST_EXCHANGE_LEN];
-static const ADIS16500_Config * CONF;
-SPI_HandleTypeDef *hspi;
-
-const ADIS16500_Config adis_imu = {
-	.spi_cs = {GPIOA, GPIO_PIN_0},
-	.spi_sck = {GPIOA, GPIO_PIN_5},
-	.spi_miso = {GPIOA, GPIO_PIN_6},
-	.spi_mosi = {GPIOB, GPIO_PIN_3},
-	.spi = {SPI1},
-	.nrst = {GPIOD, GPIO_PIN_8},
-    .dr = {GPIOD, GPIO_PIN_8}
-};
-
-void adis_init(const ADIS16500_Config * conf) {
-    hspi->Instance = conf->spi;
-    hspi->Init.Mode = SPI_MODE_MASTER;
-    hspi->Init.Direction = SPI_DIRECTION_2LINES;
-    hspi->Init.DataSize = SPI_DATASIZE_8BIT;
-    hspi->Init.CLKPolarity = SPI_POLARITY_LOW;
-    hspi->Init.CLKPhase = SPI_PHASE_1EDGE;
-    hspi->Init.NSS = SPI_NSS_SOFT;
-    hspi->Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_64;
-    hspi->Init.FirstBit = SPI_FIRSTBIT_MSB;
-    hspi->Init.TIMode = SPI_TIMODE_DISABLE;
-    hspi->Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
-    hspi->Init.CRCPolynomial = 10;
-    HAL_SPI_Init(&hspi);
+/**
+ * @brief initializes DWT for advanced clock control
+ * 
+*/
+void DWT_Init(void) {
+    if (!(DWT->CTRL & DWT_CTRL_CYCCNTENA_Msk)) {
+        CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+        DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk; 
+        DWT->CYCCNT = 0; 
+    }
 }
 
-uint16_t adis_get(ADIS_RegAddr *addr) {
-    uint8_t txbuf[2] = {*addr, 0};
-    uint8_t rxbuf[2];
-	HAL_GPIO_WritePin(adis_imu.spi_cs, GPIO_PIN_3, GPIO_PIN_RESET);
-	HAL_SPI_TransmitReceive(hspi, txbuf, rxbuf, sizeof(rxbuf), HAL_MAX_DELAY);
-	HAL_GPIO_WritePin(adis_imu.spi_cs, GPIO_PIN_3, GPIO_PIN_SET);
-    return (uint16_t)(rxbuf[0] << 8 | rxbuf[1]);
+/**
+ * @brief delays system thread by time in microseconds
+ * @param microseconds time in microseconds to delay
+*/
+void delay_us(uint32_t microseconds) {
+    uint32_t startTick = DWT->CYCCNT,
+            delayTicks = microseconds * (SystemCoreClock / 1000000); 
+    while (DWT->CYCCNT - startTick < delayTicks); 
 }
 
-void adis_set(ADIS_RegAddr addr, uint16_t value) {
-    uint8_t txbuf[4] = {
-        WRITE_ADDR(addr + 1), (uint8_t)(value >> 8),
-        WRITE_ADDR(addr), (uint8_t)value
-    };
-	HAL_GPIO_WritePin(adis_imu.spi_cs, GPIO_PIN_3, GPIO_PIN_RESET);
-	HAL_SPI_Transmit(hspi, txbuf, txbuf, sizeof(txbuf));
-	HAL_GPIO_WritePin(adis_imu.spi_cs, GPIO_PIN_3, GPIO_PIN_SET);
+/**
+ * @brief reads a register given the memory address
+ * @param device instance of ADIS IMU device
+ * @param addr address to read data from
+ * @return data in bits, MSB first
+*/
+int16_t adis_read_register(struct ADIS_Device *device, uint8_t addr) {
+	HAL_GPIO_WritePin((GPIO_TypeDef*) device->cs_pin, (uint16_t*)device->cs_pin_port, GPIO_PIN_RESET);
+	uint8_t address[2] = {addr, 0x00};
+	HAL_SPI_Transmit((SPI_HandleTypeDef*)device->spi_handle, address, 2, HAL_MAX_DELAY);
+	HAL_GPIO_WritePin((GPIO_TypeDef*) device->cs_pin, (uint16_t*)device->cs_pin_port, GPIO_PIN_SET);
+	delay_us(20);
+	HAL_GPIO_WritePin((GPIO_TypeDef*) device->cs_pin, (uint16_t*)device->cs_pin_port, GPIO_PIN_RESET);
+	uint8_t txbuf[2] = {0x00, 0x00};
+	uint8_t rxbuf[2];
+	HAL_SPI_TransmitReceive((SPI_HandleTypeDef*)device->spi_handle, txbuf, rxbuf, 2, HAL_MAX_DELAY);
+	HAL_GPIO_WritePin((GPIO_TypeDef*) device->cs_pin, (uint16_t*)device->cs_pin_port, GPIO_PIN_SET);
+	return (rxbuf[0] << 8) | (rxbuf[1] & 0xFF);
 }
 
+/**
+ * @brief writes a value to a register, given the value
+ * @param device instance of ADIS IMU device
+ * @param addr register address to write to
+ * @param value value to write to register
+*/
+void adis_write_register(struct ADIS_Device *device, uint8_t addr, uint16_t value) {
+	uint16_t address = (addr | 0x80) << 8;
+	uint16_t low_word = (address | (value & 0xFF));
+	uint16_t high_word = (address | 0x100) | ((value >> 8) & 0xFF);
+	uint8_t upper_word[2] = {high_word >> 8, high_word & 0xFF};
+	uint8_t lower_word[2] = {low_word >> 8, low_word & 0xFF};
 
-static int16_t sign_extend(uint16_t val, int bits) {
-	if ((val&(1<<(bits-1))) != 0) {
-		val = val - (1<<bits);
+	/* Writing words to SPI channel */
+	HAL_GPIO_WritePin((GPIO_TypeDef*) device->cs_pin, (uint16_t*) device->cs_pin_port, GPIO_PIN_RESET);
+	HAL_SPI_Transfer((SPI_HandleTypeDef*)device->spi_handle, high_word, 2, HAL_MAX_DELAY);
+	HAL_GPIO_WritePin((GPIO_TypeDef*) device->cs_pin, (uint16_t*) device->cs_pin_port, GPIO_PIN_SET);
+	delay_us(5);
+
+	HAL_GPIO_WritePin((GPIO_TypeDef*) device->cs_pin, (uint16_t*) device->cs_pin_port, GPIO_PIN_RESET);
+	HAL_SPI_Transfer((SPI_HandleTypeDef*)device->spi_handle, low_word, 2, HAL_MAX_DELAY);
+	HAL_GPIO_WritePin((GPIO_TypeDef*) device->cs_pin, (uint16_t*) device->cs_pin_port, GPIO_PIN_SET);
+	delay_us(5);
+
+}
+
+/**
+ * @brief burst reads a batch of output registers and returns a byte array of those registers
+ * @param device instance of ADIS IMU deviced
+ * @param burst_data array of bytes of size 21
+ * @return burst byte data in an array of size 21
+*/
+uint8_t *byte_burst(struct ADIS_Device *device, uint8_t* burst_data) {
+	HAL_GPIO_WritePin((GPIO_TypeDef*) device->cs_pin, (uint16_t*) device->cs_pin_port, GPIO_PIN_RESET);
+	uint8_t txbuf[2] = {0x68, 0x00};
+	HAL_SPI_Transmit((SPI_HandleTypeDef*)device->spi_handle, &txbuf, 2, HAL_MAX_DELAY);
+	for (int i = 0; i < 20; i++) {
+		HAL_SPI_TransmitReceive((SPI_HandleTypeDef*)device->spi_handle, 0x00, burst_data[i], 1, HAL_MAX_DELAY);
 	}
-	return val;
+	burst_data[20] = 0x01;
+	HAL_GPIO_WritePin((GPIO_TypeDef*) device->cs_pin, (uint16_t*) device->cs_pin_port, GPIO_PIN_SET);
+	return burst_data;
 }
 
-static void buffer_to_burst_data(uint8_t * raw, ADIS16500_Data * data) {
-	data->x_gyro_out  = sign_extend((raw[2]	<< 8 | raw[3]) & 0x3fff, 14);
-	data->y_gyro_out  = sign_extend((raw[4]	<< 8 | raw[5]) & 0x3fff, 14);
-	data->z_gyro_out  = sign_extend((raw[6]	<< 8 | raw[7]) & 0x3fff, 14);
-	data->x_accl_out  = sign_extend((raw[8]	<< 8 | raw[9]) & 0x3fff, 14);
-	data->y_accl_out  = sign_extend((raw[10] << 8 | raw[11]) & 0x3fff, 14);
-	data->z_accl_out  = sign_extend((raw[12] << 8 | raw[13]) & 0x3fff, 14);
-	data->x_deltang_out  = sign_extend((raw[8]	<< 8 | raw[15]) & 0x3fff, 14);
-	data->y_deltang_out  = sign_extend((raw[10] << 8 | raw[17]) & 0x3fff, 14);
-	data->z_deltang_out  = sign_extend((raw[12] << 8 | raw[19]) & 0x3fff, 14);
-	data->x_deltvel_out  = sign_extend((raw[8]	<< 8 | raw[15]) & 0x3fff, 14);
-	data->y_deltvel_out  = sign_extend((raw[10] << 8 | raw[17]) & 0x3fff, 14);
-	data->z_deltvel_out  = sign_extend((raw[12] << 8 | raw[19]) & 0x3fff, 14);
-	data->temp_out   = sign_extend((raw[20] << 8 | raw[21]) & 0x0fff, 12);
+/**
+ * @brief burst reads a batch of output registers and returns a word array of those registers
+ * @param device instance of ADIS IMU device
+ * @return burst word data in an array of size 10
+*/
+uint16_t *word_burst(struct ADIS_Device *device, uint16_t* burst_words) {
+	HAL_GPIO_WritePin((GPIO_TypeDef*) device->cs_pin, (uint16_t*) device->cs_pin_port, GPIO_PIN_RESET);
+	uint8_t txbuf[2] = {0x68, 0x00};
+	HAL_SPI_Transmit((SPI_HandleTypeDef*)device->spi_handle, &txbuf, 2, HAL_MAX_DELAY);
+	for (int i = 0; i < 10; i++) {
+		uint8_t txbuf[2] = {0x00, 0x00};
+		uint8_t rxbuf[2];
+		HAL_SPI_TransmitReceive((SPI_HandleTypeDef*)device->spi_handle, txbuf, rxbuf, 2, HAL_MAX_DELAY);
+		burst_words[i] = (rxbuf[0] << 8) | rxbuf[1];
+	}
+	HAL_GPIO_WritePin((GPIO_TypeDef*) device->cs_pin, (uint16_t*) device->cs_pin_port, GPIO_PIN_SET);
+	return burst_words;
 }
 
-void adis_get_data(ADIS16500_Data * data) { 
-	buffer_to_burst_data(adis_raw_in + 2, data);
+/**
+ * @brief converts an array of byte data and combines it into a word array
+ * @param burstdata input array of burst byte data
+ * @param word_data word data array to modify values
+ * @note do this if you like fingering yourself
+*/
+uint16_t *word_data(uint8_t *burstdata, uint16_t* word_data) {
+    word_data[0] = ((burstdata[0] << 8) | (burstdata[1] & 0xFF)); 
+    word_data[1] = ((burstdata[2] << 8) | (burstdata[3] & 0xFF)); 
+    word_data[2] = ((burstdata[4] << 8) | (burstdata[5] & 0xFF)); 
+    word_data[3] = ((burstdata[6] << 8) | (burstdata[7] & 0xFF)); 
+    word_data[4] = ((burstdata[8] << 8) | (burstdata[9] & 0xFF)); 
+    word_data[5] = ((burstdata[10] << 8) | (burstdata[11] & 0xFF)); 
+    word_data[6] = ((burstdata[12] << 8) | (burstdata[13] & 0xFF));
+    word_data[7] = ((burstdata[14] << 8) | (burstdata[15] & 0xFF)); 
+    word_data[8] = ((burstdata[16] << 8) | (burstdata[17] & 0xFF)); 
+    word_data[9] = ((burstdata[18] << 8) | (burstdata[19] & 0xFF)); 
+    return word_data;
 }
 
-uint16_t adis_self_test(void) {
-	uint16_t diagstat = adis_get(ADIS_DIAG_STAT);
-	uint16_t msc = adis_get(ADIS_MSC_CTRL);
-	adis_set(ADIS_MSC_CTRL, msc | 1<<10);
-	do {
-		msc = adis_get(ADIS_MSC_CTRL);
-	} while (msc & 1<< 10);
-	diagstat = adis_get(ADIS_DIAG_STAT);
-	return diagstat;
-}
+/**
+ * @brief updates input struct of register data
+ * @param data input structure of ADIS IMU data
+ * @param word_data returned words from IMU output
+*/
 
-void adis_reset(void) {
-	const unsigned int ADIS_RESET_MSECS = 500;
-	HAL_GPIO_WritePin(CONF->nrst, GPIO_PIN_8, GPIO_PIN_RESET);
-	HAL_Delay(ADIS_RESET_MSECS);
-	HAL_GPIO_WritePin(CONF->nrst, GPIO_PIN_8, GPIO_PIN_SET);
+void update_data(ADIS16500_Data* data, uint16_t* word_data) {
+	data->diag_stat = word_data[0];
+	data->x_gyro_out = (float) word_data[1] * 0.1f;
+	data->y_gyro_out = (float) word_data[2] * 0.1f;
+	data->z_gyro_out = (float) word_data[3] * 0.1f; //in degrees per second
+	data->x_accl_out = (float) word_data[4] * 0.01225f; //in meters per s^2
+	data->y_accl_out = (float) word_data[5] * 0.01225f;
+	data->z_accl_out = (float) word_data[6] * 0.01225f;
+	data->temp_out = (float) word_data[7] * 0.1f; //in celsius
+	data->data_cntr = word_data[8];
+	data->checksum = word_data[9];
 }

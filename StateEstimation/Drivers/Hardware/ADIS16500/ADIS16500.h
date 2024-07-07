@@ -14,12 +14,8 @@
 #ifndef _ADIS16500_H
 #define _ADIS16500_H
 
-#include "stm32h7xx_hal_tim.h"
-#include "stm32h7xx_hal_gpio.h"
-#include "stm32h723xx.h"
-
-enum spiSpeed { SPI_SLOW, SPI_MEDIUM, SPI_FAST };
-
+#include "stm32h7xx_hal.h"
+#include "core_cm7.h"
 
 typedef enum {
     ADIS_DIAG_STAT = 0x02,
@@ -80,41 +76,35 @@ typedef enum {
     ADIS_FLSHCNT_HIGH = 0x7E
 } ADIS_RegAddr;
 
-typedef struct ADIS16500_Data {  
-    int16_t x_gyro_out;
-    int16_t y_gyro_out;
-    int16_t z_gyro_out;
-    int16_t x_accl_out;
-    int16_t y_accl_out;
-    int16_t z_accl_out;
-    int16_t temp_out;
-    int16_t time_stamp;
-    int16_t data_cntr;
-    int16_t x_deltang_out;
-    int16_t y_deltang_out;
-    int16_t z_deltang_out;
-    int16_t x_deltvel_out;
-    int16_t y_deltvel_out;
-    int16_t z_deltvel_out;
+typedef struct {
+    uint16_t diag_stat;
+    uint16_t data_cntr;
+    uint16_t checksum;
+    double x_gyro_out;
+    double y_gyro_out;
+    double z_gyro_out;
+    double x_accl_out;
+    double y_accl_out;
+    double z_accl_out;
+    double temp_out;
 } ADIS16500_Data;
 
-typedef struct {
-    GPIO_TypeDef *spi_sck;
-    GPIO_TypeDef *spi_miso;
-    GPIO_TypeDef *spi_mosi;
-    GPIO_TypeDef *spi_cs;
-    SPI_TypeDef *spi;
-    GPIO_TypeDef *nrst;
-    GPIO_TypeDef *dr;
-} ADIS16500_Config;
 
-extern const ADIS16500_Config adis_imu;
 
-void adis_init(const ADIS16500_Config *conf);
-uint16_t adis_get(ADIS_RegAddr *addr);
-void adis_set(ADIS_RegAddr addr, uint16_t value);
-void adis_get_data(ADIS16500_Data *data);
-void adis_reset(void);
-uint16_t adis_self_test(void);
 
+struct ADIS_Device {
+    void *spi_handle;
+    void *cs_pin;
+    void *cs_pin_port;
+};
+
+
+void DWT_Init(void);
+void delay_us(uint32_t microseconds);
+int16_t adis_read_register(struct ADIS_Device *device, uint8_t addr);
+void adis_write_register(struct ADIS_Device *device,  uint8_t addr, uint16_t value);
+uint8_t *byte_burst(struct ADIS_Device *device, uint8_t* burst_data);
+uint16_t *word_burst(struct ADIS_Device *device, uint16_t* burst_words);
+uint16_t *word_data(uint8_t *burstdata, uint16_t* word_data);
+void update_data(ADIS16500_Data* data, uint16_t* word_data);
 #endif

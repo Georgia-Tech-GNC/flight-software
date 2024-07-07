@@ -11,7 +11,7 @@
 
 #ifndef __LIS3MDL_H__
 #define __LIS3MDL_H__
-
+#include "stm32h7xx_hal.h"
 #include <stdint.h>
 
 /* LIS3MDL Register Map */
@@ -138,12 +138,9 @@ struct lis3mdl_device {
     uint8_t temp_enable;
     uint8_t data_rate;
     uint8_t self_test;
-
     uint8_t full_scale;
-    
     uint8_t z_axis_mode;
     uint8_t endianness;
-
     void *spi_handle;
     void *cs_pin;
     void *cs_pin_port;

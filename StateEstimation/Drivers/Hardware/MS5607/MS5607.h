@@ -16,7 +16,6 @@
 #define _MS5607SPI_H_
 
 #include "stm32h7xx_hal.h"
-#include "stm32h7xx_hal_spi.h"
 #include "stm32h723xx.h"
 
 #define RESET_COMMAND                 0x1E
@@ -49,18 +48,18 @@ typedef struct promData {
   uint16_t tref;
   uint16_t tempsens;
   uint16_t crc;
-};
+} promData;
 
 typedef struct MS5607UncompensatedValues {
   uint32_t  pressure;
   uint32_t  temperature;
-};
+} MS5607UncompensatedValues;
 
 
 typedef struct MS5607Readings {
   int32_t  pressure;
   int32_t  temperature;
-};
+} MS5607Readings;
 
 MS5607StateTypeDef MS5607_Init(SPI_HandleTypeDef*, GPIO_TypeDef*, uint16_t);
 void MS5607PromRead(struct promData *);

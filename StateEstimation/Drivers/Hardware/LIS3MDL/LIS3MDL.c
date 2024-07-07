@@ -1,6 +1,5 @@
 #include "LIS3MDL.h"
-#include "stm32h7xx_hal.h"
-#include <stdio.h>
+
 
 /**
  * @brief initializes LIS3MDL magnetometer
@@ -11,16 +10,12 @@
 
 enum lis3mdl_err lis3mdl_initialize(struct lis3mdl_device *device) {
     lis3mdl_write_register(device, LIS3MDL_REG_CTRL3, LIS3MDL_CONTINUOUS_CONVERSION);
-
     uint8_t ctrl_reg_1 = device->temp_enable | device->data_rate | device->self_test;
     lis3mdl_write_register(device, LIS3MDL_REG_CTRL1, ctrl_reg_1);
-
     uint8_t ctrl_reg_2 = device->full_scale;
     lis3mdl_write_register(device, LIS3MDL_REG_CTRL2, ctrl_reg_2);
-
     uint8_t ctrl_reg_4 = device->z_axis_mode | device->endianness;
     lis3mdl_write_register(device, LIS3MDL_REG_CTRL4, ctrl_reg_4);
-
     return LIS3MDL_ERR_OK;
 }
 
@@ -36,19 +31,14 @@ enum lis3mdl_err lis3mdl_initialize(struct lis3mdl_device *device) {
 enum lis3mdl_err lis3mdl_read_mag(struct lis3mdl_device *device, double *mag_reading) {
     uint8_t mag_read_buf[6];
     double sensitivity = 0;
-
     lis3mdl_read_multiple_registers(device, LIS3MDL_REG_OUT_X_L, 6, mag_read_buf);
-
     int16_t x_reading = (mag_read_buf[1] << 8) | mag_read_buf[0]; 
     int16_t y_reading = (mag_read_buf[3] << 8) | mag_read_buf[1]; 
     int16_t z_reading = (mag_read_buf[5] << 8) | mag_read_buf[2]; 
-
     lis3mdl_sensitivity_get(device, &sensitivity);
-
     mag_reading[0] = (double) x_reading / sensitivity;
     mag_reading[1] = (double) y_reading / sensitivity;
     mag_reading[2] = (double) z_reading / sensitivity;
-
     return LIS3MDL_ERR_OK;
 }
 
@@ -79,13 +69,10 @@ enum lis3mdl_err lis3mdl_read_temp(struct lis3mdl_device *device, double *temp) 
 enum lis3mdl_err lis3mdl_write_hard_iron(struct lis3mdl_device *device, double *hard_iron_offset) {
     int16_t hard_iron_ints[3];
     double sensitivity = 0;
-
     lis3mdl_sensitivity_get(device, &sensitivity);
-
     hard_iron_ints[0] = hard_iron_offset[0] * sensitivity;
     hard_iron_ints[1] = hard_iron_offset[1] * sensitivity;
     hard_iron_ints[2] = hard_iron_offset[2] * sensitivity;
-
     return LIS3MDL_ERR_OK;
 }
 
@@ -115,7 +102,6 @@ enum lis3mdl_err lis3mdl_sensitivity_get(struct lis3mdl_device *device, double *
         default:
             return LIS3MDL_ERR_GENERAL;
     }
-    
     return LIS3MDL_ERR_OK;
 }
 
@@ -130,11 +116,9 @@ enum lis3mdl_err lis3mdl_sensitivity_get(struct lis3mdl_device *device, double *
 
 enum lis3mdl_err lis3mdl_write_register(struct lis3mdl_device *device, uint8_t reg, uint8_t data) {
     uint8_t transmit_buf[2] = {reg, data};
-
     HAL_GPIO_WritePin((GPIO_TypeDef *)device->cs_pin_port, (uint16_t)device->cs_pin, GPIO_PIN_RESET);
     HAL_SPI_Transmit((SPI_HandleTypeDef *)device->spi_handle, &transmit_buf, 2, HAL_MAX_DELAY);
     HAL_GPIO_WritePin((GPIO_TypeDef *)device->cs_pin_port, (uint16_t)device->cs_pin, GPIO_PIN_SET);
-
     return LIS3MDL_ERR_OK;
 }
 
@@ -149,11 +133,9 @@ enum lis3mdl_err lis3mdl_write_register(struct lis3mdl_device *device, uint8_t r
 enum lis3mdl_err lis3mdl_read_register(struct lis3mdl_device *device, uint8_t reg, uint8_t *data) {
     uint8_t transmit_buf[2] = {0x80 | reg, 0x00};
     uint8_t receive_buf[2];
-
-    HAL_GPIO_WritePin((GPIO_TypeDef *)device->cs_pin_port, (uint16_t)device->cs_pin, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin((GPIO_TypeDef*)device->cs_pin_port, (uint16_t)device->cs_pin, GPIO_PIN_RESET);
     HAL_SPI_TransmitReceive((SPI_HandleTypeDef *)device->spi_handle, &transmit_buf, &receive_buf, 2, HAL_MAX_DELAY);
     HAL_GPIO_WritePin((GPIO_TypeDef *)device->cs_pin_port, (uint16_t)device->cs_pin, GPIO_PIN_SET);
-
     *data = receive_buf[1];
     return LIS3MDL_ERR_OK;
 }
@@ -171,17 +153,13 @@ enum lis3mdl_err lis3mdl_read_register(struct lis3mdl_device *device, uint8_t re
 **/
 enum lis3mdl_err lis3mdl_write_multiple_registers(struct lis3mdl_device *device, uint8_t start_reg, uint8_t bytes, uint8_t *data) {
     uint8_t transmit_buf[bytes + 1];
-
     for (int i = 1; i <= bytes; i ++) {
         transmit_buf[i] = data[i - 1];
     }
-
     transmit_buf[0] = 0x40 | start_reg;
-
     HAL_GPIO_WritePin((GPIO_TypeDef *)device->cs_pin_port, (uint16_t)device->cs_pin, GPIO_PIN_RESET);
     HAL_SPI_Transmit((SPI_HandleTypeDef *)device->spi_handle, transmit_buf, bytes + 1, HAL_MAX_DELAY);
     HAL_GPIO_WritePin((GPIO_TypeDef *)device->cs_pin_port, (uint16_t)device->cs_pin, GPIO_PIN_SET);
-
     return LIS3MDL_ERR_OK;
 }
 
@@ -202,16 +180,13 @@ enum lis3mdl_err lis3mdl_read_multiple_registers(struct lis3mdl_device *device, 
     // TODO: error handling
     uint8_t transmit_buf[bytes + 1];
     uint8_t receive_buf[bytes + 1];
-
     for (int i = 1; i <= bytes; i++) {
         transmit_buf[i] = 0x00;
     }
     transmit_buf[0] = 0xC0 | start_reg;
-
     HAL_GPIO_WritePin((GPIO_TypeDef *)device->cs_pin_port, (uint16_t)device->cs_pin, GPIO_PIN_RESET);
     HAL_SPI_TransmitReceive((SPI_HandleTypeDef *)device->spi_handle, transmit_buf, receive_buf, bytes + 1, HAL_MAX_DELAY);
     HAL_GPIO_WritePin((GPIO_TypeDef *)device->cs_pin_port, (uint16_t)device->cs_pin, GPIO_PIN_SET);
-
     for (int i = 0; i < bytes; i++) {
         data[i] = receive_buf[i + 1];
     }

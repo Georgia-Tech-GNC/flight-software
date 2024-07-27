@@ -102,8 +102,8 @@ void gyro_to_rotation_quat(rocket_attitude *rocket_atd){
 
     rocket_atd->q_delt_s = cos(angle/2.0f); //Definition of quaternion elements... simply forming the instantaneous rotation quat from axis-angle representation
     rocket_atd->q_delt_x = axis[0]*sin(angle/2.0f);
-    rocket_atd->q_delt_y = axis[0]*sin(angle/2.0f);
-    rocket_atd->q_delt_z = axis[0]*sin(angle/2.0f);
+    rocket_atd->q_delt_y = axis[1]*sin(angle/2.0f);
+    rocket_atd->q_delt_z = axis[2]*sin(angle/2.0f);
 
 }
 

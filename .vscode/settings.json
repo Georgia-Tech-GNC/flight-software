@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "stm32h7xx_hal_eth.h": "c",
+        "string.h": "c",
+        "telemetry.h": "c",
+        "stm32h7xx_hal.h": "c"
+    }
+}

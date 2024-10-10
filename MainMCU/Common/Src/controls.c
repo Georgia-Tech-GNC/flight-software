@@ -1,6 +1,6 @@
 /**
  * @file controls.c
- * @author Patrick Barry
+ * @author Patrick Barry, Karsten Caillet
  * @brief Source file for in-flight control algorithm of the jet vanes rocket
  *  
  * Copyright 2024 Georgia Tech. All rights reserved.
@@ -13,25 +13,62 @@
 #include <stdio.h>
 
 /**
- * @brief Takes into account current state estimate and time since launch
- * @param 
- * @return
+ * @brief Takes into account current state estimate and time since launch and returns closest matching LQR Gain
+ * @param ctrl Takes controller struct, but uses current state and time
+ * @return closest matching LQR gain
  * @note
 */
 void LQR_gain_selector(controller *ctrl){
+    int t = (int)round(ctrl->time_since_launch);
+    float q3 = ctrl->x[8];
+    float airspeed = sqrt(ctrl->x[0] * ctrl->x[0] + ctrl->x[1] * ctrl->x[1] + ctrl->x[2] * ctrl->x[2]);
+    float min_distance = 1e9;
+    float distance = 0.0;
+    int best_index = -1;
 
+    if (t < 1 || t > 12) {
+        for (int i = 0; i < 36; i++) {
+            ctrl->K[i] = 0.0;
+        }
+    } else {
+        for (int i = 0; i < num_lqr_entries; i++) {
+            if (t == lqr_data[i].time) {
+                distance = fabs(airspeed - lqr_data[i].state[0]) + fabs(q3 - lqr_data[i].state[0]);
+                if (distance < min_distance) {
+                    min_distance = distance;
+                    best_index = i;
+                }
+            } else if (lqr_data[i].time > t) {
+                break;
+            }  
+        }
+    } 
+
+    for (int i = 0; i < 36; i++) {
+        ctrl->K[i] = lqr_data[best_index].gains[i];
+    }
 }
 
 /**
- * @brief 
- * @param 
- * @return
+ * @brief Takes in account current state estiate and time since launch and returns reference state
+ * @param ctrl Takes controller struct, but uses current state and time
+ * @return corerct reference state
  * @note
 */
 void reference_selector(controller *ctrl){
+    int t = (int)round(ctrl->time_since_launch);
+    float base_x0[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
+    if (t > 13) {
+        for (int i = 0; i < 9; i++) {
+            ctrl->x0[i] = base_x0[i];
+        }
+    } else {
+        for (int i = 0; i < 9; i++) {
+            ctrl->x0[i] = ref_state_data[t].state[i]; // time corresponds 1:1 to index
+        }
+    } 
 }
-
 
 /**
  * @brief 
@@ -39,14 +76,46 @@ void reference_selector(controller *ctrl){
  * @return
  * @note
 */
-void compute_controls(controller *ctrl){
+void compute_controls(controller *ctrl) {
+    float del_x[9] = {0};
+    float roll = 0.0;
+    float pitch = 0.0;
+    float yaw = 0.0;
+    float thrust = 0.0;
 
-}
+    for (int i = 0; i < 9; i++) {
+        del_x[i] = ctrl->x[i] - ctrl->x0[i];
+    }
 
+    for (int j = 0; j < 4; j++) {
+        if (j == 0) {
+            for (int i = 0; i < 9; i++) {
+                roll += ctrl->K[j*9 + i] * del_x[i];
+            }
+        } else if (j == 1) {
+            for (int i = 0; i < 9; i++) {
+                pitch += ctrl->K[j*9 + i] * del_x[i];
+            }
+        } else if (j == 2) {
+            for (int i = 0; i < 9; i++) {
+                yaw += ctrl->K[j*9 + i] * del_x[i];
+            }
+        } else if (j == 3) {
+            for (int i = 0; i < 9; i++) {
+                thrust += ctrl->K[j*9 + i] * del_x[i];
+            }
+        }
+    }
+
+    ctrl->M_roll = roll;
+    ctrl->M_pitch = pitch;
+    ctrl->M_yaw = yaw;
+    ctrl->T = thrust;
+} 
 
 /**
  * @brief Function that updates the yaw moment arm in the struct since it shifts due to propellant burning
- * @param Takes controller struct, but uses initial and final moment arms plus burn time
+ * @param ctrl Takes controller struct, but uses initial and final moment arms plus burn time
  * @return Updates yaw_moment_arm variable in controller struct
  * @note Uses linear interpolation
 */
@@ -62,7 +131,7 @@ void update_yaw_moment_arm(controller *ctrl){
 
 /**
  * @brief Converts desired control moments of roll and yaw into desired roll and yaw forces
- * @param Takes controller struct, uses desired roll and yaw moments, and current roll and yaw moment arms
+ * @param ctrl Takes controller struct, uses desired roll and yaw moments, and current roll and yaw moment arms
  * @return Updates values of forces 1-D array, forces = [F_roll, F_pitch]
  * @note Uses the fact that M = F*d
 */
@@ -74,7 +143,7 @@ void moment_to_sideforce(controller *ctrl){
 
 /**
  * @brief Finds current thrust value, computes max sideforce for that thrust, and then computes vane deflection angles
- * @param Takes controller struct, but uses thrust curve, time since launch, and forces 1-D array
+ * @param ctrl Takes controller struct, but uses thrust curve, time since launch, and forces 1-D array
  * @return Updates vane_deflections 1-D array [roll1, roll2, yaw1, yaw2]
  * @note Sign conventions for vanes are important here!
 */
@@ -121,7 +190,7 @@ void sideforce_to_vane_angle(controller *ctrl){ //TODO: UPDATE BASED ON ACTUAL S
 
 /**
  * @brief Turns vane angles until
- * @param Takes the controller struct, but uses the vane deflections 1-D array
+ * @param ctrl Takes the controller struct, but uses the vane deflections 1-D array
  * @return Updates the servo_deflections 1-D array
  * @note Turn a vane by x degrees --> Turn the servo by (8/5)*x degrees according to the gear ratio in servo drivetrain
 */
@@ -131,7 +200,6 @@ void vane_angle_to_servo_angle(controller *ctrl){
     ctrl->servo_deflections[1] = ctrl->vane_deflections[1]*(8.0/5.0); //roll servo 2
     ctrl->servo_deflections[2] = ctrl->vane_deflections[2]*(8.0/5.0); //yaw servo 1
     ctrl->servo_deflections[3] = ctrl->vane_deflections[3]*(8.0/5.0); //yaw servo 2
-
 }
 
 /**

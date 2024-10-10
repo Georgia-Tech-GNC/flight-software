@@ -1,6 +1,6 @@
 /**
  * @file controls.h
- * @author Patrick Barry
+ * @author Patrick Barry, Karsten Caillet
  * @brief This contains the definitions of functions needed for in-flight controls on the jet vanes rocket.
  * 
  * Copyright 2024 Georgia Tech. All rights reserved.
@@ -12,13 +12,15 @@
 #ifndef __CONTROLS_H__
 #define __CONTROLS_H__
 
+#include "arm_math.h" 
+
 typedef struct { 
- 
+
     float time_since_launch; //Update at every time step
 
-    float32_t x[9]; //State estimate
-    float32_t x0[9]; //Reference state [u, v, w, p, q, r, q0, q1, q2, q3]
-    float32_t u0[4]; //Reference control inputs [M_roll, M_pitch, M_yaw, T]
+    float32_t x[9]; //State estimate, assuming we are NOT estimating 10
+    float32_t x0[9]; //Reference state [u, v, w, p, q, r, q1, q2, q3]
+    //float32_t u0[4]; //Reference control inputs [M_roll, M_pitch, M_yaw, T]
 
     float32_t K[9*4]; //Controller gian matrix K, is size 4x9 (mxn)
 
@@ -38,10 +40,31 @@ typedef struct {
     float32_t thrust_curve[14] = {2125.0, 1650.0, 1530.0, 1520.0, 1490.0, 1350.0, 1285.0, 1150.0, 990.0, 760.0, 610.0, 400.0, 270.0, 150.0, 0.0};
         //Thrust at each second from t = 0 to t = 14, i.e., thrust_curve = {T(0.0), T(1.0), T(2.0), T(3.0), etc.}
     float current_thrust;
-        
-
 
 } controller;
+
+// Structure to hold LQR gain data for a given time and state
+typedef struct {
+
+    float time;       // Time for this LQR gain set
+    float state[9];   // State vector (e.g., 9 states in the system)
+    float gains[36];  // Flattened LQR gain matrix (4x9 matrix flattened into 1x36 array)
+
+} LQRGainSet;
+
+extern const LQRGainSet lqr_data[]; // Declare the array of LQR gains (this is defined in the .c file)
+
+extern const int num_lqr_entries; // Declare the number of entries in the LQR gain array
+
+// Structure to hold reference state data for a given time and state
+typedef struct {
+    float time;       // Time for this reference state
+    float state[10];  // 10-variable state vector
+} ReferenceState;
+
+extern const ReferenceState ref_state_data[]; // Declare the array of reference states (this is defined in the .c file)
+
+extern const int num_ref_state_entries; // Declare the number of entries in the reference state array
 
 void LQR_gain_selector(controller *ctrl);
 void reference_selector(controller *ctrl);

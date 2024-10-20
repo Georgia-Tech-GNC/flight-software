@@ -22,7 +22,7 @@ typedef struct {
     float32_t x0[9]; //Reference state [u, v, w, p, q, r, q1, q2, q3]
     //float32_t u0[4]; //Reference control inputs [M_roll, M_pitch, M_yaw, T]
 
-    float32_t K[9*4]; //Controller gian matrix K, is size 4x9 (mxn)
+    float32_t K[9*4]; //Controller gain matrix K, is size 4x9 (mxn)
 
     float M_roll; //desired roll moment from controller
     float M_pitch; //desired pitch moment from controller

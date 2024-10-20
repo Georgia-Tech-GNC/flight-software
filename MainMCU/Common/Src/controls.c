@@ -52,12 +52,12 @@ void LQR_gain_selector(controller *ctrl){
 /**
  * @brief Takes in account current state estiate and time since launch and returns reference state
  * @param ctrl Takes controller struct, but uses current state and time
- * @return corerct reference state
+ * @return correct reference state
  * @note
 */
 void reference_selector(controller *ctrl){
     int t = (int)round(ctrl->time_since_launch);
-    float base_x0[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    float base_x0[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
     if (t > 13) {
         for (int i = 0; i < 9; i++) {
@@ -71,10 +71,10 @@ void reference_selector(controller *ctrl){
 }
 
 /**
- * @brief 
- * @param 
- * @return
- * @note
+ * @brief Computes the control moments based on the LQR gain matrix and the difference between the current state and the reference state
+ * @param ctrl Takes controller struct, but uses LQR gain matrix and current state
+ * @return Updates the control moments in the controller struct
+ * @note 
 */
 void compute_controls(controller *ctrl) {
     float del_x[9] = {0};
@@ -203,11 +203,29 @@ void vane_angle_to_servo_angle(controller *ctrl){
 }
 
 /**
- * @brief 
- * @param 
+ * @brief Runs the control algorithm for the jet vanes rocket for a given time step
+ * @param ctrl Takes the controller struct, the current state estimate, and the elapsed time since launch
+ * @param state 1-D array of current state estimate
+ * @param elapsed_time Time since launch
  * @return
  * @note
 */
 void run_controls(controller *ctrl, float *state, float elapsed_time){
+    // Update time since launch
+    ctrl->time_since_launch = elapsed_time;
 
+    // Update state estimate
+    for (int i = 0; i < 9; i++) {
+        ctrl->x[i] = state[i];
+    }
+
+    reference_selector(ctrl); // Update the reference state
+    LQR_gain_selector(ctrl); // Update the LQR gain matrix
+    compute_controls(ctrl); // Compute the control moments
+    update_yaw_moment_arm(ctrl); // Update the yaw moment arm
+    moment_to_sideforce(ctrl); // Convert moments to side forces
+    sideforce_to_vane_angle(ctrl); // Convert side forces to vane angles
+    vane_angle_to_servo_angle(ctrl); // Convert vane angles to servo angles
+
+    // TODO: Send servo_deflections to the servo controller
 }

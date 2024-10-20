@@ -71,6 +71,53 @@ void reference_selector(controller *ctrl){
 }
 
 /**
+ * @brief Initializes the control struct with all default values
+ * @param ctrl Takes controller struct, but uses all variables in the struct
+ * @return Initializes all variables in the controller struct
+ * @note 
+*/
+void initialize_controls(controller *ctrl) {
+    for (int i = 0; i < 9; i++) {
+        ctrl->x[i] = 0.0;
+        ctrl->x0[i] = 0.0;
+    }
+
+    for (int i = 0; i < 36; i++) {
+        ctrl->K[i] = 0.0;
+    }
+
+    ctrl->M_roll = 0.0;
+    ctrl->M_pitch = 0.0;
+    ctrl->M_yaw = 0.0;
+    ctrl->T = 0.0;
+
+    ctrl->yaw_moment_arm = 0.967;
+    ctrl->roll_moment_arm = 0.1;
+
+    ctrl->forces[0] = 0.0;
+    ctrl->forces[1] = 0.0;
+
+    ctrl->vane_deflections[0] = 0.0;
+    ctrl->vane_deflections[1] = 0.0;
+    ctrl->vane_deflections[2] = 0.0;
+    ctrl->vane_deflections[3] = 0.0;
+
+    ctrl->servo_deflections[0] = 0.0;
+    ctrl->servo_deflections[1] = 0.0;
+    ctrl->servo_deflections[2] = 0.0;
+    ctrl->servo_deflections[3] = 0.0;
+
+    ctrl->current_thrust = 0.0;
+
+    float32_t thrust_curve[15] = {2125.0, 1650.0, 1530.0, 1520.0, 1490.0, 1350.0, 1285.0, 1150.0, 990.0, 760.0, 610.0, 400.0, 270.0, 150.0, 0.0};
+    for (int i = 0; i < 15; i++) {
+        ctrl->thrust_curve[i] = thrust_curve[i];
+    }
+
+    ctrl->time_since_launch = 0.0;
+}
+
+/**
  * @brief Computes the control moments based on the LQR gain matrix and the difference between the current state and the reference state
  * @param ctrl Takes controller struct, but uses LQR gain matrix and current state
  * @return Updates the control moments in the controller struct

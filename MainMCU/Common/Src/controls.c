@@ -33,7 +33,10 @@ void LQR_gain_selector(controller *ctrl){
     } else {
         for (int i = 0; i < num_lqr_entries; i++) {
             if (t == lqr_data[i].time) {
-                distance = fabs(airspeed - lqr_data[i].state[0]) + fabs(q3 - lqr_data[i].state[0]);
+                if (best_index == -1) {
+                    best_index = i;
+                }
+                distance = fabs(airspeed - lqr_data[i].state[0]) + fabs(q3 - lqr_data[i].state[1]);
                 if (distance < min_distance) {
                     min_distance = distance;
                     best_index = i;
@@ -42,10 +45,9 @@ void LQR_gain_selector(controller *ctrl){
                 break;
             }  
         }
-    } 
-
-    for (int i = 0; i < 36; i++) {
-        ctrl->K[i] = lqr_data[best_index].gains[i];
+        for (int i = 0; i < 36; i++) {
+            ctrl->K[i] = lqr_data[best_index].gains[i];
+        }
     }
 }
 
@@ -225,7 +227,7 @@ void sideforce_to_vane_angle(controller *ctrl){ //TODO: UPDATE BASED ON ACTUAL S
     if (roll_force_per_vane >= max_sideforce){
         roll_vane_angle = 30.0; //degrees - 30 degrees is the maximum deflection
     } else {
-        roll_vane_angle = (yaw_force_per_vane/max_sideforce)*30.0;
+        roll_vane_angle = (roll_force_per_vane/max_sideforce)*30.0;
     }
 
     ctrl->vane_deflections[0] = roll_vane_angle;

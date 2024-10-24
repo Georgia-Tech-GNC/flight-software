@@ -69,11 +69,11 @@ extern const int num_ref_state_entries; // Declare the number of entries in the 
 void LQR_gain_selector(controller *ctrl);
 void reference_selector(controller *ctrl);
 void compute_controls(controller *ctrl);
-void update_yaw_Smoment_arm(controller *ctrl);
+void update_yaw_moment_arm(controller *ctrl);
 void moment_to_sideforce(controller *ctrl);
 void sideforce_to_vane_angle(controller *ctrl);
 void vane_angle_to_servo_angle(controller *ctrl);
-void initialize_controller(controller *ctrl);
+void initialize_controls(controller *ctrl);
 void run_controls(controller *ctrl, float *state, float elapsed_time);
 
 #endif

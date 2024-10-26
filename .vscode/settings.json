@@ -3,6 +3,13 @@
         "stm32h7xx_hal_eth.h": "c",
         "string.h": "c",
         "telemetry.h": "c",
-        "stm32h7xx_hal.h": "c"
+        "stm32h7xx_hal.h": "c",
+        "main.h": "c",
+        "pid.h": "c",
+        "ipc.h": "c",
+        "message_buffer.h": "c",
+        "freertos.h": "c",
+        "task.h": "c",
+        "freertosconfig.h": "c"
     }
 }

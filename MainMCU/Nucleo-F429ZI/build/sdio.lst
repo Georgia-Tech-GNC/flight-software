@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccbcxowB.s 			page 1
+ARM GAS  /tmp/cch156dY.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccbcxowB.s 			page 1
   27:../Core/Src/sdio.c ****  * @return 1 if successful, 0 otherwise
   28:../Core/Src/sdio.c ****  */
   29:../Core/Src/sdio.c **** int sd_channel_init(SDChannel *channel, const char *file_path, uint8_t mode, uint8_t id, StaticStre
-ARM GAS  /tmp/ccbcxowB.s 			page 2
+ARM GAS  /tmp/cch156dY.s 			page 2
 
 
   30              		.loc 1 29 163 view -0
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccbcxowB.s 			page 1
   75 001e 2B46     		mov	r3, r5
   76 0020 0121     		movs	r1, #1
   77              	.LVL4:
-ARM GAS  /tmp/ccbcxowB.s 			page 3
+ARM GAS  /tmp/cch156dY.s 			page 3
 
 
   78              		.loc 1 38 38 view .LVU17
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccbcxowB.s 			page 1
  119              	.LVL12:
  120              	.L5:
   31:../Core/Src/sdio.c ****     }
-ARM GAS  /tmp/ccbcxowB.s 			page 4
+ARM GAS  /tmp/cch156dY.s 			page 4
 
 
  121              		.loc 1 31 16 view .LVU30
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccbcxowB.s 			page 1
  161              		.loc 1 59 12 is_stmt 0 view .LVU39
  162 0004 8068     		ldr	r0, [r0, #8]
  163              	.LVL17:
-ARM GAS  /tmp/ccbcxowB.s 			page 5
+ARM GAS  /tmp/cch156dY.s 			page 5
 
 
  164              		.loc 1 59 12 view .LVU40
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccbcxowB.s 			page 1
   71:../Core/Src/sdio.c **** 
   72:../Core/Src/sdio.c ****     return xStreamBufferBytesAvailable(channel->sb_handle);
  207              		.loc 1 72 5 is_stmt 1 view .LVU48
-ARM GAS  /tmp/ccbcxowB.s 			page 6
+ARM GAS  /tmp/cch156dY.s 			page 6
 
 
  208              		.loc 1 72 12 is_stmt 0 view .LVU49
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccbcxowB.s 			page 1
  249 0002 70B5     		push	{r4, r5, r6, lr}
  250              	.LCFI8:
  251              		.cfi_def_cfa_offset 16
-ARM GAS  /tmp/ccbcxowB.s 			page 7
+ARM GAS  /tmp/cch156dY.s 			page 7
 
 
  252              		.cfi_offset 4, -16
@@ -376,7 +376,7 @@ ARM GAS  /tmp/ccbcxowB.s 			page 1
  264 000e 012B     		cmp	r3, #1
  265 0010 17D1     		bne	.L26
  266              		.loc 1 85 75 discriminator 3 view .LVU61
- 267 0012 B2F5806F 		cmp	r2, #1024
+ 267 0012 B2F5007F 		cmp	r2, #512
  268 0016 01D9     		bls	.L33
   86:../Core/Src/sdio.c ****         return 0;
  269              		.loc 1 86 16 view .LVU62
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccbcxowB.s 			page 1
   95:../Core/Src/sdio.c ****     return 1;
  297              		.loc 1 95 5 view .LVU70
  298              		.loc 1 95 12 is_stmt 0 view .LVU71
-ARM GAS  /tmp/ccbcxowB.s 			page 8
+ARM GAS  /tmp/cch156dY.s 			page 8
 
 
  299 0036 0120     		movs	r0, #1
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccbcxowB.s 			page 1
   97:../Core/Src/sdio.c **** 
   98:../Core/Src/sdio.c **** /**
   99:../Core/Src/sdio.c ****  * Save the data in a channel to the SD card. The channel must be in write mode.
-ARM GAS  /tmp/ccbcxowB.s 			page 9
+ARM GAS  /tmp/cch156dY.s 			page 9
 
 
  100:../Core/Src/sdio.c ****  * @param channel The channel to save
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccbcxowB.s 			page 1
  109:../Core/Src/sdio.c ****         .type = SD_OPERATION_SAVE,
  378              		.loc 1 109 17 is_stmt 0 view .LVU88
  379 0010 8DF80020 		strb	r2, [sp]
-ARM GAS  /tmp/ccbcxowB.s 			page 10
+ARM GAS  /tmp/cch156dY.s 			page 10
 
 
  380 0014 0190     		str	r0, [sp, #4]
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccbcxowB.s 			page 1
  425              	.LVL47:
  119:../Core/Src/sdio.c ****     }
  426              		.loc 1 119 16 view .LVU99
-ARM GAS  /tmp/ccbcxowB.s 			page 11
+ARM GAS  /tmp/cch156dY.s 			page 11
 
 
  427 003a F8E7     		b	.L35
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccbcxowB.s 			page 1
  136:../Core/Src/sdio.c ****     }
  137:../Core/Src/sdio.c **** 
  138:../Core/Src/sdio.c ****     SDOperation operation = {
-ARM GAS  /tmp/ccbcxowB.s 			page 12
+ARM GAS  /tmp/cch156dY.s 			page 12
 
 
  139:../Core/Src/sdio.c ****         .type = SD_OPERATION_LOAD,
@@ -718,7 +718,7 @@ ARM GAS  /tmp/ccbcxowB.s 			page 1
  147:../Core/Src/sdio.c ****         return 0;
  502              		.loc 1 147 8 is_stmt 0 view .LVU116
  503 0026 1028     		cmp	r0, #16
-ARM GAS  /tmp/ccbcxowB.s 			page 13
+ARM GAS  /tmp/cch156dY.s 			page 13
 
 
  504 0028 03D1     		bne	.L51
@@ -778,7 +778,7 @@ ARM GAS  /tmp/ccbcxowB.s 			page 1
  158:../Core/Src/sdio.c ****  * @param len The target number of bytes to read
  159:../Core/Src/sdio.c ****  * @return The number of bytes read
  160:../Core/Src/sdio.c ****  */
-ARM GAS  /tmp/ccbcxowB.s 			page 14
+ARM GAS  /tmp/cch156dY.s 			page 14
 
 
  161:../Core/Src/sdio.c **** int sd_read_channel(SDChannel *channel, uint8_t *data, size_t len) {
@@ -838,7 +838,7 @@ ARM GAS  /tmp/ccbcxowB.s 			page 1
  163:../Core/Src/sdio.c ****         return 0;
  592              		.loc 1 163 16 view .LVU136
  593 0016 0020     		movs	r0, #0
-ARM GAS  /tmp/ccbcxowB.s 			page 15
+ARM GAS  /tmp/cch156dY.s 			page 15
 
 
  594              	.LVL66:
@@ -875,7 +875,7 @@ ARM GAS  /tmp/ccbcxowB.s 			page 1
  175:../Core/Src/sdio.c ****     FATFS fs;
  176:../Core/Src/sdio.c **** 
  177:../Core/Src/sdio.c ****     /* Buffer to mediate between fatfs and freertos stream buffer */
- 178:../Core/Src/sdio.c ****     uint8_t data_buffer[1025]; // +1 because theres some weird buffer overflow in f_read
+ 178:../Core/Src/sdio.c ****     uint8_t data_buffer[SD_MAX_READ_WRITE_SIZE + 1]; // +1 because theres some weird buffer overflo
  179:../Core/Src/sdio.c **** 
  180:../Core/Src/sdio.c ****     /* Buffer to store operation messages */
  181:../Core/Src/sdio.c ****     uint8_t operation_buffer[sizeof(SDOperation)];
@@ -898,7 +898,7 @@ ARM GAS  /tmp/ccbcxowB.s 			page 1
  198:../Core/Src/sdio.c **** 
  199:../Core/Src/sdio.c ****         /* Perform a save/load operation */
  200:../Core/Src/sdio.c ****         if (operation->type == SD_OPERATION_SAVE) {
-ARM GAS  /tmp/ccbcxowB.s 			page 16
+ARM GAS  /tmp/cch156dY.s 			page 16
 
 
  201:../Core/Src/sdio.c ****             size_t bytes_saved = 0;
@@ -958,7 +958,7 @@ ARM GAS  /tmp/ccbcxowB.s 			page 1
  222:../Core/Src/sdio.c ****     }
  223:../Core/Src/sdio.c **** 
  224:../Core/Src/sdio.c ****     SDChannel *channel = operation->channel;
-ARM GAS  /tmp/ccbcxowB.s 			page 17
+ARM GAS  /tmp/cch156dY.s 			page 17
 
 
  225:../Core/Src/sdio.c ****     FIL fil;
@@ -1018,7 +1018,7 @@ ARM GAS  /tmp/ccbcxowB.s 			page 1
  670              		.loc 1 225 5 is_stmt 1 view .LVU150
  227:../Core/Src/sdio.c ****         return 0;
  671              		.loc 1 227 5 view .LVU151
-ARM GAS  /tmp/ccbcxowB.s 			page 18
+ARM GAS  /tmp/cch156dY.s 			page 18
 
 
  227:../Core/Src/sdio.c ****         return 0;
@@ -1078,7 +1078,7 @@ ARM GAS  /tmp/ccbcxowB.s 			page 1
  712 0050 0020     		movs	r0, #0
  713 0052 E0E7     		b	.L69
  714              	.L81:
-ARM GAS  /tmp/ccbcxowB.s 			page 19
+ARM GAS  /tmp/cch156dY.s 			page 19
 
 
  241:../Core/Src/sdio.c **** 
@@ -1138,7 +1138,7 @@ ARM GAS  /tmp/ccbcxowB.s 			page 1
  754              	.L76:
  252:../Core/Src/sdio.c ****     }
  755              		.loc 1 252 16 view .LVU181
-ARM GAS  /tmp/ccbcxowB.s 			page 20
+ARM GAS  /tmp/cch156dY.s 			page 20
 
 
  756 007c 0020     		movs	r0, #0
@@ -1198,7 +1198,7 @@ ARM GAS  /tmp/ccbcxowB.s 			page 1
  287:../Core/Src/sdio.c ****     if (f_close(&fil) != FR_OK) {
  288:../Core/Src/sdio.c ****         return 0;
  289:../Core/Src/sdio.c ****     }
-ARM GAS  /tmp/ccbcxowB.s 			page 21
+ARM GAS  /tmp/cch156dY.s 			page 21
 
 
  290:../Core/Src/sdio.c **** 
@@ -1258,7 +1258,7 @@ ARM GAS  /tmp/ccbcxowB.s 			page 1
  274:../Core/Src/sdio.c ****     } 
  823              		.loc 1 274 16 view .LVU197
  824 0020 0020     		movs	r0, #0
-ARM GAS  /tmp/ccbcxowB.s 			page 22
+ARM GAS  /tmp/cch156dY.s 			page 22
 
 
  825              	.L83:
@@ -1318,7 +1318,7 @@ ARM GAS  /tmp/ccbcxowB.s 			page 1
  868              		.loc 1 284 16 view .LVU209
  869 004e 0020     		movs	r0, #0
  870 0050 E7E7     		b	.L83
-ARM GAS  /tmp/ccbcxowB.s 			page 23
+ARM GAS  /tmp/cch156dY.s 			page 23
 
 
  871              	.L95:
@@ -1366,479 +1366,411 @@ ARM GAS  /tmp/ccbcxowB.s 			page 1
  901              		.cfi_startproc
  902              		@ args = 0, pretend = 0, frame = 0
  903              		@ frame_needed = 0, uses_anonymous_args = 0
- 904              		.loc 1 301 75 is_stmt 0 view .LVU216
- 905 0000 10B5     		push	{r4, lr}
- 906              	.LCFI34:
- 907              		.cfi_def_cfa_offset 8
- 908              		.cfi_offset 4, -8
- 909              		.cfi_offset 14, -4
- 910 0002 82B0     		sub	sp, sp, #8
- 911              	.LCFI35:
- 912              		.cfi_def_cfa_offset 16
- 913 0004 0C46     		mov	r4, r1
  302:../Core/Src/sdio.c ****     if (channel->id == 0) {
- 914              		.loc 1 302 5 is_stmt 1 view .LVU217
-ARM GAS  /tmp/ccbcxowB.s 			page 24
+ 904              		.loc 1 302 5 view .LVU216
+ 905              		.loc 1 302 16 is_stmt 0 view .LVU217
+ 906 0000 4379     		ldrb	r3, [r0, #5]	@ zero_extendqisi2
+ 907              		.loc 1 302 8 view .LVU218
+ 908 0002 03B1     		cbz	r3, .L102
+ 909 0004 7047     		bx	lr
+ 910              	.L102:
+ 301:../Core/Src/sdio.c ****     if (channel->id == 0) {
+ 911              		.loc 1 301 75 view .LVU219
+ 912 0006 00B5     		push	{lr}
+ 913              	.LCFI34:
+ARM GAS  /tmp/cch156dY.s 			page 24
 
 
- 915              		.loc 1 302 16 is_stmt 0 view .LVU218
- 916 0006 4379     		ldrb	r3, [r0, #5]	@ zero_extendqisi2
- 917              		.loc 1 302 8 view .LVU219
- 918 0008 13B1     		cbz	r3, .L100
- 919              	.LVL102:
- 920              	.L97:
+ 914              		.cfi_def_cfa_offset 4
+ 915              		.cfi_offset 14, -4
+ 916 0008 83B0     		sub	sp, sp, #12
+ 917              	.LCFI35:
+ 918              		.cfi_def_cfa_offset 16
  303:../Core/Src/sdio.c ****         xTaskNotify(g_test_task_handle, SD_TASK_WRITE_COMPLETE_BIT, eSetBits);
+ 919              		.loc 1 303 9 is_stmt 1 view .LVU220
+ 920 000a 0021     		movs	r1, #0
+ 921              	.LVL102:
+ 922              		.loc 1 303 9 is_stmt 0 view .LVU221
+ 923 000c 0091     		str	r1, [sp]
+ 924 000e 0123     		movs	r3, #1
+ 925 0010 0222     		movs	r2, #2
+ 926              	.LVL103:
+ 927              		.loc 1 303 9 view .LVU222
+ 928 0012 0348     		ldr	r0, .L103
+ 929              	.LVL104:
+ 930              		.loc 1 303 9 view .LVU223
+ 931 0014 0068     		ldr	r0, [r0]
+ 932 0016 FFF7FEFF 		bl	xTaskGenericNotify
+ 933              	.LVL105:
  304:../Core/Src/sdio.c ****     }
- 305:../Core/Src/sdio.c **** 
- 306:../Core/Src/sdio.c ****     if (status == 0) {
- 921              		.loc 1 306 5 is_stmt 1 view .LVU220
- 922              		.loc 1 306 8 is_stmt 0 view .LVU221
- 923 000a 54B1     		cbz	r4, .L101
- 924              	.L96:
- 307:../Core/Src/sdio.c ****         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
- 308:../Core/Src/sdio.c ****     }
- 309:../Core/Src/sdio.c **** }
- 925              		.loc 1 309 1 view .LVU222
- 926 000c 02B0     		add	sp, sp, #8
- 927              	.LCFI36:
- 928              		.cfi_remember_state
- 929              		.cfi_def_cfa_offset 8
- 930              		@ sp needed
- 931 000e 10BD     		pop	{r4, pc}
- 932              	.LVL103:
- 933              	.L100:
- 934              	.LCFI37:
- 935              		.cfi_restore_state
- 303:../Core/Src/sdio.c ****         xTaskNotify(g_test_task_handle, SD_TASK_WRITE_COMPLETE_BIT, eSetBits);
- 936              		.loc 1 303 9 is_stmt 1 view .LVU223
- 937 0010 0021     		movs	r1, #0
- 938              	.LVL104:
- 303:../Core/Src/sdio.c ****         xTaskNotify(g_test_task_handle, SD_TASK_WRITE_COMPLETE_BIT, eSetBits);
- 939              		.loc 1 303 9 is_stmt 0 view .LVU224
- 940 0012 0091     		str	r1, [sp]
- 941 0014 0123     		movs	r3, #1
- 942 0016 0222     		movs	r2, #2
- 943              	.LVL105:
- 303:../Core/Src/sdio.c ****         xTaskNotify(g_test_task_handle, SD_TASK_WRITE_COMPLETE_BIT, eSetBits);
- 944              		.loc 1 303 9 view .LVU225
- 945 0018 0548     		ldr	r0, .L102
- 946              	.LVL106:
- 303:../Core/Src/sdio.c ****         xTaskNotify(g_test_task_handle, SD_TASK_WRITE_COMPLETE_BIT, eSetBits);
- 947              		.loc 1 303 9 view .LVU226
- 948 001a 0068     		ldr	r0, [r0]
- 949 001c FFF7FEFF 		bl	xTaskGenericNotify
- 950              	.LVL107:
- 951 0020 F3E7     		b	.L97
- 952              	.L101:
- 307:../Core/Src/sdio.c ****         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
- 953              		.loc 1 307 9 is_stmt 1 view .LVU227
- 954 0022 0122     		movs	r2, #1
- 955 0024 1146     		mov	r1, r2
- 956 0026 0348     		ldr	r0, .L102+4
- 957 0028 FFF7FEFF 		bl	HAL_GPIO_WritePin
- 958              	.LVL108:
- 959              		.loc 1 309 1 is_stmt 0 view .LVU228
-ARM GAS  /tmp/ccbcxowB.s 			page 25
+ 305:../Core/Src/sdio.c **** }
+ 934              		.loc 1 305 1 view .LVU224
+ 935 001a 03B0     		add	sp, sp, #12
+ 936              	.LCFI36:
+ 937              		.cfi_def_cfa_offset 4
+ 938              		@ sp needed
+ 939 001c 5DF804FB 		ldr	pc, [sp], #4
+ 940              	.L104:
+ 941              		.align	2
+ 942              	.L103:
+ 943 0020 00000000 		.word	g_test_task_handle
+ 944              		.cfi_endproc
+ 945              	.LFE148:
+ 947              		.section	.text.sd_load_complete,"ax",%progbits
+ 948              		.align	1
+ 949              		.global	sd_load_complete
+ 950              		.syntax unified
+ 951              		.thumb
+ 952              		.thumb_func
+ 953              		.fpu fpv4-sp-d16
+ 955              	sd_load_complete:
+ 956              	.LVL106:
+ 957              	.LFB149:
+ 306:../Core/Src/sdio.c **** 
+ 307:../Core/Src/sdio.c **** 
+ 308:../Core/Src/sdio.c **** /**
+ 309:../Core/Src/sdio.c ****  * Callback for when a load operation is complete
+ 310:../Core/Src/sdio.c ****  * @param channel The channel that was loaded
+ 311:../Core/Src/sdio.c ****  * @param bytes_loaded The number of bytes loaded
+ 312:../Core/Src/sdio.c ****  * @param status The status of the load operation. 1 if successful, 0 otherwise
+ 313:../Core/Src/sdio.c ****  */
+ 314:../Core/Src/sdio.c **** void sd_load_complete(SDChannel *channel, int status, size_t bytes_loaded) {
+ 958              		.loc 1 314 76 is_stmt 1 view -0
+ 959              		.cfi_startproc
+ 960              		@ args = 0, pretend = 0, frame = 0
+ARM GAS  /tmp/cch156dY.s 			page 25
 
 
- 960 002c EEE7     		b	.L96
- 961              	.L103:
- 962 002e 00BF     		.align	2
- 963              	.L102:
- 964 0030 00000000 		.word	g_test_task_handle
- 965 0034 00040240 		.word	1073873920
- 966              		.cfi_endproc
- 967              	.LFE148:
- 969              		.section	.text.sd_load_complete,"ax",%progbits
- 970              		.align	1
- 971              		.global	sd_load_complete
- 972              		.syntax unified
- 973              		.thumb
- 974              		.thumb_func
- 975              		.fpu fpv4-sp-d16
- 977              	sd_load_complete:
- 978              	.LVL109:
- 979              	.LFB149:
- 310:../Core/Src/sdio.c **** 
- 311:../Core/Src/sdio.c **** 
- 312:../Core/Src/sdio.c **** /**
- 313:../Core/Src/sdio.c ****  * Callback for when a load operation is complete
- 314:../Core/Src/sdio.c ****  * @param channel The channel that was loaded
- 315:../Core/Src/sdio.c ****  * @param bytes_loaded The number of bytes loaded
- 316:../Core/Src/sdio.c ****  * @param status The status of the load operation. 1 if successful, 0 otherwise
- 317:../Core/Src/sdio.c ****  */
- 318:../Core/Src/sdio.c **** void sd_load_complete(SDChannel *channel, int status, size_t bytes_loaded) {
- 980              		.loc 1 318 76 is_stmt 1 view -0
- 981              		.cfi_startproc
- 982              		@ args = 0, pretend = 0, frame = 0
- 983              		@ frame_needed = 0, uses_anonymous_args = 0
- 984              		.loc 1 318 76 is_stmt 0 view .LVU230
- 985 0000 10B5     		push	{r4, lr}
- 986              	.LCFI38:
- 987              		.cfi_def_cfa_offset 8
- 988              		.cfi_offset 4, -8
- 989              		.cfi_offset 14, -4
- 990 0002 82B0     		sub	sp, sp, #8
- 991              	.LCFI39:
- 992              		.cfi_def_cfa_offset 16
- 993 0004 0C46     		mov	r4, r1
- 319:../Core/Src/sdio.c ****     if (channel->id == 1) {
- 994              		.loc 1 319 5 is_stmt 1 view .LVU231
- 995              		.loc 1 319 16 is_stmt 0 view .LVU232
- 996 0006 4379     		ldrb	r3, [r0, #5]	@ zero_extendqisi2
- 997              		.loc 1 319 8 view .LVU233
- 998 0008 012B     		cmp	r3, #1
- 999 000a 02D0     		beq	.L108
- 1000              	.LVL110:
- 1001              	.L105:
- 320:../Core/Src/sdio.c ****         xTaskNotify(g_test_task_handle, SD_TASK_READ_COMPLETE_BIT, eSetBits);
- 321:../Core/Src/sdio.c ****     }
- 322:../Core/Src/sdio.c **** 
- 323:../Core/Src/sdio.c ****     if (status == 0) {
- 1002              		.loc 1 323 5 is_stmt 1 view .LVU234
- 1003              		.loc 1 323 8 is_stmt 0 view .LVU235
- 1004 000c 4CB1     		cbz	r4, .L109
-ARM GAS  /tmp/ccbcxowB.s 			page 26
+ 961              		@ frame_needed = 0, uses_anonymous_args = 0
+ 315:../Core/Src/sdio.c ****     if (channel->id == 1) {
+ 962              		.loc 1 315 5 view .LVU226
+ 963              		.loc 1 315 16 is_stmt 0 view .LVU227
+ 964 0000 4379     		ldrb	r3, [r0, #5]	@ zero_extendqisi2
+ 965              		.loc 1 315 8 view .LVU228
+ 966 0002 012B     		cmp	r3, #1
+ 967 0004 00D0     		beq	.L111
+ 968 0006 7047     		bx	lr
+ 969              	.L111:
+ 314:../Core/Src/sdio.c ****     if (channel->id == 1) {
+ 970              		.loc 1 314 76 view .LVU229
+ 971 0008 00B5     		push	{lr}
+ 972              	.LCFI37:
+ 973              		.cfi_def_cfa_offset 4
+ 974              		.cfi_offset 14, -4
+ 975 000a 83B0     		sub	sp, sp, #12
+ 976              	.LCFI38:
+ 977              		.cfi_def_cfa_offset 16
+ 316:../Core/Src/sdio.c ****         xTaskNotify(g_test_task_handle, SD_TASK_READ_COMPLETE_BIT, eSetBits);
+ 978              		.loc 1 316 9 is_stmt 1 view .LVU230
+ 979 000c 0021     		movs	r1, #0
+ 980              	.LVL107:
+ 981              		.loc 1 316 9 is_stmt 0 view .LVU231
+ 982 000e 0091     		str	r1, [sp]
+ 983 0010 1A46     		mov	r2, r3
+ 984              	.LVL108:
+ 985              		.loc 1 316 9 view .LVU232
+ 986 0012 0348     		ldr	r0, .L112
+ 987              	.LVL109:
+ 988              		.loc 1 316 9 view .LVU233
+ 989 0014 0068     		ldr	r0, [r0]
+ 990 0016 FFF7FEFF 		bl	xTaskGenericNotify
+ 991              	.LVL110:
+ 317:../Core/Src/sdio.c ****     }
+ 318:../Core/Src/sdio.c **** }
+ 992              		.loc 1 318 1 view .LVU234
+ 993 001a 03B0     		add	sp, sp, #12
+ 994              	.LCFI39:
+ 995              		.cfi_def_cfa_offset 4
+ 996              		@ sp needed
+ 997 001c 5DF804FB 		ldr	pc, [sp], #4
+ 998              	.L113:
+ 999              		.align	2
+ 1000              	.L112:
+ 1001 0020 00000000 		.word	g_test_task_handle
+ 1002              		.cfi_endproc
+ 1003              	.LFE149:
+ 1005              		.section	.rodata.sdio_task.str1.4,"aMS",%progbits,1
+ 1006              		.align	2
+ 1007              	.LC0:
+ 1008 0000 2F00     		.ascii	"/\000"
+ 1009              		.section	.text.sdio_task,"ax",%progbits
+ 1010              		.align	1
+ 1011              		.global	sdio_task
+ 1012              		.syntax unified
+ 1013              		.thumb
+ARM GAS  /tmp/cch156dY.s 			page 26
 
 
- 1005              	.L104:
- 324:../Core/Src/sdio.c ****         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_SET);
- 325:../Core/Src/sdio.c ****     }
- 326:../Core/Src/sdio.c **** }
- 1006              		.loc 1 326 1 view .LVU236
- 1007 000e 02B0     		add	sp, sp, #8
- 1008              	.LCFI40:
- 1009              		.cfi_remember_state
- 1010              		.cfi_def_cfa_offset 8
- 1011              		@ sp needed
- 1012 0010 10BD     		pop	{r4, pc}
- 1013              	.LVL111:
- 1014              	.L108:
- 1015              	.LCFI41:
- 1016              		.cfi_restore_state
- 320:../Core/Src/sdio.c ****         xTaskNotify(g_test_task_handle, SD_TASK_READ_COMPLETE_BIT, eSetBits);
- 1017              		.loc 1 320 9 is_stmt 1 view .LVU237
- 1018 0012 0021     		movs	r1, #0
- 1019              	.LVL112:
- 320:../Core/Src/sdio.c ****         xTaskNotify(g_test_task_handle, SD_TASK_READ_COMPLETE_BIT, eSetBits);
- 1020              		.loc 1 320 9 is_stmt 0 view .LVU238
- 1021 0014 0091     		str	r1, [sp]
- 1022 0016 1A46     		mov	r2, r3
- 1023              	.LVL113:
- 320:../Core/Src/sdio.c ****         xTaskNotify(g_test_task_handle, SD_TASK_READ_COMPLETE_BIT, eSetBits);
- 1024              		.loc 1 320 9 view .LVU239
- 1025 0018 0548     		ldr	r0, .L110
- 1026              	.LVL114:
- 320:../Core/Src/sdio.c ****         xTaskNotify(g_test_task_handle, SD_TASK_READ_COMPLETE_BIT, eSetBits);
- 1027              		.loc 1 320 9 view .LVU240
- 1028 001a 0068     		ldr	r0, [r0]
- 1029 001c FFF7FEFF 		bl	xTaskGenericNotify
- 1030              	.LVL115:
- 1031 0020 F4E7     		b	.L105
- 1032              	.L109:
- 324:../Core/Src/sdio.c ****         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_SET);
- 1033              		.loc 1 324 9 is_stmt 1 view .LVU241
- 1034 0022 0122     		movs	r2, #1
- 1035 0024 4FF48041 		mov	r1, #16384
- 1036 0028 0248     		ldr	r0, .L110+4
- 1037 002a FFF7FEFF 		bl	HAL_GPIO_WritePin
- 1038              	.LVL116:
- 1039              		.loc 1 326 1 is_stmt 0 view .LVU242
- 1040 002e EEE7     		b	.L104
- 1041              	.L111:
- 1042              		.align	2
- 1043              	.L110:
- 1044 0030 00000000 		.word	g_test_task_handle
- 1045 0034 00040240 		.word	1073873920
- 1046              		.cfi_endproc
- 1047              	.LFE149:
- 1049              		.section	.rodata.sdio_task.str1.4,"aMS",%progbits,1
- 1050              		.align	2
- 1051              	.LC0:
- 1052 0000 2F00     		.ascii	"/\000"
- 1053              		.section	.text.sdio_task,"ax",%progbits
- 1054              		.align	1
-ARM GAS  /tmp/ccbcxowB.s 			page 27
-
-
- 1055              		.global	sdio_task
- 1056              		.syntax unified
- 1057              		.thumb
- 1058              		.thumb_func
- 1059              		.fpu fpv4-sp-d16
- 1061              	sdio_task:
- 1062              	.LVL117:
- 1063              	.LFB145:
+ 1014              		.thumb_func
+ 1015              		.fpu fpv4-sp-d16
+ 1017              	sdio_task:
+ 1018              	.LVL111:
+ 1019              	.LFB145:
  173:../Core/Src/sdio.c ****     uint8_t sd_mounted = 0;
- 1064              		.loc 1 173 28 is_stmt 1 view -0
- 1065              		.cfi_startproc
- 1066              		@ args = 0, pretend = 0, frame = 5200
- 1067              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1020              		.loc 1 173 28 is_stmt 1 view -0
+ 1021              		.cfi_startproc
+ 1022              		@ args = 0, pretend = 0, frame = 4688
+ 1023              		@ frame_needed = 0, uses_anonymous_args = 0
  173:../Core/Src/sdio.c ****     uint8_t sd_mounted = 0;
- 1068              		.loc 1 173 28 is_stmt 0 view .LVU244
- 1069 0000 30B5     		push	{r4, r5, lr}
- 1070              	.LCFI42:
- 1071              		.cfi_def_cfa_offset 12
- 1072              		.cfi_offset 4, -12
- 1073              		.cfi_offset 5, -8
- 1074              		.cfi_offset 14, -4
- 1075 0002 ADF5A25D 		sub	sp, sp, #5184
- 1076              	.LCFI43:
- 1077              		.cfi_def_cfa_offset 5196
- 1078 0006 87B0     		sub	sp, sp, #28
- 1079              	.LCFI44:
- 1080              		.cfi_def_cfa_offset 5224
+ 1024              		.loc 1 173 28 is_stmt 0 view .LVU236
+ 1025 0000 30B5     		push	{r4, r5, lr}
+ 1026              	.LCFI40:
+ 1027              		.cfi_def_cfa_offset 12
+ 1028              		.cfi_offset 4, -12
+ 1029              		.cfi_offset 5, -8
+ 1030              		.cfi_offset 14, -4
+ 1031 0002 ADF5925D 		sub	sp, sp, #4672
+ 1032              	.LCFI41:
+ 1033              		.cfi_def_cfa_offset 4684
+ 1034 0006 87B0     		sub	sp, sp, #28
+ 1035              	.LCFI42:
+ 1036              		.cfi_def_cfa_offset 4712
  174:../Core/Src/sdio.c ****     FATFS fs;
- 1081              		.loc 1 174 5 is_stmt 1 view .LVU245
- 1082              	.LVL118:
+ 1037              		.loc 1 174 5 is_stmt 1 view .LVU237
+ 1038              	.LVL112:
  175:../Core/Src/sdio.c **** 
- 1083              		.loc 1 175 5 view .LVU246
+ 1039              		.loc 1 175 5 view .LVU238
  178:../Core/Src/sdio.c **** 
- 1084              		.loc 1 178 5 view .LVU247
+ 1040              		.loc 1 178 5 view .LVU239
  181:../Core/Src/sdio.c **** 
- 1085              		.loc 1 181 5 view .LVU248
+ 1041              		.loc 1 181 5 view .LVU240
  184:../Core/Src/sdio.c ****         sd_mounted = 1;
- 1086              		.loc 1 184 5 view .LVU249
+ 1042              		.loc 1 184 5 view .LVU241
  184:../Core/Src/sdio.c ****         sd_mounted = 1;
- 1087              		.loc 1 184 9 is_stmt 0 view .LVU250
- 1088 0008 0122     		movs	r2, #1
- 1089 000a 2249     		ldr	r1, .L123
- 1090 000c 0DF58460 		add	r0, sp, #1056
- 1091              	.LVL119:
+ 1043              		.loc 1 184 9 is_stmt 0 view .LVU242
+ 1044 0008 0122     		movs	r2, #1
+ 1045 000a 2049     		ldr	r1, .L125
+ 1046 000c 88A8     		add	r0, sp, #544
+ 1047              	.LVL113:
  184:../Core/Src/sdio.c ****         sd_mounted = 1;
- 1092              		.loc 1 184 9 view .LVU251
- 1093 0010 FFF7FEFF 		bl	f_mount
- 1094              	.LVL120:
+ 1048              		.loc 1 184 9 view .LVU243
+ 1049 000e FFF7FEFF 		bl	f_mount
+ 1050              	.LVL114:
  184:../Core/Src/sdio.c ****         sd_mounted = 1;
- 1095              		.loc 1 184 8 view .LVU252
- 1096 0014 08B1     		cbz	r0, .L118
+ 1051              		.loc 1 184 8 view .LVU244
+ 1052 0012 08B1     		cbz	r0, .L120
  174:../Core/Src/sdio.c ****     FATFS fs;
- 1097              		.loc 1 174 13 view .LVU253
- 1098 0016 0024     		movs	r4, #0
- 1099 0018 19E0     		b	.L114
- 1100              	.L118:
+ 1053              		.loc 1 174 13 view .LVU245
+ 1054 0014 0024     		movs	r4, #0
+ 1055 0016 18E0     		b	.L116
+ 1056              	.L120:
  185:../Core/Src/sdio.c ****     }
-ARM GAS  /tmp/ccbcxowB.s 			page 28
+ 1057              		.loc 1 185 20 view .LVU246
+ 1058 0018 0124     		movs	r4, #1
+ 1059              	.LVL115:
+ARM GAS  /tmp/cch156dY.s 			page 27
 
 
- 1101              		.loc 1 185 20 view .LVU254
- 1102 001a 0124     		movs	r4, #1
- 1103              	.LVL121:
  185:../Core/Src/sdio.c ****     }
- 1104              		.loc 1 185 20 view .LVU255
- 1105 001c 17E0     		b	.L114
- 1106              	.LVL122:
- 1107              	.L121:
- 1108              	.LBB2:
+ 1060              		.loc 1 185 20 view .LVU247
+ 1061 001a 16E0     		b	.L116
+ 1062              	.LVL116:
+ 1063              	.L123:
+ 1064              	.LBB2:
  193:../Core/Src/sdio.c ****             sd_mounted = 1;
- 1109              		.loc 1 193 28 discriminator 1 view .LVU256
- 1110 001e 0122     		movs	r2, #1
- 1111 0020 1C49     		ldr	r1, .L123
- 1112 0022 0DF58460 		add	r0, sp, #1056
- 1113 0026 FFF7FEFF 		bl	f_mount
- 1114              	.LVL123:
+ 1065              		.loc 1 193 28 discriminator 1 view .LVU248
+ 1066 001c 0122     		movs	r2, #1
+ 1067 001e 1B49     		ldr	r1, .L125
+ 1068 0020 88A8     		add	r0, sp, #544
+ 1069 0022 FFF7FEFF 		bl	f_mount
+ 1070              	.LVL117:
  193:../Core/Src/sdio.c ****             sd_mounted = 1;
- 1115              		.loc 1 193 25 discriminator 1 view .LVU257
- 1116 002a D0B9     		cbnz	r0, .L115
+ 1071              		.loc 1 193 25 discriminator 1 view .LVU249
+ 1072 0026 D0B9     		cbnz	r0, .L117
  194:../Core/Src/sdio.c ****         }
- 1117              		.loc 1 194 24 view .LVU258
- 1118 002c 0124     		movs	r4, #1
- 1119              	.LVL124:
+ 1073              		.loc 1 194 24 view .LVU250
+ 1074 0028 0124     		movs	r4, #1
+ 1075              	.LVL118:
  194:../Core/Src/sdio.c ****         }
- 1120              		.loc 1 194 24 view .LVU259
- 1121 002e 18E0     		b	.L115
- 1122              	.LVL125:
- 1123              	.L122:
- 1124              	.LBB3:
+ 1076              		.loc 1 194 24 view .LVU251
+ 1077 002a 18E0     		b	.L117
+ 1078              	.LVL119:
+ 1079              	.L124:
+ 1080              	.LBB3:
  201:../Core/Src/sdio.c ****             int status = save_operation(operation, data_buffer, &bytes_saved, sd_mounted);
- 1125              		.loc 1 201 13 is_stmt 1 view .LVU260
+ 1081              		.loc 1 201 13 is_stmt 1 view .LVU252
  201:../Core/Src/sdio.c ****             int status = save_operation(operation, data_buffer, &bytes_saved, sd_mounted);
- 1126              		.loc 1 201 20 is_stmt 0 view .LVU261
- 1127 0030 02AD     		add	r5, sp, #8
- 1128 0032 0023     		movs	r3, #0
- 1129 0034 2B60     		str	r3, [r5]
+ 1082              		.loc 1 201 20 is_stmt 0 view .LVU253
+ 1083 002c 02AD     		add	r5, sp, #8
+ 1084 002e 0023     		movs	r3, #0
+ 1085 0030 2B60     		str	r3, [r5]
  202:../Core/Src/sdio.c ****             sd_save_complete(operation->channel, status, bytes_saved);
- 1130              		.loc 1 202 13 is_stmt 1 view .LVU262
+ 1086              		.loc 1 202 13 is_stmt 1 view .LVU254
  202:../Core/Src/sdio.c ****             sd_save_complete(operation->channel, status, bytes_saved);
- 1131              		.loc 1 202 26 is_stmt 0 view .LVU263
- 1132 0036 2346     		mov	r3, r4
- 1133 0038 2A46     		mov	r2, r5
- 1134 003a 07A9     		add	r1, sp, #28
- 1135 003c 03A8     		add	r0, sp, #12
- 1136              	.LVL126:
+ 1087              		.loc 1 202 26 is_stmt 0 view .LVU255
+ 1088 0032 2346     		mov	r3, r4
+ 1089 0034 2A46     		mov	r2, r5
+ 1090 0036 07A9     		add	r1, sp, #28
+ 1091 0038 03A8     		add	r0, sp, #12
+ 1092              	.LVL120:
  202:../Core/Src/sdio.c ****             sd_save_complete(operation->channel, status, bytes_saved);
- 1137              		.loc 1 202 26 view .LVU264
- 1138 003e FFF7FEFF 		bl	save_operation
- 1139              	.LVL127:
+ 1093              		.loc 1 202 26 view .LVU256
+ 1094 003a FFF7FEFF 		bl	save_operation
+ 1095              	.LVL121:
  202:../Core/Src/sdio.c ****             sd_save_complete(operation->channel, status, bytes_saved);
- 1140              		.loc 1 202 26 view .LVU265
- 1141 0042 0146     		mov	r1, r0
- 1142              	.LVL128:
+ 1096              		.loc 1 202 26 view .LVU257
+ 1097 003e 0146     		mov	r1, r0
+ 1098              	.LVL122:
  203:../Core/Src/sdio.c ****         } else if (operation->type == SD_OPERATION_LOAD) {
- 1143              		.loc 1 203 13 is_stmt 1 view .LVU266
- 1144 0044 03AB     		add	r3, sp, #12
- 1145              	.LVL129:
-ARM GAS  /tmp/ccbcxowB.s 			page 29
+ 1099              		.loc 1 203 13 is_stmt 1 view .LVU258
+ 1100 0040 03AB     		add	r3, sp, #12
+ 1101              	.LVL123:
+ 203:../Core/Src/sdio.c ****         } else if (operation->type == SD_OPERATION_LOAD) {
+ 1102              		.loc 1 203 13 is_stmt 0 view .LVU259
+ 1103 0042 2A68     		ldr	r2, [r5]
+ARM GAS  /tmp/cch156dY.s 			page 28
 
 
+ 1104 0044 5868     		ldr	r0, [r3, #4]
+ 1105              	.LVL124:
  203:../Core/Src/sdio.c ****         } else if (operation->type == SD_OPERATION_LOAD) {
- 1146              		.loc 1 203 13 is_stmt 0 view .LVU267
- 1147 0046 2A68     		ldr	r2, [r5]
- 1148 0048 5868     		ldr	r0, [r3, #4]
- 1149              	.LVL130:
+ 1106              		.loc 1 203 13 view .LVU260
+ 1107 0046 FFF7FEFF 		bl	sd_save_complete
+ 1108              	.LVL125:
+ 1109              	.L116:
  203:../Core/Src/sdio.c ****         } else if (operation->type == SD_OPERATION_LOAD) {
- 1150              		.loc 1 203 13 view .LVU268
- 1151 004a FFF7FEFF 		bl	sd_save_complete
- 1152              	.LVL131:
- 1153              	.L114:
- 203:../Core/Src/sdio.c ****         } else if (operation->type == SD_OPERATION_LOAD) {
- 1154              		.loc 1 203 13 view .LVU269
- 1155              	.LBE3:
- 1156              	.LBE2:
+ 1110              		.loc 1 203 13 view .LVU261
+ 1111              	.LBE3:
+ 1112              	.LBE2:
  188:../Core/Src/sdio.c ****         /* Wait for an operation to be sent to us */
- 1157              		.loc 1 188 5 is_stmt 1 view .LVU270
- 1158              	.LBB5:
+ 1113              		.loc 1 188 5 is_stmt 1 view .LVU262
+ 1114              	.LBB5:
  190:../Core/Src/sdio.c **** 
- 1159              		.loc 1 190 9 view .LVU271
- 1160 004e 4FF0FF33 		mov	r3, #-1
- 1161 0052 1022     		movs	r2, #16
- 1162 0054 03A9     		add	r1, sp, #12
- 1163 0056 1048     		ldr	r0, .L123+4
- 1164 0058 0068     		ldr	r0, [r0]
- 1165 005a FFF7FEFF 		bl	xStreamBufferReceive
- 1166              	.LVL132:
+ 1115              		.loc 1 190 9 view .LVU263
+ 1116 004a 4FF0FF33 		mov	r3, #-1
+ 1117 004e 1022     		movs	r2, #16
+ 1118 0050 03A9     		add	r1, sp, #12
+ 1119 0052 0F48     		ldr	r0, .L125+4
+ 1120 0054 0068     		ldr	r0, [r0]
+ 1121 0056 FFF7FEFF 		bl	xStreamBufferReceive
+ 1122              	.LVL126:
  193:../Core/Src/sdio.c ****             sd_mounted = 1;
- 1167              		.loc 1 193 9 view .LVU272
+ 1123              		.loc 1 193 9 view .LVU264
  193:../Core/Src/sdio.c ****             sd_mounted = 1;
- 1168              		.loc 1 193 12 is_stmt 0 view .LVU273
- 1169 005e 002C     		cmp	r4, #0
- 1170 0060 DDD0     		beq	.L121
- 1171              	.LVL133:
- 1172              	.L115:
+ 1124              		.loc 1 193 12 is_stmt 0 view .LVU265
+ 1125 005a 002C     		cmp	r4, #0
+ 1126 005c DED0     		beq	.L123
+ 1127              	.LVL127:
+ 1128              	.L117:
  197:../Core/Src/sdio.c **** 
- 1173              		.loc 1 197 9 is_stmt 1 view .LVU274
+ 1129              		.loc 1 197 9 is_stmt 1 view .LVU266
  200:../Core/Src/sdio.c ****             size_t bytes_saved = 0;
- 1174              		.loc 1 200 9 view .LVU275
+ 1130              		.loc 1 200 9 view .LVU267
  200:../Core/Src/sdio.c ****             size_t bytes_saved = 0;
- 1175              		.loc 1 200 22 is_stmt 0 view .LVU276
- 1176 0062 9DF80C30 		ldrb	r3, [sp, #12]	@ zero_extendqisi2
+ 1131              		.loc 1 200 22 is_stmt 0 view .LVU268
+ 1132 005e 9DF80C30 		ldrb	r3, [sp, #12]	@ zero_extendqisi2
  200:../Core/Src/sdio.c ****             size_t bytes_saved = 0;
- 1177              		.loc 1 200 12 view .LVU277
- 1178 0066 012B     		cmp	r3, #1
- 1179 0068 E2D0     		beq	.L122
+ 1133              		.loc 1 200 12 view .LVU269
+ 1134 0062 012B     		cmp	r3, #1
+ 1135 0064 E2D0     		beq	.L124
  204:../Core/Src/sdio.c ****             size_t bytes_loaded = 0;
- 1180              		.loc 1 204 16 is_stmt 1 view .LVU278
+ 1136              		.loc 1 204 16 is_stmt 1 view .LVU270
  204:../Core/Src/sdio.c ****             size_t bytes_loaded = 0;
- 1181              		.loc 1 204 19 is_stmt 0 view .LVU279
- 1182 006a 002B     		cmp	r3, #0
- 1183 006c EFD1     		bne	.L114
- 1184              	.LBB4:
+ 1137              		.loc 1 204 19 is_stmt 0 view .LVU271
+ 1138 0066 002B     		cmp	r3, #0
+ 1139 0068 EFD1     		bne	.L116
+ 1140              	.LBB4:
  205:../Core/Src/sdio.c ****             int status = load_operation(&fs, operation, data_buffer, &bytes_loaded, sd_mounted);
- 1185              		.loc 1 205 13 is_stmt 1 discriminator 2 view .LVU280
+ 1141              		.loc 1 205 13 is_stmt 1 discriminator 2 view .LVU272
  205:../Core/Src/sdio.c ****             int status = load_operation(&fs, operation, data_buffer, &bytes_loaded, sd_mounted);
- 1186              		.loc 1 205 20 is_stmt 0 discriminator 2 view .LVU281
- 1187 006e 02AD     		add	r5, sp, #8
-ARM GAS  /tmp/ccbcxowB.s 			page 30
+ 1142              		.loc 1 205 20 is_stmt 0 discriminator 2 view .LVU273
+ 1143 006a 02AD     		add	r5, sp, #8
+ 1144 006c 0023     		movs	r3, #0
+ 1145 006e 2B60     		str	r3, [r5]
+ 206:../Core/Src/sdio.c ****             sd_load_complete(operation->channel, status, bytes_loaded);
+ARM GAS  /tmp/cch156dY.s 			page 29
 
 
- 1188 0070 0023     		movs	r3, #0
- 1189 0072 2B60     		str	r3, [r5]
+ 1146              		.loc 1 206 13 is_stmt 1 discriminator 2 view .LVU274
  206:../Core/Src/sdio.c ****             sd_load_complete(operation->channel, status, bytes_loaded);
- 1190              		.loc 1 206 13 is_stmt 1 discriminator 2 view .LVU282
+ 1147              		.loc 1 206 26 is_stmt 0 discriminator 2 view .LVU275
+ 1148 0070 0094     		str	r4, [sp]
+ 1149 0072 2B46     		mov	r3, r5
+ 1150 0074 07AA     		add	r2, sp, #28
+ 1151 0076 03A9     		add	r1, sp, #12
+ 1152              	.LVL128:
  206:../Core/Src/sdio.c ****             sd_load_complete(operation->channel, status, bytes_loaded);
- 1191              		.loc 1 206 26 is_stmt 0 discriminator 2 view .LVU283
- 1192 0074 0094     		str	r4, [sp]
- 1193 0076 2B46     		mov	r3, r5
- 1194 0078 07AA     		add	r2, sp, #28
- 1195 007a 03A9     		add	r1, sp, #12
- 1196              	.LVL134:
+ 1153              		.loc 1 206 26 discriminator 2 view .LVU276
+ 1154 0078 88A8     		add	r0, sp, #544
+ 1155 007a FFF7FEFF 		bl	load_operation
+ 1156              	.LVL129:
  206:../Core/Src/sdio.c ****             sd_load_complete(operation->channel, status, bytes_loaded);
- 1197              		.loc 1 206 26 discriminator 2 view .LVU284
- 1198 007c 0DF58460 		add	r0, sp, #1056
- 1199 0080 FFF7FEFF 		bl	load_operation
- 1200              	.LVL135:
- 206:../Core/Src/sdio.c ****             sd_load_complete(operation->channel, status, bytes_loaded);
- 1201              		.loc 1 206 26 discriminator 2 view .LVU285
- 1202 0084 0146     		mov	r1, r0
- 1203              	.LVL136:
+ 1157              		.loc 1 206 26 discriminator 2 view .LVU277
+ 1158 007e 0146     		mov	r1, r0
+ 1159              	.LVL130:
  207:../Core/Src/sdio.c ****         }
- 1204              		.loc 1 207 13 is_stmt 1 discriminator 2 view .LVU286
- 1205 0086 03AB     		add	r3, sp, #12
- 1206              	.LVL137:
+ 1160              		.loc 1 207 13 is_stmt 1 discriminator 2 view .LVU278
+ 1161 0080 03AB     		add	r3, sp, #12
+ 1162              	.LVL131:
  207:../Core/Src/sdio.c ****         }
- 1207              		.loc 1 207 13 is_stmt 0 discriminator 2 view .LVU287
- 1208 0088 2A68     		ldr	r2, [r5]
- 1209 008a 5868     		ldr	r0, [r3, #4]
- 1210              	.LVL138:
+ 1163              		.loc 1 207 13 is_stmt 0 discriminator 2 view .LVU279
+ 1164 0082 2A68     		ldr	r2, [r5]
+ 1165 0084 5868     		ldr	r0, [r3, #4]
+ 1166              	.LVL132:
  207:../Core/Src/sdio.c ****         }
- 1211              		.loc 1 207 13 discriminator 2 view .LVU288
- 1212 008c FFF7FEFF 		bl	sd_load_complete
- 1213              	.LVL139:
+ 1167              		.loc 1 207 13 discriminator 2 view .LVU280
+ 1168 0086 FFF7FEFF 		bl	sd_load_complete
+ 1169              	.LVL133:
  207:../Core/Src/sdio.c ****         }
- 1214              		.loc 1 207 13 discriminator 2 view .LVU289
- 1215 0090 DDE7     		b	.L114
- 1216              	.L124:
- 1217 0092 00BF     		.align	2
- 1218              	.L123:
- 1219 0094 00000000 		.word	.LC0
- 1220 0098 00000000 		.word	g_sdio_mb_handle
- 1221              	.LBE4:
- 1222              	.LBE5:
- 1223              		.cfi_endproc
- 1224              	.LFE145:
- 1226              		.text
- 1227              	.Letext0:
- 1228              		.file 2 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stdint.h"
- 1229              		.file 3 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stddef.h"
- 1230              		.file 4 "Core/Inc/portmacro.h"
- 1231              		.file 5 "../Core/FreeRTOS-Kernel/include/FreeRTOS.h"
- 1232              		.file 6 "../Core/FreeRTOS-Kernel/include/stream_buffer.h"
- 1233              		.file 7 "../Core/Include/sdio.h"
- 1234              		.file 8 "../Core/FreeRTOS-Kernel/include/task.h"
- 1235              		.file 9 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f429xx.h"
- 1236              		.file 10 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h"
- 1237              		.file 11 "Middlewares/Third_Party/FatFs/src/integer.h"
-ARM GAS  /tmp/ccbcxowB.s 			page 31
-
-
- 1238              		.file 12 "Middlewares/Third_Party/FatFs/src/ff.h"
- 1239              		.file 13 "../Core/FreeRTOS-Kernel/include/message_buffer.h"
- 1240              		.file 14 "../Core/Include/globals.h"
-ARM GAS  /tmp/ccbcxowB.s 			page 32
+ 1170              		.loc 1 207 13 discriminator 2 view .LVU281
+ 1171 008a DEE7     		b	.L116
+ 1172              	.L126:
+ 1173              		.align	2
+ 1174              	.L125:
+ 1175 008c 00000000 		.word	.LC0
+ 1176 0090 00000000 		.word	g_sdio_mb_handle
+ 1177              	.LBE4:
+ 1178              	.LBE5:
+ 1179              		.cfi_endproc
+ 1180              	.LFE145:
+ 1182              		.text
+ 1183              	.Letext0:
+ 1184              		.file 2 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stdint.h"
+ 1185              		.file 3 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stddef.h"
+ 1186              		.file 4 "Core/Inc/portmacro.h"
+ 1187              		.file 5 "../Core/FreeRTOS-Kernel/include/FreeRTOS.h"
+ 1188              		.file 6 "../Core/FreeRTOS-Kernel/include/stream_buffer.h"
+ 1189              		.file 7 "../Core/Include/sdio.h"
+ 1190              		.file 8 "../Core/FreeRTOS-Kernel/include/task.h"
+ 1191              		.file 9 "Middlewares/Third_Party/FatFs/src/integer.h"
+ 1192              		.file 10 "Middlewares/Third_Party/FatFs/src/ff.h"
+ 1193              		.file 11 "../Core/FreeRTOS-Kernel/include/message_buffer.h"
+ 1194              		.file 12 "../Core/Include/globals.h"
+ARM GAS  /tmp/cch156dY.s 			page 30
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 sdio.c
-     /tmp/ccbcxowB.s:18     .text.sd_channel_init:0000000000000000 $t
-     /tmp/ccbcxowB.s:26     .text.sd_channel_init:0000000000000000 sd_channel_init
-     /tmp/ccbcxowB.s:137    .text.sd_channel_get_free:0000000000000000 $t
-     /tmp/ccbcxowB.s:144    .text.sd_channel_get_free:0000000000000000 sd_channel_get_free
-     /tmp/ccbcxowB.s:184    .text.sd_channel_get_full:0000000000000000 $t
-     /tmp/ccbcxowB.s:191    .text.sd_channel_get_full:0000000000000000 sd_channel_get_full
-     /tmp/ccbcxowB.s:231    .text.sd_write_channel:0000000000000000 $t
-     /tmp/ccbcxowB.s:238    .text.sd_write_channel:0000000000000000 sd_write_channel
-     /tmp/ccbcxowB.s:340    .text.sd_save_channel:0000000000000000 $t
-     /tmp/ccbcxowB.s:347    .text.sd_save_channel:0000000000000000 sd_save_channel
-     /tmp/ccbcxowB.s:431    .text.sd_save_channel:000000000000003c $d
-     /tmp/ccbcxowB.s:436    .text.sd_load_channel:0000000000000000 $t
-     /tmp/ccbcxowB.s:443    .text.sd_load_channel:0000000000000000 sd_load_channel
-     /tmp/ccbcxowB.s:535    .text.sd_load_channel:0000000000000038 $d
-     /tmp/ccbcxowB.s:540    .text.sd_read_channel:0000000000000000 $t
-     /tmp/ccbcxowB.s:547    .text.sd_read_channel:0000000000000000 sd_read_channel
-     /tmp/ccbcxowB.s:608    .text.load_operation:0000000000000000 $t
-     /tmp/ccbcxowB.s:615    .text.load_operation:0000000000000000 load_operation
-     /tmp/ccbcxowB.s:762    .text.save_operation:0000000000000000 $t
-     /tmp/ccbcxowB.s:769    .text.save_operation:0000000000000000 save_operation
-     /tmp/ccbcxowB.s:890    .text.sd_save_complete:0000000000000000 $t
-     /tmp/ccbcxowB.s:897    .text.sd_save_complete:0000000000000000 sd_save_complete
-     /tmp/ccbcxowB.s:964    .text.sd_save_complete:0000000000000030 $d
-     /tmp/ccbcxowB.s:970    .text.sd_load_complete:0000000000000000 $t
-     /tmp/ccbcxowB.s:977    .text.sd_load_complete:0000000000000000 sd_load_complete
-     /tmp/ccbcxowB.s:1044   .text.sd_load_complete:0000000000000030 $d
-     /tmp/ccbcxowB.s:1050   .rodata.sdio_task.str1.4:0000000000000000 $d
-     /tmp/ccbcxowB.s:1054   .text.sdio_task:0000000000000000 $t
-     /tmp/ccbcxowB.s:1061   .text.sdio_task:0000000000000000 sdio_task
-     /tmp/ccbcxowB.s:1219   .text.sdio_task:0000000000000094 $d
+     /tmp/cch156dY.s:18     .text.sd_channel_init:0000000000000000 $t
+     /tmp/cch156dY.s:26     .text.sd_channel_init:0000000000000000 sd_channel_init
+     /tmp/cch156dY.s:137    .text.sd_channel_get_free:0000000000000000 $t
+     /tmp/cch156dY.s:144    .text.sd_channel_get_free:0000000000000000 sd_channel_get_free
+     /tmp/cch156dY.s:184    .text.sd_channel_get_full:0000000000000000 $t
+     /tmp/cch156dY.s:191    .text.sd_channel_get_full:0000000000000000 sd_channel_get_full
+     /tmp/cch156dY.s:231    .text.sd_write_channel:0000000000000000 $t
+     /tmp/cch156dY.s:238    .text.sd_write_channel:0000000000000000 sd_write_channel
+     /tmp/cch156dY.s:340    .text.sd_save_channel:0000000000000000 $t
+     /tmp/cch156dY.s:347    .text.sd_save_channel:0000000000000000 sd_save_channel
+     /tmp/cch156dY.s:431    .text.sd_save_channel:000000000000003c $d
+     /tmp/cch156dY.s:436    .text.sd_load_channel:0000000000000000 $t
+     /tmp/cch156dY.s:443    .text.sd_load_channel:0000000000000000 sd_load_channel
+     /tmp/cch156dY.s:535    .text.sd_load_channel:0000000000000038 $d
+     /tmp/cch156dY.s:540    .text.sd_read_channel:0000000000000000 $t
+     /tmp/cch156dY.s:547    .text.sd_read_channel:0000000000000000 sd_read_channel
+     /tmp/cch156dY.s:608    .text.load_operation:0000000000000000 $t
+     /tmp/cch156dY.s:615    .text.load_operation:0000000000000000 load_operation
+     /tmp/cch156dY.s:762    .text.save_operation:0000000000000000 $t
+     /tmp/cch156dY.s:769    .text.save_operation:0000000000000000 save_operation
+     /tmp/cch156dY.s:890    .text.sd_save_complete:0000000000000000 $t
+     /tmp/cch156dY.s:897    .text.sd_save_complete:0000000000000000 sd_save_complete
+     /tmp/cch156dY.s:943    .text.sd_save_complete:0000000000000020 $d
+     /tmp/cch156dY.s:948    .text.sd_load_complete:0000000000000000 $t
+     /tmp/cch156dY.s:955    .text.sd_load_complete:0000000000000000 sd_load_complete
+     /tmp/cch156dY.s:1001   .text.sd_load_complete:0000000000000020 $d
+     /tmp/cch156dY.s:1006   .rodata.sdio_task.str1.4:0000000000000000 $d
+     /tmp/cch156dY.s:1010   .text.sdio_task:0000000000000000 $t
+     /tmp/cch156dY.s:1017   .text.sdio_task:0000000000000000 sdio_task
+     /tmp/cch156dY.s:1175   .text.sdio_task:000000000000008c $d
 
 UNDEFINED SYMBOLS
 xStreamBufferGenericCreateStatic
@@ -1853,6 +1785,5 @@ f_read
 f_close
 f_write
 xTaskGenericNotify
-HAL_GPIO_WritePin
 g_test_task_handle
 f_mount

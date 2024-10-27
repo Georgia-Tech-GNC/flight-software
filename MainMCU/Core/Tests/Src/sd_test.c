@@ -32,22 +32,6 @@ void sd_test_task(void *args) {
 
     uint32_t notify_value = 0;
 
-    /*
-    uint8_t dummy_data[CHUNK_SIZE];
-
-    for (int i = 0; i < CHUNK_SIZE - 1; i ++) {
-        dummy_data[i] = 'f';
-    }
-
-    dummy_data[CHUNK_SIZE - 1] = '\n';
-
-    FATFS fs;
-
-    if (f_mount(&fs, "/", 1) != FR_OK) {
-        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, 1);
-    }
-    */
-
     while (1) {
         sd_load_channel(&read_channel, read_ptr, CHUNK_SIZE);
         // wait for read to complete
@@ -64,29 +48,12 @@ void sd_test_task(void *args) {
         sd_read_channel(&read_channel, transfer_buf, n_bytes);
         sd_write_channel(&write_channel, transfer_buf, n_bytes);
 
+        sd_save_channel(&write_channel);
+
         // wait for write to complete
         xTaskNotifyWait(0, SD_TASK_WRITE_COMPLETE_BIT, &notify_value, portMAX_DELAY);
 
         HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0);
-
-       /*
-        FIL fil;
-        if (f_open(&fil, "test_cpy.txt", FA_WRITE | FA_OPEN_APPEND) != FR_OK) {
-            HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, 1);
-        } 
-
-        UINT written;
-        if (f_write(&fil, dummy_data, CHUNK_SIZE, &written) != FR_OK) {
-            HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, 1);
-        }
-        
-        if (f_close(&fil) != FR_OK) {
-            HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, 1);
-        }
-
-        vTaskDelay(1000);
-        HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
-    */
     }
 
     while (1);

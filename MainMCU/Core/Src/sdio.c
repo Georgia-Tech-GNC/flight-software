@@ -175,7 +175,7 @@ void sdio_task(void *args) {
     FATFS fs;
 
     /* Buffer to mediate between fatfs and freertos stream buffer */
-    uint8_t data_buffer[1025]; // +1 because theres some weird buffer overflow in f_read
+    uint8_t data_buffer[SD_MAX_READ_WRITE_SIZE + 1]; // +1 because theres some weird buffer overflow in f_read
 
     /* Buffer to store operation messages */
     uint8_t operation_buffer[sizeof(SDOperation)];
@@ -302,10 +302,6 @@ void sd_save_complete(SDChannel *channel, int status, size_t bytes_saved) {
     if (channel->id == 0) {
         xTaskNotify(g_test_task_handle, SD_TASK_WRITE_COMPLETE_BIT, eSetBits);
     }
-
-    if (status == 0) {
-        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
-    }
 }
 
 
@@ -318,9 +314,5 @@ void sd_save_complete(SDChannel *channel, int status, size_t bytes_saved) {
 void sd_load_complete(SDChannel *channel, int status, size_t bytes_loaded) {
     if (channel->id == 1) {
         xTaskNotify(g_test_task_handle, SD_TASK_READ_COMPLETE_BIT, eSetBits);
-    }
-
-    if (status == 0) {
-        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_SET);
     }
 }

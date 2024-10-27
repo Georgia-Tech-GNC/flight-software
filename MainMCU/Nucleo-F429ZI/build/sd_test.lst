@@ -1,4 +1,4 @@
-ARM GAS  /tmp/cckPJhnL.s 			page 1
+ARM GAS  /tmp/ccFy0mWd.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/cckPJhnL.s 			page 1
   15:../Core/Tests/Src/sd_test.c **** void sd_test_task(void *args) {
   37              		.loc 1 15 31 view -0
   38              		.cfi_startproc
-ARM GAS  /tmp/cckPJhnL.s 			page 2
+ARM GAS  /tmp/ccFy0mWd.s 			page 2
 
 
   39              		@ args = 0, pretend = 0, frame = 1656
@@ -100,7 +100,7 @@ ARM GAS  /tmp/cckPJhnL.s 			page 1
   63 0016 0093     		str	r3, [sp]
   64 0018 0023     		movs	r3, #0
   65 001a 0122     		movs	r2, #1
-  66 001c 2549     		ldr	r1, .L7
+  66 001c 2749     		ldr	r1, .L7
   67 001e 0DF27C60 		addw	r0, sp, #1660
   68              	.LVL1:
   69              		.loc 1 27 5 is_stmt 0 view .LVU9
@@ -115,10 +115,10 @@ ARM GAS  /tmp/cckPJhnL.s 			page 1
   77 0030 0093     		str	r3, [sp]
   78 0032 0123     		movs	r3, #1
   79 0034 0022     		movs	r2, #0
-  80 0036 2049     		ldr	r1, .L7+4
+  80 0036 2249     		ldr	r1, .L7+4
   81 0038 0DF5CE60 		add	r0, sp, #1648
   82 003c FFF7FEFF 		bl	sd_channel_init
-ARM GAS  /tmp/cckPJhnL.s 			page 3
+ARM GAS  /tmp/ccFy0mWd.s 			page 3
 
 
   83              	.LVL3:
@@ -136,35 +136,19 @@ ARM GAS  /tmp/cckPJhnL.s 			page 1
   90              	.LVL4:
   91              	.L4:
   34:../Core/Tests/Src/sd_test.c **** 
-  35:../Core/Tests/Src/sd_test.c ****     /*
-  36:../Core/Tests/Src/sd_test.c ****     uint8_t dummy_data[CHUNK_SIZE];
-  37:../Core/Tests/Src/sd_test.c **** 
-  38:../Core/Tests/Src/sd_test.c ****     for (int i = 0; i < CHUNK_SIZE - 1; i ++) {
-  39:../Core/Tests/Src/sd_test.c ****         dummy_data[i] = 'f';
-  40:../Core/Tests/Src/sd_test.c ****     }
-  41:../Core/Tests/Src/sd_test.c **** 
-  42:../Core/Tests/Src/sd_test.c ****     dummy_data[CHUNK_SIZE - 1] = '\n';
-  43:../Core/Tests/Src/sd_test.c **** 
-  44:../Core/Tests/Src/sd_test.c ****     FATFS fs;
-  45:../Core/Tests/Src/sd_test.c **** 
-  46:../Core/Tests/Src/sd_test.c ****     if (f_mount(&fs, "/", 1) != FR_OK) {
-  47:../Core/Tests/Src/sd_test.c ****         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, 1);
-  48:../Core/Tests/Src/sd_test.c ****     }
-  49:../Core/Tests/Src/sd_test.c ****     */
-  50:../Core/Tests/Src/sd_test.c **** 
-  51:../Core/Tests/Src/sd_test.c ****     while (1) {
-  92              		.loc 1 51 5 is_stmt 1 view .LVU15
+  35:../Core/Tests/Src/sd_test.c ****     while (1) {
+  92              		.loc 1 35 5 is_stmt 1 view .LVU15
   93              	.LBB2:
-  52:../Core/Tests/Src/sd_test.c ****         sd_load_channel(&read_channel, read_ptr, CHUNK_SIZE);
-  94              		.loc 1 52 9 view .LVU16
+  36:../Core/Tests/Src/sd_test.c ****         sd_load_channel(&read_channel, read_ptr, CHUNK_SIZE);
+  94              		.loc 1 36 9 view .LVU16
   95 0044 4FF40072 		mov	r2, #512
   96 0048 2946     		mov	r1, r5
   97 004a 0DF5CE60 		add	r0, sp, #1648
   98 004e FFF7FEFF 		bl	sd_load_channel
   99              	.LVL5:
-  53:../Core/Tests/Src/sd_test.c ****         // wait for read to complete
-  54:../Core/Tests/Src/sd_test.c ****         xTaskNotifyWait(0, SD_TASK_READ_COMPLETE_BIT, &notify_value, portMAX_DELAY);
- 100              		.loc 1 54 9 view .LVU17
+  37:../Core/Tests/Src/sd_test.c ****         // wait for read to complete
+  38:../Core/Tests/Src/sd_test.c ****         xTaskNotifyWait(0, SD_TASK_READ_COMPLETE_BIT, &notify_value, portMAX_DELAY);
+ 100              		.loc 1 38 9 view .LVU17
  101 0052 4FF0FF33 		mov	r3, #-1
  102 0056 0093     		str	r3, [sp]
  103 0058 04AB     		add	r3, sp, #16
@@ -173,120 +157,126 @@ ARM GAS  /tmp/cckPJhnL.s 			page 1
  106 005e 0846     		mov	r0, r1
  107 0060 FFF7FEFF 		bl	xTaskGenericNotifyWait
  108              	.LVL6:
-  55:../Core/Tests/Src/sd_test.c **** 
-  56:../Core/Tests/Src/sd_test.c ****         uint16_t n_bytes = sd_channel_get_full(&read_channel);
- 109              		.loc 1 56 9 view .LVU18
- 110              		.loc 1 56 28 is_stmt 0 view .LVU19
+  39:../Core/Tests/Src/sd_test.c **** 
+  40:../Core/Tests/Src/sd_test.c ****         uint16_t n_bytes = sd_channel_get_full(&read_channel);
+ 109              		.loc 1 40 9 view .LVU18
+ 110              		.loc 1 40 28 is_stmt 0 view .LVU19
  111 0064 0DF5CE60 		add	r0, sp, #1648
-ARM GAS  /tmp/cckPJhnL.s 			page 4
-
-
  112 0068 FFF7FEFF 		bl	sd_channel_get_full
  113              	.LVL7:
- 114              		.loc 1 56 18 view .LVU20
+ 114              		.loc 1 40 18 view .LVU20
  115 006c 84B2     		uxth	r4, r0
-  57:../Core/Tests/Src/sd_test.c ****         read_ptr += n_bytes;
- 116              		.loc 1 57 9 is_stmt 1 view .LVU21
- 117              		.loc 1 57 18 is_stmt 0 view .LVU22
+  41:../Core/Tests/Src/sd_test.c ****         read_ptr += n_bytes;
+ 116              		.loc 1 41 9 is_stmt 1 view .LVU21
+ 117              		.loc 1 41 18 is_stmt 0 view .LVU22
  118 006e 2544     		add	r5, r5, r4
  119              	.LVL8:
-  58:../Core/Tests/Src/sd_test.c ****         
-  59:../Core/Tests/Src/sd_test.c ****         if (n_bytes == 0) {
- 120              		.loc 1 59 9 is_stmt 1 view .LVU23
- 121              		.loc 1 59 12 is_stmt 0 view .LVU24
- 122 0070 CCB1     		cbz	r4, .L6
-  60:../Core/Tests/Src/sd_test.c ****             HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, GPIO_PIN_SET);
-  61:../Core/Tests/Src/sd_test.c ****             while (1);
-  62:../Core/Tests/Src/sd_test.c ****         }
-  63:../Core/Tests/Src/sd_test.c **** 
-  64:../Core/Tests/Src/sd_test.c ****         sd_read_channel(&read_channel, transfer_buf, n_bytes);
- 123              		.loc 1 64 9 is_stmt 1 view .LVU25
+  42:../Core/Tests/Src/sd_test.c ****         
+  43:../Core/Tests/Src/sd_test.c ****         if (n_bytes == 0) {
+ 120              		.loc 1 43 9 is_stmt 1 view .LVU23
+ 121              		.loc 1 43 12 is_stmt 0 view .LVU24
+ 122 0070 ECB1     		cbz	r4, .L6
+  44:../Core/Tests/Src/sd_test.c ****             HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, GPIO_PIN_SET);
+  45:../Core/Tests/Src/sd_test.c ****             while (1);
+ARM GAS  /tmp/ccFy0mWd.s 			page 4
+
+
+  46:../Core/Tests/Src/sd_test.c ****         }
+  47:../Core/Tests/Src/sd_test.c **** 
+  48:../Core/Tests/Src/sd_test.c ****         sd_read_channel(&read_channel, transfer_buf, n_bytes);
+ 123              		.loc 1 48 9 is_stmt 1 view .LVU25
  124 0072 2246     		mov	r2, r4
  125 0074 05A9     		add	r1, sp, #20
  126 0076 0DF5CE60 		add	r0, sp, #1648
  127 007a FFF7FEFF 		bl	sd_read_channel
  128              	.LVL9:
-  65:../Core/Tests/Src/sd_test.c ****         sd_write_channel(&write_channel, transfer_buf, n_bytes);
- 129              		.loc 1 65 9 view .LVU26
+  49:../Core/Tests/Src/sd_test.c ****         sd_write_channel(&write_channel, transfer_buf, n_bytes);
+ 129              		.loc 1 49 9 view .LVU26
  130 007e 2246     		mov	r2, r4
  131 0080 05A9     		add	r1, sp, #20
  132 0082 0DF27C60 		addw	r0, sp, #1660
  133 0086 FFF7FEFF 		bl	sd_write_channel
  134              	.LVL10:
-  66:../Core/Tests/Src/sd_test.c **** 
-  67:../Core/Tests/Src/sd_test.c ****         // wait for write to complete
-  68:../Core/Tests/Src/sd_test.c ****         xTaskNotifyWait(0, SD_TASK_WRITE_COMPLETE_BIT, &notify_value, portMAX_DELAY);
- 135              		.loc 1 68 9 view .LVU27
- 136 008a 4FF0FF33 		mov	r3, #-1
- 137 008e 0093     		str	r3, [sp]
- 138 0090 04AB     		add	r3, sp, #16
- 139 0092 0222     		movs	r2, #2
- 140 0094 0021     		movs	r1, #0
- 141 0096 0846     		mov	r0, r1
- 142 0098 FFF7FEFF 		bl	xTaskGenericNotifyWait
- 143              	.LVL11:
-  69:../Core/Tests/Src/sd_test.c **** 
-  70:../Core/Tests/Src/sd_test.c ****         HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0);
- 144              		.loc 1 70 9 view .LVU28
- 145 009c 0121     		movs	r1, #1
- 146 009e 0748     		ldr	r0, .L7+8
- 147 00a0 FFF7FEFF 		bl	HAL_GPIO_TogglePin
- 148              	.LVL12:
- 149              	.LBE2:
-  51:../Core/Tests/Src/sd_test.c ****         sd_load_channel(&read_channel, read_ptr, CHUNK_SIZE);
- 150              		.loc 1 51 11 view .LVU29
-  51:../Core/Tests/Src/sd_test.c ****         sd_load_channel(&read_channel, read_ptr, CHUNK_SIZE);
- 151              		.loc 1 51 15 is_stmt 0 view .LVU30
- 152 00a4 CEE7     		b	.L4
-ARM GAS  /tmp/cckPJhnL.s 			page 5
+  50:../Core/Tests/Src/sd_test.c **** 
+  51:../Core/Tests/Src/sd_test.c ****         sd_save_channel(&write_channel);
+ 135              		.loc 1 51 9 view .LVU27
+ 136 008a 0DF27C60 		addw	r0, sp, #1660
+ 137 008e FFF7FEFF 		bl	sd_save_channel
+ 138              	.LVL11:
+  52:../Core/Tests/Src/sd_test.c **** 
+  53:../Core/Tests/Src/sd_test.c ****         // wait for write to complete
+  54:../Core/Tests/Src/sd_test.c ****         xTaskNotifyWait(0, SD_TASK_WRITE_COMPLETE_BIT, &notify_value, portMAX_DELAY);
+ 139              		.loc 1 54 9 view .LVU28
+ 140 0092 4FF0FF33 		mov	r3, #-1
+ 141 0096 0093     		str	r3, [sp]
+ 142 0098 04AB     		add	r3, sp, #16
+ 143 009a 0222     		movs	r2, #2
+ 144 009c 0021     		movs	r1, #0
+ 145 009e 0846     		mov	r0, r1
+ 146 00a0 FFF7FEFF 		bl	xTaskGenericNotifyWait
+ 147              	.LVL12:
+  55:../Core/Tests/Src/sd_test.c **** 
+  56:../Core/Tests/Src/sd_test.c ****         HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0);
+ 148              		.loc 1 56 9 view .LVU29
+ 149 00a4 0121     		movs	r1, #1
+ 150 00a6 0748     		ldr	r0, .L7+8
+ 151 00a8 FFF7FEFF 		bl	HAL_GPIO_TogglePin
+ 152              	.LVL13:
+ 153              	.LBE2:
+  35:../Core/Tests/Src/sd_test.c ****         sd_load_channel(&read_channel, read_ptr, CHUNK_SIZE);
+ 154              		.loc 1 35 11 view .LVU30
+  35:../Core/Tests/Src/sd_test.c ****         sd_load_channel(&read_channel, read_ptr, CHUNK_SIZE);
+ 155              		.loc 1 35 15 is_stmt 0 view .LVU31
+ 156 00ac CAE7     		b	.L4
+ 157              	.L6:
+ 158              	.LBB3:
+  44:../Core/Tests/Src/sd_test.c ****             while (1);
+ 159              		.loc 1 44 13 is_stmt 1 view .LVU32
+ 160 00ae 0122     		movs	r2, #1
+ 161 00b0 8021     		movs	r1, #128
+ 162 00b2 0448     		ldr	r0, .L7+8
+ 163 00b4 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 164              	.LVL14:
+ 165              	.L3:
+ARM GAS  /tmp/ccFy0mWd.s 			page 5
 
 
- 153              	.L6:
- 154              	.LBB3:
-  60:../Core/Tests/Src/sd_test.c ****             while (1);
- 155              		.loc 1 60 13 is_stmt 1 view .LVU31
- 156 00a6 0122     		movs	r2, #1
- 157 00a8 8021     		movs	r1, #128
- 158 00aa 0448     		ldr	r0, .L7+8
- 159 00ac FFF7FEFF 		bl	HAL_GPIO_WritePin
- 160              	.LVL13:
- 161              	.L3:
-  61:../Core/Tests/Src/sd_test.c ****         }
- 162              		.loc 1 61 13 discriminator 1 view .LVU32
-  61:../Core/Tests/Src/sd_test.c ****         }
- 163              		.loc 1 61 22 discriminator 1 view .LVU33
-  61:../Core/Tests/Src/sd_test.c ****         }
- 164              		.loc 1 61 19 discriminator 1 view .LVU34
- 165 00b0 FEE7     		b	.L3
- 166              	.L8:
- 167 00b2 00BF     		.align	2
- 168              	.L7:
- 169 00b4 00000000 		.word	.LC0
- 170 00b8 10000000 		.word	.LC1
- 171 00bc 00040240 		.word	1073873920
- 172              	.LBE3:
- 173              		.cfi_endproc
- 174              	.LFE138:
- 176              		.text
- 177              	.Letext0:
- 178              		.file 2 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stddef.h"
- 179              		.file 3 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stdint.h"
- 180              		.file 4 "Core/Inc/portmacro.h"
- 181              		.file 5 "../Core/FreeRTOS-Kernel/include/FreeRTOS.h"
- 182              		.file 6 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f429xx.h"
- 183              		.file 7 "../Core/FreeRTOS-Kernel/include/stream_buffer.h"
- 184              		.file 8 "../Core/Include/sdio.h"
- 185              		.file 9 "../Core/FreeRTOS-Kernel/include/task.h"
- 186              		.file 10 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h"
-ARM GAS  /tmp/cckPJhnL.s 			page 6
+  45:../Core/Tests/Src/sd_test.c ****         }
+ 166              		.loc 1 45 13 discriminator 1 view .LVU33
+  45:../Core/Tests/Src/sd_test.c ****         }
+ 167              		.loc 1 45 22 discriminator 1 view .LVU34
+  45:../Core/Tests/Src/sd_test.c ****         }
+ 168              		.loc 1 45 19 discriminator 1 view .LVU35
+ 169 00b8 FEE7     		b	.L3
+ 170              	.L8:
+ 171 00ba 00BF     		.align	2
+ 172              	.L7:
+ 173 00bc 00000000 		.word	.LC0
+ 174 00c0 10000000 		.word	.LC1
+ 175 00c4 00040240 		.word	1073873920
+ 176              	.LBE3:
+ 177              		.cfi_endproc
+ 178              	.LFE138:
+ 180              		.text
+ 181              	.Letext0:
+ 182              		.file 2 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stddef.h"
+ 183              		.file 3 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stdint.h"
+ 184              		.file 4 "Core/Inc/portmacro.h"
+ 185              		.file 5 "../Core/FreeRTOS-Kernel/include/FreeRTOS.h"
+ 186              		.file 6 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f429xx.h"
+ 187              		.file 7 "../Core/FreeRTOS-Kernel/include/stream_buffer.h"
+ 188              		.file 8 "../Core/Include/sdio.h"
+ 189              		.file 9 "../Core/FreeRTOS-Kernel/include/task.h"
+ 190              		.file 10 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h"
+ARM GAS  /tmp/ccFy0mWd.s 			page 6
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 sd_test.c
-     /tmp/cckPJhnL.s:18     .rodata.sd_test_task.str1.4:0000000000000000 $d
-     /tmp/cckPJhnL.s:25     .text.sd_test_task:0000000000000000 $t
-     /tmp/cckPJhnL.s:33     .text.sd_test_task:0000000000000000 sd_test_task
-     /tmp/cckPJhnL.s:169    .text.sd_test_task:00000000000000b4 $d
+     /tmp/ccFy0mWd.s:18     .rodata.sd_test_task.str1.4:0000000000000000 $d
+     /tmp/ccFy0mWd.s:25     .text.sd_test_task:0000000000000000 $t
+     /tmp/ccFy0mWd.s:33     .text.sd_test_task:0000000000000000 sd_test_task
+     /tmp/ccFy0mWd.s:173    .text.sd_test_task:00000000000000bc $d
 
 UNDEFINED SYMBOLS
 sd_channel_init
@@ -295,5 +285,6 @@ xTaskGenericNotifyWait
 sd_channel_get_full
 sd_read_channel
 sd_write_channel
+sd_save_channel
 HAL_GPIO_TogglePin
 HAL_GPIO_WritePin

@@ -53,7 +53,7 @@
 
 1. Replace code in user_dskio.c. Again, you may just copy the file in the Nucleo-F429ZI.
 
-## Main
+## main.c file
 
 1. Include "port_layer.h" file in user code includes
 2. Call port_init() and port_start() in user code section 2

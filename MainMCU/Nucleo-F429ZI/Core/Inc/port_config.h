@@ -7,7 +7,8 @@
 #define SD_CS_PIN           GPIO_PIN_4
 
 #define telemetry_uart      huart2
-#define state_uart          huart3
+#define state_uart          huart6
+#define debug_uart          huart3
 #define sd_spi              hspi1
 
 #endif

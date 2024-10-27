@@ -7,7 +7,7 @@
 
 void blink_task(void *args) {
     while (1) {
-        HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0);
+        HAL_GPIO_TogglePin(LD3_GPIO_PORT, LD3_PIN);
         vTaskDelay(1000);
     }
 }

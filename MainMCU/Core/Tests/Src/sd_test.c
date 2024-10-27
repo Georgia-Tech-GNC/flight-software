@@ -41,7 +41,7 @@ void sd_test_task(void *args) {
         read_ptr += n_bytes;
         
         if (n_bytes == 0) {
-            HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, GPIO_PIN_SET);
+            HAL_GPIO_WritePin(LD2_GPIO_PORT, LD2_PIN, GPIO_PIN_SET);
             while (1);
         }
 
@@ -53,7 +53,7 @@ void sd_test_task(void *args) {
         // wait for write to complete
         xTaskNotifyWait(0, SD_TASK_WRITE_COMPLETE_BIT, &notify_value, portMAX_DELAY);
 
-        HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0);
+        HAL_GPIO_TogglePin(LD1_GPIO_PORT, LD1_PIN);
     }
 
     while (1);

@@ -47,7 +47,7 @@
 
 ## FreeRTOS
 
-1. Depending on the exact type of Cortex-M, add in the appropriate freertos portmacro.h and port.c files.
+1. Depending on the exact type of Cortex-M, add in the appropriate freertos portmacro.h and port.c files (copy from H723 if Cortex-M7, and from F4390 if Cortex-M4).
 
 ## FATFS
 

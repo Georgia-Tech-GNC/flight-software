@@ -43,11 +43,11 @@
 
 1. Locate the stm32xxxx_it.c and .h file in Core/Src
 2. Delete SVC_Handler, PendSV_Handler, and SysTick_Handler definitions in stm32xxxx_it.c and .h files.
-3. This is the only step in post-generation configuration that will have to be done every time CubeMX generates.
+3. _This is the only step in post-generation configuration that will have to be done every time CubeMX generates._
 
 ## FreeRTOS
 
-1. Depending on the exact type of Cortex-M, add in the appropriate freertos portmacro.h and port.c files (copy from H723 if Cortex-M7, and from F4390 if Cortex-M4).
+1. Depending on the exact type of Cortex-M, add in the appropriate freertos portmacro.h and port.c files (copy from H723 if Cortex-M7, and from F429 if Cortex-M4).
 
 ## FATFS
 

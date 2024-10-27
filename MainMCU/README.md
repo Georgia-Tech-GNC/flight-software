@@ -24,6 +24,7 @@
 
 1. Enable one SPIx module as Full-Duplex Master
 2. Configure baud rate prescaler such that baud rate is somewhere near 5 MBits/s
+3. Set Data Size to 8 Bits
 
 ### Project Manager
 

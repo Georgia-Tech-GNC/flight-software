@@ -10,6 +10,13 @@
         "message_buffer.h": "c",
         "freertos.h": "c",
         "task.h": "c",
-        "freertosconfig.h": "c"
+        "freertosconfig.h": "c",
+        "fatfs_sd.h": "c",
+        "port_layer.h": "c",
+        "semphr.h": "c",
+        "sdio.h": "c",
+        "port_config.h": "c",
+        "globals.h": "c",
+        "stm32f4xx_hal.h": "c"
     }
 }

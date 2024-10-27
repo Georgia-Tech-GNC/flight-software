@@ -1,0 +1,116 @@
+#include "port_layer.h"
+
+TaskHandle_t g_test_task_handle;
+StackType_t test_task_stack[8192];
+StaticTask_t test_task_buff;
+
+TaskHandle_t g_sdio_task_handle;
+StackType_t sdio_task_stack[4096];
+StaticTask_t sdio_task_buff;
+
+TaskHandle_t g_telemetry_tx_task_handle;
+StackType_t telemetry_tx_task_stack[4096];
+StaticTask_t telemetry_tx_task_buff;
+
+TaskHandle_t g_telemetry_rx_task_handle;
+StackType_t telemetry_rx_task_stack[4096];
+StaticTask_t telemetry_rx_task_buff;
+
+TaskHandle_t g_state_rx_task_handle;
+StackType_t state_rx_task_stack[4096];
+StaticTask_t state_rx_task_buff;
+
+SemaphoreHandle_t g_state_mutex_handle;
+StaticSemaphore_t state_mutex_buff;
+
+StreamBufferHandle_t g_telemetry_rx_sb_handle;
+uint8_t telemetry_rx_sb_storage[16 + 1];
+StaticStreamBuffer_t telemetry_rx_sb_buff;
+
+MessageBufferHandle_t g_telemetry_tx_mb_handle;
+uint8_t telemetry_tx_mb_storage[TX_MESSAGE_BUFFER_SIZE];
+StaticMessageBuffer_t telemetry_tx_mb_buff;
+
+StreamBufferHandle_t g_state_rx_sb_handle;
+uint8_t state_rx_sb_storage[STATE_STRUCT_SIZE * 2 + 1];
+StaticMessageBuffer_t state_rx_sb_buff;
+
+MessageBufferHandle_t g_sdio_mb_handle;
+uint8_t sdio_mb_storage[256];
+StaticMessageBuffer_t sdio_mb_buff;
+
+uint8_t telemetry_uart_rx_buf[UART2_RX_BUFFER_SIZE];
+uint8_t state_uart_rx_buf[UART3_RX_BUFFER_SIZE];
+
+int port_init(void) {
+    /* Create mutexes */
+    g_state_mutex_handle = xSemaphoreCreateMutexStatic(&state_mutex_buff);
+
+    if (g_state_mutex_handle == NULL) {
+        return 0;
+    }
+
+    /* Create stream/message buffers */
+    g_telemetry_rx_sb_handle = xStreamBufferCreateStatic(16 + 1, 1, telemetry_rx_sb_storage, &telemetry_rx_sb_buff);
+    if (g_telemetry_rx_sb_handle == NULL) return 0;
+
+    g_telemetry_tx_mb_handle = xMessageBufferCreateStatic(TX_MESSAGE_BUFFER_SIZE + 1, telemetry_tx_mb_storage, &telemetry_tx_mb_buff);
+    if (g_telemetry_tx_mb_handle == NULL) return 0;
+
+    g_state_rx_sb_handle = xStreamBufferCreateStatic(STATE_STRUCT_SIZE * 2 + 1, 1, state_rx_sb_storage, &state_rx_sb_buff);
+    if (g_state_rx_sb_handle == NULL) return 0;
+
+    g_sdio_mb_handle = xMessageBufferCreateStatic(SD_MB_SIZE + 1, sdio_mb_storage, &sdio_mb_buff);
+
+    /* Create tasks */
+    g_sdio_task_handle = xTaskCreateStatic(sdio_task, "flash_task", 4096, NULL, tskIDLE_PRIORITY, sdio_task_stack, &sdio_task_buff);
+    if (g_sdio_task_handle == NULL) return 0;
+    
+    g_telemetry_tx_task_handle = xTaskCreateStatic(telemetry_tx_task, "telemetry_tx_task", 4096, NULL, tskIDLE_PRIORITY, telemetry_tx_task_stack, &telemetry_tx_task_buff);
+    if (g_telemetry_tx_task_handle == NULL) return 0;
+    
+    g_telemetry_rx_task_handle = xTaskCreateStatic(telemetry_rx_task, "telemetry_rx_task", 4096, NULL, tskIDLE_PRIORITY, telemetry_rx_task_stack, &telemetry_rx_task_buff);
+    if (g_telemetry_rx_task_handle == NULL) return 0;
+    
+    g_state_rx_task_handle = xTaskCreateStatic(state_rx_task, "state_rx_task", 4096, NULL, tskIDLE_PRIORITY, state_rx_task_stack, &state_rx_task_buff);
+    if (g_state_rx_task_handle == NULL) return 0;
+
+    g_test_task_handle = xTaskCreateStatic(test_task, "test_task", 8192, NULL, tskIDLE_PRIORITY, test_task_stack, &test_task_buff);
+    if (g_test_task_handle == NULL) return 0;
+
+    /* Begin listening over uart */
+    if (HAL_UARTEx_ReceiveToIdle_DMA(&telemetry_uart, telemetry_uart_rx_buf, UART2_RX_BUFFER_SIZE) != HAL_OK) {
+        return 0;
+    }
+
+    if (HAL_UARTEx_ReceiveToIdle_DMA(&state_uart, state_uart_rx_buf, UART3_RX_BUFFER_SIZE) != HAL_OK) {
+        return 0;
+    }
+    
+    return 1;
+}
+
+void port_start(void) {
+    vTaskStartScheduler();
+}
+
+uint16_t prev_size_uart_telemetry = 0;
+uint16_t prev_size_uart_state = 0;
+
+void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
+    if (huart->Instance == telemetry_uart.Instance) {
+        if (size < prev_size_uart_telemetry) {
+            prev_size_uart_telemetry = 0;
+        }
+
+        xStreamBufferSendFromISR(g_telemetry_rx_sb_handle, telemetry_uart_rx_buf + prev_size_uart_telemetry, size - prev_size_uart_telemetry, NULL);
+        prev_size_uart_telemetry = size;
+    } else if (huart->Instance == state_uart.Instance) {
+        if (size < prev_size_uart_state) {
+            prev_size_uart_state = 0;
+        }
+
+        xStreamBufferSendFromISR(g_telemetry_rx_sb_handle, state_uart_rx_buf + prev_size_uart_state, size - prev_size_uart_state, NULL);
+        prev_size_uart_state = size;
+    }
+}

@@ -1,0 +1,224 @@
+ARM GAS  /tmp/cc0hKOr1.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.eabi_attribute 28, 1
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 1
+  10              		.eabi_attribute 34, 1
+  11              		.eabi_attribute 18, 4
+  12              		.file	"state_rx.c"
+  13              		.text
+  14              	.Ltext0:
+  15              		.cfi_sections	.debug_frame
+  16              		.section	.text.state_rx_task,"ax",%progbits
+  17              		.align	1
+  18              		.global	state_rx_task
+  19              		.arch armv7e-m
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  23              		.fpu fpv5-d16
+  25              	state_rx_task:
+  26              	.LVL0:
+  27              	.LFB148:
+  28              		.file 1 "../Core/Src/state_rx.c"
+   1:../Core/Src/state_rx.c **** #include "state_rx.h"
+   2:../Core/Src/state_rx.c **** 
+   3:../Core/Src/state_rx.c **** #include "FreeRTOS.h"
+   4:../Core/Src/state_rx.c **** #include "message_buffer.h"
+   5:../Core/Src/state_rx.c **** #include "semphr.h"
+   6:../Core/Src/state_rx.c **** 
+   7:../Core/Src/state_rx.c **** #include "globals.h"
+   8:../Core/Src/state_rx.c **** 
+   9:../Core/Src/state_rx.c **** uint8_t _g_current_state[STATE_STRUCT_SIZE];
+  10:../Core/Src/state_rx.c **** uint8_t *g_current_state = _g_current_state;
+  11:../Core/Src/state_rx.c **** 
+  12:../Core/Src/state_rx.c **** /**
+  13:../Core/Src/state_rx.c ****  * Task to receive new states and put them into the g_current_state global variable
+  14:../Core/Src/state_rx.c ****  * @param args Unused
+  15:../Core/Src/state_rx.c ****  */
+  16:../Core/Src/state_rx.c **** void state_rx_task(void *args) {
+  29              		.loc 1 16 32 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 16
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              		.loc 1 16 32 is_stmt 0 view .LVU1
+  34 0000 30B5     		push	{r4, r5, lr}
+  35              	.LCFI0:
+  36              		.cfi_def_cfa_offset 12
+  37              		.cfi_offset 4, -12
+  38              		.cfi_offset 5, -8
+  39              		.cfi_offset 14, -4
+  40 0002 85B0     		sub	sp, sp, #20
+  41              	.LCFI1:
+  42              		.cfi_def_cfa_offset 32
+ARM GAS  /tmp/cc0hKOr1.s 			page 2
+
+
+  17:../Core/Src/state_rx.c ****     uint8_t _state_rx_buff[STATE_STRUCT_SIZE];
+  43              		.loc 1 17 5 is_stmt 1 view .LVU2
+  18:../Core/Src/state_rx.c ****     uint8_t *state_rx_buff = _state_rx_buff;
+  44              		.loc 1 18 5 view .LVU3
+  45              	.LVL1:
+  46              		.loc 1 18 14 is_stmt 0 view .LVU4
+  47 0004 6C46     		mov	r4, sp
+  48 0006 1EE0     		b	.L5
+  49              	.LVL2:
+  50              	.L3:
+  51              	.LBB2:
+  52              	.LBB3:
+  19:../Core/Src/state_rx.c **** 
+  20:../Core/Src/state_rx.c ****     while(1) {
+  21:../Core/Src/state_rx.c ****         size_t total_read = 0;
+  22:../Core/Src/state_rx.c **** 
+  23:../Core/Src/state_rx.c ****         /* Loop until we've received the full next state */
+  24:../Core/Src/state_rx.c ****         while (total_read < STATE_STRUCT_SIZE) {
+  25:../Core/Src/state_rx.c ****             size_t read = xStreamBufferReceive(g_state_rx_sb_handle, state_rx_buff + total_read, ST
+  53              		.loc 1 25 13 is_stmt 1 view .LVU5
+  54              		.loc 1 25 27 is_stmt 0 view .LVU6
+  55 0008 4FF0FF33 		mov	r3, #-1
+  56 000c C4F11002 		rsb	r2, r4, #16
+  57 0010 2919     		adds	r1, r5, r4
+  58 0012 0E48     		ldr	r0, .L8
+  59 0014 0068     		ldr	r0, [r0]
+  60 0016 FFF7FEFF 		bl	xStreamBufferReceive
+  61              	.LVL3:
+  26:../Core/Src/state_rx.c ****             total_read += read;
+  62              		.loc 1 26 13 is_stmt 1 view .LVU7
+  63              		.loc 1 26 24 is_stmt 0 view .LVU8
+  64 001a 0444     		add	r4, r4, r0
+  65              	.LVL4:
+  66              	.L2:
+  67              		.loc 1 26 24 view .LVU9
+  68              	.LBE3:
+  24:../Core/Src/state_rx.c ****             size_t read = xStreamBufferReceive(g_state_rx_sb_handle, state_rx_buff + total_read, ST
+  69              		.loc 1 24 15 is_stmt 1 view .LVU10
+  70 001c 0F2C     		cmp	r4, #15
+  71 001e F3D9     		bls	.L3
+  27:../Core/Src/state_rx.c ****         }
+  28:../Core/Src/state_rx.c **** 
+  29:../Core/Src/state_rx.c ****         /* Swap buffers */
+  30:../Core/Src/state_rx.c ****         if (xSemaphoreTake(g_state_mutex_handle, STATE_SEMAPHORE_TIMEOUT) == pdTRUE) {
+  72              		.loc 1 30 9 view .LVU11
+  73              		.loc 1 30 13 is_stmt 0 view .LVU12
+  74 0020 0A21     		movs	r1, #10
+  75 0022 0B4B     		ldr	r3, .L8+4
+  76 0024 1868     		ldr	r0, [r3]
+  77 0026 FFF7FEFF 		bl	xQueueSemaphoreTake
+  78              	.LVL5:
+  79              		.loc 1 30 12 view .LVU13
+  80 002a 0128     		cmp	r0, #1
+  81 002c 01D0     		beq	.L7
+  82              	.LVL6:
+  83              	.L4:
+  84              		.loc 1 30 12 view .LVU14
+ARM GAS  /tmp/cc0hKOr1.s 			page 3
+
+
+  85              	.LBE2:
+  20:../Core/Src/state_rx.c ****         size_t total_read = 0;
+  86              		.loc 1 20 5 is_stmt 1 view .LVU15
+  87              	.LBB5:
+  21:../Core/Src/state_rx.c **** 
+  88              		.loc 1 21 9 view .LVU16
+  24:../Core/Src/state_rx.c ****             size_t read = xStreamBufferReceive(g_state_rx_sb_handle, state_rx_buff + total_read, ST
+  89              		.loc 1 24 9 view .LVU17
+  21:../Core/Src/state_rx.c **** 
+  90              		.loc 1 21 16 is_stmt 0 view .LVU18
+  91 002e 0024     		movs	r4, #0
+  24:../Core/Src/state_rx.c ****             size_t read = xStreamBufferReceive(g_state_rx_sb_handle, state_rx_buff + total_read, ST
+  92              		.loc 1 24 15 view .LVU19
+  93 0030 F4E7     		b	.L2
+  94              	.LVL7:
+  95              	.L7:
+  96              	.LBB4:
+  31:../Core/Src/state_rx.c ****             uint8_t *temp = g_current_state;
+  97              		.loc 1 31 13 is_stmt 1 view .LVU20
+  98              		.loc 1 31 22 is_stmt 0 view .LVU21
+  99 0032 084B     		ldr	r3, .L8+8
+ 100 0034 1C68     		ldr	r4, [r3]
+ 101              	.LVL8:
+  32:../Core/Src/state_rx.c ****             g_current_state = state_rx_buff;
+ 102              		.loc 1 32 13 is_stmt 1 view .LVU22
+ 103              		.loc 1 32 29 is_stmt 0 view .LVU23
+ 104 0036 1D60     		str	r5, [r3]
+  33:../Core/Src/state_rx.c ****             state_rx_buff = temp;
+ 105              		.loc 1 33 13 is_stmt 1 view .LVU24
+ 106              	.LVL9:
+  34:../Core/Src/state_rx.c **** 
+  35:../Core/Src/state_rx.c ****             xSemaphoreGive(g_state_mutex_handle);
+ 107              		.loc 1 35 13 view .LVU25
+ 108 0038 0023     		movs	r3, #0
+ 109 003a 1A46     		mov	r2, r3
+ 110 003c 1946     		mov	r1, r3
+ 111 003e 0448     		ldr	r0, .L8+4
+ 112 0040 0068     		ldr	r0, [r0]
+ 113 0042 FFF7FEFF 		bl	xQueueGenericSend
+ 114              	.LVL10:
+ 115              	.L5:
+ 116              		.loc 1 35 13 is_stmt 0 view .LVU26
+ 117              	.LBE4:
+ 118              	.LBE5:
+  18:../Core/Src/state_rx.c **** 
+ 119              		.loc 1 18 14 view .LVU27
+ 120 0046 2546     		mov	r5, r4
+ 121 0048 F1E7     		b	.L4
+ 122              	.L9:
+ 123 004a 00BF     		.align	2
+ 124              	.L8:
+ 125 004c 00000000 		.word	g_state_rx_sb_handle
+ 126 0050 00000000 		.word	g_state_mutex_handle
+ 127 0054 00000000 		.word	.LANCHOR0
+ 128              		.cfi_endproc
+ 129              	.LFE148:
+ 131              		.global	g_current_state
+ARM GAS  /tmp/cc0hKOr1.s 			page 4
+
+
+ 132              		.global	_g_current_state
+ 133              		.section	.bss._g_current_state,"aw",%nobits
+ 134              		.align	2
+ 137              	_g_current_state:
+ 138 0000 00000000 		.space	16
+ 138      00000000 
+ 138      00000000 
+ 138      00000000 
+ 139              		.section	.data.g_current_state,"aw"
+ 140              		.align	2
+ 141              		.set	.LANCHOR0,. + 0
+ 144              	g_current_state:
+ 145 0000 00000000 		.word	_g_current_state
+ 146              		.text
+ 147              	.Letext0:
+ 148              		.file 2 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stdint.h"
+ 149              		.file 3 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stddef.h"
+ 150              		.file 4 "Core/Inc/portmacro.h"
+ 151              		.file 5 "../Core/FreeRTOS-Kernel/include/stream_buffer.h"
+ 152              		.file 6 "../Core/FreeRTOS-Kernel/include/queue.h"
+ 153              		.file 7 "../Core/FreeRTOS-Kernel/include/semphr.h"
+ 154              		.file 8 "../Core/Include/globals.h"
+ARM GAS  /tmp/cc0hKOr1.s 			page 5
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 state_rx.c
+     /tmp/cc0hKOr1.s:17     .text.state_rx_task:0000000000000000 $t
+     /tmp/cc0hKOr1.s:25     .text.state_rx_task:0000000000000000 state_rx_task
+     /tmp/cc0hKOr1.s:125    .text.state_rx_task:000000000000004c $d
+     /tmp/cc0hKOr1.s:144    .data.g_current_state:0000000000000000 g_current_state
+     /tmp/cc0hKOr1.s:137    .bss._g_current_state:0000000000000000 _g_current_state
+     /tmp/cc0hKOr1.s:134    .bss._g_current_state:0000000000000000 $d
+     /tmp/cc0hKOr1.s:140    .data.g_current_state:0000000000000000 $d
+
+UNDEFINED SYMBOLS
+xStreamBufferReceive
+xQueueSemaphoreTake
+xQueueGenericSend
+g_state_rx_sb_handle
+g_state_mutex_handle

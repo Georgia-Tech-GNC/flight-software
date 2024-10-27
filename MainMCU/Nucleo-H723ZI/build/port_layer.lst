@@ -1,0 +1,1112 @@
+ARM GAS  /tmp/ccvMj1r6.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.eabi_attribute 28, 1
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 1
+  10              		.eabi_attribute 34, 1
+  11              		.eabi_attribute 18, 4
+  12              		.file	"port_layer.c"
+  13              		.text
+  14              	.Ltext0:
+  15              		.cfi_sections	.debug_frame
+  16              		.section	.rodata.port_init.str1.4,"aMS",%progbits,1
+  17              		.align	2
+  18              	.LC0:
+  19 0000 666C6173 		.ascii	"flash_task\000"
+  19      685F7461 
+  19      736B00
+  20 000b 00       		.align	2
+  21              	.LC1:
+  22 000c 74656C65 		.ascii	"telemetry_tx_task\000"
+  22      6D657472 
+  22      795F7478 
+  22      5F746173 
+  22      6B00
+  23 001e 0000     		.align	2
+  24              	.LC2:
+  25 0020 74656C65 		.ascii	"telemetry_rx_task\000"
+  25      6D657472 
+  25      795F7278 
+  25      5F746173 
+  25      6B00
+  26 0032 0000     		.align	2
+  27              	.LC3:
+  28 0034 73746174 		.ascii	"state_rx_task\000"
+  28      655F7278 
+  28      5F746173 
+  28      6B00
+  29 0042 0000     		.align	2
+  30              	.LC4:
+  31 0044 74657374 		.ascii	"test_task\000"
+  31      5F746173 
+  31      6B00
+  32              		.section	.text.port_init,"ax",%progbits
+  33              		.align	1
+  34              		.global	port_init
+  35              		.arch armv7e-m
+  36              		.syntax unified
+  37              		.thumb
+  38              		.thumb_func
+  39              		.fpu fpv5-d16
+  41              	port_init:
+  42              	.LFB148:
+  43              		.file 1 "../Core/Src/port_layer.c"
+ARM GAS  /tmp/ccvMj1r6.s 			page 2
+
+
+   1:../Core/Src/port_layer.c **** #include "port_layer.h"
+   2:../Core/Src/port_layer.c **** 
+   3:../Core/Src/port_layer.c **** TaskHandle_t g_test_task_handle;
+   4:../Core/Src/port_layer.c **** StackType_t test_task_stack[8192];
+   5:../Core/Src/port_layer.c **** StaticTask_t test_task_buff;
+   6:../Core/Src/port_layer.c **** 
+   7:../Core/Src/port_layer.c **** TaskHandle_t g_sdio_task_handle;
+   8:../Core/Src/port_layer.c **** StackType_t sdio_task_stack[4096];
+   9:../Core/Src/port_layer.c **** StaticTask_t sdio_task_buff;
+  10:../Core/Src/port_layer.c **** 
+  11:../Core/Src/port_layer.c **** TaskHandle_t g_telemetry_tx_task_handle;
+  12:../Core/Src/port_layer.c **** StackType_t telemetry_tx_task_stack[4096];
+  13:../Core/Src/port_layer.c **** StaticTask_t telemetry_tx_task_buff;
+  14:../Core/Src/port_layer.c **** 
+  15:../Core/Src/port_layer.c **** TaskHandle_t g_telemetry_rx_task_handle;
+  16:../Core/Src/port_layer.c **** StackType_t telemetry_rx_task_stack[4096];
+  17:../Core/Src/port_layer.c **** StaticTask_t telemetry_rx_task_buff;
+  18:../Core/Src/port_layer.c **** 
+  19:../Core/Src/port_layer.c **** TaskHandle_t g_state_rx_task_handle;
+  20:../Core/Src/port_layer.c **** StackType_t state_rx_task_stack[4096];
+  21:../Core/Src/port_layer.c **** StaticTask_t state_rx_task_buff;
+  22:../Core/Src/port_layer.c **** 
+  23:../Core/Src/port_layer.c **** SemaphoreHandle_t g_state_mutex_handle;
+  24:../Core/Src/port_layer.c **** StaticSemaphore_t state_mutex_buff;
+  25:../Core/Src/port_layer.c **** 
+  26:../Core/Src/port_layer.c **** StreamBufferHandle_t g_telemetry_rx_sb_handle;
+  27:../Core/Src/port_layer.c **** uint8_t telemetry_rx_sb_storage[16 + 1];
+  28:../Core/Src/port_layer.c **** StaticStreamBuffer_t telemetry_rx_sb_buff;
+  29:../Core/Src/port_layer.c **** 
+  30:../Core/Src/port_layer.c **** MessageBufferHandle_t g_telemetry_tx_mb_handle;
+  31:../Core/Src/port_layer.c **** uint8_t telemetry_tx_mb_storage[TX_MESSAGE_BUFFER_SIZE];
+  32:../Core/Src/port_layer.c **** StaticMessageBuffer_t telemetry_tx_mb_buff;
+  33:../Core/Src/port_layer.c **** 
+  34:../Core/Src/port_layer.c **** StreamBufferHandle_t g_state_rx_sb_handle;
+  35:../Core/Src/port_layer.c **** uint8_t state_rx_sb_storage[STATE_STRUCT_SIZE * 2 + 1];
+  36:../Core/Src/port_layer.c **** StaticMessageBuffer_t state_rx_sb_buff;
+  37:../Core/Src/port_layer.c **** 
+  38:../Core/Src/port_layer.c **** MessageBufferHandle_t g_sdio_mb_handle;
+  39:../Core/Src/port_layer.c **** uint8_t sdio_mb_storage[256];
+  40:../Core/Src/port_layer.c **** StaticMessageBuffer_t sdio_mb_buff;
+  41:../Core/Src/port_layer.c **** 
+  42:../Core/Src/port_layer.c **** uint8_t telemetry_uart_rx_buf[UART2_RX_BUFFER_SIZE];
+  43:../Core/Src/port_layer.c **** uint8_t state_uart_rx_buf[UART3_RX_BUFFER_SIZE];
+  44:../Core/Src/port_layer.c **** 
+  45:../Core/Src/port_layer.c **** int port_init(void) {
+  44              		.loc 1 45 21 view -0
+  45              		.cfi_startproc
+  46              		@ args = 0, pretend = 0, frame = 0
+  47              		@ frame_needed = 0, uses_anonymous_args = 0
+  48 0000 10B5     		push	{r4, lr}
+  49              	.LCFI0:
+  50              		.cfi_def_cfa_offset 8
+  51              		.cfi_offset 4, -8
+  52              		.cfi_offset 14, -4
+  53 0002 84B0     		sub	sp, sp, #16
+  54              	.LCFI1:
+  55              		.cfi_def_cfa_offset 24
+ARM GAS  /tmp/ccvMj1r6.s 			page 3
+
+
+  46:../Core/Src/port_layer.c ****     /* Create mutexes */
+  47:../Core/Src/port_layer.c ****     g_state_mutex_handle = xSemaphoreCreateMutexStatic(&state_mutex_buff);
+  56              		.loc 1 47 5 view .LVU1
+  57              		.loc 1 47 28 is_stmt 0 view .LVU2
+  58 0004 5A49     		ldr	r1, .L16
+  59 0006 0120     		movs	r0, #1
+  60 0008 FFF7FEFF 		bl	xQueueCreateMutexStatic
+  61              	.LVL0:
+  62              		.loc 1 47 26 view .LVU3
+  63 000c 594B     		ldr	r3, .L16+4
+  64 000e 1860     		str	r0, [r3]
+  48:../Core/Src/port_layer.c **** 
+  49:../Core/Src/port_layer.c ****     if (g_state_mutex_handle == NULL) {
+  65              		.loc 1 49 5 is_stmt 1 view .LVU4
+  66              		.loc 1 49 8 is_stmt 0 view .LVU5
+  67 0010 0028     		cmp	r0, #0
+  68 0012 00F09880 		beq	.L3
+  50:../Core/Src/port_layer.c ****         return 0;
+  51:../Core/Src/port_layer.c ****     }
+  52:../Core/Src/port_layer.c **** 
+  53:../Core/Src/port_layer.c ****     /* Create stream/message buffers */
+  54:../Core/Src/port_layer.c ****     g_telemetry_rx_sb_handle = xStreamBufferCreateStatic(16 + 1, 1, telemetry_rx_sb_storage, &telem
+  69              		.loc 1 54 5 is_stmt 1 view .LVU6
+  70              		.loc 1 54 32 is_stmt 0 view .LVU7
+  71 0016 0022     		movs	r2, #0
+  72 0018 0292     		str	r2, [sp, #8]
+  73 001a 0192     		str	r2, [sp, #4]
+  74 001c 564B     		ldr	r3, .L16+8
+  75 001e 0093     		str	r3, [sp]
+  76 0020 564B     		ldr	r3, .L16+12
+  77 0022 0121     		movs	r1, #1
+  78 0024 1120     		movs	r0, #17
+  79 0026 FFF7FEFF 		bl	xStreamBufferGenericCreateStatic
+  80              	.LVL1:
+  81              		.loc 1 54 30 view .LVU8
+  82 002a 554B     		ldr	r3, .L16+16
+  83 002c 1860     		str	r0, [r3]
+  55:../Core/Src/port_layer.c ****     if (g_telemetry_rx_sb_handle == NULL) return 0;
+  84              		.loc 1 55 5 is_stmt 1 view .LVU9
+  85              		.loc 1 55 8 is_stmt 0 view .LVU10
+  86 002e 0028     		cmp	r0, #0
+  87 0030 00F08C80 		beq	.L4
+  56:../Core/Src/port_layer.c **** 
+  57:../Core/Src/port_layer.c ****     g_telemetry_tx_mb_handle = xMessageBufferCreateStatic(TX_MESSAGE_BUFFER_SIZE + 1, telemetry_tx_
+  88              		.loc 1 57 5 is_stmt 1 view .LVU11
+  89              		.loc 1 57 32 is_stmt 0 view .LVU12
+  90 0034 0021     		movs	r1, #0
+  91 0036 0291     		str	r1, [sp, #8]
+  92 0038 0191     		str	r1, [sp, #4]
+  93 003a 524B     		ldr	r3, .L16+20
+  94 003c 0093     		str	r3, [sp]
+  95 003e 524B     		ldr	r3, .L16+24
+  96 0040 0122     		movs	r2, #1
+  97 0042 40F20940 		movw	r0, #1033
+  98 0046 FFF7FEFF 		bl	xStreamBufferGenericCreateStatic
+  99              	.LVL2:
+ 100              		.loc 1 57 30 view .LVU13
+ARM GAS  /tmp/ccvMj1r6.s 			page 4
+
+
+ 101 004a 504B     		ldr	r3, .L16+28
+ 102 004c 1860     		str	r0, [r3]
+  58:../Core/Src/port_layer.c ****     if (g_telemetry_tx_mb_handle == NULL) return 0;
+ 103              		.loc 1 58 5 is_stmt 1 view .LVU14
+ 104              		.loc 1 58 8 is_stmt 0 view .LVU15
+ 105 004e 0028     		cmp	r0, #0
+ 106 0050 7ED0     		beq	.L5
+  59:../Core/Src/port_layer.c **** 
+  60:../Core/Src/port_layer.c ****     g_state_rx_sb_handle = xStreamBufferCreateStatic(STATE_STRUCT_SIZE * 2 + 1, 1, state_rx_sb_stor
+ 107              		.loc 1 60 5 is_stmt 1 view .LVU16
+ 108              		.loc 1 60 28 is_stmt 0 view .LVU17
+ 109 0052 0022     		movs	r2, #0
+ 110 0054 0292     		str	r2, [sp, #8]
+ 111 0056 0192     		str	r2, [sp, #4]
+ 112 0058 4D4B     		ldr	r3, .L16+32
+ 113 005a 0093     		str	r3, [sp]
+ 114 005c 4D4B     		ldr	r3, .L16+36
+ 115 005e 0121     		movs	r1, #1
+ 116 0060 2120     		movs	r0, #33
+ 117 0062 FFF7FEFF 		bl	xStreamBufferGenericCreateStatic
+ 118              	.LVL3:
+ 119              		.loc 1 60 26 view .LVU18
+ 120 0066 4C4B     		ldr	r3, .L16+40
+ 121 0068 1860     		str	r0, [r3]
+  61:../Core/Src/port_layer.c ****     if (g_state_rx_sb_handle == NULL) return 0;
+ 122              		.loc 1 61 5 is_stmt 1 view .LVU19
+ 123              		.loc 1 61 8 is_stmt 0 view .LVU20
+ 124 006a 0028     		cmp	r0, #0
+ 125 006c 72D0     		beq	.L6
+  62:../Core/Src/port_layer.c **** 
+  63:../Core/Src/port_layer.c ****     g_sdio_mb_handle = xMessageBufferCreateStatic(SD_MB_SIZE + 1, sdio_mb_storage, &sdio_mb_buff);
+ 126              		.loc 1 63 5 is_stmt 1 view .LVU21
+ 127              		.loc 1 63 24 is_stmt 0 view .LVU22
+ 128 006e 0024     		movs	r4, #0
+ 129 0070 0294     		str	r4, [sp, #8]
+ 130 0072 0194     		str	r4, [sp, #4]
+ 131 0074 494B     		ldr	r3, .L16+44
+ 132 0076 0093     		str	r3, [sp]
+ 133 0078 494B     		ldr	r3, .L16+48
+ 134 007a 0122     		movs	r2, #1
+ 135 007c 2146     		mov	r1, r4
+ 136 007e 4120     		movs	r0, #65
+ 137 0080 FFF7FEFF 		bl	xStreamBufferGenericCreateStatic
+ 138              	.LVL4:
+ 139              		.loc 1 63 22 view .LVU23
+ 140 0084 474B     		ldr	r3, .L16+52
+ 141 0086 1860     		str	r0, [r3]
+  64:../Core/Src/port_layer.c **** 
+  65:../Core/Src/port_layer.c ****     /* Create tasks */
+  66:../Core/Src/port_layer.c ****     g_sdio_task_handle = xTaskCreateStatic(sdio_task, "flash_task", 4096, NULL, tskIDLE_PRIORITY, s
+ 142              		.loc 1 66 5 is_stmt 1 view .LVU24
+ 143              		.loc 1 66 26 is_stmt 0 view .LVU25
+ 144 0088 474B     		ldr	r3, .L16+56
+ 145 008a 0293     		str	r3, [sp, #8]
+ 146 008c 474B     		ldr	r3, .L16+60
+ 147 008e 0193     		str	r3, [sp, #4]
+ 148 0090 0094     		str	r4, [sp]
+ARM GAS  /tmp/ccvMj1r6.s 			page 5
+
+
+ 149 0092 2346     		mov	r3, r4
+ 150 0094 4FF48052 		mov	r2, #4096
+ 151 0098 4549     		ldr	r1, .L16+64
+ 152 009a 4648     		ldr	r0, .L16+68
+ 153 009c FFF7FEFF 		bl	xTaskCreateStatic
+ 154              	.LVL5:
+ 155              		.loc 1 66 24 view .LVU26
+ 156 00a0 454B     		ldr	r3, .L16+72
+ 157 00a2 1860     		str	r0, [r3]
+  67:../Core/Src/port_layer.c ****     if (g_sdio_task_handle == NULL) return 0;
+ 158              		.loc 1 67 5 is_stmt 1 view .LVU27
+ 159              		.loc 1 67 8 is_stmt 0 view .LVU28
+ 160 00a4 0028     		cmp	r0, #0
+ 161 00a6 57D0     		beq	.L7
+  68:../Core/Src/port_layer.c ****     
+  69:../Core/Src/port_layer.c ****     g_telemetry_tx_task_handle = xTaskCreateStatic(telemetry_tx_task, "telemetry_tx_task", 4096, NU
+ 162              		.loc 1 69 5 is_stmt 1 view .LVU29
+ 163              		.loc 1 69 34 is_stmt 0 view .LVU30
+ 164 00a8 444B     		ldr	r3, .L16+76
+ 165 00aa 0293     		str	r3, [sp, #8]
+ 166 00ac 444B     		ldr	r3, .L16+80
+ 167 00ae 0193     		str	r3, [sp, #4]
+ 168 00b0 2346     		mov	r3, r4
+ 169 00b2 0094     		str	r4, [sp]
+ 170 00b4 4FF48052 		mov	r2, #4096
+ 171 00b8 4249     		ldr	r1, .L16+84
+ 172 00ba 4348     		ldr	r0, .L16+88
+ 173 00bc FFF7FEFF 		bl	xTaskCreateStatic
+ 174              	.LVL6:
+ 175              		.loc 1 69 32 view .LVU31
+ 176 00c0 424B     		ldr	r3, .L16+92
+ 177 00c2 1860     		str	r0, [r3]
+  70:../Core/Src/port_layer.c ****     if (g_telemetry_tx_task_handle == NULL) return 0;
+ 178              		.loc 1 70 5 is_stmt 1 view .LVU32
+ 179              		.loc 1 70 8 is_stmt 0 view .LVU33
+ 180 00c4 0028     		cmp	r0, #0
+ 181 00c6 49D0     		beq	.L8
+  71:../Core/Src/port_layer.c ****     
+  72:../Core/Src/port_layer.c ****     g_telemetry_rx_task_handle = xTaskCreateStatic(telemetry_rx_task, "telemetry_rx_task", 4096, NU
+ 182              		.loc 1 72 5 is_stmt 1 view .LVU34
+ 183              		.loc 1 72 34 is_stmt 0 view .LVU35
+ 184 00c8 414B     		ldr	r3, .L16+96
+ 185 00ca 0293     		str	r3, [sp, #8]
+ 186 00cc 414B     		ldr	r3, .L16+100
+ 187 00ce 0193     		str	r3, [sp, #4]
+ 188 00d0 2346     		mov	r3, r4
+ 189 00d2 0094     		str	r4, [sp]
+ 190 00d4 4FF48052 		mov	r2, #4096
+ 191 00d8 3F49     		ldr	r1, .L16+104
+ 192 00da 4048     		ldr	r0, .L16+108
+ 193 00dc FFF7FEFF 		bl	xTaskCreateStatic
+ 194              	.LVL7:
+ 195              		.loc 1 72 32 view .LVU36
+ 196 00e0 3F4B     		ldr	r3, .L16+112
+ 197 00e2 1860     		str	r0, [r3]
+  73:../Core/Src/port_layer.c ****     if (g_telemetry_rx_task_handle == NULL) return 0;
+ 198              		.loc 1 73 5 is_stmt 1 view .LVU37
+ARM GAS  /tmp/ccvMj1r6.s 			page 6
+
+
+ 199              		.loc 1 73 8 is_stmt 0 view .LVU38
+ 200 00e4 0028     		cmp	r0, #0
+ 201 00e6 3BD0     		beq	.L9
+  74:../Core/Src/port_layer.c ****     
+  75:../Core/Src/port_layer.c ****     g_state_rx_task_handle = xTaskCreateStatic(state_rx_task, "state_rx_task", 4096, NULL, tskIDLE_
+ 202              		.loc 1 75 5 is_stmt 1 view .LVU39
+ 203              		.loc 1 75 30 is_stmt 0 view .LVU40
+ 204 00e8 3E4B     		ldr	r3, .L16+116
+ 205 00ea 0293     		str	r3, [sp, #8]
+ 206 00ec 3E4B     		ldr	r3, .L16+120
+ 207 00ee 0193     		str	r3, [sp, #4]
+ 208 00f0 2346     		mov	r3, r4
+ 209 00f2 0094     		str	r4, [sp]
+ 210 00f4 4FF48052 		mov	r2, #4096
+ 211 00f8 3C49     		ldr	r1, .L16+124
+ 212 00fa 3D48     		ldr	r0, .L16+128
+ 213 00fc FFF7FEFF 		bl	xTaskCreateStatic
+ 214              	.LVL8:
+ 215              		.loc 1 75 28 view .LVU41
+ 216 0100 3C4B     		ldr	r3, .L16+132
+ 217 0102 1860     		str	r0, [r3]
+  76:../Core/Src/port_layer.c ****     if (g_state_rx_task_handle == NULL) return 0;
+ 218              		.loc 1 76 5 is_stmt 1 view .LVU42
+ 219              		.loc 1 76 8 is_stmt 0 view .LVU43
+ 220 0104 70B3     		cbz	r0, .L10
+  77:../Core/Src/port_layer.c **** 
+  78:../Core/Src/port_layer.c ****     g_test_task_handle = xTaskCreateStatic(test_task, "test_task", 8192, NULL, tskIDLE_PRIORITY, te
+ 221              		.loc 1 78 5 is_stmt 1 view .LVU44
+ 222              		.loc 1 78 26 is_stmt 0 view .LVU45
+ 223 0106 3C4B     		ldr	r3, .L16+136
+ 224 0108 0293     		str	r3, [sp, #8]
+ 225 010a 3C4B     		ldr	r3, .L16+140
+ 226 010c 0193     		str	r3, [sp, #4]
+ 227 010e 2346     		mov	r3, r4
+ 228 0110 0094     		str	r4, [sp]
+ 229 0112 4FF40052 		mov	r2, #8192
+ 230 0116 3A49     		ldr	r1, .L16+144
+ 231 0118 3A48     		ldr	r0, .L16+148
+ 232 011a FFF7FEFF 		bl	xTaskCreateStatic
+ 233              	.LVL9:
+ 234              		.loc 1 78 24 view .LVU46
+ 235 011e 3A4B     		ldr	r3, .L16+152
+ 236 0120 1860     		str	r0, [r3]
+  79:../Core/Src/port_layer.c ****     if (g_test_task_handle == NULL) return 0;
+ 237              		.loc 1 79 5 is_stmt 1 view .LVU47
+ 238              		.loc 1 79 8 is_stmt 0 view .LVU48
+ 239 0122 08B3     		cbz	r0, .L11
+  80:../Core/Src/port_layer.c **** 
+  81:../Core/Src/port_layer.c ****     /* Begin listening over uart */
+  82:../Core/Src/port_layer.c ****     if (HAL_UARTEx_ReceiveToIdle_DMA(&telemetry_uart, telemetry_uart_rx_buf, UART2_RX_BUFFER_SIZE) 
+ 240              		.loc 1 82 5 is_stmt 1 view .LVU49
+ 241              		.loc 1 82 9 is_stmt 0 view .LVU50
+ 242 0124 1022     		movs	r2, #16
+ 243 0126 3949     		ldr	r1, .L16+156
+ 244 0128 3948     		ldr	r0, .L16+160
+ 245 012a FFF7FEFF 		bl	HAL_UARTEx_ReceiveToIdle_DMA
+ 246              	.LVL10:
+ARM GAS  /tmp/ccvMj1r6.s 			page 7
+
+
+ 247              		.loc 1 82 8 view .LVU51
+ 248 012e 08B1     		cbz	r0, .L15
+  83:../Core/Src/port_layer.c ****         return 0;
+ 249              		.loc 1 83 16 view .LVU52
+ 250 0130 0020     		movs	r0, #0
+ 251 0132 09E0     		b	.L1
+ 252              	.L15:
+  84:../Core/Src/port_layer.c ****     }
+  85:../Core/Src/port_layer.c **** 
+  86:../Core/Src/port_layer.c ****     if (HAL_UARTEx_ReceiveToIdle_DMA(&state_uart, state_uart_rx_buf, UART3_RX_BUFFER_SIZE) != HAL_O
+ 253              		.loc 1 86 5 is_stmt 1 view .LVU53
+ 254              		.loc 1 86 9 is_stmt 0 view .LVU54
+ 255 0134 4FF48072 		mov	r2, #256
+ 256 0138 3649     		ldr	r1, .L16+164
+ 257 013a 3748     		ldr	r0, .L16+168
+ 258 013c FFF7FEFF 		bl	HAL_UARTEx_ReceiveToIdle_DMA
+ 259              	.LVL11:
+ 260              		.loc 1 86 8 view .LVU55
+ 261 0140 A0B9     		cbnz	r0, .L13
+  87:../Core/Src/port_layer.c ****         return 0;
+  88:../Core/Src/port_layer.c ****     }
+  89:../Core/Src/port_layer.c ****     
+  90:../Core/Src/port_layer.c ****     return 1;
+ 262              		.loc 1 90 12 view .LVU56
+ 263 0142 0120     		movs	r0, #1
+ 264 0144 00E0     		b	.L1
+ 265              	.L3:
+  50:../Core/Src/port_layer.c ****     }
+ 266              		.loc 1 50 16 view .LVU57
+ 267 0146 0020     		movs	r0, #0
+ 268              	.L1:
+  91:../Core/Src/port_layer.c **** }
+ 269              		.loc 1 91 1 view .LVU58
+ 270 0148 04B0     		add	sp, sp, #16
+ 271              	.LCFI2:
+ 272              		.cfi_remember_state
+ 273              		.cfi_def_cfa_offset 8
+ 274              		@ sp needed
+ 275 014a 10BD     		pop	{r4, pc}
+ 276              	.L4:
+ 277              	.LCFI3:
+ 278              		.cfi_restore_state
+  55:../Core/Src/port_layer.c **** 
+ 279              		.loc 1 55 50 view .LVU59
+ 280 014c 0020     		movs	r0, #0
+ 281 014e FBE7     		b	.L1
+ 282              	.L5:
+  58:../Core/Src/port_layer.c **** 
+ 283              		.loc 1 58 50 view .LVU60
+ 284 0150 0020     		movs	r0, #0
+ 285 0152 F9E7     		b	.L1
+ 286              	.L6:
+  61:../Core/Src/port_layer.c **** 
+ 287              		.loc 1 61 46 view .LVU61
+ 288 0154 0020     		movs	r0, #0
+ 289 0156 F7E7     		b	.L1
+ 290              	.L7:
+ARM GAS  /tmp/ccvMj1r6.s 			page 8
+
+
+  67:../Core/Src/port_layer.c ****     
+ 291              		.loc 1 67 44 view .LVU62
+ 292 0158 0020     		movs	r0, #0
+ 293 015a F5E7     		b	.L1
+ 294              	.L8:
+  70:../Core/Src/port_layer.c ****     
+ 295              		.loc 1 70 52 view .LVU63
+ 296 015c 0020     		movs	r0, #0
+ 297 015e F3E7     		b	.L1
+ 298              	.L9:
+  73:../Core/Src/port_layer.c ****     
+ 299              		.loc 1 73 52 view .LVU64
+ 300 0160 0020     		movs	r0, #0
+ 301 0162 F1E7     		b	.L1
+ 302              	.L10:
+  76:../Core/Src/port_layer.c **** 
+ 303              		.loc 1 76 48 view .LVU65
+ 304 0164 0020     		movs	r0, #0
+ 305 0166 EFE7     		b	.L1
+ 306              	.L11:
+  79:../Core/Src/port_layer.c **** 
+ 307              		.loc 1 79 44 view .LVU66
+ 308 0168 0020     		movs	r0, #0
+ 309 016a EDE7     		b	.L1
+ 310              	.L13:
+  87:../Core/Src/port_layer.c ****     }
+ 311              		.loc 1 87 16 view .LVU67
+ 312 016c 0020     		movs	r0, #0
+ 313 016e EBE7     		b	.L1
+ 314              	.L17:
+ 315              		.align	2
+ 316              	.L16:
+ 317 0170 00000000 		.word	.LANCHOR0
+ 318 0174 00000000 		.word	.LANCHOR1
+ 319 0178 00000000 		.word	.LANCHOR3
+ 320 017c 00000000 		.word	.LANCHOR2
+ 321 0180 00000000 		.word	.LANCHOR4
+ 322 0184 00000000 		.word	.LANCHOR6
+ 323 0188 00000000 		.word	.LANCHOR5
+ 324 018c 00000000 		.word	.LANCHOR7
+ 325 0190 00000000 		.word	.LANCHOR9
+ 326 0194 00000000 		.word	.LANCHOR8
+ 327 0198 00000000 		.word	.LANCHOR10
+ 328 019c 00000000 		.word	.LANCHOR12
+ 329 01a0 00000000 		.word	.LANCHOR11
+ 330 01a4 00000000 		.word	.LANCHOR13
+ 331 01a8 00000000 		.word	.LANCHOR14
+ 332 01ac 00000000 		.word	sdio_task_stack
+ 333 01b0 00000000 		.word	.LC0
+ 334 01b4 00000000 		.word	sdio_task
+ 335 01b8 00000000 		.word	.LANCHOR15
+ 336 01bc 00000000 		.word	.LANCHOR16
+ 337 01c0 00000000 		.word	telemetry_tx_task_stack
+ 338 01c4 0C000000 		.word	.LC1
+ 339 01c8 00000000 		.word	telemetry_tx_task
+ 340 01cc 00000000 		.word	.LANCHOR17
+ 341 01d0 00000000 		.word	.LANCHOR18
+ARM GAS  /tmp/ccvMj1r6.s 			page 9
+
+
+ 342 01d4 00000000 		.word	telemetry_rx_task_stack
+ 343 01d8 20000000 		.word	.LC2
+ 344 01dc 00000000 		.word	telemetry_rx_task
+ 345 01e0 00000000 		.word	.LANCHOR19
+ 346 01e4 00000000 		.word	.LANCHOR20
+ 347 01e8 00000000 		.word	state_rx_task_stack
+ 348 01ec 34000000 		.word	.LC3
+ 349 01f0 00000000 		.word	state_rx_task
+ 350 01f4 00000000 		.word	.LANCHOR21
+ 351 01f8 00000000 		.word	.LANCHOR22
+ 352 01fc 00000000 		.word	test_task_stack
+ 353 0200 44000000 		.word	.LC4
+ 354 0204 00000000 		.word	sd_test_task
+ 355 0208 00000000 		.word	.LANCHOR23
+ 356 020c 00000000 		.word	.LANCHOR24
+ 357 0210 00000000 		.word	huart2
+ 358 0214 00000000 		.word	.LANCHOR25
+ 359 0218 00000000 		.word	huart6
+ 360              		.cfi_endproc
+ 361              	.LFE148:
+ 363              		.section	.text.port_start,"ax",%progbits
+ 364              		.align	1
+ 365              		.global	port_start
+ 366              		.syntax unified
+ 367              		.thumb
+ 368              		.thumb_func
+ 369              		.fpu fpv5-d16
+ 371              	port_start:
+ 372              	.LFB149:
+  92:../Core/Src/port_layer.c **** 
+  93:../Core/Src/port_layer.c **** void port_start(void) {
+ 373              		.loc 1 93 23 is_stmt 1 view -0
+ 374              		.cfi_startproc
+ 375              		@ args = 0, pretend = 0, frame = 0
+ 376              		@ frame_needed = 0, uses_anonymous_args = 0
+ 377 0000 08B5     		push	{r3, lr}
+ 378              	.LCFI4:
+ 379              		.cfi_def_cfa_offset 8
+ 380              		.cfi_offset 3, -8
+ 381              		.cfi_offset 14, -4
+  94:../Core/Src/port_layer.c ****     vTaskStartScheduler();
+ 382              		.loc 1 94 5 view .LVU69
+ 383 0002 FFF7FEFF 		bl	vTaskStartScheduler
+ 384              	.LVL12:
+  95:../Core/Src/port_layer.c **** }
+ 385              		.loc 1 95 1 is_stmt 0 view .LVU70
+ 386 0006 08BD     		pop	{r3, pc}
+ 387              		.cfi_endproc
+ 388              	.LFE149:
+ 390              		.section	.text.HAL_UARTEx_RxEventCallback,"ax",%progbits
+ 391              		.align	1
+ 392              		.global	HAL_UARTEx_RxEventCallback
+ 393              		.syntax unified
+ 394              		.thumb
+ 395              		.thumb_func
+ 396              		.fpu fpv5-d16
+ 398              	HAL_UARTEx_RxEventCallback:
+ARM GAS  /tmp/ccvMj1r6.s 			page 10
+
+
+ 399              	.LVL13:
+ 400              	.LFB150:
+  96:../Core/Src/port_layer.c **** 
+  97:../Core/Src/port_layer.c **** uint16_t prev_size_uart_telemetry = 0;
+  98:../Core/Src/port_layer.c **** uint16_t prev_size_uart_state = 0;
+  99:../Core/Src/port_layer.c **** 
+ 100:../Core/Src/port_layer.c **** void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
+ 401              		.loc 1 100 75 is_stmt 1 view -0
+ 402              		.cfi_startproc
+ 403              		@ args = 0, pretend = 0, frame = 0
+ 404              		@ frame_needed = 0, uses_anonymous_args = 0
+ 405              		.loc 1 100 75 is_stmt 0 view .LVU72
+ 406 0000 38B5     		push	{r3, r4, r5, lr}
+ 407              	.LCFI5:
+ 408              		.cfi_def_cfa_offset 16
+ 409              		.cfi_offset 3, -16
+ 410              		.cfi_offset 4, -12
+ 411              		.cfi_offset 5, -8
+ 412              		.cfi_offset 14, -4
+ 413 0002 0C46     		mov	r4, r1
+ 101:../Core/Src/port_layer.c ****     if (huart->Instance == telemetry_uart.Instance) {
+ 414              		.loc 1 101 5 is_stmt 1 view .LVU73
+ 415              		.loc 1 101 14 is_stmt 0 view .LVU74
+ 416 0004 0368     		ldr	r3, [r0]
+ 417              		.loc 1 101 42 view .LVU75
+ 418 0006 174A     		ldr	r2, .L28
+ 419 0008 1268     		ldr	r2, [r2]
+ 420              		.loc 1 101 8 view .LVU76
+ 421 000a 9342     		cmp	r3, r2
+ 422 000c 04D0     		beq	.L26
+ 102:../Core/Src/port_layer.c ****         if (size < prev_size_uart_telemetry) {
+ 103:../Core/Src/port_layer.c ****             prev_size_uart_telemetry = 0;
+ 104:../Core/Src/port_layer.c ****         }
+ 105:../Core/Src/port_layer.c **** 
+ 106:../Core/Src/port_layer.c ****         xStreamBufferSendFromISR(g_telemetry_rx_sb_handle, telemetry_uart_rx_buf + prev_size_uart_t
+ 107:../Core/Src/port_layer.c ****         prev_size_uart_telemetry = size;
+ 108:../Core/Src/port_layer.c ****     } else if (huart->Instance == state_uart.Instance) {
+ 423              		.loc 1 108 12 is_stmt 1 view .LVU77
+ 424              		.loc 1 108 45 is_stmt 0 view .LVU78
+ 425 000e 164A     		ldr	r2, .L28+4
+ 426 0010 1268     		ldr	r2, [r2]
+ 427              		.loc 1 108 15 view .LVU79
+ 428 0012 9342     		cmp	r3, r2
+ 429 0014 13D0     		beq	.L27
+ 430              	.LVL14:
+ 431              	.L20:
+ 109:../Core/Src/port_layer.c ****         if (size < prev_size_uart_state) {
+ 110:../Core/Src/port_layer.c ****             prev_size_uart_state = 0;
+ 111:../Core/Src/port_layer.c ****         }
+ 112:../Core/Src/port_layer.c **** 
+ 113:../Core/Src/port_layer.c ****         xStreamBufferSendFromISR(g_telemetry_rx_sb_handle, state_uart_rx_buf + prev_size_uart_state
+ 114:../Core/Src/port_layer.c ****         prev_size_uart_state = size;
+ 115:../Core/Src/port_layer.c ****     }
+ 116:../Core/Src/port_layer.c **** }...
+ 432              		.loc 1 116 1 view .LVU80
+ 433 0016 38BD     		pop	{r3, r4, r5, pc}
+ 434              	.LVL15:
+ARM GAS  /tmp/ccvMj1r6.s 			page 11
+
+
+ 435              	.L26:
+ 102:../Core/Src/port_layer.c ****         if (size < prev_size_uart_telemetry) {
+ 436              		.loc 1 102 9 is_stmt 1 view .LVU81
+ 102:../Core/Src/port_layer.c ****         if (size < prev_size_uart_telemetry) {
+ 437              		.loc 1 102 18 is_stmt 0 view .LVU82
+ 438 0018 144B     		ldr	r3, .L28+8
+ 439 001a 1B88     		ldrh	r3, [r3]
+ 102:../Core/Src/port_layer.c ****         if (size < prev_size_uart_telemetry) {
+ 440              		.loc 1 102 12 view .LVU83
+ 441 001c 8B42     		cmp	r3, r1
+ 442 001e 02D9     		bls	.L22
+ 103:../Core/Src/port_layer.c ****             prev_size_uart_telemetry = 0;
+ 443              		.loc 1 103 13 is_stmt 1 view .LVU84
+ 103:../Core/Src/port_layer.c ****             prev_size_uart_telemetry = 0;
+ 444              		.loc 1 103 38 is_stmt 0 view .LVU85
+ 445 0020 124B     		ldr	r3, .L28+8
+ 446 0022 0022     		movs	r2, #0
+ 447 0024 1A80     		strh	r2, [r3]	@ movhi
+ 448              	.L22:
+ 106:../Core/Src/port_layer.c ****         xStreamBufferSendFromISR(g_telemetry_rx_sb_handle, telemetry_uart_rx_buf + prev_size_uart_t
+ 449              		.loc 1 106 9 is_stmt 1 view .LVU86
+ 450 0026 114D     		ldr	r5, .L28+8
+ 451 0028 2988     		ldrh	r1, [r5]
+ 452              	.LVL16:
+ 106:../Core/Src/port_layer.c ****         xStreamBufferSendFromISR(g_telemetry_rx_sb_handle, telemetry_uart_rx_buf + prev_size_uart_t
+ 453              		.loc 1 106 9 is_stmt 0 view .LVU87
+ 454 002a 0023     		movs	r3, #0
+ 455 002c 621A     		subs	r2, r4, r1
+ 456 002e 1048     		ldr	r0, .L28+12
+ 457              	.LVL17:
+ 106:../Core/Src/port_layer.c ****         xStreamBufferSendFromISR(g_telemetry_rx_sb_handle, telemetry_uart_rx_buf + prev_size_uart_t
+ 458              		.loc 1 106 9 view .LVU88
+ 459 0030 0144     		add	r1, r1, r0
+ 460 0032 1048     		ldr	r0, .L28+16
+ 461 0034 0068     		ldr	r0, [r0]
+ 462 0036 FFF7FEFF 		bl	xStreamBufferSendFromISR
+ 463              	.LVL18:
+ 107:../Core/Src/port_layer.c ****         prev_size_uart_telemetry = size;
+ 464              		.loc 1 107 9 is_stmt 1 view .LVU89
+ 107:../Core/Src/port_layer.c ****         prev_size_uart_telemetry = size;
+ 465              		.loc 1 107 34 is_stmt 0 view .LVU90
+ 466 003a 2C80     		strh	r4, [r5]	@ movhi
+ 467 003c EBE7     		b	.L20
+ 468              	.LVL19:
+ 469              	.L27:
+ 109:../Core/Src/port_layer.c ****         if (size < prev_size_uart_state) {
+ 470              		.loc 1 109 9 is_stmt 1 view .LVU91
+ 109:../Core/Src/port_layer.c ****         if (size < prev_size_uart_state) {
+ 471              		.loc 1 109 18 is_stmt 0 view .LVU92
+ 472 003e 0E4B     		ldr	r3, .L28+20
+ 473 0040 1B88     		ldrh	r3, [r3]
+ 109:../Core/Src/port_layer.c ****         if (size < prev_size_uart_state) {
+ 474              		.loc 1 109 12 view .LVU93
+ 475 0042 8B42     		cmp	r3, r1
+ 476 0044 02D9     		bls	.L24
+ 110:../Core/Src/port_layer.c ****             prev_size_uart_state = 0;
+ 477              		.loc 1 110 13 is_stmt 1 view .LVU94
+ARM GAS  /tmp/ccvMj1r6.s 			page 12
+
+
+ 110:../Core/Src/port_layer.c ****             prev_size_uart_state = 0;
+ 478              		.loc 1 110 34 is_stmt 0 view .LVU95
+ 479 0046 0C4B     		ldr	r3, .L28+20
+ 480 0048 0022     		movs	r2, #0
+ 481 004a 1A80     		strh	r2, [r3]	@ movhi
+ 482              	.L24:
+ 113:../Core/Src/port_layer.c ****         xStreamBufferSendFromISR(g_telemetry_rx_sb_handle, state_uart_rx_buf + prev_size_uart_state
+ 483              		.loc 1 113 9 is_stmt 1 view .LVU96
+ 484 004c 0A4D     		ldr	r5, .L28+20
+ 485 004e 2988     		ldrh	r1, [r5]
+ 486              	.LVL20:
+ 113:../Core/Src/port_layer.c ****         xStreamBufferSendFromISR(g_telemetry_rx_sb_handle, state_uart_rx_buf + prev_size_uart_state
+ 487              		.loc 1 113 9 is_stmt 0 view .LVU97
+ 488 0050 0023     		movs	r3, #0
+ 489 0052 621A     		subs	r2, r4, r1
+ 490 0054 0948     		ldr	r0, .L28+24
+ 491              	.LVL21:
+ 113:../Core/Src/port_layer.c ****         xStreamBufferSendFromISR(g_telemetry_rx_sb_handle, state_uart_rx_buf + prev_size_uart_state
+ 492              		.loc 1 113 9 view .LVU98
+ 493 0056 0144     		add	r1, r1, r0
+ 494 0058 0648     		ldr	r0, .L28+16
+ 495 005a 0068     		ldr	r0, [r0]
+ 496 005c FFF7FEFF 		bl	xStreamBufferSendFromISR
+ 497              	.LVL22:
+ 114:../Core/Src/port_layer.c ****         prev_size_uart_state = size;
+ 498              		.loc 1 114 9 is_stmt 1 view .LVU99
+ 114:../Core/Src/port_layer.c ****         prev_size_uart_state = size;
+ 499              		.loc 1 114 30 is_stmt 0 view .LVU100
+ 500 0060 2C80     		strh	r4, [r5]	@ movhi
+ 501              		.loc 1 116 1 view .LVU101
+ 502 0062 D8E7     		b	.L20
+ 503              	.L29:
+ 504              		.align	2
+ 505              	.L28:
+ 506 0064 00000000 		.word	huart2
+ 507 0068 00000000 		.word	huart6
+ 508 006c 00000000 		.word	.LANCHOR26
+ 509 0070 00000000 		.word	.LANCHOR24
+ 510 0074 00000000 		.word	.LANCHOR4
+ 511 0078 00000000 		.word	.LANCHOR27
+ 512 007c 00000000 		.word	.LANCHOR25
+ 513              		.cfi_endproc
+ 514              	.LFE150:
+ 516              		.global	prev_size_uart_state
+ 517              		.global	prev_size_uart_telemetry
+ 518              		.global	state_uart_rx_buf
+ 519              		.global	telemetry_uart_rx_buf
+ 520              		.global	sdio_mb_buff
+ 521              		.global	sdio_mb_storage
+ 522              		.global	g_sdio_mb_handle
+ 523              		.global	state_rx_sb_buff
+ 524              		.global	state_rx_sb_storage
+ 525              		.global	g_state_rx_sb_handle
+ 526              		.global	telemetry_tx_mb_buff
+ 527              		.global	telemetry_tx_mb_storage
+ 528              		.global	g_telemetry_tx_mb_handle
+ 529              		.global	telemetry_rx_sb_buff
+ARM GAS  /tmp/ccvMj1r6.s 			page 13
+
+
+ 530              		.global	telemetry_rx_sb_storage
+ 531              		.global	g_telemetry_rx_sb_handle
+ 532              		.global	state_mutex_buff
+ 533              		.global	g_state_mutex_handle
+ 534              		.global	state_rx_task_buff
+ 535              		.global	state_rx_task_stack
+ 536              		.global	g_state_rx_task_handle
+ 537              		.global	telemetry_rx_task_buff
+ 538              		.global	telemetry_rx_task_stack
+ 539              		.global	g_telemetry_rx_task_handle
+ 540              		.global	telemetry_tx_task_buff
+ 541              		.global	telemetry_tx_task_stack
+ 542              		.global	g_telemetry_tx_task_handle
+ 543              		.global	sdio_task_buff
+ 544              		.global	sdio_task_stack
+ 545              		.global	g_sdio_task_handle
+ 546              		.global	test_task_buff
+ 547              		.global	test_task_stack
+ 548              		.global	g_test_task_handle
+ 549              		.section	.bss.g_sdio_mb_handle,"aw",%nobits
+ 550              		.align	2
+ 551              		.set	.LANCHOR13,. + 0
+ 554              	g_sdio_mb_handle:
+ 555 0000 00000000 		.space	4
+ 556              		.section	.bss.g_sdio_task_handle,"aw",%nobits
+ 557              		.align	2
+ 558              		.set	.LANCHOR15,. + 0
+ 561              	g_sdio_task_handle:
+ 562 0000 00000000 		.space	4
+ 563              		.section	.bss.g_state_mutex_handle,"aw",%nobits
+ 564              		.align	2
+ 565              		.set	.LANCHOR1,. + 0
+ 568              	g_state_mutex_handle:
+ 569 0000 00000000 		.space	4
+ 570              		.section	.bss.g_state_rx_sb_handle,"aw",%nobits
+ 571              		.align	2
+ 572              		.set	.LANCHOR10,. + 0
+ 575              	g_state_rx_sb_handle:
+ 576 0000 00000000 		.space	4
+ 577              		.section	.bss.g_state_rx_task_handle,"aw",%nobits
+ 578              		.align	2
+ 579              		.set	.LANCHOR21,. + 0
+ 582              	g_state_rx_task_handle:
+ 583 0000 00000000 		.space	4
+ 584              		.section	.bss.g_telemetry_rx_sb_handle,"aw",%nobits
+ 585              		.align	2
+ 586              		.set	.LANCHOR4,. + 0
+ 589              	g_telemetry_rx_sb_handle:
+ 590 0000 00000000 		.space	4
+ 591              		.section	.bss.g_telemetry_rx_task_handle,"aw",%nobits
+ 592              		.align	2
+ 593              		.set	.LANCHOR19,. + 0
+ 596              	g_telemetry_rx_task_handle:
+ 597 0000 00000000 		.space	4
+ 598              		.section	.bss.g_telemetry_tx_mb_handle,"aw",%nobits
+ 599              		.align	2
+ 600              		.set	.LANCHOR7,. + 0
+ARM GAS  /tmp/ccvMj1r6.s 			page 14
+
+
+ 603              	g_telemetry_tx_mb_handle:
+ 604 0000 00000000 		.space	4
+ 605              		.section	.bss.g_telemetry_tx_task_handle,"aw",%nobits
+ 606              		.align	2
+ 607              		.set	.LANCHOR17,. + 0
+ 610              	g_telemetry_tx_task_handle:
+ 611 0000 00000000 		.space	4
+ 612              		.section	.bss.g_test_task_handle,"aw",%nobits
+ 613              		.align	2
+ 614              		.set	.LANCHOR23,. + 0
+ 617              	g_test_task_handle:
+ 618 0000 00000000 		.space	4
+ 619              		.section	.bss.prev_size_uart_state,"aw",%nobits
+ 620              		.align	1
+ 621              		.set	.LANCHOR27,. + 0
+ 624              	prev_size_uart_state:
+ 625 0000 0000     		.space	2
+ 626              		.section	.bss.prev_size_uart_telemetry,"aw",%nobits
+ 627              		.align	1
+ 628              		.set	.LANCHOR26,. + 0
+ 631              	prev_size_uart_telemetry:
+ 632 0000 0000     		.space	2
+ 633              		.section	.bss.sdio_mb_buff,"aw",%nobits
+ 634              		.align	2
+ 635              		.set	.LANCHOR12,. + 0
+ 638              	sdio_mb_buff:
+ 639 0000 00000000 		.space	40
+ 639      00000000 
+ 639      00000000 
+ 639      00000000 
+ 639      00000000 
+ 640              		.section	.bss.sdio_mb_storage,"aw",%nobits
+ 641              		.align	2
+ 642              		.set	.LANCHOR11,. + 0
+ 645              	sdio_mb_storage:
+ 646 0000 00000000 		.space	256
+ 646      00000000 
+ 646      00000000 
+ 646      00000000 
+ 646      00000000 
+ 647              		.section	.bss.sdio_task_buff,"aw",%nobits
+ 648              		.align	2
+ 649              		.set	.LANCHOR14,. + 0
+ 652              	sdio_task_buff:
+ 653 0000 00000000 		.space	92
+ 653      00000000 
+ 653      00000000 
+ 653      00000000 
+ 653      00000000 
+ 654              		.section	.bss.sdio_task_stack,"aw",%nobits
+ 655              		.align	2
+ 658              	sdio_task_stack:
+ 659 0000 00000000 		.space	16384
+ 659      00000000 
+ 659      00000000 
+ 659      00000000 
+ 659      00000000 
+ARM GAS  /tmp/ccvMj1r6.s 			page 15
+
+
+ 660              		.section	.bss.state_mutex_buff,"aw",%nobits
+ 661              		.align	2
+ 662              		.set	.LANCHOR0,. + 0
+ 665              	state_mutex_buff:
+ 666 0000 00000000 		.space	80
+ 666      00000000 
+ 666      00000000 
+ 666      00000000 
+ 666      00000000 
+ 667              		.section	.bss.state_rx_sb_buff,"aw",%nobits
+ 668              		.align	2
+ 669              		.set	.LANCHOR9,. + 0
+ 672              	state_rx_sb_buff:
+ 673 0000 00000000 		.space	40
+ 673      00000000 
+ 673      00000000 
+ 673      00000000 
+ 673      00000000 
+ 674              		.section	.bss.state_rx_sb_storage,"aw",%nobits
+ 675              		.align	2
+ 676              		.set	.LANCHOR8,. + 0
+ 679              	state_rx_sb_storage:
+ 680 0000 00000000 		.space	33
+ 680      00000000 
+ 680      00000000 
+ 680      00000000 
+ 680      00000000 
+ 681              		.section	.bss.state_rx_task_buff,"aw",%nobits
+ 682              		.align	2
+ 683              		.set	.LANCHOR20,. + 0
+ 686              	state_rx_task_buff:
+ 687 0000 00000000 		.space	92
+ 687      00000000 
+ 687      00000000 
+ 687      00000000 
+ 687      00000000 
+ 688              		.section	.bss.state_rx_task_stack,"aw",%nobits
+ 689              		.align	2
+ 692              	state_rx_task_stack:
+ 693 0000 00000000 		.space	16384
+ 693      00000000 
+ 693      00000000 
+ 693      00000000 
+ 693      00000000 
+ 694              		.section	.bss.state_uart_rx_buf,"aw",%nobits
+ 695              		.align	2
+ 696              		.set	.LANCHOR25,. + 0
+ 699              	state_uart_rx_buf:
+ 700 0000 00000000 		.space	256
+ 700      00000000 
+ 700      00000000 
+ 700      00000000 
+ 700      00000000 
+ 701              		.section	.bss.telemetry_rx_sb_buff,"aw",%nobits
+ 702              		.align	2
+ 703              		.set	.LANCHOR3,. + 0
+ 706              	telemetry_rx_sb_buff:
+ARM GAS  /tmp/ccvMj1r6.s 			page 16
+
+
+ 707 0000 00000000 		.space	40
+ 707      00000000 
+ 707      00000000 
+ 707      00000000 
+ 707      00000000 
+ 708              		.section	.bss.telemetry_rx_sb_storage,"aw",%nobits
+ 709              		.align	2
+ 710              		.set	.LANCHOR2,. + 0
+ 713              	telemetry_rx_sb_storage:
+ 714 0000 00000000 		.space	17
+ 714      00000000 
+ 714      00000000 
+ 714      00000000 
+ 714      00
+ 715              		.section	.bss.telemetry_rx_task_buff,"aw",%nobits
+ 716              		.align	2
+ 717              		.set	.LANCHOR18,. + 0
+ 720              	telemetry_rx_task_buff:
+ 721 0000 00000000 		.space	92
+ 721      00000000 
+ 721      00000000 
+ 721      00000000 
+ 721      00000000 
+ 722              		.section	.bss.telemetry_rx_task_stack,"aw",%nobits
+ 723              		.align	2
+ 726              	telemetry_rx_task_stack:
+ 727 0000 00000000 		.space	16384
+ 727      00000000 
+ 727      00000000 
+ 727      00000000 
+ 727      00000000 
+ 728              		.section	.bss.telemetry_tx_mb_buff,"aw",%nobits
+ 729              		.align	2
+ 730              		.set	.LANCHOR6,. + 0
+ 733              	telemetry_tx_mb_buff:
+ 734 0000 00000000 		.space	40
+ 734      00000000 
+ 734      00000000 
+ 734      00000000 
+ 734      00000000 
+ 735              		.section	.bss.telemetry_tx_mb_storage,"aw",%nobits
+ 736              		.align	2
+ 737              		.set	.LANCHOR5,. + 0
+ 740              	telemetry_tx_mb_storage:
+ 741 0000 00000000 		.space	1032
+ 741      00000000 
+ 741      00000000 
+ 741      00000000 
+ 741      00000000 
+ 742              		.section	.bss.telemetry_tx_task_buff,"aw",%nobits
+ 743              		.align	2
+ 744              		.set	.LANCHOR16,. + 0
+ 747              	telemetry_tx_task_buff:
+ 748 0000 00000000 		.space	92
+ 748      00000000 
+ 748      00000000 
+ 748      00000000 
+ARM GAS  /tmp/ccvMj1r6.s 			page 17
+
+
+ 748      00000000 
+ 749              		.section	.bss.telemetry_tx_task_stack,"aw",%nobits
+ 750              		.align	2
+ 753              	telemetry_tx_task_stack:
+ 754 0000 00000000 		.space	16384
+ 754      00000000 
+ 754      00000000 
+ 754      00000000 
+ 754      00000000 
+ 755              		.section	.bss.telemetry_uart_rx_buf,"aw",%nobits
+ 756              		.align	2
+ 757              		.set	.LANCHOR24,. + 0
+ 760              	telemetry_uart_rx_buf:
+ 761 0000 00000000 		.space	16
+ 761      00000000 
+ 761      00000000 
+ 761      00000000 
+ 762              		.section	.bss.test_task_buff,"aw",%nobits
+ 763              		.align	2
+ 764              		.set	.LANCHOR22,. + 0
+ 767              	test_task_buff:
+ 768 0000 00000000 		.space	92
+ 768      00000000 
+ 768      00000000 
+ 768      00000000 
+ 768      00000000 
+ 769              		.section	.bss.test_task_stack,"aw",%nobits
+ 770              		.align	2
+ 773              	test_task_stack:
+ 774 0000 00000000 		.space	32768
+ 774      00000000 
+ 774      00000000 
+ 774      00000000 
+ 774      00000000 
+ 775              		.text
+ 776              	.Letext0:
+ 777              		.file 2 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stddef.h"
+ 778              		.file 3 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stdint.h"
+ 779              		.file 4 "Core/Inc/portmacro.h"
+ 780              		.file 5 "../Core/FreeRTOS-Kernel/include/FreeRTOS.h"
+ 781              		.file 6 "../Core/FreeRTOS-Kernel/include/task.h"
+ 782              		.file 7 "../Core/FreeRTOS-Kernel/include/stream_buffer.h"
+ 783              		.file 8 "../Core/FreeRTOS-Kernel/include/message_buffer.h"
+ 784              		.file 9 "../Core/FreeRTOS-Kernel/include/queue.h"
+ 785              		.file 10 "../Core/FreeRTOS-Kernel/include/semphr.h"
+ 786              		.file 11 "Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h723xx.h"
+ 787              		.file 12 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_def.h"
+ 788              		.file 13 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dma.h"
+ 789              		.file 14 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h"
+ 790              		.file 15 "../Core/Include/globals.h"
+ 791              		.file 16 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h"
+ARM GAS  /tmp/ccvMj1r6.s 			page 18
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 port_layer.c
+     /tmp/ccvMj1r6.s:17     .rodata.port_init.str1.4:0000000000000000 $d
+     /tmp/ccvMj1r6.s:33     .text.port_init:0000000000000000 $t
+     /tmp/ccvMj1r6.s:41     .text.port_init:0000000000000000 port_init
+     /tmp/ccvMj1r6.s:317    .text.port_init:0000000000000170 $d
+     /tmp/ccvMj1r6.s:658    .bss.sdio_task_stack:0000000000000000 sdio_task_stack
+     /tmp/ccvMj1r6.s:753    .bss.telemetry_tx_task_stack:0000000000000000 telemetry_tx_task_stack
+     /tmp/ccvMj1r6.s:726    .bss.telemetry_rx_task_stack:0000000000000000 telemetry_rx_task_stack
+     /tmp/ccvMj1r6.s:692    .bss.state_rx_task_stack:0000000000000000 state_rx_task_stack
+     /tmp/ccvMj1r6.s:773    .bss.test_task_stack:0000000000000000 test_task_stack
+     /tmp/ccvMj1r6.s:364    .text.port_start:0000000000000000 $t
+     /tmp/ccvMj1r6.s:371    .text.port_start:0000000000000000 port_start
+     /tmp/ccvMj1r6.s:391    .text.HAL_UARTEx_RxEventCallback:0000000000000000 $t
+     /tmp/ccvMj1r6.s:398    .text.HAL_UARTEx_RxEventCallback:0000000000000000 HAL_UARTEx_RxEventCallback
+     /tmp/ccvMj1r6.s:506    .text.HAL_UARTEx_RxEventCallback:0000000000000064 $d
+     /tmp/ccvMj1r6.s:624    .bss.prev_size_uart_state:0000000000000000 prev_size_uart_state
+     /tmp/ccvMj1r6.s:631    .bss.prev_size_uart_telemetry:0000000000000000 prev_size_uart_telemetry
+     /tmp/ccvMj1r6.s:699    .bss.state_uart_rx_buf:0000000000000000 state_uart_rx_buf
+     /tmp/ccvMj1r6.s:760    .bss.telemetry_uart_rx_buf:0000000000000000 telemetry_uart_rx_buf
+     /tmp/ccvMj1r6.s:638    .bss.sdio_mb_buff:0000000000000000 sdio_mb_buff
+     /tmp/ccvMj1r6.s:645    .bss.sdio_mb_storage:0000000000000000 sdio_mb_storage
+     /tmp/ccvMj1r6.s:554    .bss.g_sdio_mb_handle:0000000000000000 g_sdio_mb_handle
+     /tmp/ccvMj1r6.s:672    .bss.state_rx_sb_buff:0000000000000000 state_rx_sb_buff
+     /tmp/ccvMj1r6.s:679    .bss.state_rx_sb_storage:0000000000000000 state_rx_sb_storage
+     /tmp/ccvMj1r6.s:575    .bss.g_state_rx_sb_handle:0000000000000000 g_state_rx_sb_handle
+     /tmp/ccvMj1r6.s:733    .bss.telemetry_tx_mb_buff:0000000000000000 telemetry_tx_mb_buff
+     /tmp/ccvMj1r6.s:740    .bss.telemetry_tx_mb_storage:0000000000000000 telemetry_tx_mb_storage
+     /tmp/ccvMj1r6.s:603    .bss.g_telemetry_tx_mb_handle:0000000000000000 g_telemetry_tx_mb_handle
+     /tmp/ccvMj1r6.s:706    .bss.telemetry_rx_sb_buff:0000000000000000 telemetry_rx_sb_buff
+     /tmp/ccvMj1r6.s:713    .bss.telemetry_rx_sb_storage:0000000000000000 telemetry_rx_sb_storage
+     /tmp/ccvMj1r6.s:589    .bss.g_telemetry_rx_sb_handle:0000000000000000 g_telemetry_rx_sb_handle
+     /tmp/ccvMj1r6.s:665    .bss.state_mutex_buff:0000000000000000 state_mutex_buff
+     /tmp/ccvMj1r6.s:568    .bss.g_state_mutex_handle:0000000000000000 g_state_mutex_handle
+     /tmp/ccvMj1r6.s:686    .bss.state_rx_task_buff:0000000000000000 state_rx_task_buff
+     /tmp/ccvMj1r6.s:582    .bss.g_state_rx_task_handle:0000000000000000 g_state_rx_task_handle
+     /tmp/ccvMj1r6.s:720    .bss.telemetry_rx_task_buff:0000000000000000 telemetry_rx_task_buff
+     /tmp/ccvMj1r6.s:596    .bss.g_telemetry_rx_task_handle:0000000000000000 g_telemetry_rx_task_handle
+     /tmp/ccvMj1r6.s:747    .bss.telemetry_tx_task_buff:0000000000000000 telemetry_tx_task_buff
+     /tmp/ccvMj1r6.s:610    .bss.g_telemetry_tx_task_handle:0000000000000000 g_telemetry_tx_task_handle
+     /tmp/ccvMj1r6.s:652    .bss.sdio_task_buff:0000000000000000 sdio_task_buff
+     /tmp/ccvMj1r6.s:561    .bss.g_sdio_task_handle:0000000000000000 g_sdio_task_handle
+     /tmp/ccvMj1r6.s:767    .bss.test_task_buff:0000000000000000 test_task_buff
+     /tmp/ccvMj1r6.s:617    .bss.g_test_task_handle:0000000000000000 g_test_task_handle
+     /tmp/ccvMj1r6.s:550    .bss.g_sdio_mb_handle:0000000000000000 $d
+     /tmp/ccvMj1r6.s:557    .bss.g_sdio_task_handle:0000000000000000 $d
+     /tmp/ccvMj1r6.s:564    .bss.g_state_mutex_handle:0000000000000000 $d
+     /tmp/ccvMj1r6.s:571    .bss.g_state_rx_sb_handle:0000000000000000 $d
+     /tmp/ccvMj1r6.s:578    .bss.g_state_rx_task_handle:0000000000000000 $d
+     /tmp/ccvMj1r6.s:585    .bss.g_telemetry_rx_sb_handle:0000000000000000 $d
+     /tmp/ccvMj1r6.s:592    .bss.g_telemetry_rx_task_handle:0000000000000000 $d
+     /tmp/ccvMj1r6.s:599    .bss.g_telemetry_tx_mb_handle:0000000000000000 $d
+     /tmp/ccvMj1r6.s:606    .bss.g_telemetry_tx_task_handle:0000000000000000 $d
+     /tmp/ccvMj1r6.s:613    .bss.g_test_task_handle:0000000000000000 $d
+     /tmp/ccvMj1r6.s:620    .bss.prev_size_uart_state:0000000000000000 $d
+     /tmp/ccvMj1r6.s:627    .bss.prev_size_uart_telemetry:0000000000000000 $d
+     /tmp/ccvMj1r6.s:634    .bss.sdio_mb_buff:0000000000000000 $d
+ARM GAS  /tmp/ccvMj1r6.s 			page 19
+
+
+     /tmp/ccvMj1r6.s:641    .bss.sdio_mb_storage:0000000000000000 $d
+     /tmp/ccvMj1r6.s:648    .bss.sdio_task_buff:0000000000000000 $d
+     /tmp/ccvMj1r6.s:655    .bss.sdio_task_stack:0000000000000000 $d
+     /tmp/ccvMj1r6.s:661    .bss.state_mutex_buff:0000000000000000 $d
+     /tmp/ccvMj1r6.s:668    .bss.state_rx_sb_buff:0000000000000000 $d
+     /tmp/ccvMj1r6.s:675    .bss.state_rx_sb_storage:0000000000000000 $d
+     /tmp/ccvMj1r6.s:682    .bss.state_rx_task_buff:0000000000000000 $d
+     /tmp/ccvMj1r6.s:689    .bss.state_rx_task_stack:0000000000000000 $d
+     /tmp/ccvMj1r6.s:695    .bss.state_uart_rx_buf:0000000000000000 $d
+     /tmp/ccvMj1r6.s:702    .bss.telemetry_rx_sb_buff:0000000000000000 $d
+     /tmp/ccvMj1r6.s:709    .bss.telemetry_rx_sb_storage:0000000000000000 $d
+     /tmp/ccvMj1r6.s:716    .bss.telemetry_rx_task_buff:0000000000000000 $d
+     /tmp/ccvMj1r6.s:723    .bss.telemetry_rx_task_stack:0000000000000000 $d
+     /tmp/ccvMj1r6.s:729    .bss.telemetry_tx_mb_buff:0000000000000000 $d
+     /tmp/ccvMj1r6.s:736    .bss.telemetry_tx_mb_storage:0000000000000000 $d
+     /tmp/ccvMj1r6.s:743    .bss.telemetry_tx_task_buff:0000000000000000 $d
+     /tmp/ccvMj1r6.s:750    .bss.telemetry_tx_task_stack:0000000000000000 $d
+     /tmp/ccvMj1r6.s:756    .bss.telemetry_uart_rx_buf:0000000000000000 $d
+     /tmp/ccvMj1r6.s:763    .bss.test_task_buff:0000000000000000 $d
+     /tmp/ccvMj1r6.s:770    .bss.test_task_stack:0000000000000000 $d
+
+UNDEFINED SYMBOLS
+xQueueCreateMutexStatic
+xStreamBufferGenericCreateStatic
+xTaskCreateStatic
+HAL_UARTEx_ReceiveToIdle_DMA
+sdio_task
+telemetry_tx_task
+telemetry_rx_task
+state_rx_task
+sd_test_task
+huart2
+huart6
+vTaskStartScheduler
+xStreamBufferSendFromISR

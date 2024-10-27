@@ -17,6 +17,7 @@
         "sdio.h": "c",
         "port_config.h": "c",
         "globals.h": "c",
-        "stm32f4xx_hal.h": "c"
+        "stm32f4xx_hal.h": "c",
+        "ff.h": "c"
     }
 }

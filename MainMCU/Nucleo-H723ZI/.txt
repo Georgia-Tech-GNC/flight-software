@@ -1,0 +1,7 @@
+sudo apt-get install git gcc-arm-none-eabi build-essential
+sudo apt-get install libtool libusb-1.0-0 libusb-1.0-0-dev gdb-multiarch
+git clone https://github.com/openocd-org/openocd
+    ./bootstrap 
+    ./configure --prefix=/usr/local --enable-ftdi --enable-stlink --enable-jLink
+    make
+    sudo make install

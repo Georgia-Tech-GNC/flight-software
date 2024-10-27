@@ -1,0 +1,275 @@
+ARM GAS  /tmp/cc25o28O.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.eabi_attribute 28, 1
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 1
+  10              		.eabi_attribute 34, 1
+  11              		.eabi_attribute 18, 4
+  12              		.file	"crc_hash.c"
+  13              		.text
+  14              	.Ltext0:
+  15              		.cfi_sections	.debug_frame
+  16              		.section	.text.calculate_crc8_hash,"ax",%progbits
+  17              		.align	1
+  18              		.global	calculate_crc8_hash
+  19              		.arch armv7e-m
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  23              		.fpu fpv5-d16
+  25              	calculate_crc8_hash:
+  26              	.LVL0:
+  27              	.LFB3:
+  28              		.file 1 "../Core/Src/crc_hash.c"
+   1:../Core/Src/crc_hash.c **** #include <stdint.h>
+   2:../Core/Src/crc_hash.c **** #include <stdio.h>
+   3:../Core/Src/crc_hash.c **** #include <stdbool.h>
+   4:../Core/Src/crc_hash.c **** #include <stddef.h>
+   5:../Core/Src/crc_hash.c **** 
+   6:../Core/Src/crc_hash.c **** 
+   7:../Core/Src/crc_hash.c **** // Precompute all hashes for 0xe7
+   8:../Core/Src/crc_hash.c **** uint8_t crctable[256] = {0, 231, 41, 206, 82, 181, 123, 156, 164, 67, 141, 106, 246, 17,
+   9:../Core/Src/crc_hash.c ****  223, 56, 175, 72, 134, 97, 253, 26, 212, 51, 11, 236, 34, 197, 89, 190, 112, 151, 185, 94, 
+  10:../Core/Src/crc_hash.c ****  144, 119, 235, 12, 194, 37, 29, 250, 52, 211, 79, 168, 102, 129, 22, 241, 63, 216, 68, 163, 
+  11:../Core/Src/crc_hash.c ****  109, 138, 178, 85, 155, 124, 224, 7, 201, 46, 149, 114, 188, 91, 199, 32, 238, 9, 49, 214, 24, 
+  12:../Core/Src/crc_hash.c ****  255, 99, 132, 74, 173, 58, 221, 19, 244, 104, 143, 65, 166, 158, 121, 183, 80, 204, 43, 229, 2, 
+  13:../Core/Src/crc_hash.c ****  44, 203, 5, 226, 126, 153, 87, 176, 136, 111, 161, 70, 218, 61, 243, 20, 131, 100, 170, 77, 209, 
+  14:../Core/Src/crc_hash.c ****  54, 248, 31, 39, 192, 14, 233, 117, 146, 92, 187, 205, 42, 228, 3, 159, 120, 182, 81, 105, 142, 64
+  15:../Core/Src/crc_hash.c ****  167, 59, 220, 18, 245, 98, 133, 75, 172, 48, 215, 25, 254, 198, 33, 239, 8, 148, 115, 189, 90, 116
+  16:../Core/Src/crc_hash.c ****  147, 93, 186, 38, 193, 15, 232, 208, 55, 249, 30, 130, 101, 171, 76, 219, 60, 242, 21, 137, 110, 1
+  17:../Core/Src/crc_hash.c ****  127, 152, 86, 177, 45, 202, 4, 227, 88, 191, 113, 150, 10, 237, 35, 196, 252, 27, 213, 50, 174, 73
+  18:../Core/Src/crc_hash.c ****  247, 16, 222, 57, 165, 66, 140, 107, 83, 180, 122, 157, 1, 230, 40, 207, 225, 6, 200, 47, 179, 84,
+  19:../Core/Src/crc_hash.c ****  162, 108, 139, 23, 240, 62, 217, 78, 169, 103, 128, 28, 251, 53, 210, 234, 13, 195, 36, 184, 95, 1
+  20:../Core/Src/crc_hash.c **** };
+  21:../Core/Src/crc_hash.c **** 
+  22:../Core/Src/crc_hash.c **** uint8_t calculate_crc8_hash(const uint8_t *raw_data, const size_t data_size) {
+  29              		.loc 1 22 78 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              		@ link register save eliminated.
+  34              		.loc 1 22 78 is_stmt 0 view .LVU1
+  35 0000 8446     		mov	ip, r0
+  23:../Core/Src/crc_hash.c ****     uint8_t crc = 0;
+ARM GAS  /tmp/cc25o28O.s 			page 2
+
+
+  36              		.loc 1 23 5 is_stmt 1 view .LVU2
+  37              	.LVL1:
+  24:../Core/Src/crc_hash.c ****     for (int i = 0; i < data_size; i++)
+  38              		.loc 1 24 5 view .LVU3
+  39              	.LBB2:
+  40              		.loc 1 24 10 view .LVU4
+  41              		.loc 1 24 14 is_stmt 0 view .LVU5
+  42 0002 0023     		movs	r3, #0
+  43              	.LBE2:
+  23:../Core/Src/crc_hash.c ****     uint8_t crc = 0;
+  44              		.loc 1 23 13 view .LVU6
+  45 0004 1846     		mov	r0, r3
+  46              	.LVL2:
+  47              	.LBB3:
+  48              		.loc 1 24 21 is_stmt 1 view .LVU7
+  49              		.loc 1 24 5 is_stmt 0 view .LVU8
+  50 0006 8B42     		cmp	r3, r1
+  51 0008 0BD2     		bcs	.L8
+  52              	.LBE3:
+  22:../Core/Src/crc_hash.c ****     uint8_t crc = 0;
+  53              		.loc 1 22 78 view .LVU9
+  54 000a 10B4     		push	{r4}
+  55              	.LCFI0:
+  56              		.cfi_def_cfa_offset 4
+  57              		.cfi_offset 4, -4
+  58              	.LVL3:
+  59              	.L3:
+  60              	.LBB4:
+  25:../Core/Src/crc_hash.c ****     {
+  26:../Core/Src/crc_hash.c ****         // XOR-in next input byte and get current CRC value = remainder 
+  27:../Core/Src/crc_hash.c ****         crc = crctable[raw_data[i] ^ crc];
+  61              		.loc 1 27 9 is_stmt 1 discriminator 3 view .LVU10
+  62              		.loc 1 27 32 is_stmt 0 discriminator 3 view .LVU11
+  63 000c 1CF80320 		ldrb	r2, [ip, r3]	@ zero_extendqisi2
+  64              		.loc 1 27 36 discriminator 3 view .LVU12
+  65 0010 4240     		eors	r2, r2, r0
+  66              		.loc 1 27 13 discriminator 3 view .LVU13
+  67 0012 044C     		ldr	r4, .L9
+  68 0014 A05C     		ldrb	r0, [r4, r2]	@ zero_extendqisi2
+  69              	.LVL4:
+  24:../Core/Src/crc_hash.c ****     {
+  70              		.loc 1 24 36 is_stmt 1 discriminator 3 view .LVU14
+  24:../Core/Src/crc_hash.c ****     {
+  71              		.loc 1 24 37 is_stmt 0 discriminator 3 view .LVU15
+  72 0016 0133     		adds	r3, r3, #1
+  73              	.LVL5:
+  24:../Core/Src/crc_hash.c ****     {
+  74              		.loc 1 24 21 is_stmt 1 discriminator 3 view .LVU16
+  24:../Core/Src/crc_hash.c ****     {
+  75              		.loc 1 24 5 is_stmt 0 discriminator 3 view .LVU17
+  76 0018 8B42     		cmp	r3, r1
+  77 001a F7D3     		bcc	.L3
+  78              	.LBE4:
+  28:../Core/Src/crc_hash.c ****     }
+  29:../Core/Src/crc_hash.c **** 
+  30:../Core/Src/crc_hash.c ****     return crc;
+  79              		.loc 1 30 5 is_stmt 1 view .LVU18
+ARM GAS  /tmp/cc25o28O.s 			page 3
+
+
+  31:../Core/Src/crc_hash.c **** }
+  80              		.loc 1 31 1 is_stmt 0 view .LVU19
+  81 001c 5DF8044B 		ldr	r4, [sp], #4
+  82              	.LCFI1:
+  83              		.cfi_restore 4
+  84              		.cfi_def_cfa_offset 0
+  85 0020 7047     		bx	lr
+  86              	.LVL6:
+  87              	.L8:
+  88              		.loc 1 31 1 view .LVU20
+  89 0022 7047     		bx	lr
+  90              	.L10:
+  91              		.align	2
+  92              	.L9:
+  93 0024 00000000 		.word	.LANCHOR0
+  94              		.cfi_endproc
+  95              	.LFE3:
+  97              		.section	.text.verify_crc8_hash,"ax",%progbits
+  98              		.align	1
+  99              		.global	verify_crc8_hash
+ 100              		.syntax unified
+ 101              		.thumb
+ 102              		.thumb_func
+ 103              		.fpu fpv5-d16
+ 105              	verify_crc8_hash:
+ 106              	.LVL7:
+ 107              	.LFB4:
+  32:../Core/Src/crc_hash.c **** 
+  33:../Core/Src/crc_hash.c **** bool verify_crc8_hash(const uint8_t *data, const size_t data_size) {
+ 108              		.loc 1 33 68 is_stmt 1 view -0
+ 109              		.cfi_startproc
+ 110              		@ args = 0, pretend = 0, frame = 0
+ 111              		@ frame_needed = 0, uses_anonymous_args = 0
+ 112              		.loc 1 33 68 is_stmt 0 view .LVU22
+ 113 0000 08B5     		push	{r3, lr}
+ 114              	.LCFI2:
+ 115              		.cfi_def_cfa_offset 8
+ 116              		.cfi_offset 3, -8
+ 117              		.cfi_offset 14, -4
+  34:../Core/Src/crc_hash.c ****     return 0 == calculate_crc8_hash(data, data_size);
+ 118              		.loc 1 34 5 is_stmt 1 view .LVU23
+ 119              		.loc 1 34 17 is_stmt 0 view .LVU24
+ 120 0002 FFF7FEFF 		bl	calculate_crc8_hash
+ 121              	.LVL8:
+  35:../Core/Src/crc_hash.c **** }...
+ 122              		.loc 1 35 1 view .LVU25
+ 123 0006 B0FA80F0 		clz	r0, r0
+ 124 000a 4009     		lsrs	r0, r0, #5
+ 125 000c 08BD     		pop	{r3, pc}
+ 126              		.cfi_endproc
+ 127              	.LFE4:
+ 129              		.global	crctable
+ 130              		.section	.data.crctable,"aw"
+ 131              		.align	2
+ 132              		.set	.LANCHOR0,. + 0
+ 135              	crctable:
+ 136 0000 00E729CE 		.ascii	"\000\347)\316R\265{\234\244C\215j\366\021\3378\257H"
+ARM GAS  /tmp/cc25o28O.s 			page 4
+
+
+ 136      52B57B9C 
+ 136      A4438D6A 
+ 136      F611DF38 
+ 136      AF48
+ 137 0012 8661FD1A 		.ascii	"\206a\375\032\3243\013\354\"\305Y\276p\227\271^\220"
+ 137      D4330BEC 
+ 137      22C559BE 
+ 137      7097B95E 
+ 137      90
+ 138 0023 77EB0CC2 		.ascii	"w\353\014\302%\035\3724\323O\250f\201\026\361?\330D"
+ 138      251DFA34 
+ 138      D34FA866 
+ 138      8116F13F 
+ 138      D844
+ 139 0035 A36D8AB2 		.ascii	"\243m\212\262U\233|\340\007\311.\225r\274[\307 \356"
+ 139      559B7CE0 
+ 139      07C92E95 
+ 139      72BC5BC7 
+ 139      20EE
+ 140 0047 0931D618 		.ascii	"\0111\326\030\377c\204J\255:\335\023\364h\217A\246\236"
+ 140      FF63844A 
+ 140      AD3ADD13 
+ 140      F4688F41 
+ 140      A69E
+ 141 0059 79B750CC 		.ascii	"y\267P\314+\345\002,\313\005\342~\231W\260\210o\241"
+ 141      2BE5022C 
+ 141      CB05E27E 
+ 141      9957B088 
+ 141      6FA1
+ 142 006b 46DA3DF3 		.ascii	"F\332=\363\024\203d\252M\3216\370\037'\300\016\351u"
+ 142      148364AA 
+ 142      4DD136F8 
+ 142      1F27C00E 
+ 142      E975
+ 143 007d 925CBBCD 		.ascii	"\222\\\273\315*\344\003\237x\266Qi\216@\247;\334\022"
+ 143      2AE4039F 
+ 143      78B65169 
+ 143      8E40A73B 
+ 143      DC12
+ 144 008f F562854B 		.ascii	"\365b\205K\2540\327\031\376\306!\357\010\224s\275Zt"
+ 144      AC30D719 
+ 144      FEC621EF 
+ 144      089473BD 
+ 144      5A74
+ 145 00a1 935DBA26 		.ascii	"\223]\272&\301\017\350\3207\371\036\202e\253L\333<\362"
+ 145      C10FE8D0 
+ 145      37F91E82 
+ 145      65AB4CDB 
+ 145      3CF2
+ 146 00b3 15896EA0 		.ascii	"\025\211n\240G\177\230V\261-\312\004\343X\277q\226\012"
+ 146      477F9856 
+ 146      B12DCA04 
+ 146      E358BF71 
+ 146      960A
+ 147 00c5 ED23C4FC 		.ascii	"\355#\304\374\033\3252\256I\207`\367\020\3369\245B\214"
+ 147      1BD532AE 
+ 147      498760F7 
+ARM GAS  /tmp/cc25o28O.s 			page 5
+
+
+ 147      10DE39A5 
+ 147      428C
+ 148 00d7 6B53B47A 		.ascii	"kS\264z\235\001\346(\317\341\006\310/\263T\232}E\242"
+ 148      9D01E628 
+ 148      CFE106C8 
+ 148      2FB3549A 
+ 148      7D45A2
+ 149 00ea 6C8B17F0 		.ascii	"l\213\027\360>\331N\251g\200\034\3735\322\352\015\303"
+ 149      3ED94EA9 
+ 149      67801CFB 
+ 149      35D2EA0D 
+ 149      C3
+ 150 00fb 24B85F91 		.ascii	"$\270_\221v"
+ 150      76
+ 151              		.text
+ 152              	.Letext0:
+ 153              		.file 2 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stdint.h"
+ 154              		.file 3 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stddef.h"
+ARM GAS  /tmp/cc25o28O.s 			page 6
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 crc_hash.c
+     /tmp/cc25o28O.s:17     .text.calculate_crc8_hash:0000000000000000 $t
+     /tmp/cc25o28O.s:25     .text.calculate_crc8_hash:0000000000000000 calculate_crc8_hash
+     /tmp/cc25o28O.s:93     .text.calculate_crc8_hash:0000000000000024 $d
+     /tmp/cc25o28O.s:98     .text.verify_crc8_hash:0000000000000000 $t
+     /tmp/cc25o28O.s:105    .text.verify_crc8_hash:0000000000000000 verify_crc8_hash
+     /tmp/cc25o28O.s:135    .data.crctable:0000000000000000 crctable
+     /tmp/cc25o28O.s:131    .data.crctable:0000000000000000 $d
+
+NO UNDEFINED SYMBOLS

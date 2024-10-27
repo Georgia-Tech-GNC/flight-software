@@ -304,7 +304,6 @@ void sd_save_complete(SDChannel *channel, int status, size_t bytes_saved) {
     }
 }
 
-
 /**
  * Callback for when a load operation is complete
  * @param channel The channel that was loaded

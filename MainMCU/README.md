@@ -52,32 +52,37 @@
 
 1. Replace code in user_dskio.c. Again, you may just copy the file in the Nucleo-F429ZI.
 
+## Main
+
+1. Include "port_layer.h" file in user code includes
+2. Call port_init() and port_start() in user code section 2
+
 ## Makefile
 
 1. Update makefile by adding the following lines to the C_SOURCES list:
 
-Core/Src/port.c \
-../Core/FreeRTOS-Kernel/croutine.c \
-../Core/FreeRTOS-Kernel/event_groups.c \
-../Core/FreeRTOS-Kernel/list.c \
-../Core/FreeRTOS-Kernel/queue.c \
-../Core/FreeRTOS-Kernel/stream_buffer.c \
-../Core/FreeRTOS-Kernel/tasks.c \
-../Core/FreeRTOS-Kernel/timers.c \
-../Core/Src/crc_hash.c \
-../Core/Src/fatfs_sd.c \
-../Core/Src/packet_encode.c \
-../Core/Src/port_layer.c \
-../Core/Src/protocol.c \
-../Core/Src/sdio.c \
-../Core/Src/state_rx.c \
-../Core/Src/telemetry.c \
-../Core/Src/transmission_manager.c \
-../Core/Tests/Src/blink.c \
-../Core/Tests/Src/sd_test.c \
+Core/Src/port.c \\\
+../Core/FreeRTOS-Kernel/croutine.c \\\
+../Core/FreeRTOS-Kernel/event_groups.c \\\
+../Core/FreeRTOS-Kernel/list.c \\\
+../Core/FreeRTOS-Kernel/queue.c \\\
+../Core/FreeRTOS-Kernel/stream_buffer.c \\\
+../Core/FreeRTOS-Kernel/tasks.c \\\
+../Core/FreeRTOS-Kernel/timers.c \\\
+../Core/Src/crc_hash.c \\\
+../Core/Src/fatfs_sd.c \\\
+../Core/Src/packet_encode.c \\\
+../Core/Src/port_layer.c \\\
+../Core/Src/protocol.c \\\
+../Core/Src/sdio.c \\\
+../Core/Src/state_rx.c \\\
+../Core/Src/telemetry.c \\\
+../Core/Src/transmission_manager.c \\\
+../Core/Tests/Src/blink.c \\\
+../Core/Tests/Src/sd_test.c \\
 
 2. Next, add the following lines to the C_INCLUDES list:
 
--I../Core/Include \
--I../Core/Tests/Include \
--I../Core/FreeRTOS-Kernel/include \
+-I../Core/Include \\\
+-I../Core/Tests/Include \\\
+-I../Core/FreeRTOS-Kernel/include \\

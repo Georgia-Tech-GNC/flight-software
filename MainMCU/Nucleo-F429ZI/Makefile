@@ -89,7 +89,8 @@ Core/Src/port.c \
 ../Core/Src/telemetry.c \
 ../Core/Src/transmission_manager.c \
 ../Core/Tests/Src/blink.c \
-../Core/Tests/Src/sd_test.c
+../Core/Tests/Src/sd_test.c \
+../Core/Tests/Src/uart_test.c \
 
 # ASM sources
 ASM_SOURCES =  \

@@ -182,8 +182,6 @@ void sdio_task(void *args) {
     /* Initial attempt to mount SD card */
     if (f_mount(&fs, "/", 1) == FR_OK) {
         sd_mounted = 1;
-    } else {
-        HAL_GPIO_TogglePin(LD3_GPIO_PORT, LD3_PIN);
     }
 
     for (;;) {

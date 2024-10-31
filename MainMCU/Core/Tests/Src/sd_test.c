@@ -8,6 +8,8 @@
 #include "main.h"
 #include "sdio.h"
 
+#include "globals.h"
+
 #include "ff.h"
 
 #define CHUNK_SIZE 512
@@ -32,6 +34,9 @@ void sd_test_task(void *args) {
 
     uint32_t notify_value = 0;
 
+    char *msg1 = "Doing things...\r\n";
+    char *msg2 = "Done\r\n";
+
     while (1) {
         sd_load_channel(&read_channel, read_ptr, CHUNK_SIZE);
         // wait for read to complete
@@ -41,7 +46,7 @@ void sd_test_task(void *args) {
         read_ptr += n_bytes;
         
         if (n_bytes == 0) {
-            HAL_GPIO_WritePin(LD2_GPIO_PORT, LD2_PIN, GPIO_PIN_SET);
+            HAL_UART_Transmit(&huart2, (uint8_t *) msg2, 6, HAL_MAX_DELAY);
             while (1);
         }
 
@@ -52,8 +57,7 @@ void sd_test_task(void *args) {
 
         // wait for write to complete
         xTaskNotifyWait(0, SD_TASK_WRITE_COMPLETE_BIT, &notify_value, portMAX_DELAY);
-
-        HAL_GPIO_TogglePin(LD1_GPIO_PORT, LD1_PIN);
+        HAL_UART_Transmit(&huart2, (uint8_t *) msg1, 17, HAL_MAX_DELAY);
     }
 
     while (1);

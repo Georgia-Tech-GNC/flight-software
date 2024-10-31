@@ -21,6 +21,7 @@ extern MessageBufferHandle_t g_sdio_mb_handle;
 
 extern UART_HandleTypeDef telemetry_uart;
 extern UART_HandleTypeDef state_uart;
+extern UART_HandleTypeDef debug_uart;
 
 extern SPI_HandleTypeDef sd_spi;
 

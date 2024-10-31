@@ -1,0 +1,708 @@
+ARM GAS  /tmp/ccF9undW.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.eabi_attribute 28, 1
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 1
+  10              		.eabi_attribute 34, 1
+  11              		.eabi_attribute 18, 4
+  12              		.file	"packet_encode.c"
+  13              		.text
+  14              	.Ltext0:
+  15              		.cfi_sections	.debug_frame
+  16              		.section	.text.cobs_encode,"ax",%progbits
+  17              		.align	1
+  18              		.global	cobs_encode
+  19              		.arch armv7e-m
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  23              		.fpu fpv5-d16
+  25              	cobs_encode:
+  26              	.LVL0:
+  27              	.LFB0:
+  28              		.file 1 "../Core/Src/packet_encode.c"
+   1:../Core/Src/packet_encode.c **** #include <stdint.h>
+   2:../Core/Src/packet_encode.c **** #include <stdbool.h>
+   3:../Core/Src/packet_encode.c **** #include <stddef.h>
+   4:../Core/Src/packet_encode.c **** #include <string.h>
+   5:../Core/Src/packet_encode.c **** 
+   6:../Core/Src/packet_encode.c **** #include "crc_hash.h"
+   7:../Core/Src/packet_encode.c **** 
+   8:../Core/Src/packet_encode.c **** /** 
+   9:../Core/Src/packet_encode.c ****  * Applies the COBS algorithm to an input rawData.
+  10:../Core/Src/packet_encode.c ****  * This method removes all instances of the 0x00 byte by stuffing a linked list of bytes into the p
+  11:../Core/Src/packet_encode.c ****  * This last instance of the 0x00 byte will point to the index after the array
+  12:../Core/Src/packet_encode.c ****  * Note that the raw data may NOT be more than 254 bytes long. 
+  13:../Core/Src/packet_encode.c ****  * The encoded data will be exactly one byte longer than the raw data (the first byte is the COBS b
+  14:../Core/Src/packet_encode.c ****  * 
+  15:../Core/Src/packet_encode.c ****  * @param   rawData                 A pointer to the start of a uint8_t[] representing the data to 
+  16:../Core/Src/packet_encode.c ****  * @param   encodedData             A pointer to the start of a uint8_t[]. This array will be overw
+  17:../Core/Src/packet_encode.c ****  * @param   dataSize                The length of the raw data (in bytes)
+  18:../Core/Src/packet_encode.c ****  * @param   encodedDataStartIndex   Represents the index at which this method should begin storing 
+  19:../Core/Src/packet_encode.c ****  * @return                          The index of the final stuffed bit in the encodedData array
+  20:../Core/Src/packet_encode.c ****  */
+  21:../Core/Src/packet_encode.c **** int cobs_encode(const uint8_t *rawData, const uint8_t dataSize, uint8_t *encodedData, const int enc
+  29              		.loc 1 21 120 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              		.loc 1 21 120 is_stmt 0 view .LVU1
+  34 0000 30B5     		push	{r4, r5, lr}
+  35              	.LCFI0:
+  36              		.cfi_def_cfa_offset 12
+  37              		.cfi_offset 4, -12
+ARM GAS  /tmp/ccF9undW.s 			page 2
+
+
+  38              		.cfi_offset 5, -8
+  39              		.cfi_offset 14, -4
+  22:../Core/Src/packet_encode.c ****     int lastStuffedByteIndex = 0;
+  40              		.loc 1 22 5 is_stmt 1 view .LVU2
+  41              	.LVL1:
+  23:../Core/Src/packet_encode.c ****     encodedData[encodedDataStartIndex] = dataSize + 1;
+  42              		.loc 1 23 5 view .LVU3
+  43              		.loc 1 23 51 is_stmt 0 view .LVU4
+  44 0002 4C1C     		adds	r4, r1, #1
+  45              		.loc 1 23 40 view .LVU5
+  46 0004 D454     		strb	r4, [r2, r3]
+  24:../Core/Src/packet_encode.c **** 
+  25:../Core/Src/packet_encode.c ****     for (int i = 1; i <= dataSize; i++) {
+  47              		.loc 1 25 5 is_stmt 1 view .LVU6
+  48              	.LBB2:
+  49              		.loc 1 25 10 view .LVU7
+  50              	.LVL2:
+  51              		.loc 1 25 14 is_stmt 0 view .LVU8
+  52 0006 4FF0010C 		mov	ip, #1
+  53              	.LBE2:
+  22:../Core/Src/packet_encode.c ****     encodedData[encodedDataStartIndex] = dataSize + 1;
+  54              		.loc 1 22 9 view .LVU9
+  55 000a 0024     		movs	r4, #0
+  56              	.LBB3:
+  57              		.loc 1 25 5 view .LVU10
+  58 000c 05E0     		b	.L2
+  59              	.LVL3:
+  60              	.L3:
+  26:../Core/Src/packet_encode.c ****         if (rawData[i - 1] == 0x00) {
+  27:../Core/Src/packet_encode.c ****             // Apply COBS algorithm and set index from previous COBS byte to point here
+  28:../Core/Src/packet_encode.c ****             encodedData[encodedDataStartIndex + lastStuffedByteIndex] = i - lastStuffedByteIndex;
+  29:../Core/Src/packet_encode.c ****             lastStuffedByteIndex = i;
+  30:../Core/Src/packet_encode.c ****             encodedData[encodedDataStartIndex + i] = dataSize + 1 - i;
+  31:../Core/Src/packet_encode.c ****         } else {
+  32:../Core/Src/packet_encode.c ****             encodedData[encodedDataStartIndex + i] = rawData[i - 1];
+  61              		.loc 1 32 13 is_stmt 1 view .LVU11
+  62              		.loc 1 32 47 is_stmt 0 view .LVU12
+  63 000e 0CEB030E 		add	lr, ip, r3
+  64              		.loc 1 32 52 view .LVU13
+  65 0012 02F80E50 		strb	r5, [r2, lr]
+  66              	.L4:
+  25:../Core/Src/packet_encode.c ****         if (rawData[i - 1] == 0x00) {
+  67              		.loc 1 25 36 is_stmt 1 discriminator 2 view .LVU14
+  25:../Core/Src/packet_encode.c ****         if (rawData[i - 1] == 0x00) {
+  68              		.loc 1 25 37 is_stmt 0 discriminator 2 view .LVU15
+  69 0016 0CF1010C 		add	ip, ip, #1
+  70              	.LVL4:
+  71              	.L2:
+  25:../Core/Src/packet_encode.c ****         if (rawData[i - 1] == 0x00) {
+  72              		.loc 1 25 21 is_stmt 1 discriminator 1 view .LVU16
+  25:../Core/Src/packet_encode.c ****         if (rawData[i - 1] == 0x00) {
+  73              		.loc 1 25 5 is_stmt 0 discriminator 1 view .LVU17
+  74 001a 6145     		cmp	r1, ip
+  75 001c 15DB     		blt	.L7
+  26:../Core/Src/packet_encode.c ****         if (rawData[i - 1] == 0x00) {
+  76              		.loc 1 26 9 is_stmt 1 view .LVU18
+  26:../Core/Src/packet_encode.c ****         if (rawData[i - 1] == 0x00) {
+ARM GAS  /tmp/ccF9undW.s 			page 3
+
+
+  77              		.loc 1 26 20 is_stmt 0 view .LVU19
+  78 001e 00EB0C05 		add	r5, r0, ip
+  79 0022 15F8015C 		ldrb	r5, [r5, #-1]	@ zero_extendqisi2
+  26:../Core/Src/packet_encode.c ****         if (rawData[i - 1] == 0x00) {
+  80              		.loc 1 26 12 view .LVU20
+  81 0026 002D     		cmp	r5, #0
+  82 0028 F1D1     		bne	.L3
+  28:../Core/Src/packet_encode.c ****             lastStuffedByteIndex = i;
+  83              		.loc 1 28 13 is_stmt 1 view .LVU21
+  28:../Core/Src/packet_encode.c ****             lastStuffedByteIndex = i;
+  84              		.loc 1 28 75 is_stmt 0 view .LVU22
+  85 002a 5FFA8CFE 		uxtb	lr, ip
+  28:../Core/Src/packet_encode.c ****             lastStuffedByteIndex = i;
+  86              		.loc 1 28 47 view .LVU23
+  87 002e E518     		adds	r5, r4, r3
+  28:../Core/Src/packet_encode.c ****             lastStuffedByteIndex = i;
+  88              		.loc 1 28 75 view .LVU24
+  89 0030 AEEB0404 		sub	r4, lr, r4
+  90              	.LVL5:
+  28:../Core/Src/packet_encode.c ****             lastStuffedByteIndex = i;
+  91              		.loc 1 28 71 view .LVU25
+  92 0034 5455     		strb	r4, [r2, r5]
+  29:../Core/Src/packet_encode.c ****             encodedData[encodedDataStartIndex + i] = dataSize + 1 - i;
+  93              		.loc 1 29 13 is_stmt 1 view .LVU26
+  94              	.LVL6:
+  30:../Core/Src/packet_encode.c ****         } else {
+  95              		.loc 1 30 13 view .LVU27
+  30:../Core/Src/packet_encode.c ****         } else {
+  96              		.loc 1 30 47 is_stmt 0 view .LVU28
+  97 0036 0CEB0304 		add	r4, ip, r3
+  30:../Core/Src/packet_encode.c ****         } else {
+  98              		.loc 1 30 67 view .LVU29
+  99 003a A1EB0E0E 		sub	lr, r1, lr
+ 100 003e 0EF1010E 		add	lr, lr, #1
+  30:../Core/Src/packet_encode.c ****         } else {
+ 101              		.loc 1 30 52 view .LVU30
+ 102 0042 02F804E0 		strb	lr, [r2, r4]
+  29:../Core/Src/packet_encode.c ****             encodedData[encodedDataStartIndex + i] = dataSize + 1 - i;
+ 103              		.loc 1 29 34 view .LVU31
+ 104 0046 6446     		mov	r4, ip
+ 105 0048 E5E7     		b	.L4
+ 106              	.LVL7:
+ 107              	.L7:
+  29:../Core/Src/packet_encode.c ****             encodedData[encodedDataStartIndex + i] = dataSize + 1 - i;
+ 108              		.loc 1 29 34 view .LVU32
+ 109              	.LBE3:
+  33:../Core/Src/packet_encode.c ****         }
+  34:../Core/Src/packet_encode.c ****     }
+  35:../Core/Src/packet_encode.c **** 
+  36:../Core/Src/packet_encode.c ****     return lastStuffedByteIndex + encodedDataStartIndex;
+ 110              		.loc 1 36 5 is_stmt 1 view .LVU33
+  37:../Core/Src/packet_encode.c **** }
+ 111              		.loc 1 37 1 is_stmt 0 view .LVU34
+ 112 004a E018     		adds	r0, r4, r3
+ 113              	.LVL8:
+ 114              		.loc 1 37 1 view .LVU35
+ 115 004c 30BD     		pop	{r4, r5, pc}
+ARM GAS  /tmp/ccF9undW.s 			page 4
+
+
+ 116              		.loc 1 37 1 view .LVU36
+ 117              		.cfi_endproc
+ 118              	.LFE0:
+ 120              		.section	.text.generate_packet,"ax",%progbits
+ 121              		.align	1
+ 122              		.global	generate_packet
+ 123              		.syntax unified
+ 124              		.thumb
+ 125              		.thumb_func
+ 126              		.fpu fpv5-d16
+ 128              	generate_packet:
+ 129              	.LVL9:
+ 130              	.LFB1:
+  38:../Core/Src/packet_encode.c **** 
+  39:../Core/Src/packet_encode.c **** 
+  40:../Core/Src/packet_encode.c **** int generate_packet(const uint8_t *rawData, const uint8_t dataSize, uint8_t *packetizedData, const 
+ 131              		.loc 1 40 119 is_stmt 1 view -0
+ 132              		.cfi_startproc
+ 133              		@ args = 0, pretend = 0, frame = 0
+ 134              		@ frame_needed = 0, uses_anonymous_args = 0
+ 135              		.loc 1 40 119 is_stmt 0 view .LVU38
+ 136 0000 70B5     		push	{r4, r5, r6, lr}
+ 137              	.LCFI1:
+ 138              		.cfi_def_cfa_offset 16
+ 139              		.cfi_offset 4, -16
+ 140              		.cfi_offset 5, -12
+ 141              		.cfi_offset 6, -8
+ 142              		.cfi_offset 14, -4
+ 143 0002 0D46     		mov	r5, r1
+ 144 0004 1446     		mov	r4, r2
+  41:../Core/Src/packet_encode.c ****     packetizedData[0] = 0x00;                               // Byte 0: 0x00
+ 145              		.loc 1 41 5 is_stmt 1 view .LVU39
+ 146              		.loc 1 41 23 is_stmt 0 view .LVU40
+ 147 0006 0026     		movs	r6, #0
+ 148 0008 1670     		strb	r6, [r2]
+  42:../Core/Src/packet_encode.c ****     packetizedData[1] = messageID;                          // Byte 1: message id
+ 149              		.loc 1 42 5 is_stmt 1 view .LVU41
+ 150              		.loc 1 42 23 is_stmt 0 view .LVU42
+ 151 000a 5370     		strb	r3, [r2, #1]
+  43:../Core/Src/packet_encode.c ****     packetizedData[2] = dataSize;                           // Byte 2: payload size
+ 152              		.loc 1 43 5 is_stmt 1 view .LVU43
+ 153              		.loc 1 43 23 is_stmt 0 view .LVU44
+ 154 000c 9170     		strb	r1, [r2, #2]
+  44:../Core/Src/packet_encode.c ****     int cobs_overwrite_index = cobs_encode(rawData, dataSize, packetizedData, 3);  
+ 155              		.loc 1 44 5 is_stmt 1 view .LVU45
+ 156              		.loc 1 44 32 is_stmt 0 view .LVU46
+ 157 000e 0323     		movs	r3, #3
+ 158              	.LVL10:
+ 159              		.loc 1 44 32 view .LVU47
+ 160 0010 FFF7FEFF 		bl	cobs_encode
+ 161              	.LVL11:
+ 162              		.loc 1 44 32 view .LVU48
+ 163 0014 0646     		mov	r6, r0
+ 164              	.LVL12:
+  45:../Core/Src/packet_encode.c ****                                                             // Byte 3 COBS byte         
+  46:../Core/Src/packet_encode.c ****                                                             // Bytes 4 - dataSize+3: payload
+  47:../Core/Src/packet_encode.c **** 
+ARM GAS  /tmp/ccF9undW.s 			page 5
+
+
+  48:../Core/Src/packet_encode.c ****     // Calculate the CRC-8 checksum
+  49:../Core/Src/packet_encode.c ****     uint8_t crc = calculate_crc8_hash(packetizedData, dataSize + 4);
+ 165              		.loc 1 49 5 is_stmt 1 view .LVU49
+ 166              		.loc 1 49 19 is_stmt 0 view .LVU50
+ 167 0016 291D     		adds	r1, r5, #4
+ 168 0018 2046     		mov	r0, r4
+ 169              	.LVL13:
+ 170              		.loc 1 49 19 view .LVU51
+ 171 001a FFF7FEFF 		bl	calculate_crc8_hash
+ 172              	.LVL14:
+  50:../Core/Src/packet_encode.c ****                                                    
+  51:../Core/Src/packet_encode.c ****     if (crc == 0x00) {                                      // Byte dataSize+4: checksum
+ 173              		.loc 1 51 5 is_stmt 1 view .LVU52
+ 174              		.loc 1 51 8 is_stmt 0 view .LVU53
+ 175 001e 20B9     		cbnz	r0, .L9
+  52:../Core/Src/packet_encode.c ****         packetizedData[dataSize + 4] = 1;
+ 176              		.loc 1 52 9 is_stmt 1 view .LVU54
+ 177              		.loc 1 52 23 is_stmt 0 view .LVU55
+ 178 0020 2B1D     		adds	r3, r5, #4
+ 179              		.loc 1 52 38 view .LVU56
+ 180 0022 0122     		movs	r2, #1
+ 181 0024 E254     		strb	r2, [r4, r3]
+ 182              	.L10:
+  53:../Core/Src/packet_encode.c ****     } else {
+  54:../Core/Src/packet_encode.c ****         packetizedData[dataSize + 4] = crc;
+  55:../Core/Src/packet_encode.c ****         packetizedData[cobs_overwrite_index]++;     // cobs encoding automatically assumed that crc
+  56:../Core/Src/packet_encode.c ****                                                     // incrementing the last jump by one
+  57:../Core/Src/packet_encode.c ****     }
+  58:../Core/Src/packet_encode.c **** 
+  59:../Core/Src/packet_encode.c ****     return dataSize + 5;
+ 183              		.loc 1 59 5 is_stmt 1 view .LVU57
+  60:../Core/Src/packet_encode.c **** }
+ 184              		.loc 1 60 1 is_stmt 0 view .LVU58
+ 185 0026 681D     		adds	r0, r5, #5
+ 186              	.LVL15:
+ 187              		.loc 1 60 1 view .LVU59
+ 188 0028 70BD     		pop	{r4, r5, r6, pc}
+ 189              	.LVL16:
+ 190              	.L9:
+  54:../Core/Src/packet_encode.c ****         packetizedData[cobs_overwrite_index]++;     // cobs encoding automatically assumed that crc
+ 191              		.loc 1 54 9 is_stmt 1 view .LVU60
+  54:../Core/Src/packet_encode.c ****         packetizedData[cobs_overwrite_index]++;     // cobs encoding automatically assumed that crc
+ 192              		.loc 1 54 23 is_stmt 0 view .LVU61
+ 193 002a 2A1D     		adds	r2, r5, #4
+  54:../Core/Src/packet_encode.c ****         packetizedData[cobs_overwrite_index]++;     // cobs encoding automatically assumed that crc
+ 194              		.loc 1 54 38 view .LVU62
+ 195 002c A054     		strb	r0, [r4, r2]
+  55:../Core/Src/packet_encode.c ****                                                     // incrementing the last jump by one
+ 196              		.loc 1 55 9 is_stmt 1 view .LVU63
+  55:../Core/Src/packet_encode.c ****                                                     // incrementing the last jump by one
+ 197              		.loc 1 55 23 is_stmt 0 view .LVU64
+ 198 002e A35D     		ldrb	r3, [r4, r6]	@ zero_extendqisi2
+  55:../Core/Src/packet_encode.c ****                                                     // incrementing the last jump by one
+ 199              		.loc 1 55 45 view .LVU65
+ 200 0030 0133     		adds	r3, r3, #1
+ 201 0032 A355     		strb	r3, [r4, r6]
+ 202 0034 F7E7     		b	.L10
+ARM GAS  /tmp/ccF9undW.s 			page 6
+
+
+ 203              		.cfi_endproc
+ 204              	.LFE1:
+ 206              		.section	.text.verify_packet,"ax",%progbits
+ 207              		.align	1
+ 208              		.global	verify_packet
+ 209              		.syntax unified
+ 210              		.thumb
+ 211              		.thumb_func
+ 212              		.fpu fpv5-d16
+ 214              	verify_packet:
+ 215              	.LVL17:
+ 216              	.LFB2:
+  61:../Core/Src/packet_encode.c **** 
+  62:../Core/Src/packet_encode.c **** 
+  63:../Core/Src/packet_encode.c **** bool verify_packet(uint8_t *rawData, const size_t dataSize) {
+ 217              		.loc 1 63 61 is_stmt 1 view -0
+ 218              		.cfi_startproc
+ 219              		@ args = 0, pretend = 0, frame = 0
+ 220              		@ frame_needed = 0, uses_anonymous_args = 0
+  64:../Core/Src/packet_encode.c ****     if (dataSize < 5) return false;
+ 221              		.loc 1 64 5 view .LVU67
+ 222              		.loc 1 64 8 is_stmt 0 view .LVU68
+ 223 0000 0429     		cmp	r1, #4
+ 224 0002 1AD9     		bls	.L19
+  63:../Core/Src/packet_encode.c ****     if (dataSize < 5) return false;
+ 225              		.loc 1 63 61 view .LVU69
+ 226 0004 08B5     		push	{r3, lr}
+ 227              	.LCFI2:
+ 228              		.cfi_def_cfa_offset 8
+ 229              		.cfi_offset 3, -8
+ 230              		.cfi_offset 14, -4
+  65:../Core/Src/packet_encode.c ****     // First either de-stuff the crc_hash byte if needed or move back the last cobs pointer
+  66:../Core/Src/packet_encode.c ****     
+  67:../Core/Src/packet_encode.c ****     int next_cobs_byte = 3;
+ 231              		.loc 1 67 9 view .LVU70
+ 232 0006 0323     		movs	r3, #3
+ 233              	.L14:
+ 234              	.LVL18:
+  68:../Core/Src/packet_encode.c ****     while (next_cobs_byte < dataSize) {
+ 235              		.loc 1 68 11 is_stmt 1 view .LVU71
+ 236 0008 8B42     		cmp	r3, r1
+ 237 000a 11D2     		bcs	.L16
+ 238              	.LBB4:
+  69:../Core/Src/packet_encode.c ****         int increment = rawData[next_cobs_byte];
+ 239              		.loc 1 69 9 view .LVU72
+ 240              		.loc 1 69 32 is_stmt 0 view .LVU73
+ 241 000c 00EB030E 		add	lr, r0, r3
+ 242 0010 C25C     		ldrb	r2, [r0, r3]	@ zero_extendqisi2
+ 243              	.LVL19:
+  70:../Core/Src/packet_encode.c ****         if (increment == 0) return false; // Avoid infinite loops
+ 244              		.loc 1 70 9 is_stmt 1 view .LVU74
+ 245              		.loc 1 70 12 is_stmt 0 view .LVU75
+ 246 0012 A2B1     		cbz	r2, .L20
+  71:../Core/Src/packet_encode.c ****         else if (next_cobs_byte + increment == dataSize - 1) {
+ 247              		.loc 1 71 14 is_stmt 1 view .LVU76
+ 248              		.loc 1 71 33 is_stmt 0 view .LVU77
+ 249 0014 1344     		add	r3, r3, r2
+ARM GAS  /tmp/ccF9undW.s 			page 7
+
+
+ 250              	.LVL20:
+ 251              		.loc 1 71 57 view .LVU78
+ 252 0016 01F1FF3C 		add	ip, r1, #-1
+ 253              		.loc 1 71 17 view .LVU79
+ 254 001a 6345     		cmp	r3, ip
+ 255 001c 05D0     		beq	.L25
+  72:../Core/Src/packet_encode.c ****             rawData[dataSize-1] = 0;
+  73:../Core/Src/packet_encode.c ****             break;
+  74:../Core/Src/packet_encode.c ****         } else if (next_cobs_byte + increment >= dataSize) {
+ 256              		.loc 1 74 16 is_stmt 1 view .LVU80
+ 257              		.loc 1 74 19 is_stmt 0 view .LVU81
+ 258 001e 8B42     		cmp	r3, r1
+ 259 0020 F2D3     		bcc	.L14
+  75:../Core/Src/packet_encode.c ****             rawData[next_cobs_byte]--;
+ 260              		.loc 1 75 13 is_stmt 1 view .LVU82
+ 261              		.loc 1 75 36 is_stmt 0 view .LVU83
+ 262 0022 013A     		subs	r2, r2, #1
+ 263              	.LVL21:
+ 264              		.loc 1 75 36 view .LVU84
+ 265 0024 8EF80020 		strb	r2, [lr]
+ 266 0028 EEE7     		b	.L14
+ 267              	.LVL22:
+ 268              	.L25:
+  72:../Core/Src/packet_encode.c ****             rawData[dataSize-1] = 0;
+ 269              		.loc 1 72 13 is_stmt 1 view .LVU85
+  72:../Core/Src/packet_encode.c ****             rawData[dataSize-1] = 0;
+ 270              		.loc 1 72 33 is_stmt 0 view .LVU86
+ 271 002a 0023     		movs	r3, #0
+ 272 002c 00F80C30 		strb	r3, [r0, ip]
+  73:../Core/Src/packet_encode.c ****         } else if (next_cobs_byte + increment >= dataSize) {
+ 273              		.loc 1 73 13 is_stmt 1 view .LVU87
+ 274              	.LVL23:
+ 275              	.L16:
+  73:../Core/Src/packet_encode.c ****         } else if (next_cobs_byte + increment >= dataSize) {
+ 276              		.loc 1 73 13 is_stmt 0 view .LVU88
+ 277              	.LBE4:
+  76:../Core/Src/packet_encode.c ****         }
+  77:../Core/Src/packet_encode.c **** 
+  78:../Core/Src/packet_encode.c ****         next_cobs_byte += increment;
+  79:../Core/Src/packet_encode.c ****     } 
+  80:../Core/Src/packet_encode.c **** 
+  81:../Core/Src/packet_encode.c ****     return verify_crc8_hash(rawData+1, dataSize-1);
+ 278              		.loc 1 81 5 is_stmt 1 view .LVU89
+ 279              		.loc 1 81 12 is_stmt 0 view .LVU90
+ 280 0030 0139     		subs	r1, r1, #1
+ 281              	.LVL24:
+ 282              		.loc 1 81 12 view .LVU91
+ 283 0032 0130     		adds	r0, r0, #1
+ 284              	.LVL25:
+ 285              		.loc 1 81 12 view .LVU92
+ 286 0034 FFF7FEFF 		bl	verify_crc8_hash
+ 287              	.LVL26:
+ 288              	.L13:
+  82:../Core/Src/packet_encode.c **** }
+ 289              		.loc 1 82 1 view .LVU93
+ 290 0038 08BD     		pop	{r3, pc}
+ 291              	.LVL27:
+ARM GAS  /tmp/ccF9undW.s 			page 8
+
+
+ 292              	.L19:
+ 293              	.LCFI3:
+ 294              		.cfi_def_cfa_offset 0
+ 295              		.cfi_restore 3
+ 296              		.cfi_restore 14
+  64:../Core/Src/packet_encode.c ****     // First either de-stuff the crc_hash byte if needed or move back the last cobs pointer
+ 297              		.loc 1 64 30 view .LVU94
+ 298 003a 0020     		movs	r0, #0
+ 299              	.LVL28:
+ 300              		.loc 1 82 1 view .LVU95
+ 301 003c 7047     		bx	lr
+ 302              	.LVL29:
+ 303              	.L20:
+ 304              	.LCFI4:
+ 305              		.cfi_def_cfa_offset 8
+ 306              		.cfi_offset 3, -8
+ 307              		.cfi_offset 14, -4
+ 308              	.LBB5:
+  70:../Core/Src/packet_encode.c ****         else if (next_cobs_byte + increment == dataSize - 1) {
+ 309              		.loc 1 70 36 view .LVU96
+ 310 003e 0020     		movs	r0, #0
+ 311              	.LVL30:
+  70:../Core/Src/packet_encode.c ****         else if (next_cobs_byte + increment == dataSize - 1) {
+ 312              		.loc 1 70 36 view .LVU97
+ 313 0040 FAE7     		b	.L13
+ 314              	.LBE5:
+ 315              		.cfi_endproc
+ 316              	.LFE2:
+ 318              		.section	.text.extract_packet,"ax",%progbits
+ 319              		.align	1
+ 320              		.global	extract_packet
+ 321              		.syntax unified
+ 322              		.thumb
+ 323              		.thumb_func
+ 324              		.fpu fpv5-d16
+ 326              	extract_packet:
+ 327              	.LVL31:
+ 328              	.LFB3:
+  83:../Core/Src/packet_encode.c **** 
+  84:../Core/Src/packet_encode.c **** 
+  85:../Core/Src/packet_encode.c **** uint8_t extract_packet(uint8_t *rawData, const size_t dataSize, uint8_t *extractedData) {
+ 329              		.loc 1 85 89 is_stmt 1 view -0
+ 330              		.cfi_startproc
+ 331              		@ args = 0, pretend = 0, frame = 0
+ 332              		@ frame_needed = 0, uses_anonymous_args = 0
+ 333              		.loc 1 85 89 is_stmt 0 view .LVU99
+ 334 0000 38B5     		push	{r3, r4, r5, lr}
+ 335              	.LCFI5:
+ 336              		.cfi_def_cfa_offset 16
+ 337              		.cfi_offset 3, -16
+ 338              		.cfi_offset 4, -12
+ 339              		.cfi_offset 5, -8
+ 340              		.cfi_offset 14, -4
+ 341 0002 8446     		mov	ip, r0
+ 342 0004 1046     		mov	r0, r2
+ 343              	.LVL32:
+  86:../Core/Src/packet_encode.c ****     uint8_t message_id = rawData[1];
+ARM GAS  /tmp/ccF9undW.s 			page 9
+
+
+ 344              		.loc 1 86 5 is_stmt 1 view .LVU100
+ 345              		.loc 1 86 13 is_stmt 0 view .LVU101
+ 346 0006 9CF80150 		ldrb	r5, [ip, #1]	@ zero_extendqisi2
+ 347              	.LVL33:
+  87:../Core/Src/packet_encode.c **** 
+  88:../Core/Src/packet_encode.c ****     // First de-stuff the packet
+  89:../Core/Src/packet_encode.c ****     int next_cobs_byte = 3;
+ 348              		.loc 1 89 5 is_stmt 1 view .LVU102
+  90:../Core/Src/packet_encode.c ****     while (next_cobs_byte < dataSize - 1) {
+ 349              		.loc 1 90 5 view .LVU103
+  89:../Core/Src/packet_encode.c ****     while (next_cobs_byte < dataSize - 1) {
+ 350              		.loc 1 89 9 is_stmt 0 view .LVU104
+ 351 000a 0323     		movs	r3, #3
+ 352              		.loc 1 90 11 view .LVU105
+ 353 000c 04E0     		b	.L27
+ 354              	.LVL34:
+ 355              	.L33:
+ 356              	.LBB6:
+  91:../Core/Src/packet_encode.c ****         int increment = rawData[next_cobs_byte];
+  92:../Core/Src/packet_encode.c ****         if (increment == 0) return 0;
+  93:../Core/Src/packet_encode.c ****         rawData[next_cobs_byte] = 0;
+ 357              		.loc 1 93 9 is_stmt 1 view .LVU106
+ 358              		.loc 1 93 33 is_stmt 0 view .LVU107
+ 359 000e 4FF0000E 		mov	lr, #0
+ 360 0012 0CF803E0 		strb	lr, [ip, r3]
+  94:../Core/Src/packet_encode.c **** 
+  95:../Core/Src/packet_encode.c ****         next_cobs_byte += increment;
+ 361              		.loc 1 95 9 is_stmt 1 view .LVU108
+ 362              		.loc 1 95 24 is_stmt 0 view .LVU109
+ 363 0016 2344     		add	r3, r3, r4
+ 364              	.LVL35:
+ 365              	.L27:
+ 366              		.loc 1 95 24 view .LVU110
+ 367              	.LBE6:
+  90:../Core/Src/packet_encode.c ****         int increment = rawData[next_cobs_byte];
+ 368              		.loc 1 90 11 is_stmt 1 view .LVU111
+  90:../Core/Src/packet_encode.c ****         int increment = rawData[next_cobs_byte];
+ 369              		.loc 1 90 38 is_stmt 0 view .LVU112
+ 370 0018 4C1E     		subs	r4, r1, #1
+  90:../Core/Src/packet_encode.c ****         int increment = rawData[next_cobs_byte];
+ 371              		.loc 1 90 11 view .LVU113
+ 372 001a 9C42     		cmp	r4, r3
+ 373 001c 05D9     		bls	.L32
+ 374              	.LBB7:
+  91:../Core/Src/packet_encode.c ****         int increment = rawData[next_cobs_byte];
+ 375              		.loc 1 91 9 is_stmt 1 view .LVU114
+  91:../Core/Src/packet_encode.c ****         int increment = rawData[next_cobs_byte];
+ 376              		.loc 1 91 32 is_stmt 0 view .LVU115
+ 377 001e 1CF80340 		ldrb	r4, [ip, r3]	@ zero_extendqisi2
+ 378              	.LVL36:
+  92:../Core/Src/packet_encode.c ****         rawData[next_cobs_byte] = 0;
+ 379              		.loc 1 92 9 is_stmt 1 view .LVU116
+  92:../Core/Src/packet_encode.c ****         rawData[next_cobs_byte] = 0;
+ 380              		.loc 1 92 12 is_stmt 0 view .LVU117
+ 381 0022 002C     		cmp	r4, #0
+ 382 0024 F3D1     		bne	.L33
+  92:../Core/Src/packet_encode.c ****         rawData[next_cobs_byte] = 0;
+ARM GAS  /tmp/ccF9undW.s 			page 10
+
+
+ 383              		.loc 1 92 36 view .LVU118
+ 384 0026 0025     		movs	r5, #0
+ 385              	.LVL37:
+  92:../Core/Src/packet_encode.c ****         rawData[next_cobs_byte] = 0;
+ 386              		.loc 1 92 36 view .LVU119
+ 387 0028 04E0     		b	.L28
+ 388              	.LVL38:
+ 389              	.L32:
+  92:../Core/Src/packet_encode.c ****         rawData[next_cobs_byte] = 0;
+ 390              		.loc 1 92 36 view .LVU120
+ 391              	.LBE7:
+  96:../Core/Src/packet_encode.c ****     }  
+  97:../Core/Src/packet_encode.c **** 
+  98:../Core/Src/packet_encode.c ****     memcpy(extractedData, rawData + 4, dataSize - 5);
+ 392              		.loc 1 98 5 is_stmt 1 view .LVU121
+ 393 002a 4A1F     		subs	r2, r1, #5
+ 394              	.LVL39:
+ 395              		.loc 1 98 5 is_stmt 0 view .LVU122
+ 396 002c 0CF10401 		add	r1, ip, #4
+ 397              	.LVL40:
+ 398              		.loc 1 98 5 view .LVU123
+ 399 0030 FFF7FEFF 		bl	memcpy
+ 400              	.LVL41:
+  99:../Core/Src/packet_encode.c **** 
+ 100:../Core/Src/packet_encode.c ****     return message_id;
+ 401              		.loc 1 100 5 is_stmt 1 view .LVU124
+ 402              	.L28:
+ 101:../Core/Src/packet_encode.c **** }
+ 403              		.loc 1 101 1 is_stmt 0 view .LVU125
+ 404 0034 2846     		mov	r0, r5
+ 405 0036 38BD     		pop	{r3, r4, r5, pc}
+ 406              		.cfi_endproc
+ 407              	.LFE3:
+ 409              		.section	.text.process_incoming_byte,"ax",%progbits
+ 410              		.align	1
+ 411              		.global	process_incoming_byte
+ 412              		.syntax unified
+ 413              		.thumb
+ 414              		.thumb_func
+ 415              		.fpu fpv5-d16
+ 417              	process_incoming_byte:
+ 418              	.LVL42:
+ 419              	.LFB4:
+ 102:../Core/Src/packet_encode.c **** 
+ 103:../Core/Src/packet_encode.c **** int process_incoming_byte(const uint8_t inputted_byte, uint8_t *buffer, const int current_buffer_si
+ 420              		.loc 1 103 104 is_stmt 1 view -0
+ 421              		.cfi_startproc
+ 422              		@ args = 0, pretend = 0, frame = 0
+ 423              		@ frame_needed = 0, uses_anonymous_args = 0
+ 424              		@ link register save eliminated.
+ 104:../Core/Src/packet_encode.c ****     if (inputted_byte == 0) { // New message started
+ 425              		.loc 1 104 5 view .LVU127
+ 426              		.loc 1 104 8 is_stmt 0 view .LVU128
+ 427 0000 48B1     		cbz	r0, .L39
+ 105:../Core/Src/packet_encode.c ****         buffer[0] = 0;
+ 106:../Core/Src/packet_encode.c ****         return 1;
+ 107:../Core/Src/packet_encode.c ****     }
+ARM GAS  /tmp/ccF9undW.s 			page 11
+
+
+ 108:../Core/Src/packet_encode.c **** 
+ 109:../Core/Src/packet_encode.c ****     if (current_buffer_size == 0)  // No currently active message
+ 428              		.loc 1 109 5 is_stmt 1 view .LVU129
+ 429              		.loc 1 109 8 is_stmt 0 view .LVU130
+ 430 0002 92B1     		cbz	r2, .L38
+ 110:../Core/Src/packet_encode.c ****         return 0;
+ 111:../Core/Src/packet_encode.c ****     
+ 112:../Core/Src/packet_encode.c **** 
+ 113:../Core/Src/packet_encode.c ****     buffer[current_buffer_size] = inputted_byte;
+ 431              		.loc 1 113 5 is_stmt 1 view .LVU131
+ 432              		.loc 1 113 33 is_stmt 0 view .LVU132
+ 433 0004 8854     		strb	r0, [r1, r2]
+ 114:../Core/Src/packet_encode.c **** 
+ 115:../Core/Src/packet_encode.c ****     if (current_buffer_size >= 2) { // We know the size
+ 434              		.loc 1 115 5 is_stmt 1 view .LVU133
+ 435              		.loc 1 115 8 is_stmt 0 view .LVU134
+ 436 0006 012A     		cmp	r2, #1
+ 437 0008 03DD     		ble	.L37
+ 116:../Core/Src/packet_encode.c ****         if (current_buffer_size + 1 >= buffer[2] + 5) {
+ 438              		.loc 1 116 9 is_stmt 1 view .LVU135
+ 439              		.loc 1 116 46 is_stmt 0 view .LVU136
+ 440 000a 8878     		ldrb	r0, [r1, #2]	@ zero_extendqisi2
+ 441              	.LVL43:
+ 442              		.loc 1 116 37 view .LVU137
+ 443 000c C31C     		adds	r3, r0, #3
+ 444              		.loc 1 116 12 view .LVU138
+ 445 000e 9342     		cmp	r3, r2
+ 446 0010 05DB     		blt	.L40
+ 447              	.L37:
+ 117:../Core/Src/packet_encode.c ****             return -buffer[2] - 5;
+ 118:../Core/Src/packet_encode.c ****         }
+ 119:../Core/Src/packet_encode.c ****     }
+ 120:../Core/Src/packet_encode.c ****     
+ 121:../Core/Src/packet_encode.c ****     return current_buffer_size + 1;
+ 448              		.loc 1 121 5 is_stmt 1 view .LVU139
+ 449              		.loc 1 121 32 is_stmt 0 view .LVU140
+ 450 0012 501C     		adds	r0, r2, #1
+ 451 0014 7047     		bx	lr
+ 452              	.LVL44:
+ 453              	.L39:
+ 105:../Core/Src/packet_encode.c ****         return 1;
+ 454              		.loc 1 105 9 is_stmt 1 view .LVU141
+ 105:../Core/Src/packet_encode.c ****         return 1;
+ 455              		.loc 1 105 19 is_stmt 0 view .LVU142
+ 456 0016 0023     		movs	r3, #0
+ 457 0018 0B70     		strb	r3, [r1]
+ 106:../Core/Src/packet_encode.c ****     }
+ 458              		.loc 1 106 9 is_stmt 1 view .LVU143
+ 106:../Core/Src/packet_encode.c ****     }
+ 459              		.loc 1 106 16 is_stmt 0 view .LVU144
+ 460 001a 0120     		movs	r0, #1
+ 461              	.LVL45:
+ 106:../Core/Src/packet_encode.c ****     }
+ 462              		.loc 1 106 16 view .LVU145
+ 463 001c 7047     		bx	lr
+ 464              	.LVL46:
+ 465              	.L40:
+ARM GAS  /tmp/ccF9undW.s 			page 12
+
+
+ 117:../Core/Src/packet_encode.c ****             return -buffer[2] - 5;
+ 466              		.loc 1 117 13 is_stmt 1 view .LVU146
+ 117:../Core/Src/packet_encode.c ****             return -buffer[2] - 5;
+ 467              		.loc 1 117 31 is_stmt 0 view .LVU147
+ 468 001e C0F1FF20 		rsb	r0, r0, #-16711936
+ 469 0022 00F57F00 		add	r0, r0, #16711680
+ 470 0026 FB30     		adds	r0, r0, #251
+ 471 0028 7047     		bx	lr
+ 472              	.LVL47:
+ 473              	.L38:
+ 110:../Core/Src/packet_encode.c ****     
+ 474              		.loc 1 110 16 view .LVU148
+ 475 002a 1046     		mov	r0, r2
+ 476              	.LVL48:
+ 122:../Core/Src/packet_encode.c **** }
+ 477              		.loc 1 122 1 view .LVU149
+ 478 002c 7047     		bx	lr
+ 479              		.cfi_endproc
+ 480              	.LFE4:
+ 482              		.text
+ 483              	.Letext0:
+ 484              		.file 2 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stdint.h"
+ 485              		.file 3 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stddef.h"
+ 486              		.file 4 "../Core/Include/crc_hash.h"
+ 487              		.file 5 "<built-in>"
+ARM GAS  /tmp/ccF9undW.s 			page 13
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 packet_encode.c
+     /tmp/ccF9undW.s:17     .text.cobs_encode:0000000000000000 $t
+     /tmp/ccF9undW.s:25     .text.cobs_encode:0000000000000000 cobs_encode
+     /tmp/ccF9undW.s:121    .text.generate_packet:0000000000000000 $t
+     /tmp/ccF9undW.s:128    .text.generate_packet:0000000000000000 generate_packet
+     /tmp/ccF9undW.s:207    .text.verify_packet:0000000000000000 $t
+     /tmp/ccF9undW.s:214    .text.verify_packet:0000000000000000 verify_packet
+     /tmp/ccF9undW.s:319    .text.extract_packet:0000000000000000 $t
+     /tmp/ccF9undW.s:326    .text.extract_packet:0000000000000000 extract_packet
+     /tmp/ccF9undW.s:410    .text.process_incoming_byte:0000000000000000 $t
+     /tmp/ccF9undW.s:417    .text.process_incoming_byte:0000000000000000 process_incoming_byte
+
+UNDEFINED SYMBOLS
+calculate_crc8_hash
+verify_crc8_hash
+memcpy

@@ -1,4 +1,9 @@
 {
     "cortex-debug.gdbPath": "/usr/bin/gdb-multiarch",
-    "stm32-for-vscode.openOCDPath": "/usr/local/bin/openocd"
+    "stm32-for-vscode.openOCDPath": "/usr/local/bin/openocd",
+    "files.associations": {
+        "port_layer.h": "c",
+        "globals.h": "c",
+        "port_config.h": "c"
+    }
 }

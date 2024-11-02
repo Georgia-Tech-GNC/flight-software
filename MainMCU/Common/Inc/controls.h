@@ -12,7 +12,7 @@
 #ifndef __CONTROLS_H__
 #define __CONTROLS_H__
 
-#include "arm_math.h" 
+#include "arm_math.h"
 
 typedef struct { 
 
@@ -36,7 +36,7 @@ typedef struct {
 
     float32_t vane_deflections[4]; //Desired vane deflections according to forces [Roll Vane 1, Roll Vane 2, Yaw Vane 1, Yaw Vane 2], degrees
     float32_t servo_deflections[4]; //Desired servo deflections according to servo drivetrain gear ratio, degrees
-
+    
     float32_t thrust_curve[15];
         //Thrust at each second from t = 0 to t = 14, i.e., thrust_curve = {T(0.0), T(1.0), T(2.0), T(3.0), etc.}
     float current_thrust;

@@ -2,6 +2,15 @@
 import os
 
 # Functions
+def list_subdirectories(path):
+    """Lists all subdirectories in the given path."""
+
+    subdirectories = []
+    for entry in os.scandir(path):
+        if entry.is_dir():
+            subdirectories.append(entry.name)
+    return subdirectories
+
 def find_file_with_ending(directory, ending):
     files = []
     for file in os.listdir(directory):
@@ -35,7 +44,12 @@ def comment_bad_lines(file_path, bad_lines, lines_to_comment):
             file_handler.write(line)
 
 # User input
-mcu = input("Choose MCU/Nucleo: ")
+list_subdir = list_subdirectories("MainMCU/")
+print("Choose MCU/Nucleo (Select a number):")
+for i in range(len(list_subdir)):
+    print(str(i) + ": " + list_subdir[i])
+mcu = list_subdir[int(input())]
+
 
 bad_handlers = ["PendSV_Handler", "SysTick_Handler", "SVC_Handler"]
 

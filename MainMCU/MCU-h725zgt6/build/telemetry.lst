@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccLWUe00.s 			page 1
+ARM GAS  /tmp/ccJLjvbv.s 			page 1
 
 
    1              		.cpu cortex-m7
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccLWUe00.s 			page 1
   28:../Core/Src/telemetry.c **** 
   29:../Core/Src/telemetry.c **** /**
   30:../Core/Src/telemetry.c ****  * Queue a message to be sent
-ARM GAS  /tmp/ccLWUe00.s 			page 2
+ARM GAS  /tmp/ccJLjvbv.s 			page 2
 
 
   31:../Core/Src/telemetry.c ****  * @param payload The payload of the message
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccLWUe00.s 			page 1
   49:../Core/Src/telemetry.c ****     return 1;
   65              		.loc 1 49 12 view .LVU11
   66 0022 0120     		movs	r0, #1
-ARM GAS  /tmp/ccLWUe00.s 			page 3
+ARM GAS  /tmp/ccJLjvbv.s 			page 3
 
 
   67              	.LVL5:
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccLWUe00.s 			page 1
  111              		.cfi_offset 4, -8
  112              		.cfi_offset 14, -4
  113 0002 0C46     		mov	r4, r1
-ARM GAS  /tmp/ccLWUe00.s 			page 4
+ARM GAS  /tmp/ccJLjvbv.s 			page 4
 
 
   60:../Core/Src/telemetry.c ****     int packet_size = generate_packet(message->payload, message->payload_size, packet_buf, message-
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccLWUe00.s 			page 1
  160              		.fpu fpv5-d16
  162              	telemetry_tx_task:
  163              	.LFB148:
-ARM GAS  /tmp/ccLWUe00.s 			page 5
+ARM GAS  /tmp/ccJLjvbv.s 			page 5
 
 
   15:../Core/Src/telemetry.c ****     /* Buffer to store the generated packet */
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccLWUe00.s 			page 1
  210              		.syntax unified
  211              		.thumb
  212              		.thumb_func
-ARM GAS  /tmp/ccLWUe00.s 			page 6
+ARM GAS  /tmp/ccJLjvbv.s 			page 6
 
 
  213              		.fpu fpv5-d16
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccLWUe00.s 			page 1
  231 0004 1446     		mov	r4, r2
  232 0006 1D46     		mov	r5, r3
  105:../Core/Src/telemetry.c ****     int next_packet_buffer_size = process_incoming_byte(byte, packet_buffer, *packet_buffer_size);
-ARM GAS  /tmp/ccLWUe00.s 			page 7
+ARM GAS  /tmp/ccJLjvbv.s 			page 7
 
 
  233              		.loc 1 105 5 is_stmt 1 view .LVU39
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccLWUe00.s 			page 1
  111:../Core/Src/telemetry.c ****             int extracted_buffer_size = next_packet_buffer_size - 5;
  268              		.loc 1 111 13 is_stmt 1 view .LVU53
  269              	.LVL26:
-ARM GAS  /tmp/ccLWUe00.s 			page 8
+ARM GAS  /tmp/ccJLjvbv.s 			page 8
 
 
  112:../Core/Src/telemetry.c ****             int message_id = extract_packet(packet_buffer, next_packet_buffer_size, extracted_buffe
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccLWUe00.s 			page 1
  316              	.L26:
   86:../Core/Src/telemetry.c ****     while (1) {
  317              		.loc 1 86 5 is_stmt 1 view .LVU64
-ARM GAS  /tmp/ccLWUe00.s 			page 9
+ARM GAS  /tmp/ccJLjvbv.s 			page 9
 
 
  318              	.LBB4:
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccLWUe00.s 			page 1
  361              	.LBE4:
  362              		.cfi_endproc
  363              	.LFE151:
-ARM GAS  /tmp/ccLWUe00.s 			page 10
+ARM GAS  /tmp/ccJLjvbv.s 			page 10
 
 
  365              		.text
@@ -555,25 +555,25 @@ ARM GAS  /tmp/ccLWUe00.s 			page 1
  376              		.file 11 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h"
  377              		.file 12 "../Core/Include/globals.h"
  378              		.file 13 "../Core/Include/packet_encode.h"
-ARM GAS  /tmp/ccLWUe00.s 			page 11
+ARM GAS  /tmp/ccJLjvbv.s 			page 11
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 telemetry.c
-     /tmp/ccLWUe00.s:17     .text.send_message:0000000000000000 $t
-     /tmp/ccLWUe00.s:25     .text.send_message:0000000000000000 send_message
-     /tmp/ccLWUe00.s:88     .text.send_message:0000000000000030 $d
-     /tmp/ccLWUe00.s:93     .text.uart_transmit_message:0000000000000000 $t
-     /tmp/ccLWUe00.s:100    .text.uart_transmit_message:0000000000000000 uart_transmit_message
-     /tmp/ccLWUe00.s:150    .text.uart_transmit_message:0000000000000024 $d
-     /tmp/ccLWUe00.s:155    .text.telemetry_tx_task:0000000000000000 $t
-     /tmp/ccLWUe00.s:162    .text.telemetry_tx_task:0000000000000000 telemetry_tx_task
-     /tmp/ccLWUe00.s:203    .text.telemetry_tx_task:0000000000000024 $d
-     /tmp/ccLWUe00.s:208    .text.rx_process_byte:0000000000000000 $t
-     /tmp/ccLWUe00.s:215    .text.rx_process_byte:0000000000000000 rx_process_byte
-     /tmp/ccLWUe00.s:284    .text.telemetry_rx_task:0000000000000000 $t
-     /tmp/ccLWUe00.s:291    .text.telemetry_rx_task:0000000000000000 telemetry_rx_task
-     /tmp/ccLWUe00.s:359    .text.telemetry_rx_task:0000000000000040 $d
+     /tmp/ccJLjvbv.s:17     .text.send_message:0000000000000000 $t
+     /tmp/ccJLjvbv.s:25     .text.send_message:0000000000000000 send_message
+     /tmp/ccJLjvbv.s:88     .text.send_message:0000000000000030 $d
+     /tmp/ccJLjvbv.s:93     .text.uart_transmit_message:0000000000000000 $t
+     /tmp/ccJLjvbv.s:100    .text.uart_transmit_message:0000000000000000 uart_transmit_message
+     /tmp/ccJLjvbv.s:150    .text.uart_transmit_message:0000000000000024 $d
+     /tmp/ccJLjvbv.s:155    .text.telemetry_tx_task:0000000000000000 $t
+     /tmp/ccJLjvbv.s:162    .text.telemetry_tx_task:0000000000000000 telemetry_tx_task
+     /tmp/ccJLjvbv.s:203    .text.telemetry_tx_task:0000000000000024 $d
+     /tmp/ccJLjvbv.s:208    .text.rx_process_byte:0000000000000000 $t
+     /tmp/ccJLjvbv.s:215    .text.rx_process_byte:0000000000000000 rx_process_byte
+     /tmp/ccJLjvbv.s:284    .text.telemetry_rx_task:0000000000000000 $t
+     /tmp/ccJLjvbv.s:291    .text.telemetry_rx_task:0000000000000000 telemetry_rx_task
+     /tmp/ccJLjvbv.s:359    .text.telemetry_rx_task:0000000000000040 $d
 
 UNDEFINED SYMBOLS
 xStreamBufferSend

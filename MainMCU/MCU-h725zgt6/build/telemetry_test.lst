@@ -1,0 +1,138 @@
+ARM GAS  /tmp/ccz7Tqdg.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.eabi_attribute 28, 1
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 1
+  10              		.eabi_attribute 34, 1
+  11              		.eabi_attribute 18, 4
+  12              		.file	"telemetry_test.c"
+  13              		.text
+  14              	.Ltext0:
+  15              		.cfi_sections	.debug_frame
+  16              		.section	.rodata.telemetry_test_task.str1.4,"aMS",%progbits,1
+  17              		.align	2
+  18              	.LC0:
+  19 0000 53656E64 		.ascii	"Sending message\012\000"
+  19      696E6720 
+  19      6D657373 
+  19      6167650A 
+  19      00
+  20              		.section	.text.telemetry_test_task,"ax",%progbits
+  21              		.align	1
+  22              		.global	telemetry_test_task
+  23              		.arch armv7e-m
+  24              		.syntax unified
+  25              		.thumb
+  26              		.thumb_func
+  27              		.fpu fpv5-d16
+  29              	telemetry_test_task:
+  30              	.LVL0:
+  31              	.LFB148:
+  32              		.file 1 "../Core/Tests/Src/telemetry_test.c"
+   1:../Core/Tests/Src/telemetry_test.c **** #include "telemetry_test.h"
+   2:../Core/Tests/Src/telemetry_test.c **** #include "telemetry.h"
+   3:../Core/Tests/Src/telemetry_test.c **** #include "stdint.h"
+   4:../Core/Tests/Src/telemetry_test.c **** #include "main.h"
+   5:../Core/Tests/Src/telemetry_test.c **** 
+   6:../Core/Tests/Src/telemetry_test.c **** #include "FreeRTOS.h"
+   7:../Core/Tests/Src/telemetry_test.c **** #include "task.h"
+   8:../Core/Tests/Src/telemetry_test.c **** 
+   9:../Core/Tests/Src/telemetry_test.c **** #include "globals.h"
+  10:../Core/Tests/Src/telemetry_test.c **** #include "port_config.h"
+  11:../Core/Tests/Src/telemetry_test.c **** 
+  12:../Core/Tests/Src/telemetry_test.c **** void telemetry_test_task(void *args) {
+  33              		.loc 1 12 38 view -0
+  34              		.cfi_startproc
+  35              		@ args = 0, pretend = 0, frame = 8
+  36              		@ frame_needed = 0, uses_anonymous_args = 0
+  37              		.loc 1 12 38 is_stmt 0 view .LVU1
+  38 0000 00B5     		push	{lr}
+  39              	.LCFI0:
+  40              		.cfi_def_cfa_offset 4
+  41              		.cfi_offset 14, -4
+  42 0002 83B0     		sub	sp, sp, #12
+ARM GAS  /tmp/ccz7Tqdg.s 			page 2
+
+
+  43              	.LCFI1:
+  44              		.cfi_def_cfa_offset 16
+  13:../Core/Tests/Src/telemetry_test.c **** 
+  14:../Core/Tests/Src/telemetry_test.c ****     uint8_t data[] = {0x01, 0x02, 0x03, 0x04};
+  45              		.loc 1 14 5 is_stmt 1 view .LVU2
+  46              		.loc 1 14 13 is_stmt 0 view .LVU3
+  47 0004 094B     		ldr	r3, .L4
+  48 0006 0193     		str	r3, [sp, #4]
+  15:../Core/Tests/Src/telemetry_test.c ****     uint8_t message_id = 0x03;
+  49              		.loc 1 15 5 is_stmt 1 view .LVU4
+  50              	.LVL1:
+  51              	.L2:
+  16:../Core/Tests/Src/telemetry_test.c **** 
+  17:../Core/Tests/Src/telemetry_test.c ****     while (1) {
+  52              		.loc 1 17 5 discriminator 1 view .LVU5
+  18:../Core/Tests/Src/telemetry_test.c ****         HAL_UART_Transmit(&debug_uart, "Sending message\n", 16, HAL_MAX_DELAY);
+  53              		.loc 1 18 9 discriminator 1 view .LVU6
+  54 0008 4FF0FF33 		mov	r3, #-1
+  55 000c 1022     		movs	r2, #16
+  56 000e 0849     		ldr	r1, .L4+4
+  57 0010 0848     		ldr	r0, .L4+8
+  58 0012 FFF7FEFF 		bl	HAL_UART_Transmit
+  59              	.LVL2:
+  19:../Core/Tests/Src/telemetry_test.c ****         send_message(data, 4, message_id);
+  60              		.loc 1 19 9 discriminator 1 view .LVU7
+  61 0016 0322     		movs	r2, #3
+  62 0018 0421     		movs	r1, #4
+  63 001a 0DEB0100 		add	r0, sp, r1
+  64 001e FFF7FEFF 		bl	send_message
+  65              	.LVL3:
+  20:../Core/Tests/Src/telemetry_test.c **** 
+  21:../Core/Tests/Src/telemetry_test.c ****         vTaskDelay(1000);
+  66              		.loc 1 21 9 discriminator 1 view .LVU8
+  67 0022 4FF47A70 		mov	r0, #1000
+  68 0026 FFF7FEFF 		bl	vTaskDelay
+  69              	.LVL4:
+  17:../Core/Tests/Src/telemetry_test.c ****         HAL_UART_Transmit(&debug_uart, "Sending message\n", 16, HAL_MAX_DELAY);
+  70              		.loc 1 17 11 discriminator 1 view .LVU9
+  71 002a EDE7     		b	.L2
+  72              	.L5:
+  73              		.align	2
+  74              	.L4:
+  75 002c 01020304 		.word	67305985
+  76 0030 00000000 		.word	.LC0
+  77 0034 00000000 		.word	huart2
+  78              		.cfi_endproc
+  79              	.LFE148:
+  81              		.text
+  82              	.Letext0:
+  83              		.file 2 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stdint.h"
+  84              		.file 3 "Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h725xx.h"
+  85              		.file 4 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_def.h"
+  86              		.file 5 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dma.h"
+  87              		.file 6 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h"
+  88              		.file 7 "../Core/Include/telemetry.h"
+  89              		.file 8 "../Core/FreeRTOS-Kernel/include/task.h"
+  90              		.file 9 "../Core/Include/globals.h"
+ARM GAS  /tmp/ccz7Tqdg.s 			page 3
+
+
+ARM GAS  /tmp/ccz7Tqdg.s 			page 4
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 telemetry_test.c
+     /tmp/ccz7Tqdg.s:17     .rodata.telemetry_test_task.str1.4:0000000000000000 $d
+     /tmp/ccz7Tqdg.s:21     .text.telemetry_test_task:0000000000000000 $t
+     /tmp/ccz7Tqdg.s:29     .text.telemetry_test_task:0000000000000000 telemetry_test_task
+     /tmp/ccz7Tqdg.s:75     .text.telemetry_test_task:000000000000002c $d
+
+UNDEFINED SYMBOLS
+HAL_UART_Transmit
+send_message
+vTaskDelay
+huart2

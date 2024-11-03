@@ -25,6 +25,8 @@ extern UART_HandleTypeDef debug_uart;
 
 extern SPI_HandleTypeDef sd_spi;
 
+extern OSPI_HandleTypeDef flash_spi;
+
 extern uint8_t *g_current_state;
 
 #endif

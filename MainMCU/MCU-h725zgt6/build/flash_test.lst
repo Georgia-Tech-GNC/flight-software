@@ -1,0 +1,470 @@
+ARM GAS  /tmp/cc0N9Yp1.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.eabi_attribute 28, 1
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 1
+  10              		.eabi_attribute 34, 1
+  11              		.eabi_attribute 18, 4
+  12              		.file	"flash_test.c"
+  13              		.text
+  14              	.Ltext0:
+  15              		.cfi_sections	.debug_frame
+  16              		.section	.rodata.flash_test_task.str1.4,"aMS",%progbits,1
+  17              		.align	2
+  18              	.LC0:
+  19 0000 496E6974 		.ascii	"Init failed\012\000"
+  19      20666169 
+  19      6C65640A 
+  19      00
+  20 000d 000000   		.align	2
+  21              	.LC1:
+  22 0010 496E6974 		.ascii	"Init success\012\000"
+  22      20737563 
+  22      63657373 
+  22      0A00
+  23 001e 0000     		.align	2
+  24              	.LC2:
+  25 0020 57726974 		.ascii	"Write failed\012\000"
+  25      65206661 
+  25      696C6564 
+  25      0A00
+  26 002e 0000     		.align	2
+  27              	.LC3:
+  28 0030 57726974 		.ascii	"Write success\012\000"
+  28      65207375 
+  28      63636573 
+  28      730A00
+  29 003f 00       		.align	2
+  30              	.LC4:
+  31 0040 52656164 		.ascii	"Read failed\012\000"
+  31      20666169 
+  31      6C65640A 
+  31      00
+  32 004d 000000   		.align	2
+  33              	.LC5:
+  34 0050 52656164 		.ascii	"Read success\012\000"
+  34      20737563 
+  34      63657373 
+  34      0A00
+  35 005e 0000     		.align	2
+  36              	.LC6:
+  37 0060 44617461 		.ascii	"Data: %02X\012\000"
+  37      3A202530 
+  37      32580A00 
+ARM GAS  /tmp/cc0N9Yp1.s 			page 2
+
+
+  38              		.align	2
+  39              	.LC7:
+  40 006c 44617461 		.ascii	"Data is the same\012\000"
+  40      20697320 
+  40      74686520 
+  40      73616D65 
+  40      0A00
+  41 007e 0000     		.align	2
+  42              	.LC8:
+  43 0080 44617461 		.ascii	"Data is different\012\000"
+  43      20697320 
+  43      64696666 
+  43      6572656E 
+  43      740A00
+  44              		.section	.text.flash_test_task,"ax",%progbits
+  45              		.align	1
+  46              		.global	flash_test_task
+  47              		.arch armv7e-m
+  48              		.syntax unified
+  49              		.thumb
+  50              		.thumb_func
+  51              		.fpu fpv5-d16
+  53              	flash_test_task:
+  54              	.LVL0:
+  55              	.LFB148:
+  56              		.file 1 "../Core/Tests/Src/flash_test.c"
+   1:../Core/Tests/Src/flash_test.c **** #include "flash_test.h"
+   2:../Core/Tests/Src/flash_test.c **** #include "globals.h"
+   3:../Core/Tests/Src/flash_test.c **** #include "w25q.h"
+   4:../Core/Tests/Src/flash_test.c **** 
+   5:../Core/Tests/Src/flash_test.c **** void flash_test_task(void *args) {
+  57              		.loc 1 5 34 view -0
+  58              		.cfi_startproc
+  59              		@ args = 0, pretend = 0, frame = 144
+  60              		@ frame_needed = 0, uses_anonymous_args = 0
+  61              		.loc 1 5 34 is_stmt 0 view .LVU1
+  62 0000 30B5     		push	{r4, r5, lr}
+  63              	.LCFI0:
+  64              		.cfi_def_cfa_offset 12
+  65              		.cfi_offset 4, -12
+  66              		.cfi_offset 5, -8
+  67              		.cfi_offset 14, -4
+  68 0002 A5B0     		sub	sp, sp, #148
+  69              	.LCFI1:
+  70              		.cfi_def_cfa_offset 160
+   6:../Core/Tests/Src/flash_test.c ****     vTaskDelay(100);
+  71              		.loc 1 6 5 is_stmt 1 view .LVU2
+  72 0004 6420     		movs	r0, #100
+  73              	.LVL1:
+  74              		.loc 1 6 5 is_stmt 0 view .LVU3
+  75 0006 FFF7FEFF 		bl	vTaskDelay
+  76              	.LVL2:
+   7:../Core/Tests/Src/flash_test.c **** 
+   8:../Core/Tests/Src/flash_test.c ****     struct w25q_device device = {
+  77              		.loc 1 8 5 is_stmt 1 view .LVU4
+  78              		.loc 1 8 24 is_stmt 0 view .LVU5
+  79 000a 0023     		movs	r3, #0
+ARM GAS  /tmp/cc0N9Yp1.s 			page 3
+
+
+  80 000c 2293     		str	r3, [sp, #136]
+  81 000e 2393     		str	r3, [sp, #140]
+  82 0010 424B     		ldr	r3, .L19
+  83 0012 2293     		str	r3, [sp, #136]
+   9:../Core/Tests/Src/flash_test.c ****         .hospi = (void *) &flash_spi,
+  10:../Core/Tests/Src/flash_test.c ****         .status = 0,
+  11:../Core/Tests/Src/flash_test.c ****     };
+  12:../Core/Tests/Src/flash_test.c **** 
+  13:../Core/Tests/Src/flash_test.c ****     if (w25q_init(&device) != W25Q_ERR_OK) {
+  84              		.loc 1 13 5 is_stmt 1 view .LVU6
+  85              		.loc 1 13 9 is_stmt 0 view .LVU7
+  86 0014 22A8     		add	r0, sp, #136
+  87 0016 FFF7FEFF 		bl	w25q_init
+  88              	.LVL3:
+  89              		.loc 1 13 8 view .LVU8
+  90 001a 0028     		cmp	r0, #0
+  91 001c 36D0     		beq	.L2
+  14:../Core/Tests/Src/flash_test.c ****         HAL_UART_Transmit(&debug_uart, "Init failed\n", 12, HAL_MAX_DELAY);
+  92              		.loc 1 14 9 is_stmt 1 view .LVU9
+  93 001e 4FF0FF33 		mov	r3, #-1
+  94 0022 0C22     		movs	r2, #12
+  95 0024 3E49     		ldr	r1, .L19+4
+  96 0026 3F48     		ldr	r0, .L19+8
+  97 0028 FFF7FEFF 		bl	HAL_UART_Transmit
+  98              	.LVL4:
+  99              	.L3:
+  15:../Core/Tests/Src/flash_test.c ****     } else {
+  16:../Core/Tests/Src/flash_test.c ****         HAL_UART_Transmit(&debug_uart, "Init success\n", 13, HAL_MAX_DELAY);
+  17:../Core/Tests/Src/flash_test.c ****     }
+  18:../Core/Tests/Src/flash_test.c **** 
+  19:../Core/Tests/Src/flash_test.c **** 
+  20:../Core/Tests/Src/flash_test.c ****     uint8_t test_data[] = {0x01, 0x02, 0x03, 0x04};
+ 100              		.loc 1 20 5 view .LVU10
+ 101              		.loc 1 20 13 is_stmt 0 view .LVU11
+ 102 002c 3E4B     		ldr	r3, .L19+12
+ 103 002e 2193     		str	r3, [sp, #132]
+  21:../Core/Tests/Src/flash_test.c **** 
+  22:../Core/Tests/Src/flash_test.c ****     w25q_write_enable(&device, 1);
+ 104              		.loc 1 22 5 is_stmt 1 view .LVU12
+ 105 0030 0121     		movs	r1, #1
+ 106 0032 22A8     		add	r0, sp, #136
+ 107 0034 FFF7FEFF 		bl	w25q_write_enable
+ 108              	.LVL5:
+  23:../Core/Tests/Src/flash_test.c **** 
+  24:../Core/Tests/Src/flash_test.c ****     if (w25q_write_raw(&device, test_data, 4, 0) != W25Q_ERR_OK) {
+ 109              		.loc 1 24 5 view .LVU13
+ 110              		.loc 1 24 9 is_stmt 0 view .LVU14
+ 111 0038 0023     		movs	r3, #0
+ 112 003a 0422     		movs	r2, #4
+ 113 003c 21A9     		add	r1, sp, #132
+ 114 003e 22A8     		add	r0, sp, #136
+ 115 0040 FFF7FEFF 		bl	w25q_write_raw
+ 116              	.LVL6:
+ 117              		.loc 1 24 8 view .LVU15
+ 118 0044 50B3     		cbz	r0, .L4
+  25:../Core/Tests/Src/flash_test.c ****         HAL_UART_Transmit(&debug_uart, "Write failed\n", 13, HAL_MAX_DELAY);
+ 119              		.loc 1 25 9 is_stmt 1 view .LVU16
+ARM GAS  /tmp/cc0N9Yp1.s 			page 4
+
+
+ 120 0046 4FF0FF33 		mov	r3, #-1
+ 121 004a 0D22     		movs	r2, #13
+ 122 004c 3749     		ldr	r1, .L19+16
+ 123 004e 3548     		ldr	r0, .L19+8
+ 124 0050 FFF7FEFF 		bl	HAL_UART_Transmit
+ 125              	.LVL7:
+ 126              	.L5:
+  26:../Core/Tests/Src/flash_test.c ****     } else {
+  27:../Core/Tests/Src/flash_test.c ****         HAL_UART_Transmit(&debug_uart, "Write success\n", 14, HAL_MAX_DELAY);
+  28:../Core/Tests/Src/flash_test.c ****     }
+  29:../Core/Tests/Src/flash_test.c ****     
+  30:../Core/Tests/Src/flash_test.c ****     uint8_t read_data[32];
+ 127              		.loc 1 30 5 view .LVU17
+  31:../Core/Tests/Src/flash_test.c **** 
+  32:../Core/Tests/Src/flash_test.c ****     if (w25q_read_raw(&device, read_data, 4, 0) != W25Q_ERR_OK) {
+ 128              		.loc 1 32 5 view .LVU18
+ 129              		.loc 1 32 9 is_stmt 0 view .LVU19
+ 130 0054 0023     		movs	r3, #0
+ 131 0056 0422     		movs	r2, #4
+ 132 0058 19A9     		add	r1, sp, #100
+ 133 005a 22A8     		add	r0, sp, #136
+ 134 005c FFF7FEFF 		bl	w25q_read_raw
+ 135              	.LVL8:
+ 136              		.loc 1 32 8 view .LVU20
+ 137 0060 20B3     		cbz	r0, .L6
+  33:../Core/Tests/Src/flash_test.c ****         HAL_UART_Transmit(&debug_uart, "Read failed\n", 12, HAL_MAX_DELAY);
+ 138              		.loc 1 33 9 is_stmt 1 view .LVU21
+ 139 0062 4FF0FF33 		mov	r3, #-1
+ 140 0066 0C22     		movs	r2, #12
+ 141 0068 3149     		ldr	r1, .L19+20
+ 142 006a 2E48     		ldr	r0, .L19+8
+ 143 006c FFF7FEFF 		bl	HAL_UART_Transmit
+ 144              	.LVL9:
+ 145              	.L7:
+  34:../Core/Tests/Src/flash_test.c ****     } else {
+  35:../Core/Tests/Src/flash_test.c ****         HAL_UART_Transmit(&debug_uart, "Read success\n", 13, HAL_MAX_DELAY);
+  36:../Core/Tests/Src/flash_test.c ****     }
+  37:../Core/Tests/Src/flash_test.c **** 
+  38:../Core/Tests/Src/flash_test.c ****     int same_data = 1;
+ 146              		.loc 1 38 5 view .LVU22
+  39:../Core/Tests/Src/flash_test.c **** 
+  40:../Core/Tests/Src/flash_test.c ****     for (int i = 0; i < 4; i++) {
+ 147              		.loc 1 40 5 view .LVU23
+ 148              	.LBB2:
+ 149              		.loc 1 40 10 view .LVU24
+ 150              		.loc 1 40 14 is_stmt 0 view .LVU25
+ 151 0070 0023     		movs	r3, #0
+ 152              	.LVL10:
+ 153              	.L8:
+ 154              		.loc 1 40 21 is_stmt 1 discriminator 1 view .LVU26
+ 155              		.loc 1 40 5 is_stmt 0 discriminator 1 view .LVU27
+ 156 0072 032B     		cmp	r3, #3
+ 157 0074 22DC     		bgt	.L18
+  41:../Core/Tests/Src/flash_test.c ****         if (test_data[i] != read_data[i]) {
+ 158              		.loc 1 41 9 is_stmt 1 view .LVU28
+ 159              		.loc 1 41 22 is_stmt 0 view .LVU29
+ 160 0076 03F19002 		add	r2, r3, #144
+ARM GAS  /tmp/cc0N9Yp1.s 			page 5
+
+
+ 161 007a 6A44     		add	r2, sp, r2
+ 162 007c 12F80C1C 		ldrb	r1, [r2, #-12]	@ zero_extendqisi2
+ 163              		.loc 1 41 38 view .LVU30
+ 164 0080 12F82C2C 		ldrb	r2, [r2, #-44]	@ zero_extendqisi2
+ 165              		.loc 1 41 12 view .LVU31
+ 166 0084 9142     		cmp	r1, r2
+ 167 0086 1CD1     		bne	.L16
+  40:../Core/Tests/Src/flash_test.c ****         if (test_data[i] != read_data[i]) {
+ 168              		.loc 1 40 28 is_stmt 1 discriminator 2 view .LVU32
+  40:../Core/Tests/Src/flash_test.c ****         if (test_data[i] != read_data[i]) {
+ 169              		.loc 1 40 29 is_stmt 0 discriminator 2 view .LVU33
+ 170 0088 0133     		adds	r3, r3, #1
+ 171              	.LVL11:
+  40:../Core/Tests/Src/flash_test.c ****         if (test_data[i] != read_data[i]) {
+ 172              		.loc 1 40 29 discriminator 2 view .LVU34
+ 173 008a F2E7     		b	.L8
+ 174              	.LVL12:
+ 175              	.L2:
+  40:../Core/Tests/Src/flash_test.c ****         if (test_data[i] != read_data[i]) {
+ 176              		.loc 1 40 29 discriminator 2 view .LVU35
+ 177              	.LBE2:
+  16:../Core/Tests/Src/flash_test.c ****     }
+ 178              		.loc 1 16 9 is_stmt 1 view .LVU36
+ 179 008c 4FF0FF33 		mov	r3, #-1
+ 180 0090 0D22     		movs	r2, #13
+ 181 0092 2849     		ldr	r1, .L19+24
+ 182 0094 2348     		ldr	r0, .L19+8
+ 183 0096 FFF7FEFF 		bl	HAL_UART_Transmit
+ 184              	.LVL13:
+ 185 009a C7E7     		b	.L3
+ 186              	.L4:
+  27:../Core/Tests/Src/flash_test.c ****     }
+ 187              		.loc 1 27 9 view .LVU37
+ 188 009c 4FF0FF33 		mov	r3, #-1
+ 189 00a0 0E22     		movs	r2, #14
+ 190 00a2 2549     		ldr	r1, .L19+28
+ 191 00a4 1F48     		ldr	r0, .L19+8
+ 192 00a6 FFF7FEFF 		bl	HAL_UART_Transmit
+ 193              	.LVL14:
+ 194 00aa D3E7     		b	.L5
+ 195              	.L6:
+  35:../Core/Tests/Src/flash_test.c ****     }
+ 196              		.loc 1 35 9 view .LVU38
+ 197 00ac 4FF0FF33 		mov	r3, #-1
+ 198 00b0 0D22     		movs	r2, #13
+ 199 00b2 2249     		ldr	r1, .L19+32
+ 200 00b4 1B48     		ldr	r0, .L19+8
+ 201 00b6 FFF7FEFF 		bl	HAL_UART_Transmit
+ 202              	.LVL15:
+ 203 00ba D9E7     		b	.L7
+ 204              	.LVL16:
+ 205              	.L18:
+  38:../Core/Tests/Src/flash_test.c **** 
+ 206              		.loc 1 38 9 is_stmt 0 view .LVU39
+ 207 00bc 0125     		movs	r5, #1
+ 208              	.L9:
+ 209              	.LVL17:
+ARM GAS  /tmp/cc0N9Yp1.s 			page 6
+
+
+  42:../Core/Tests/Src/flash_test.c ****             same_data = 0;
+  43:../Core/Tests/Src/flash_test.c ****             break;
+  44:../Core/Tests/Src/flash_test.c ****         }
+  45:../Core/Tests/Src/flash_test.c ****     }
+  46:../Core/Tests/Src/flash_test.c **** 
+  47:../Core/Tests/Src/flash_test.c ****     char msg[100];
+ 210              		.loc 1 47 5 is_stmt 1 view .LVU40
+  48:../Core/Tests/Src/flash_test.c ****     
+  49:../Core/Tests/Src/flash_test.c ****     for (int i = 0; i < 4; i ++) {
+ 211              		.loc 1 49 5 view .LVU41
+ 212              	.LBB3:
+ 213              		.loc 1 49 10 view .LVU42
+ 214              		.loc 1 49 14 is_stmt 0 view .LVU43
+ 215 00be 0024     		movs	r4, #0
+ 216              		.loc 1 49 5 view .LVU44
+ 217 00c0 15E0     		b	.L11
+ 218              	.LVL18:
+ 219              	.L16:
+ 220              		.loc 1 49 5 view .LVU45
+ 221              	.LBE3:
+ 222              	.LBB5:
+  42:../Core/Tests/Src/flash_test.c ****             same_data = 0;
+ 223              		.loc 1 42 23 view .LVU46
+ 224 00c2 0025     		movs	r5, #0
+ 225 00c4 FBE7     		b	.L9
+ 226              	.LVL19:
+ 227              	.L12:
+  42:../Core/Tests/Src/flash_test.c ****             same_data = 0;
+ 228              		.loc 1 42 23 view .LVU47
+ 229              	.LBE5:
+ 230              	.LBB6:
+ 231              	.LBB4:
+  50:../Core/Tests/Src/flash_test.c ****         sprintf(msg, "Data: %02X\n", read_data[i]);
+ 232              		.loc 1 50 9 is_stmt 1 discriminator 3 view .LVU48
+ 233              		.loc 1 50 47 is_stmt 0 discriminator 3 view .LVU49
+ 234 00c6 04F19003 		add	r3, r4, #144
+ 235 00ca 6B44     		add	r3, sp, r3
+ 236              		.loc 1 50 9 discriminator 3 view .LVU50
+ 237 00cc 13F82C2C 		ldrb	r2, [r3, #-44]	@ zero_extendqisi2
+ 238 00d0 1B49     		ldr	r1, .L19+36
+ 239 00d2 6846     		mov	r0, sp
+ 240 00d4 FFF7FEFF 		bl	sprintf
+ 241              	.LVL20:
+  51:../Core/Tests/Src/flash_test.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) msg, strlen(msg), HAL_MAX_DELAY);
+ 242              		.loc 1 51 9 is_stmt 1 discriminator 3 view .LVU51
+ 243              		.loc 1 51 57 is_stmt 0 discriminator 3 view .LVU52
+ 244 00d8 6846     		mov	r0, sp
+ 245 00da FFF7FEFF 		bl	strlen
+ 246              	.LVL21:
+ 247              		.loc 1 51 9 discriminator 3 view .LVU53
+ 248 00de 4FF0FF33 		mov	r3, #-1
+ 249 00e2 82B2     		uxth	r2, r0
+ 250 00e4 6946     		mov	r1, sp
+ 251 00e6 0F48     		ldr	r0, .L19+8
+ 252 00e8 FFF7FEFF 		bl	HAL_UART_Transmit
+ 253              	.LVL22:
+ 254              	.LBE4:
+ARM GAS  /tmp/cc0N9Yp1.s 			page 7
+
+
+  49:../Core/Tests/Src/flash_test.c ****         sprintf(msg, "Data: %02X\n", read_data[i]);
+ 255              		.loc 1 49 28 is_stmt 1 discriminator 3 view .LVU54
+  49:../Core/Tests/Src/flash_test.c ****         sprintf(msg, "Data: %02X\n", read_data[i]);
+ 256              		.loc 1 49 30 is_stmt 0 discriminator 3 view .LVU55
+ 257 00ec 0134     		adds	r4, r4, #1
+ 258              	.LVL23:
+ 259              	.L11:
+  49:../Core/Tests/Src/flash_test.c ****         sprintf(msg, "Data: %02X\n", read_data[i]);
+ 260              		.loc 1 49 21 is_stmt 1 discriminator 1 view .LVU56
+  49:../Core/Tests/Src/flash_test.c ****         sprintf(msg, "Data: %02X\n", read_data[i]);
+ 261              		.loc 1 49 5 is_stmt 0 discriminator 1 view .LVU57
+ 262 00ee 032C     		cmp	r4, #3
+ 263 00f0 E9DD     		ble	.L12
+ 264              	.LBE6:
+  52:../Core/Tests/Src/flash_test.c ****     }
+  53:../Core/Tests/Src/flash_test.c **** 
+  54:../Core/Tests/Src/flash_test.c ****     if (same_data) {
+ 265              		.loc 1 54 5 is_stmt 1 view .LVU58
+ 266              		.loc 1 54 8 is_stmt 0 view .LVU59
+ 267 00f2 5DB1     		cbz	r5, .L13
+  55:../Core/Tests/Src/flash_test.c ****         HAL_UART_Transmit(&debug_uart, "Data is the same\n", 17, HAL_MAX_DELAY);
+ 268              		.loc 1 55 9 is_stmt 1 view .LVU60
+ 269 00f4 4FF0FF33 		mov	r3, #-1
+ 270 00f8 1122     		movs	r2, #17
+ 271 00fa 1249     		ldr	r1, .L19+40
+ 272 00fc 0948     		ldr	r0, .L19+8
+ 273 00fe FFF7FEFF 		bl	HAL_UART_Transmit
+ 274              	.LVL24:
+ 275              	.L14:
+  56:../Core/Tests/Src/flash_test.c ****     } else {
+  57:../Core/Tests/Src/flash_test.c ****         HAL_UART_Transmit(&debug_uart, "Data is different\n", 19, HAL_MAX_DELAY);
+  58:../Core/Tests/Src/flash_test.c ****     }
+  59:../Core/Tests/Src/flash_test.c **** 
+  60:../Core/Tests/Src/flash_test.c ****     while (1) {
+ 276              		.loc 1 60 5 discriminator 1 view .LVU61
+  61:../Core/Tests/Src/flash_test.c ****         vTaskDelay(1000);
+ 277              		.loc 1 61 9 discriminator 1 view .LVU62
+ 278 0102 4FF47A70 		mov	r0, #1000
+ 279 0106 FFF7FEFF 		bl	vTaskDelay
+ 280              	.LVL25:
+  60:../Core/Tests/Src/flash_test.c ****         vTaskDelay(1000);
+ 281              		.loc 1 60 11 discriminator 1 view .LVU63
+ 282 010a FAE7     		b	.L14
+ 283              	.L13:
+  57:../Core/Tests/Src/flash_test.c ****     }
+ 284              		.loc 1 57 9 view .LVU64
+ 285 010c 4FF0FF33 		mov	r3, #-1
+ 286 0110 1322     		movs	r2, #19
+ 287 0112 0D49     		ldr	r1, .L19+44
+ 288 0114 0348     		ldr	r0, .L19+8
+ 289 0116 FFF7FEFF 		bl	HAL_UART_Transmit
+ 290              	.LVL26:
+ 291 011a F2E7     		b	.L14
+ 292              	.L20:
+ 293              		.align	2
+ 294              	.L19:
+ 295 011c 00000000 		.word	hospi1
+ARM GAS  /tmp/cc0N9Yp1.s 			page 8
+
+
+ 296 0120 00000000 		.word	.LC0
+ 297 0124 00000000 		.word	huart2
+ 298 0128 01020304 		.word	67305985
+ 299 012c 20000000 		.word	.LC2
+ 300 0130 40000000 		.word	.LC4
+ 301 0134 10000000 		.word	.LC1
+ 302 0138 30000000 		.word	.LC3
+ 303 013c 50000000 		.word	.LC5
+ 304 0140 60000000 		.word	.LC6
+ 305 0144 6C000000 		.word	.LC7
+ 306 0148 80000000 		.word	.LC8
+ 307              		.cfi_endproc
+ 308              	.LFE148:
+ 310              		.text
+ 311              	.Letext0:
+ 312              		.file 2 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stdint.h"
+ 313              		.file 3 "Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h725xx.h"
+ 314              		.file 4 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_def.h"
+ 315              		.file 5 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dma.h"
+ 316              		.file 6 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_mdma.h"
+ 317              		.file 7 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_ospi.h"
+ 318              		.file 8 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h"
+ 319              		.file 9 "../Core/Include/globals.h"
+ 320              		.file 10 "../Core/Include/w25q.h"
+ 321              		.file 11 "<built-in>"
+ 322              		.file 12 "../Core/FreeRTOS-Kernel/include/task.h"
+ARM GAS  /tmp/cc0N9Yp1.s 			page 9
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 flash_test.c
+     /tmp/cc0N9Yp1.s:17     .rodata.flash_test_task.str1.4:0000000000000000 $d
+     /tmp/cc0N9Yp1.s:45     .text.flash_test_task:0000000000000000 $t
+     /tmp/cc0N9Yp1.s:53     .text.flash_test_task:0000000000000000 flash_test_task
+     /tmp/cc0N9Yp1.s:295    .text.flash_test_task:000000000000011c $d
+
+UNDEFINED SYMBOLS
+vTaskDelay
+w25q_init
+HAL_UART_Transmit
+w25q_write_enable
+w25q_write_raw
+w25q_read_raw
+sprintf
+strlen
+hospi1
+huart2

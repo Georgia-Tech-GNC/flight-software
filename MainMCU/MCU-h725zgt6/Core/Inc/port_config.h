@@ -7,6 +7,9 @@
 #define SD_CS_GPIO_PORT     GPIOG
 #define SD_CS_PIN           GPIO_PIN_10
 
+#define FLASH_CS_GPIO_PORT  GPIOG
+#define FLASH_CS_PIN        GPIO_PIN_6
+
 #define LD1_GPIO_PORT       GPIOB
 #define LD1_PIN             GPIO_PIN_0
 #define LD2_GPIO_PORT       GPIOE
@@ -19,5 +22,7 @@
 #define debug_uart          huart2
 
 #define sd_spi              hspi1
+
+#define flash_spi           hospi1
 
 #endif

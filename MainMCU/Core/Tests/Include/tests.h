@@ -5,7 +5,9 @@
 #include "sd_test.h"
 #include "uart_test.h"
 #include "state_test.h"
+#include "flash_test.h"
+#include "telemetry_test.h"
 
-#define test_task state_test_task
+#define test_task telemetry_test_task
 
 #endif

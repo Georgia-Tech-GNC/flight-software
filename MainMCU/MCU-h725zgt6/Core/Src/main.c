@@ -113,8 +113,8 @@ int main(void)
   MX_FATFS_Init();
   MX_OCTOSPI1_Init();
   /* USER CODE BEGIN 2 */
-  port_init();
-  port_start();
+  //port_init();
+  //port_start();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -122,7 +122,8 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
+    HAL_UART_Transmit(&telemetry_uart, "kms\r\n", 5, HAL_MAX_DELAY);
+    HAL_Delay(1000);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -213,7 +214,7 @@ static void MX_OCTOSPI1_Init(void)
   hospi1.Init.FreeRunningClock = HAL_OSPI_FREERUNCLK_DISABLE;
   hospi1.Init.ClockMode = HAL_OSPI_CLOCK_MODE_0;
   hospi1.Init.WrapSize = HAL_OSPI_WRAP_NOT_SUPPORTED;
-  hospi1.Init.ClockPrescaler = 1;
+  hospi1.Init.ClockPrescaler = 2;
   hospi1.Init.SampleShifting = HAL_OSPI_SAMPLE_SHIFTING_NONE;
   hospi1.Init.DelayHoldQuarterCycle = HAL_OSPI_DHQC_DISABLE;
   hospi1.Init.ChipSelectBoundary = 0;
@@ -300,7 +301,7 @@ static void MX_UART4_Init(void)
 
   /* USER CODE END UART4_Init 1 */
   huart4.Instance = UART4;
-  huart4.Init.BaudRate = 115200;
+  huart4.Init.BaudRate = 9600;
   huart4.Init.WordLength = UART_WORDLENGTH_8B;
   huart4.Init.StopBits = UART_STOPBITS_1;
   huart4.Init.Parity = UART_PARITY_NONE;

@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccz7Tqdg.s 			page 1
+ARM GAS  /tmp/ccZZhw7v.s 			page 1
 
 
    1              		.cpu cortex-m7
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccz7Tqdg.s 			page 1
   40              		.cfi_def_cfa_offset 4
   41              		.cfi_offset 14, -4
   42 0002 83B0     		sub	sp, sp, #12
-ARM GAS  /tmp/ccz7Tqdg.s 			page 2
+ARM GAS  /tmp/ccZZhw7v.s 			page 2
 
 
   43              	.LCFI1:
@@ -84,16 +84,17 @@ ARM GAS  /tmp/ccz7Tqdg.s 			page 1
   57 0010 0848     		ldr	r0, .L4+8
   58 0012 FFF7FEFF 		bl	HAL_UART_Transmit
   59              	.LVL2:
-  19:../Core/Tests/Src/telemetry_test.c ****         send_message(data, 4, message_id);
-  60              		.loc 1 19 9 discriminator 1 view .LVU7
+  19:../Core/Tests/Src/telemetry_test.c **** 
+  20:../Core/Tests/Src/telemetry_test.c ****         send_message(data, 4, message_id);
+  60              		.loc 1 20 9 discriminator 1 view .LVU7
   61 0016 0322     		movs	r2, #3
   62 0018 0421     		movs	r1, #4
   63 001a 0DEB0100 		add	r0, sp, r1
   64 001e FFF7FEFF 		bl	send_message
   65              	.LVL3:
-  20:../Core/Tests/Src/telemetry_test.c **** 
-  21:../Core/Tests/Src/telemetry_test.c ****         vTaskDelay(1000);
-  66              		.loc 1 21 9 discriminator 1 view .LVU8
+  21:../Core/Tests/Src/telemetry_test.c **** 
+  22:../Core/Tests/Src/telemetry_test.c ****         vTaskDelay(1000);
+  66              		.loc 1 22 9 discriminator 1 view .LVU8
   67 0022 4FF47A70 		mov	r0, #1000
   68 0026 FFF7FEFF 		bl	vTaskDelay
   69              	.LVL4:
@@ -117,19 +118,19 @@ ARM GAS  /tmp/ccz7Tqdg.s 			page 1
   87              		.file 6 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h"
   88              		.file 7 "../Core/Include/telemetry.h"
   89              		.file 8 "../Core/FreeRTOS-Kernel/include/task.h"
+ARM GAS  /tmp/ccZZhw7v.s 			page 3
+
+
   90              		.file 9 "../Core/Include/globals.h"
-ARM GAS  /tmp/ccz7Tqdg.s 			page 3
-
-
-ARM GAS  /tmp/ccz7Tqdg.s 			page 4
+ARM GAS  /tmp/ccZZhw7v.s 			page 4
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 telemetry_test.c
-     /tmp/ccz7Tqdg.s:17     .rodata.telemetry_test_task.str1.4:0000000000000000 $d
-     /tmp/ccz7Tqdg.s:21     .text.telemetry_test_task:0000000000000000 $t
-     /tmp/ccz7Tqdg.s:29     .text.telemetry_test_task:0000000000000000 telemetry_test_task
-     /tmp/ccz7Tqdg.s:75     .text.telemetry_test_task:000000000000002c $d
+     /tmp/ccZZhw7v.s:17     .rodata.telemetry_test_task.str1.4:0000000000000000 $d
+     /tmp/ccZZhw7v.s:21     .text.telemetry_test_task:0000000000000000 $t
+     /tmp/ccZZhw7v.s:29     .text.telemetry_test_task:0000000000000000 telemetry_test_task
+     /tmp/ccZZhw7v.s:75     .text.telemetry_test_task:000000000000002c $d
 
 UNDEFINED SYMBOLS
 HAL_UART_Transmit

@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccS4BENO.s 			page 1
+ARM GAS  /tmp/ccxgCAR7.s 			page 1
 
 
    1              		.cpu cortex-m7
@@ -49,39 +49,47 @@ ARM GAS  /tmp/ccS4BENO.s 			page 1
   19:../Core/Src/crc_hash.c ****  162, 108, 139, 23, 240, 62, 217, 78, 169, 103, 128, 28, 251, 53, 210, 234, 13, 195, 36, 184, 95, 1
   20:../Core/Src/crc_hash.c **** };
   21:../Core/Src/crc_hash.c **** 
-  22:../Core/Src/crc_hash.c **** uint8_t calculate_crc8_hash(const uint8_t *raw_data, const size_t data_size) {
-  29              		.loc 1 22 78 view -0
+  22:../Core/Src/crc_hash.c **** /** 
+  23:../Core/Src/crc_hash.c ****  * Returns the 8-bit CRC hash of this data
+  24:../Core/Src/crc_hash.c ****  * 
+  25:../Core/Src/crc_hash.c ****  * @param rawData   pointer to the data that the hash should be calculated for
+  26:../Core/Src/crc_hash.c ****  * @param dataSize  size of the data in bytes
+  27:../Core/Src/crc_hash.c ****  * 
+  28:../Core/Src/crc_hash.c ****  * @return the CRC8 hash of the data
+  29:../Core/Src/crc_hash.c ****  */
+  30:../Core/Src/crc_hash.c **** uint8_t calculate_crc8_hash(const uint8_t *raw_data, const size_t data_size) {
+ARM GAS  /tmp/ccxgCAR7.s 			page 2
+
+
+  29              		.loc 1 30 78 view -0
   30              		.cfi_startproc
   31              		@ args = 0, pretend = 0, frame = 0
   32              		@ frame_needed = 0, uses_anonymous_args = 0
   33              		@ link register save eliminated.
-  34              		.loc 1 22 78 is_stmt 0 view .LVU1
+  34              		.loc 1 30 78 is_stmt 0 view .LVU1
   35 0000 8446     		mov	ip, r0
-  23:../Core/Src/crc_hash.c ****     uint8_t crc = 0;
-ARM GAS  /tmp/ccS4BENO.s 			page 2
-
-
-  36              		.loc 1 23 5 is_stmt 1 view .LVU2
+  31:../Core/Src/crc_hash.c ****     uint8_t crc = 0;
+  36              		.loc 1 31 5 is_stmt 1 view .LVU2
   37              	.LVL1:
-  24:../Core/Src/crc_hash.c ****     for (int i = 0; i < data_size; i++)
-  38              		.loc 1 24 5 view .LVU3
+  32:../Core/Src/crc_hash.c ****     for (int i = 0; i < data_size; i++)
+  38              		.loc 1 32 5 view .LVU3
   39              	.LBB2:
-  40              		.loc 1 24 10 view .LVU4
-  41              		.loc 1 24 14 is_stmt 0 view .LVU5
+  40              		.loc 1 32 10 view .LVU4
+  41              		.loc 1 32 14 is_stmt 0 view .LVU5
   42 0002 0023     		movs	r3, #0
   43              	.LBE2:
-  23:../Core/Src/crc_hash.c ****     uint8_t crc = 0;
-  44              		.loc 1 23 13 view .LVU6
+  31:../Core/Src/crc_hash.c ****     uint8_t crc = 0;
+  44              		.loc 1 31 13 view .LVU6
   45 0004 1846     		mov	r0, r3
   46              	.LVL2:
   47              	.LBB3:
-  48              		.loc 1 24 21 is_stmt 1 view .LVU7
-  49              		.loc 1 24 5 is_stmt 0 view .LVU8
+  48              		.loc 1 32 21 is_stmt 1 view .LVU7
+  49              		.loc 1 32 5 is_stmt 0 view .LVU8
   50 0006 8B42     		cmp	r3, r1
   51 0008 0BD2     		bcs	.L8
   52              	.LBE3:
-  22:../Core/Src/crc_hash.c ****     uint8_t crc = 0;
-  53              		.loc 1 22 78 view .LVU9
+  30:../Core/Src/crc_hash.c ****     uint8_t crc = 0;
+  53              		.loc 1 30 78 view .LVU9
   54 000a 10B4     		push	{r4}
   55              	.LCFI0:
   56              		.cfi_def_cfa_offset 4
@@ -89,40 +97,40 @@ ARM GAS  /tmp/ccS4BENO.s 			page 1
   58              	.LVL3:
   59              	.L3:
   60              	.LBB4:
-  25:../Core/Src/crc_hash.c ****     {
-  26:../Core/Src/crc_hash.c ****         // XOR-in next input byte and get current CRC value = remainder 
-  27:../Core/Src/crc_hash.c ****         crc = crctable[raw_data[i] ^ crc];
-  61              		.loc 1 27 9 is_stmt 1 discriminator 3 view .LVU10
-  62              		.loc 1 27 32 is_stmt 0 discriminator 3 view .LVU11
+  33:../Core/Src/crc_hash.c ****     {
+  34:../Core/Src/crc_hash.c ****         // XOR-in next input byte and get current CRC value = remainder 
+  35:../Core/Src/crc_hash.c ****         crc = crctable[raw_data[i] ^ crc];
+  61              		.loc 1 35 9 is_stmt 1 discriminator 3 view .LVU10
+  62              		.loc 1 35 32 is_stmt 0 discriminator 3 view .LVU11
   63 000c 1CF80320 		ldrb	r2, [ip, r3]	@ zero_extendqisi2
-  64              		.loc 1 27 36 discriminator 3 view .LVU12
+  64              		.loc 1 35 36 discriminator 3 view .LVU12
   65 0010 4240     		eors	r2, r2, r0
-  66              		.loc 1 27 13 discriminator 3 view .LVU13
+  66              		.loc 1 35 13 discriminator 3 view .LVU13
   67 0012 044C     		ldr	r4, .L9
   68 0014 A05C     		ldrb	r0, [r4, r2]	@ zero_extendqisi2
   69              	.LVL4:
-  24:../Core/Src/crc_hash.c ****     {
-  70              		.loc 1 24 36 is_stmt 1 discriminator 3 view .LVU14
-  24:../Core/Src/crc_hash.c ****     {
-  71              		.loc 1 24 37 is_stmt 0 discriminator 3 view .LVU15
+  32:../Core/Src/crc_hash.c ****     {
+  70              		.loc 1 32 36 is_stmt 1 discriminator 3 view .LVU14
+  32:../Core/Src/crc_hash.c ****     {
+  71              		.loc 1 32 37 is_stmt 0 discriminator 3 view .LVU15
   72 0016 0133     		adds	r3, r3, #1
   73              	.LVL5:
-  24:../Core/Src/crc_hash.c ****     {
-  74              		.loc 1 24 21 is_stmt 1 discriminator 3 view .LVU16
-  24:../Core/Src/crc_hash.c ****     {
-  75              		.loc 1 24 5 is_stmt 0 discriminator 3 view .LVU17
+  32:../Core/Src/crc_hash.c ****     {
+  74              		.loc 1 32 21 is_stmt 1 discriminator 3 view .LVU16
+  32:../Core/Src/crc_hash.c ****     {
+ARM GAS  /tmp/ccxgCAR7.s 			page 3
+
+
+  75              		.loc 1 32 5 is_stmt 0 discriminator 3 view .LVU17
   76 0018 8B42     		cmp	r3, r1
   77 001a F7D3     		bcc	.L3
   78              	.LBE4:
-  28:../Core/Src/crc_hash.c ****     }
-  29:../Core/Src/crc_hash.c **** 
-  30:../Core/Src/crc_hash.c ****     return crc;
-  79              		.loc 1 30 5 is_stmt 1 view .LVU18
-ARM GAS  /tmp/ccS4BENO.s 			page 3
-
-
-  31:../Core/Src/crc_hash.c **** }
-  80              		.loc 1 31 1 is_stmt 0 view .LVU19
+  36:../Core/Src/crc_hash.c ****     }
+  37:../Core/Src/crc_hash.c **** 
+  38:../Core/Src/crc_hash.c ****     return crc;
+  79              		.loc 1 38 5 is_stmt 1 view .LVU18
+  39:../Core/Src/crc_hash.c **** }
+  80              		.loc 1 39 1 is_stmt 0 view .LVU19
   81 001c 5DF8044B 		ldr	r4, [sp], #4
   82              	.LCFI1:
   83              		.cfi_restore 4
@@ -130,7 +138,7 @@ ARM GAS  /tmp/ccS4BENO.s 			page 1
   85 0020 7047     		bx	lr
   86              	.LVL6:
   87              	.L8:
-  88              		.loc 1 31 1 view .LVU20
+  88              		.loc 1 39 1 view .LVU20
   89 0022 7047     		bx	lr
   90              	.L10:
   91              		.align	2
@@ -148,25 +156,40 @@ ARM GAS  /tmp/ccS4BENO.s 			page 1
  105              	verify_crc8_hash:
  106              	.LVL7:
  107              	.LFB4:
-  32:../Core/Src/crc_hash.c **** 
-  33:../Core/Src/crc_hash.c **** bool verify_crc8_hash(const uint8_t *data, const size_t data_size) {
- 108              		.loc 1 33 68 is_stmt 1 view -0
+  40:../Core/Src/crc_hash.c **** 
+  41:../Core/Src/crc_hash.c **** /**
+  42:../Core/Src/crc_hash.c ****  * Returns true if the crc8 hash is valid for this data. It assumes that the 8-bit crc hash immedia
+  43:../Core/Src/crc_hash.c ****  * 
+  44:../Core/Src/crc_hash.c ****  * @param rawData   pointer to the data that the hash should be verified for (last byte should be t
+  45:../Core/Src/crc_hash.c ****  * @param dataSize  size of the data in bytes (including the hash byte)
+  46:../Core/Src/crc_hash.c ****  * 
+  47:../Core/Src/crc_hash.c ****  * Note that size includes the hash byte. In other words, if you want to verify the hash of n bytes
+  48:../Core/Src/crc_hash.c ****  * an n+1 byte array where the first n bytes are the data and the n+1-th byte is the hash. 
+  49:../Core/Src/crc_hash.c ****  * data_size should also equal n+1.
+  50:../Core/Src/crc_hash.c ****  * 
+  51:../Core/Src/crc_hash.c ****  * @return true if the hash was valid, and false otherwise
+  52:../Core/Src/crc_hash.c ****  */
+  53:../Core/Src/crc_hash.c **** bool verify_crc8_hash(const uint8_t *data, const size_t data_size) {
+ 108              		.loc 1 53 68 is_stmt 1 view -0
  109              		.cfi_startproc
  110              		@ args = 0, pretend = 0, frame = 0
  111              		@ frame_needed = 0, uses_anonymous_args = 0
- 112              		.loc 1 33 68 is_stmt 0 view .LVU22
+ 112              		.loc 1 53 68 is_stmt 0 view .LVU22
  113 0000 08B5     		push	{r3, lr}
  114              	.LCFI2:
  115              		.cfi_def_cfa_offset 8
+ARM GAS  /tmp/ccxgCAR7.s 			page 4
+
+
  116              		.cfi_offset 3, -8
  117              		.cfi_offset 14, -4
-  34:../Core/Src/crc_hash.c ****     return 0 == calculate_crc8_hash(data, data_size);
- 118              		.loc 1 34 5 is_stmt 1 view .LVU23
- 119              		.loc 1 34 17 is_stmt 0 view .LVU24
+  54:../Core/Src/crc_hash.c ****     return 0 == calculate_crc8_hash(data, data_size);
+ 118              		.loc 1 54 5 is_stmt 1 view .LVU23
+ 119              		.loc 1 54 17 is_stmt 0 view .LVU24
  120 0002 FFF7FEFF 		bl	calculate_crc8_hash
  121              	.LVL8:
-  35:../Core/Src/crc_hash.c **** }...
- 122              		.loc 1 35 1 view .LVU25
+  55:../Core/Src/crc_hash.c **** }...
+ 122              		.loc 1 55 1 view .LVU25
  123 0006 B0FA80F0 		clz	r0, r0
  124 000a 4009     		lsrs	r0, r0, #5
  125 000c 08BD     		pop	{r3, pc}
@@ -178,9 +201,6 @@ ARM GAS  /tmp/ccS4BENO.s 			page 1
  132              		.set	.LANCHOR0,. + 0
  135              	crctable:
  136 0000 00E729CE 		.ascii	"\000\347)\316R\265{\234\244C\215j\366\021\3378\257H"
-ARM GAS  /tmp/ccS4BENO.s 			page 4
-
-
  136      52B57B9C 
  136      A4438D6A 
  136      F611DF38 
@@ -218,6 +238,9 @@ ARM GAS  /tmp/ccS4BENO.s 			page 1
  143 007d 925CBBCD 		.ascii	"\222\\\273\315*\344\003\237x\266Qi\216@\247;\334\022"
  143      2AE4039F 
  143      78B65169 
+ARM GAS  /tmp/ccxgCAR7.s 			page 5
+
+
  143      8E40A73B 
  143      DC12
  144 008f F562854B 		.ascii	"\365b\205K\2540\327\031\376\306!\357\010\224s\275Zt"
@@ -238,9 +261,6 @@ ARM GAS  /tmp/ccS4BENO.s 			page 1
  147 00c5 ED23C4FC 		.ascii	"\355#\304\374\033\3252\256I\207`\367\020\3369\245B\214"
  147      1BD532AE 
  147      498760F7 
-ARM GAS  /tmp/ccS4BENO.s 			page 5
-
-
  147      10DE39A5 
  147      428C
  148 00d7 6B53B47A 		.ascii	"kS\264z\235\001\346(\317\341\006\310/\263T\232}E\242"
@@ -259,17 +279,17 @@ ARM GAS  /tmp/ccS4BENO.s 			page 1
  152              	.Letext0:
  153              		.file 2 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stdint.h"
  154              		.file 3 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stddef.h"
-ARM GAS  /tmp/ccS4BENO.s 			page 6
+ARM GAS  /tmp/ccxgCAR7.s 			page 6
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 crc_hash.c
-     /tmp/ccS4BENO.s:17     .text.calculate_crc8_hash:0000000000000000 $t
-     /tmp/ccS4BENO.s:25     .text.calculate_crc8_hash:0000000000000000 calculate_crc8_hash
-     /tmp/ccS4BENO.s:93     .text.calculate_crc8_hash:0000000000000024 $d
-     /tmp/ccS4BENO.s:98     .text.verify_crc8_hash:0000000000000000 $t
-     /tmp/ccS4BENO.s:105    .text.verify_crc8_hash:0000000000000000 verify_crc8_hash
-     /tmp/ccS4BENO.s:135    .data.crctable:0000000000000000 crctable
-     /tmp/ccS4BENO.s:131    .data.crctable:0000000000000000 $d
+     /tmp/ccxgCAR7.s:17     .text.calculate_crc8_hash:0000000000000000 $t
+     /tmp/ccxgCAR7.s:25     .text.calculate_crc8_hash:0000000000000000 calculate_crc8_hash
+     /tmp/ccxgCAR7.s:93     .text.calculate_crc8_hash:0000000000000024 $d
+     /tmp/ccxgCAR7.s:98     .text.verify_crc8_hash:0000000000000000 $t
+     /tmp/ccxgCAR7.s:105    .text.verify_crc8_hash:0000000000000000 verify_crc8_hash
+     /tmp/ccxgCAR7.s:135    .data.crctable:0000000000000000 crctable
+     /tmp/ccxgCAR7.s:131    .data.crctable:0000000000000000 $d
 
 NO UNDEFINED SYMBOLS

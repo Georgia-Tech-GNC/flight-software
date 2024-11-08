@@ -22,6 +22,10 @@ uint8_t calculate_crc8_hash(const uint8_t *rawData, const size_t data_size);
  * @param rawData   pointer to the data that the hash should be verified for (last byte should be the hash)
  * @param dataSize  size of the data in bytes (including the hash byte)
  * 
+ * Note that size includes the hash byte. In other words, if you want to verify the hash of n bytes, pass in 
+ * an n+1 byte array where the first n bytes are the data and the n+1-th byte is the hash. 
+ * data_size should also equal n+1.
+ * 
  * @return true if the hash was valid, and false otherwise
  */
 bool verify_crc8_hash(const uint8_t *data, const size_t data_size);

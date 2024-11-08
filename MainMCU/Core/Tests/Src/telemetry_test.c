@@ -16,6 +16,7 @@ void telemetry_test_task(void *args) {
 
     while (1) {
         HAL_UART_Transmit(&debug_uart, "Sending message\n", 16, HAL_MAX_DELAY);
+
         send_message(data, 4, message_id);
 
         vTaskDelay(1000);

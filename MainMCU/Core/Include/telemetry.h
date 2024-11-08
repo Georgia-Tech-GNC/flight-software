@@ -14,11 +14,6 @@ typedef struct {
     uint8_t *payload;
 } Message;
 
-struct CommandStruct { // TODO: delegate to generated header file once that exists :) tomorrow night
-  uint8_t command_id;
-  uint8_t command_counter;
-};
-
 void telemetry_rx_task(void *args);
 void telemetry_tx_task(void *args);
 int send_message(uint8_t *payload, uint8_t payload_size, uint8_t message_id);

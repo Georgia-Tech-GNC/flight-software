@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccI5gi9p.s 			page 1
+ARM GAS  /tmp/ccetTm8w.s 			page 1
 
 
    1              		.cpu cortex-m7
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
   29:../Core/FreeRTOS-Kernel/timers.c **** /* Standard includes. */
   30:../Core/FreeRTOS-Kernel/timers.c **** #include <stdlib.h>
   31:../Core/FreeRTOS-Kernel/timers.c **** 
-ARM GAS  /tmp/ccI5gi9p.s 			page 2
+ARM GAS  /tmp/ccetTm8w.s 			page 2
 
 
   32:../Core/FreeRTOS-Kernel/timers.c **** /* Defining MPU_WRAPPERS_INCLUDED_FROM_API_FILE prevents task.h from redefining
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
   86:../Core/FreeRTOS-Kernel/timers.c ****         ListItem_t xTimerListItem;                                               /**< Standard link
   87:../Core/FreeRTOS-Kernel/timers.c ****         TickType_t xTimerPeriodInTicks;                                          /**< How quickly a
   88:../Core/FreeRTOS-Kernel/timers.c ****         void * pvTimerID;                                                        /**< An ID to iden
-ARM GAS  /tmp/ccI5gi9p.s 			page 3
+ARM GAS  /tmp/ccetTm8w.s 			page 3
 
 
   89:../Core/FreeRTOS-Kernel/timers.c ****         portTIMER_CALLBACK_ATTRIBUTE TimerCallbackFunction_t pxCallbackFunction; /**< The function 
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  143:../Core/FreeRTOS-Kernel/timers.c ****     PRIVILEGED_DATA static List_t xActiveTimerList1;
  144:../Core/FreeRTOS-Kernel/timers.c ****     PRIVILEGED_DATA static List_t xActiveTimerList2;
  145:../Core/FreeRTOS-Kernel/timers.c ****     PRIVILEGED_DATA static List_t * pxCurrentTimerList;
-ARM GAS  /tmp/ccI5gi9p.s 			page 4
+ARM GAS  /tmp/ccetTm8w.s 			page 4
 
 
  146:../Core/FreeRTOS-Kernel/timers.c ****     PRIVILEGED_DATA static List_t * pxOverflowTimerList;
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  200:../Core/FreeRTOS-Kernel/timers.c ****  * current timer list does not still reference some timers.
  201:../Core/FreeRTOS-Kernel/timers.c ****  */
  202:../Core/FreeRTOS-Kernel/timers.c ****     static void prvSwitchTimerLists( void ) PRIVILEGED_FUNCTION;
-ARM GAS  /tmp/ccI5gi9p.s 			page 5
+ARM GAS  /tmp/ccetTm8w.s 			page 5
 
 
  203:../Core/FreeRTOS-Kernel/timers.c **** 
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  257:../Core/FreeRTOS-Kernel/timers.c ****                     configSTACK_DEPTH_TYPE uxTimerTaskStackSize;
  258:../Core/FreeRTOS-Kernel/timers.c **** 
  259:../Core/FreeRTOS-Kernel/timers.c ****                     vApplicationGetTimerTaskMemory( &pxTimerTaskTCBBuffer, &pxTimerTaskStackBuffer,
-ARM GAS  /tmp/ccI5gi9p.s 			page 6
+ARM GAS  /tmp/ccetTm8w.s 			page 6
 
 
  260:../Core/FreeRTOS-Kernel/timers.c ****                     xTimerTaskHandle = xTaskCreateStaticAffinitySet( prvTimerTask,
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  314:../Core/FreeRTOS-Kernel/timers.c ****                                            ( ( UBaseType_t ) configTIMER_TASK_PRIORITY ) | portPRIV
  315:../Core/FreeRTOS-Kernel/timers.c ****                                            &xTimerTaskHandle );
  316:../Core/FreeRTOS-Kernel/timers.c ****                 }
-ARM GAS  /tmp/ccI5gi9p.s 			page 7
+ARM GAS  /tmp/ccetTm8w.s 			page 7
 
 
  317:../Core/FreeRTOS-Kernel/timers.c ****                 #endif /* configSUPPORT_STATIC_ALLOCATION */
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  371:../Core/FreeRTOS-Kernel/timers.c ****                                           const TickType_t xTimerPeriodInTicks,
  372:../Core/FreeRTOS-Kernel/timers.c ****                                           const BaseType_t xAutoReload,
  373:../Core/FreeRTOS-Kernel/timers.c ****                                           void * const pvTimerID,
-ARM GAS  /tmp/ccI5gi9p.s 			page 8
+ARM GAS  /tmp/ccetTm8w.s 			page 8
 
 
  374:../Core/FreeRTOS-Kernel/timers.c ****                                           TimerCallbackFunction_t pxCallbackFunction,
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  428:../Core/FreeRTOS-Kernel/timers.c ****          * created/initialised. */
  429:../Core/FreeRTOS-Kernel/timers.c ****         prvCheckForValidListAndQueue();
  430:../Core/FreeRTOS-Kernel/timers.c **** 
-ARM GAS  /tmp/ccI5gi9p.s 			page 9
+ARM GAS  /tmp/ccetTm8w.s 			page 9
 
 
  431:../Core/FreeRTOS-Kernel/timers.c ****         /* Initialise the timer structure members using the function
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  485:../Core/FreeRTOS-Kernel/timers.c **** 
  486:../Core/FreeRTOS-Kernel/timers.c ****             traceTIMER_COMMAND_SEND( xTimer, xCommandID, xOptionalValue, xReturn );
  487:../Core/FreeRTOS-Kernel/timers.c ****         }
-ARM GAS  /tmp/ccI5gi9p.s 			page 10
+ARM GAS  /tmp/ccetTm8w.s 			page 10
 
 
  488:../Core/FreeRTOS-Kernel/timers.c ****         else
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  542:../Core/FreeRTOS-Kernel/timers.c **** 
  543:../Core/FreeRTOS-Kernel/timers.c ****     TaskHandle_t xTimerGetTimerDaemonTaskHandle( void )
  544:../Core/FreeRTOS-Kernel/timers.c ****     {
-ARM GAS  /tmp/ccI5gi9p.s 			page 11
+ARM GAS  /tmp/ccetTm8w.s 			page 11
 
 
  545:../Core/FreeRTOS-Kernel/timers.c ****         traceENTER_xTimerGetTimerDaemonTaskHandle();
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  599:../Core/FreeRTOS-Kernel/timers.c ****         BaseType_t xReturn;
  600:../Core/FreeRTOS-Kernel/timers.c **** 
  601:../Core/FreeRTOS-Kernel/timers.c ****         traceENTER_xTimerGetReloadMode( xTimer );
-ARM GAS  /tmp/ccI5gi9p.s 			page 12
+ARM GAS  /tmp/ccetTm8w.s 			page 12
 
 
  602:../Core/FreeRTOS-Kernel/timers.c **** 
@@ -718,7 +718,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  656:../Core/FreeRTOS-Kernel/timers.c ****                                           StaticTimer_t ** ppxTimerBuffer )
  657:../Core/FreeRTOS-Kernel/timers.c ****         {
  658:../Core/FreeRTOS-Kernel/timers.c ****             BaseType_t xReturn;
-ARM GAS  /tmp/ccI5gi9p.s 			page 13
+ARM GAS  /tmp/ccetTm8w.s 			page 13
 
 
  659:../Core/FreeRTOS-Kernel/timers.c ****             Timer_t * pxTimer = xTimer;
@@ -778,7 +778,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  713:../Core/FreeRTOS-Kernel/timers.c ****             pxTimer->pxCallbackFunction( ( TimerHandle_t ) pxTimer );
  714:../Core/FreeRTOS-Kernel/timers.c ****         }
  715:../Core/FreeRTOS-Kernel/timers.c ****     }
-ARM GAS  /tmp/ccI5gi9p.s 			page 14
+ARM GAS  /tmp/ccetTm8w.s 			page 14
 
 
  716:../Core/FreeRTOS-Kernel/timers.c **** /*-----------------------------------------------------------*/
@@ -838,7 +838,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  770:../Core/FreeRTOS-Kernel/timers.c ****             xNextExpireTime = prvGetNextExpireTime( &xListWasEmpty );
  771:../Core/FreeRTOS-Kernel/timers.c **** 
  772:../Core/FreeRTOS-Kernel/timers.c ****             /* If a timer has expired, process it.  Otherwise, block this task
-ARM GAS  /tmp/ccI5gi9p.s 			page 15
+ARM GAS  /tmp/ccetTm8w.s 			page 15
 
 
  773:../Core/FreeRTOS-Kernel/timers.c ****              * until either a timer does expire, or a command is received. */
@@ -898,7 +898,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  827:../Core/FreeRTOS-Kernel/timers.c ****                          * will not cause the task to block. */
  828:../Core/FreeRTOS-Kernel/timers.c ****                         taskYIELD_WITHIN_API();
  829:../Core/FreeRTOS-Kernel/timers.c ****                     }
-ARM GAS  /tmp/ccI5gi9p.s 			page 16
+ARM GAS  /tmp/ccetTm8w.s 			page 16
 
 
  830:../Core/FreeRTOS-Kernel/timers.c ****                     else
@@ -958,7 +958,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
   52              	.LVL1:
   53              		.loc 1 859 29 view .LVU10
   54 0012 7047     		bx	lr
-ARM GAS  /tmp/ccI5gi9p.s 			page 17
+ARM GAS  /tmp/ccetTm8w.s 			page 17
 
 
   55              	.LVL2:
@@ -1018,7 +1018,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  886:../Core/FreeRTOS-Kernel/timers.c ****         }
  887:../Core/FreeRTOS-Kernel/timers.c **** 
  888:../Core/FreeRTOS-Kernel/timers.c ****         xLastTime = xTimeNow;
-ARM GAS  /tmp/ccI5gi9p.s 			page 18
+ARM GAS  /tmp/ccetTm8w.s 			page 18
 
 
  889:../Core/FreeRTOS-Kernel/timers.c **** 
@@ -1078,7 +1078,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  114              		.loc 1 912 34 view .LVU26
  115 0012 0120     		movs	r0, #1
  116              	.LVL8:
-ARM GAS  /tmp/ccI5gi9p.s 			page 19
+ARM GAS  /tmp/ccetTm8w.s 			page 19
 
 
  117              	.L8:
@@ -1138,7 +1138,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  142              	.LVL14:
  921:../Core/FreeRTOS-Kernel/timers.c ****             {
  143              		.loc 1 921 45 view .LVU34
-ARM GAS  /tmp/ccI5gi9p.s 			page 20
+ARM GAS  /tmp/ccetTm8w.s 			page 20
 
 
  144 002a 0122     		movcc	r2, #1
@@ -1198,7 +1198,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  702:../Core/FreeRTOS-Kernel/timers.c ****         /* Insert the timer into the appropriate list for the next expiry time.
  191              		.loc 1 702 5 is_stmt 1 view -0
  192              		.cfi_startproc
-ARM GAS  /tmp/ccI5gi9p.s 			page 21
+ARM GAS  /tmp/ccetTm8w.s 			page 21
 
 
  193              		@ args = 0, pretend = 0, frame = 0
@@ -1258,7 +1258,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  234 001e FFF7FEFF 		bl	prvInsertTimerInActiveList
  235              	.LVL25:
  706:../Core/FreeRTOS-Kernel/timers.c ****         {
-ARM GAS  /tmp/ccI5gi9p.s 			page 22
+ARM GAS  /tmp/ccetTm8w.s 			page 22
 
 
  236              		.loc 1 706 14 view .LVU58
@@ -1318,7 +1318,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  282 0010 FFF7FEFF 		bl	uxListRemove
  283              	.LVL29:
  733:../Core/FreeRTOS-Kernel/timers.c ****         {
-ARM GAS  /tmp/ccI5gi9p.s 			page 23
+ARM GAS  /tmp/ccetTm8w.s 			page 23
 
 
  284              		.loc 1 733 9 is_stmt 1 view .LVU69
@@ -1378,7 +1378,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  936:../Core/FreeRTOS-Kernel/timers.c **** /*-----------------------------------------------------------*/
  937:../Core/FreeRTOS-Kernel/timers.c **** 
  938:../Core/FreeRTOS-Kernel/timers.c ****     static void prvProcessReceivedCommands( void )
-ARM GAS  /tmp/ccI5gi9p.s 			page 24
+ARM GAS  /tmp/ccetTm8w.s 			page 24
 
 
  939:../Core/FreeRTOS-Kernel/timers.c ****     {
@@ -1438,7 +1438,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  993:../Core/FreeRTOS-Kernel/timers.c ****                  *  queue with a time that is ahead of the timer daemon task (because it
  994:../Core/FreeRTOS-Kernel/timers.c ****                  *  pre-empted the timer daemon task after the xTimeNow value was set). */
  995:../Core/FreeRTOS-Kernel/timers.c ****                 xTimeNow = prvSampleTimeNow( &xTimerListsWereSwitched );
-ARM GAS  /tmp/ccI5gi9p.s 			page 25
+ARM GAS  /tmp/ccetTm8w.s 			page 25
 
 
  996:../Core/FreeRTOS-Kernel/timers.c **** 
@@ -1498,7 +1498,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
 1050:../Core/FreeRTOS-Kernel/timers.c **** 
 1051:../Core/FreeRTOS-Kernel/timers.c ****                     case tmrCOMMAND_DELETE:
 1052:../Core/FreeRTOS-Kernel/timers.c ****                         #if ( configSUPPORT_DYNAMIC_ALLOCATION == 1 )
-ARM GAS  /tmp/ccI5gi9p.s 			page 26
+ARM GAS  /tmp/ccetTm8w.s 			page 26
 
 
 1053:../Core/FreeRTOS-Kernel/timers.c ****                         {
@@ -1558,7 +1558,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  341              		.loc 1 1095 9 view .LVU83
  342              		.loc 1 1095 14 is_stmt 0 view .LVU84
  343 0002 05E0     		b	.L30
-ARM GAS  /tmp/ccI5gi9p.s 			page 27
+ARM GAS  /tmp/ccetTm8w.s 			page 27
 
 
  344              	.L31:
@@ -1618,7 +1618,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  382 002c 00000000 		.word	.LANCHOR1
  383              		.cfi_endproc
  384              	.LFE25:
-ARM GAS  /tmp/ccI5gi9p.s 			page 28
+ARM GAS  /tmp/ccetTm8w.s 			page 28
 
 
  386              		.section	.text.prvSampleTimeNow,"ax",%progbits
@@ -1678,7 +1678,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  429              	.LVL40:
  430              	.L37:
  888:../Core/FreeRTOS-Kernel/timers.c **** 
-ARM GAS  /tmp/ccI5gi9p.s 			page 29
+ARM GAS  /tmp/ccetTm8w.s 			page 29
 
 
  431              		.loc 1 888 9 is_stmt 1 view .LVU110
@@ -1738,7 +1738,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  479              	.LCFI6:
  480              		.cfi_def_cfa_offset 24
  481 0004 0646     		mov	r6, r0
-ARM GAS  /tmp/ccI5gi9p.s 			page 30
+ARM GAS  /tmp/ccetTm8w.s 			page 30
 
 
  482 0006 0C46     		mov	r4, r1
@@ -1798,7 +1798,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  521 0032 1868     		ldr	r0, [r3]
  522              	.LVL47:
  820:../Core/FreeRTOS-Kernel/timers.c **** 
-ARM GAS  /tmp/ccI5gi9p.s 			page 31
+ARM GAS  /tmp/ccetTm8w.s 			page 31
 
 
  523              		.loc 1 820 21 is_stmt 0 view .LVU134
@@ -1858,7 +1858,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  817:../Core/FreeRTOS-Kernel/timers.c ****                     }
  566              		.loc 1 817 41 view .LVU146
  567 0064 E2E7     		b	.L46
-ARM GAS  /tmp/ccI5gi9p.s 			page 32
+ARM GAS  /tmp/ccetTm8w.s 			page 32
 
 
  568              	.LVL55:
@@ -1918,7 +1918,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  617 0008 0393     		str	r3, [sp, #12]
  618 000a 0493     		str	r3, [sp, #16]
  619 000c 0593     		str	r3, [sp, #20]
-ARM GAS  /tmp/ccI5gi9p.s 			page 33
+ARM GAS  /tmp/ccetTm8w.s 			page 33
 
 
  941:../Core/FreeRTOS-Kernel/timers.c ****         BaseType_t xTimerListsWereSwitched;
@@ -1978,7 +1978,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  656              		.loc 1 960 21 view .LVU171
  657 002c 0599     		ldr	r1, [sp, #20]
  658 002e 0498     		ldr	r0, [sp, #16]
-ARM GAS  /tmp/ccI5gi9p.s 			page 34
+ARM GAS  /tmp/ccetTm8w.s 			page 34
 
 
  659 0030 039B     		ldr	r3, [sp, #12]
@@ -2038,7 +2038,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  699 0056 05       		.byte	(.L61-.L59)/2
  700 0057 05       		.byte	(.L61-.L59)/2
  701 0058 29       		.byte	(.L60-.L59)/2
-ARM GAS  /tmp/ccI5gi9p.s 			page 35
+ARM GAS  /tmp/ccetTm8w.s 			page 35
 
 
  702 0059 30       		.byte	(.L58-.L59)/2
@@ -2098,7 +2098,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  742              		.loc 1 1020 58 is_stmt 1 view .LVU199
 1021:../Core/FreeRTOS-Kernel/timers.c ****                         }
  743              		.loc 1 1021 29 view .LVU200
-ARM GAS  /tmp/ccI5gi9p.s 			page 36
+ARM GAS  /tmp/ccetTm8w.s 			page 36
 
 
 1021:../Core/FreeRTOS-Kernel/timers.c ****                         }
@@ -2158,7 +2158,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
 1048:../Core/FreeRTOS-Kernel/timers.c ****                         break;
  784              		.loc 1 1048 25 view .LVU215
 1048:../Core/FreeRTOS-Kernel/timers.c ****                         break;
-ARM GAS  /tmp/ccI5gi9p.s 			page 37
+ARM GAS  /tmp/ccetTm8w.s 			page 37
 
 
  785              		.loc 1 1048 34 is_stmt 0 view .LVU216
@@ -2218,7 +2218,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  749:../Core/FreeRTOS-Kernel/timers.c ****         TickType_t xNextExpireTime;
  834              		.loc 1 749 5 is_stmt 0 view .LVU224
  835 0000 00B5     		push	{lr}
-ARM GAS  /tmp/ccI5gi9p.s 			page 38
+ARM GAS  /tmp/ccetTm8w.s 			page 38
 
 
  836              	.LCFI11:
@@ -2278,7 +2278,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  878              		.loc 1 1112 5 view -0
  879              		.cfi_startproc
  880              		@ args = 0, pretend = 0, frame = 0
-ARM GAS  /tmp/ccI5gi9p.s 			page 39
+ARM GAS  /tmp/ccetTm8w.s 			page 39
 
 
  881              		@ frame_needed = 0, uses_anonymous_args = 0
@@ -2338,7 +2338,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
 1147:../Core/FreeRTOS-Kernel/timers.c ****                     {
 1148:../Core/FreeRTOS-Kernel/timers.c ****                         mtCOVERAGE_TEST_MARKER();
 1149:../Core/FreeRTOS-Kernel/timers.c ****                     }
-ARM GAS  /tmp/ccI5gi9p.s 			page 40
+ARM GAS  /tmp/ccetTm8w.s 			page 40
 
 
 1150:../Core/FreeRTOS-Kernel/timers.c ****                 }
@@ -2398,7 +2398,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  936              		.loc 1 1132 21 view .LVU250
 1132:../Core/FreeRTOS-Kernel/timers.c ****                 }
  937              		.loc 1 1132 35 is_stmt 0 view .LVU251
-ARM GAS  /tmp/ccI5gi9p.s 			page 41
+ARM GAS  /tmp/ccetTm8w.s 			page 41
 
 
  938 002e 0023     		movs	r3, #0
@@ -2458,7 +2458,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  988 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
  989              	.LCFI17:
  990              		.cfi_def_cfa_offset 24
-ARM GAS  /tmp/ccI5gi9p.s 			page 42
+ARM GAS  /tmp/ccetTm8w.s 			page 42
 
 
  991              		.cfi_offset 4, -24
@@ -2518,7 +2518,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  1030 002e 84F82830 		strb	r3, [r4, #40]
  444:../Core/FreeRTOS-Kernel/timers.c ****     }
  1031              		.loc 1 444 40 is_stmt 1 view .LVU273
-ARM GAS  /tmp/ccI5gi9p.s 			page 43
+ARM GAS  /tmp/ccetTm8w.s 			page 43
 
 
  1032              	.L82:
@@ -2578,7 +2578,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  290:../Core/FreeRTOS-Kernel/timers.c ****                     StackType_t * pxTimerTaskStackBuffer = NULL;
  1078              		.loc 1 290 21 is_stmt 1 view .LVU283
  290:../Core/FreeRTOS-Kernel/timers.c ****                     StackType_t * pxTimerTaskStackBuffer = NULL;
-ARM GAS  /tmp/ccI5gi9p.s 			page 44
+ARM GAS  /tmp/ccetTm8w.s 			page 44
 
 
  1079              		.loc 1 290 36 is_stmt 0 view .LVU284
@@ -2638,7 +2638,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  239:../Core/FreeRTOS-Kernel/timers.c **** 
  1121              		.loc 1 239 20 view .LVU297
  1122 0040 2046     		mov	r0, r4
-ARM GAS  /tmp/ccI5gi9p.s 			page 45
+ARM GAS  /tmp/ccetTm8w.s 			page 45
 
 
  1123 0042 00E0     		b	.L85
@@ -2698,7 +2698,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  1172              		.cfi_def_cfa_offset 24
  1173 0004 079C     		ldr	r4, [sp, #28]
  377:../Core/FreeRTOS-Kernel/timers.c **** 
-ARM GAS  /tmp/ccI5gi9p.s 			page 46
+ARM GAS  /tmp/ccetTm8w.s 			page 46
 
 
  1174              		.loc 1 377 13 is_stmt 1 view .LVU305
@@ -2758,7 +2758,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  1217              		.loc 1 453 5 is_stmt 1 view -0
  1218              		.cfi_startproc
  1219              		@ args = 4, pretend = 0, frame = 16
-ARM GAS  /tmp/ccI5gi9p.s 			page 47
+ARM GAS  /tmp/ccetTm8w.s 			page 47
 
 
  1220              		@ frame_needed = 0, uses_anonymous_args = 0
@@ -2818,7 +2818,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  1255 0012 03DD     		ble	.L106
  454:../Core/FreeRTOS-Kernel/timers.c ****         DaemonTaskMessage_t xMessage;
  1256              		.loc 1 454 20 view .LVU338
-ARM GAS  /tmp/ccI5gi9p.s 			page 48
+ARM GAS  /tmp/ccetTm8w.s 			page 48
 
 
  1257 0014 0020     		movs	r0, #0
@@ -2878,7 +2878,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  1299 003a 0348     		ldr	r0, .L108
  1300 003c 0068     		ldr	r0, [r0]
  1301 003e FFF7FEFF 		bl	xQueueGenericSend
-ARM GAS  /tmp/ccI5gi9p.s 			page 49
+ARM GAS  /tmp/ccetTm8w.s 			page 49
 
 
  1302              	.LVL106:
@@ -2938,7 +2938,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  1350              		.loc 1 508 9 view .LVU358
  510:../Core/FreeRTOS-Kernel/timers.c **** 
  1351              		.loc 1 510 126 view .LVU359
-ARM GAS  /tmp/ccI5gi9p.s 			page 50
+ARM GAS  /tmp/ccetTm8w.s 			page 50
 
 
  512:../Core/FreeRTOS-Kernel/timers.c **** 
@@ -2998,7 +2998,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  1387              		@ sp needed
  1388 001a 10BD     		pop	{r4, pc}
  1389              	.LVL113:
-ARM GAS  /tmp/ccI5gi9p.s 			page 51
+ARM GAS  /tmp/ccetTm8w.s 			page 51
 
 
  1390              	.L115:
@@ -3058,7 +3058,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  1437              		@ link register save eliminated.
  545:../Core/FreeRTOS-Kernel/timers.c **** 
  1438              		.loc 1 545 52 view .LVU388
-ARM GAS  /tmp/ccI5gi9p.s 			page 52
+ARM GAS  /tmp/ccetTm8w.s 			page 52
 
 
  549:../Core/FreeRTOS-Kernel/timers.c **** 
@@ -3118,7 +3118,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  1484              		.global	vTimerSetReloadMode
  1485              		.syntax unified
  1486              		.thumb
-ARM GAS  /tmp/ccI5gi9p.s 			page 53
+ARM GAS  /tmp/ccetTm8w.s 			page 53
 
 
  1487              		.thumb_func
@@ -3178,7 +3178,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  1529              	.LVL126:
  1530              	.L123:
  587:../Core/FreeRTOS-Kernel/timers.c ****             }
-ARM GAS  /tmp/ccI5gi9p.s 			page 54
+ARM GAS  /tmp/ccetTm8w.s 			page 54
 
 
  1531              		.loc 1 587 17 is_stmt 1 view .LVU414
@@ -3238,7 +3238,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  609:../Core/FreeRTOS-Kernel/timers.c ****             }
  1576              		.loc 1 609 25 view .LVU426
  1577 0012 0024     		movs	r4, #0
-ARM GAS  /tmp/ccI5gi9p.s 			page 55
+ARM GAS  /tmp/ccetTm8w.s 			page 55
 
 
  1578              	.LVL130:
@@ -3298,7 +3298,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  1622              		.loc 1 630 36 is_stmt 0 view .LVU438
  1623 0002 FFF7FEFF 		bl	xTimerGetReloadMode
  1624              	.LVL135:
-ARM GAS  /tmp/ccI5gi9p.s 			page 56
+ARM GAS  /tmp/ccetTm8w.s 			page 56
 
 
  632:../Core/FreeRTOS-Kernel/timers.c **** 
@@ -3358,7 +3358,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  1669              		.fpu fpv5-d16
  1671              	xTimerGetStaticBuffer:
  1672              	.LVL138:
-ARM GAS  /tmp/ccI5gi9p.s 			page 57
+ARM GAS  /tmp/ccetTm8w.s 			page 57
 
 
  1673              	.LFB15:
@@ -3418,7 +3418,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  1711              		.section	.text.pcTimerGetName,"ax",%progbits
  1712              		.align	1
  1713              		.global	pcTimerGetName
-ARM GAS  /tmp/ccI5gi9p.s 			page 58
+ARM GAS  /tmp/ccetTm8w.s 			page 58
 
 
  1714              		.syntax unified
@@ -3478,7 +3478,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  1759              		.cfi_offset 4, -8
  1760              		.cfi_offset 14, -4
  1761 0002 0446     		mov	r4, r0
-ARM GAS  /tmp/ccI5gi9p.s 			page 59
+ARM GAS  /tmp/ccetTm8w.s 			page 59
 
 
 1164:../Core/FreeRTOS-Kernel/timers.c ****         BaseType_t xReturn;
@@ -3538,7 +3538,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  1790              		.loc 1 1180 25 view .LVU492
  1791 001c 0124     		movs	r4, #1
  1792              	.LVL151:
-ARM GAS  /tmp/ccI5gi9p.s 			page 60
+ARM GAS  /tmp/ccetTm8w.s 			page 60
 
 
 1180:../Core/FreeRTOS-Kernel/timers.c ****             }
@@ -3598,7 +3598,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  1832              		.loc 1 1204 9 is_stmt 1 view .LVU503
  1833 000a FFF7FEFF 		bl	vPortExitCritical
  1834              	.LVL156:
-ARM GAS  /tmp/ccI5gi9p.s 			page 61
+ARM GAS  /tmp/ccetTm8w.s 			page 61
 
 
 1205:../Core/FreeRTOS-Kernel/timers.c **** 
@@ -3658,7 +3658,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  1874 0006 FFF7FEFF 		bl	vPortEnterCritical
  1875              	.LVL159:
 1222:../Core/FreeRTOS-Kernel/timers.c ****         {
-ARM GAS  /tmp/ccI5gi9p.s 			page 62
+ARM GAS  /tmp/ccetTm8w.s 			page 62
 
 
 1223:../Core/FreeRTOS-Kernel/timers.c ****             pxTimer->pvTimerID = pvNewID;
@@ -3718,7 +3718,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  1916              		.loc 1 1238 13 is_stmt 1 view .LVU522
 1239:../Core/FreeRTOS-Kernel/timers.c ****             BaseType_t xReturn;
  1917              		.loc 1 1239 13 view .LVU523
-ARM GAS  /tmp/ccI5gi9p.s 			page 63
+ARM GAS  /tmp/ccetTm8w.s 			page 63
 
 
 1240:../Core/FreeRTOS-Kernel/timers.c **** 
@@ -3778,7 +3778,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  1955              	.LVL167:
  1956              	.L148:
  1957              		.loc 1 1256 9 view .LVU542
-ARM GAS  /tmp/ccI5gi9p.s 			page 64
+ARM GAS  /tmp/ccetTm8w.s 			page 64
 
 
  1958              		.align	2
@@ -3838,7 +3838,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  1994              		.loc 1 1276 40 view .LVU548
 1277:../Core/FreeRTOS-Kernel/timers.c **** 
 1278:../Core/FreeRTOS-Kernel/timers.c ****             /* Complete the message with the function parameters and post it to the
-ARM GAS  /tmp/ccI5gi9p.s 			page 65
+ARM GAS  /tmp/ccetTm8w.s 			page 65
 
 
 1279:../Core/FreeRTOS-Kernel/timers.c ****              * daemon task. */
@@ -3898,7 +3898,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  2036 0024 00000000 		.word	.LANCHOR3
  2037              		.cfi_endproc
  2038              	.LFE31:
-ARM GAS  /tmp/ccI5gi9p.s 			page 66
+ARM GAS  /tmp/ccetTm8w.s 			page 66
 
 
  2040              		.section	.text.uxTimerGetTimerNumber,"ax",%progbits
@@ -3958,7 +3958,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
 1311:../Core/FreeRTOS-Kernel/timers.c **** 
 1312:../Core/FreeRTOS-Kernel/timers.c ****         void vTimerSetTimerNumber( TimerHandle_t xTimer,
 1313:../Core/FreeRTOS-Kernel/timers.c ****                                    UBaseType_t uxTimerNumber )
-ARM GAS  /tmp/ccI5gi9p.s 			page 67
+ARM GAS  /tmp/ccetTm8w.s 			page 67
 
 
 1314:../Core/FreeRTOS-Kernel/timers.c ****         {
@@ -4018,7 +4018,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  2114              		.loc 1 1333 26 is_stmt 0 view .LVU583
  2115 0006 024A     		ldr	r2, .L156+4
  2116 0008 1360     		str	r3, [r2]
-ARM GAS  /tmp/ccI5gi9p.s 			page 68
+ARM GAS  /tmp/ccetTm8w.s 			page 68
 
 
 1334:../Core/FreeRTOS-Kernel/timers.c ****     }
@@ -4078,7 +4078,7 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  2171              		.set	.LANCHOR6,. + 0
  2174              	xStaticTimerQueue.0:
  2175 0000 00000000 		.space	80
-ARM GAS  /tmp/ccI5gi9p.s 			page 69
+ARM GAS  /tmp/ccetTm8w.s 			page 69
 
 
  2175      00000000 
@@ -4106,114 +4106,114 @@ ARM GAS  /tmp/ccI5gi9p.s 			page 1
  2198              		.file 8 "../Core/FreeRTOS-Kernel/include/task.h"
  2199              		.file 9 "../Core/FreeRTOS-Kernel/include/queue.h"
  2200              		.file 10 "../Core/FreeRTOS-Kernel/include/timers.h"
-ARM GAS  /tmp/ccI5gi9p.s 			page 70
+ARM GAS  /tmp/ccetTm8w.s 			page 70
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 timers.c
-     /tmp/ccI5gi9p.s:17     .text.prvGetNextExpireTime:0000000000000000 $t
-     /tmp/ccI5gi9p.s:24     .text.prvGetNextExpireTime:0000000000000000 prvGetNextExpireTime
-     /tmp/ccI5gi9p.s:70     .text.prvGetNextExpireTime:000000000000001c $d
-     /tmp/ccI5gi9p.s:75     .text.prvInsertTimerInActiveList:0000000000000000 $t
-     /tmp/ccI5gi9p.s:81     .text.prvInsertTimerInActiveList:0000000000000000 prvInsertTimerInActiveList
-     /tmp/ccI5gi9p.s:176    .text.prvInsertTimerInActiveList:0000000000000048 $d
-     /tmp/ccI5gi9p.s:182    .text.prvReloadTimer:0000000000000000 $t
-     /tmp/ccI5gi9p.s:188    .text.prvReloadTimer:0000000000000000 prvReloadTimer
-     /tmp/ccI5gi9p.s:246    .text.prvProcessExpiredTimer:0000000000000000 $t
-     /tmp/ccI5gi9p.s:252    .text.prvProcessExpiredTimer:0000000000000000 prvProcessExpiredTimer
-     /tmp/ccI5gi9p.s:317    .text.prvProcessExpiredTimer:000000000000003c $d
-     /tmp/ccI5gi9p.s:322    .text.prvSwitchTimerLists:0000000000000000 $t
-     /tmp/ccI5gi9p.s:328    .text.prvSwitchTimerLists:0000000000000000 prvSwitchTimerLists
-     /tmp/ccI5gi9p.s:381    .text.prvSwitchTimerLists:0000000000000028 $d
-     /tmp/ccI5gi9p.s:387    .text.prvSampleTimeNow:0000000000000000 $t
-     /tmp/ccI5gi9p.s:393    .text.prvSampleTimeNow:0000000000000000 prvSampleTimeNow
-     /tmp/ccI5gi9p.s:452    .text.prvSampleTimeNow:0000000000000028 $d
-     /tmp/ccI5gi9p.s:457    .text.prvProcessTimerOrBlockTask:0000000000000000 $t
-     /tmp/ccI5gi9p.s:463    .text.prvProcessTimerOrBlockTask:0000000000000000 prvProcessTimerOrBlockTask
-     /tmp/ccI5gi9p.s:586    .text.prvProcessTimerOrBlockTask:0000000000000070 $d
-     /tmp/ccI5gi9p.s:592    .text.prvProcessReceivedCommands:0000000000000000 $t
-     /tmp/ccI5gi9p.s:598    .text.prvProcessReceivedCommands:0000000000000000 prvProcessReceivedCommands
-     /tmp/ccI5gi9p.s:699    .text.prvProcessReceivedCommands:0000000000000056 $d
-     /tmp/ccI5gi9p.s:816    .text.prvProcessReceivedCommands:00000000000000e8 $d
-     /tmp/ccI5gi9p.s:821    .text.prvTimerTask:0000000000000000 $t
-     /tmp/ccI5gi9p.s:827    .text.prvTimerTask:0000000000000000 prvTimerTask
-     /tmp/ccI5gi9p.s:866    .rodata.prvCheckForValidListAndQueue.str1.4:0000000000000000 $d
-     /tmp/ccI5gi9p.s:870    .text.prvCheckForValidListAndQueue:0000000000000000 $t
-     /tmp/ccI5gi9p.s:876    .text.prvCheckForValidListAndQueue:0000000000000000 prvCheckForValidListAndQueue
-     /tmp/ccI5gi9p.s:962    .text.prvCheckForValidListAndQueue:0000000000000050 $d
-     /tmp/ccI5gi9p.s:974    .text.prvInitialiseNewTimer:0000000000000000 $t
-     /tmp/ccI5gi9p.s:980    .text.prvInitialiseNewTimer:0000000000000000 prvInitialiseNewTimer
-     /tmp/ccI5gi9p.s:1040   .rodata.xTimerCreateTimerTask.str1.4:0000000000000000 $d
-     /tmp/ccI5gi9p.s:1044   .text.xTimerCreateTimerTask:0000000000000000 $t
-     /tmp/ccI5gi9p.s:1051   .text.xTimerCreateTimerTask:0000000000000000 xTimerCreateTimerTask
-     /tmp/ccI5gi9p.s:1141   .text.xTimerCreateTimerTask:000000000000004c $d
-     /tmp/ccI5gi9p.s:1149   .text.xTimerCreateStatic:0000000000000000 $t
-     /tmp/ccI5gi9p.s:1156   .text.xTimerCreateStatic:0000000000000000 xTimerCreateStatic
-     /tmp/ccI5gi9p.s:1207   .text.xTimerGenericCommandFromTask:0000000000000000 $t
-     /tmp/ccI5gi9p.s:1214   .text.xTimerGenericCommandFromTask:0000000000000000 xTimerGenericCommandFromTask
-     /tmp/ccI5gi9p.s:1318   .text.xTimerGenericCommandFromTask:0000000000000048 $d
-     /tmp/ccI5gi9p.s:1323   .text.xTimerGenericCommandFromISR:0000000000000000 $t
-     /tmp/ccI5gi9p.s:1330   .text.xTimerGenericCommandFromISR:0000000000000000 xTimerGenericCommandFromISR
-     /tmp/ccI5gi9p.s:1419   .text.xTimerGenericCommandFromISR:0000000000000030 $d
-     /tmp/ccI5gi9p.s:1424   .text.xTimerGetTimerDaemonTaskHandle:0000000000000000 $t
-     /tmp/ccI5gi9p.s:1431   .text.xTimerGetTimerDaemonTaskHandle:0000000000000000 xTimerGetTimerDaemonTaskHandle
-     /tmp/ccI5gi9p.s:1449   .text.xTimerGetTimerDaemonTaskHandle:0000000000000008 $d
-     /tmp/ccI5gi9p.s:1454   .text.xTimerGetPeriod:0000000000000000 $t
-     /tmp/ccI5gi9p.s:1461   .text.xTimerGetPeriod:0000000000000000 xTimerGetPeriod
-     /tmp/ccI5gi9p.s:1483   .text.vTimerSetReloadMode:0000000000000000 $t
-     /tmp/ccI5gi9p.s:1490   .text.vTimerSetReloadMode:0000000000000000 vTimerSetReloadMode
-     /tmp/ccI5gi9p.s:1541   .text.xTimerGetReloadMode:0000000000000000 $t
-     /tmp/ccI5gi9p.s:1548   .text.xTimerGetReloadMode:0000000000000000 xTimerGetReloadMode
-     /tmp/ccI5gi9p.s:1599   .text.uxTimerGetReloadMode:0000000000000000 $t
-     /tmp/ccI5gi9p.s:1606   .text.uxTimerGetReloadMode:0000000000000000 uxTimerGetReloadMode
-ARM GAS  /tmp/ccI5gi9p.s 			page 71
+     /tmp/ccetTm8w.s:17     .text.prvGetNextExpireTime:0000000000000000 $t
+     /tmp/ccetTm8w.s:24     .text.prvGetNextExpireTime:0000000000000000 prvGetNextExpireTime
+     /tmp/ccetTm8w.s:70     .text.prvGetNextExpireTime:000000000000001c $d
+     /tmp/ccetTm8w.s:75     .text.prvInsertTimerInActiveList:0000000000000000 $t
+     /tmp/ccetTm8w.s:81     .text.prvInsertTimerInActiveList:0000000000000000 prvInsertTimerInActiveList
+     /tmp/ccetTm8w.s:176    .text.prvInsertTimerInActiveList:0000000000000048 $d
+     /tmp/ccetTm8w.s:182    .text.prvReloadTimer:0000000000000000 $t
+     /tmp/ccetTm8w.s:188    .text.prvReloadTimer:0000000000000000 prvReloadTimer
+     /tmp/ccetTm8w.s:246    .text.prvProcessExpiredTimer:0000000000000000 $t
+     /tmp/ccetTm8w.s:252    .text.prvProcessExpiredTimer:0000000000000000 prvProcessExpiredTimer
+     /tmp/ccetTm8w.s:317    .text.prvProcessExpiredTimer:000000000000003c $d
+     /tmp/ccetTm8w.s:322    .text.prvSwitchTimerLists:0000000000000000 $t
+     /tmp/ccetTm8w.s:328    .text.prvSwitchTimerLists:0000000000000000 prvSwitchTimerLists
+     /tmp/ccetTm8w.s:381    .text.prvSwitchTimerLists:0000000000000028 $d
+     /tmp/ccetTm8w.s:387    .text.prvSampleTimeNow:0000000000000000 $t
+     /tmp/ccetTm8w.s:393    .text.prvSampleTimeNow:0000000000000000 prvSampleTimeNow
+     /tmp/ccetTm8w.s:452    .text.prvSampleTimeNow:0000000000000028 $d
+     /tmp/ccetTm8w.s:457    .text.prvProcessTimerOrBlockTask:0000000000000000 $t
+     /tmp/ccetTm8w.s:463    .text.prvProcessTimerOrBlockTask:0000000000000000 prvProcessTimerOrBlockTask
+     /tmp/ccetTm8w.s:586    .text.prvProcessTimerOrBlockTask:0000000000000070 $d
+     /tmp/ccetTm8w.s:592    .text.prvProcessReceivedCommands:0000000000000000 $t
+     /tmp/ccetTm8w.s:598    .text.prvProcessReceivedCommands:0000000000000000 prvProcessReceivedCommands
+     /tmp/ccetTm8w.s:699    .text.prvProcessReceivedCommands:0000000000000056 $d
+     /tmp/ccetTm8w.s:816    .text.prvProcessReceivedCommands:00000000000000e8 $d
+     /tmp/ccetTm8w.s:821    .text.prvTimerTask:0000000000000000 $t
+     /tmp/ccetTm8w.s:827    .text.prvTimerTask:0000000000000000 prvTimerTask
+     /tmp/ccetTm8w.s:866    .rodata.prvCheckForValidListAndQueue.str1.4:0000000000000000 $d
+     /tmp/ccetTm8w.s:870    .text.prvCheckForValidListAndQueue:0000000000000000 $t
+     /tmp/ccetTm8w.s:876    .text.prvCheckForValidListAndQueue:0000000000000000 prvCheckForValidListAndQueue
+     /tmp/ccetTm8w.s:962    .text.prvCheckForValidListAndQueue:0000000000000050 $d
+     /tmp/ccetTm8w.s:974    .text.prvInitialiseNewTimer:0000000000000000 $t
+     /tmp/ccetTm8w.s:980    .text.prvInitialiseNewTimer:0000000000000000 prvInitialiseNewTimer
+     /tmp/ccetTm8w.s:1040   .rodata.xTimerCreateTimerTask.str1.4:0000000000000000 $d
+     /tmp/ccetTm8w.s:1044   .text.xTimerCreateTimerTask:0000000000000000 $t
+     /tmp/ccetTm8w.s:1051   .text.xTimerCreateTimerTask:0000000000000000 xTimerCreateTimerTask
+     /tmp/ccetTm8w.s:1141   .text.xTimerCreateTimerTask:000000000000004c $d
+     /tmp/ccetTm8w.s:1149   .text.xTimerCreateStatic:0000000000000000 $t
+     /tmp/ccetTm8w.s:1156   .text.xTimerCreateStatic:0000000000000000 xTimerCreateStatic
+     /tmp/ccetTm8w.s:1207   .text.xTimerGenericCommandFromTask:0000000000000000 $t
+     /tmp/ccetTm8w.s:1214   .text.xTimerGenericCommandFromTask:0000000000000000 xTimerGenericCommandFromTask
+     /tmp/ccetTm8w.s:1318   .text.xTimerGenericCommandFromTask:0000000000000048 $d
+     /tmp/ccetTm8w.s:1323   .text.xTimerGenericCommandFromISR:0000000000000000 $t
+     /tmp/ccetTm8w.s:1330   .text.xTimerGenericCommandFromISR:0000000000000000 xTimerGenericCommandFromISR
+     /tmp/ccetTm8w.s:1419   .text.xTimerGenericCommandFromISR:0000000000000030 $d
+     /tmp/ccetTm8w.s:1424   .text.xTimerGetTimerDaemonTaskHandle:0000000000000000 $t
+     /tmp/ccetTm8w.s:1431   .text.xTimerGetTimerDaemonTaskHandle:0000000000000000 xTimerGetTimerDaemonTaskHandle
+     /tmp/ccetTm8w.s:1449   .text.xTimerGetTimerDaemonTaskHandle:0000000000000008 $d
+     /tmp/ccetTm8w.s:1454   .text.xTimerGetPeriod:0000000000000000 $t
+     /tmp/ccetTm8w.s:1461   .text.xTimerGetPeriod:0000000000000000 xTimerGetPeriod
+     /tmp/ccetTm8w.s:1483   .text.vTimerSetReloadMode:0000000000000000 $t
+     /tmp/ccetTm8w.s:1490   .text.vTimerSetReloadMode:0000000000000000 vTimerSetReloadMode
+     /tmp/ccetTm8w.s:1541   .text.xTimerGetReloadMode:0000000000000000 $t
+     /tmp/ccetTm8w.s:1548   .text.xTimerGetReloadMode:0000000000000000 xTimerGetReloadMode
+     /tmp/ccetTm8w.s:1599   .text.uxTimerGetReloadMode:0000000000000000 $t
+     /tmp/ccetTm8w.s:1606   .text.uxTimerGetReloadMode:0000000000000000 uxTimerGetReloadMode
+ARM GAS  /tmp/ccetTm8w.s 			page 71
 
 
-     /tmp/ccI5gi9p.s:1633   .text.xTimerGetExpiryTime:0000000000000000 $t
-     /tmp/ccI5gi9p.s:1640   .text.xTimerGetExpiryTime:0000000000000000 xTimerGetExpiryTime
-     /tmp/ccI5gi9p.s:1664   .text.xTimerGetStaticBuffer:0000000000000000 $t
-     /tmp/ccI5gi9p.s:1671   .text.xTimerGetStaticBuffer:0000000000000000 xTimerGetStaticBuffer
-     /tmp/ccI5gi9p.s:1712   .text.pcTimerGetName:0000000000000000 $t
-     /tmp/ccI5gi9p.s:1719   .text.pcTimerGetName:0000000000000000 pcTimerGetName
-     /tmp/ccI5gi9p.s:1741   .text.xTimerIsTimerActive:0000000000000000 $t
-     /tmp/ccI5gi9p.s:1748   .text.xTimerIsTimerActive:0000000000000000 xTimerIsTimerActive
-     /tmp/ccI5gi9p.s:1799   .text.pvTimerGetTimerID:0000000000000000 $t
-     /tmp/ccI5gi9p.s:1806   .text.pvTimerGetTimerID:0000000000000000 pvTimerGetTimerID
-     /tmp/ccI5gi9p.s:1845   .text.vTimerSetTimerID:0000000000000000 $t
-     /tmp/ccI5gi9p.s:1852   .text.vTimerSetTimerID:0000000000000000 vTimerSetTimerID
-     /tmp/ccI5gi9p.s:1890   .text.xTimerPendFunctionCallFromISR:0000000000000000 $t
-     /tmp/ccI5gi9p.s:1897   .text.xTimerPendFunctionCallFromISR:0000000000000000 xTimerPendFunctionCallFromISR
-     /tmp/ccI5gi9p.s:1960   .text.xTimerPendFunctionCallFromISR:0000000000000024 $d
-     /tmp/ccI5gi9p.s:1965   .text.xTimerPendFunctionCall:0000000000000000 $t
-     /tmp/ccI5gi9p.s:1972   .text.xTimerPendFunctionCall:0000000000000000 xTimerPendFunctionCall
-     /tmp/ccI5gi9p.s:2036   .text.xTimerPendFunctionCall:0000000000000024 $d
-     /tmp/ccI5gi9p.s:2041   .text.uxTimerGetTimerNumber:0000000000000000 $t
-     /tmp/ccI5gi9p.s:2048   .text.uxTimerGetTimerNumber:0000000000000000 uxTimerGetTimerNumber
-     /tmp/ccI5gi9p.s:2068   .text.vTimerSetTimerNumber:0000000000000000 $t
-     /tmp/ccI5gi9p.s:2075   .text.vTimerSetTimerNumber:0000000000000000 vTimerSetTimerNumber
-     /tmp/ccI5gi9p.s:2094   .text.vTimerResetState:0000000000000000 $t
-     /tmp/ccI5gi9p.s:2101   .text.vTimerResetState:0000000000000000 vTimerResetState
-     /tmp/ccI5gi9p.s:2122   .text.vTimerResetState:000000000000000c $d
-     /tmp/ccI5gi9p.s:2128   .bss.pxCurrentTimerList:0000000000000000 $d
-     /tmp/ccI5gi9p.s:2132   .bss.pxCurrentTimerList:0000000000000000 pxCurrentTimerList
-     /tmp/ccI5gi9p.s:2135   .bss.pxOverflowTimerList:0000000000000000 $d
-     /tmp/ccI5gi9p.s:2139   .bss.pxOverflowTimerList:0000000000000000 pxOverflowTimerList
-     /tmp/ccI5gi9p.s:2142   .bss.ucStaticTimerQueueStorage.1:0000000000000000 $d
-     /tmp/ccI5gi9p.s:2146   .bss.ucStaticTimerQueueStorage.1:0000000000000000 ucStaticTimerQueueStorage.1
-     /tmp/ccI5gi9p.s:2149   .bss.xActiveTimerList1:0000000000000000 $d
-     /tmp/ccI5gi9p.s:2153   .bss.xActiveTimerList1:0000000000000000 xActiveTimerList1
-     /tmp/ccI5gi9p.s:2156   .bss.xActiveTimerList2:0000000000000000 $d
-     /tmp/ccI5gi9p.s:2160   .bss.xActiveTimerList2:0000000000000000 xActiveTimerList2
-     /tmp/ccI5gi9p.s:2163   .bss.xLastTime.2:0000000000000000 $d
-     /tmp/ccI5gi9p.s:2167   .bss.xLastTime.2:0000000000000000 xLastTime.2
-     /tmp/ccI5gi9p.s:2170   .bss.xStaticTimerQueue.0:0000000000000000 $d
-     /tmp/ccI5gi9p.s:2174   .bss.xStaticTimerQueue.0:0000000000000000 xStaticTimerQueue.0
-     /tmp/ccI5gi9p.s:2177   .bss.xTimerQueue:0000000000000000 $d
-     /tmp/ccI5gi9p.s:2181   .bss.xTimerQueue:0000000000000000 xTimerQueue
-     /tmp/ccI5gi9p.s:2184   .bss.xTimerTaskHandle:0000000000000000 $d
-     /tmp/ccI5gi9p.s:2188   .bss.xTimerTaskHandle:0000000000000000 xTimerTaskHandle
-     /tmp/ccI5gi9p.s:708    .text.prvProcessReceivedCommands:000000000000005f $d
-     /tmp/ccI5gi9p.s:708    .text.prvProcessReceivedCommands:0000000000000060 $t
+     /tmp/ccetTm8w.s:1633   .text.xTimerGetExpiryTime:0000000000000000 $t
+     /tmp/ccetTm8w.s:1640   .text.xTimerGetExpiryTime:0000000000000000 xTimerGetExpiryTime
+     /tmp/ccetTm8w.s:1664   .text.xTimerGetStaticBuffer:0000000000000000 $t
+     /tmp/ccetTm8w.s:1671   .text.xTimerGetStaticBuffer:0000000000000000 xTimerGetStaticBuffer
+     /tmp/ccetTm8w.s:1712   .text.pcTimerGetName:0000000000000000 $t
+     /tmp/ccetTm8w.s:1719   .text.pcTimerGetName:0000000000000000 pcTimerGetName
+     /tmp/ccetTm8w.s:1741   .text.xTimerIsTimerActive:0000000000000000 $t
+     /tmp/ccetTm8w.s:1748   .text.xTimerIsTimerActive:0000000000000000 xTimerIsTimerActive
+     /tmp/ccetTm8w.s:1799   .text.pvTimerGetTimerID:0000000000000000 $t
+     /tmp/ccetTm8w.s:1806   .text.pvTimerGetTimerID:0000000000000000 pvTimerGetTimerID
+     /tmp/ccetTm8w.s:1845   .text.vTimerSetTimerID:0000000000000000 $t
+     /tmp/ccetTm8w.s:1852   .text.vTimerSetTimerID:0000000000000000 vTimerSetTimerID
+     /tmp/ccetTm8w.s:1890   .text.xTimerPendFunctionCallFromISR:0000000000000000 $t
+     /tmp/ccetTm8w.s:1897   .text.xTimerPendFunctionCallFromISR:0000000000000000 xTimerPendFunctionCallFromISR
+     /tmp/ccetTm8w.s:1960   .text.xTimerPendFunctionCallFromISR:0000000000000024 $d
+     /tmp/ccetTm8w.s:1965   .text.xTimerPendFunctionCall:0000000000000000 $t
+     /tmp/ccetTm8w.s:1972   .text.xTimerPendFunctionCall:0000000000000000 xTimerPendFunctionCall
+     /tmp/ccetTm8w.s:2036   .text.xTimerPendFunctionCall:0000000000000024 $d
+     /tmp/ccetTm8w.s:2041   .text.uxTimerGetTimerNumber:0000000000000000 $t
+     /tmp/ccetTm8w.s:2048   .text.uxTimerGetTimerNumber:0000000000000000 uxTimerGetTimerNumber
+     /tmp/ccetTm8w.s:2068   .text.vTimerSetTimerNumber:0000000000000000 $t
+     /tmp/ccetTm8w.s:2075   .text.vTimerSetTimerNumber:0000000000000000 vTimerSetTimerNumber
+     /tmp/ccetTm8w.s:2094   .text.vTimerResetState:0000000000000000 $t
+     /tmp/ccetTm8w.s:2101   .text.vTimerResetState:0000000000000000 vTimerResetState
+     /tmp/ccetTm8w.s:2122   .text.vTimerResetState:000000000000000c $d
+     /tmp/ccetTm8w.s:2128   .bss.pxCurrentTimerList:0000000000000000 $d
+     /tmp/ccetTm8w.s:2132   .bss.pxCurrentTimerList:0000000000000000 pxCurrentTimerList
+     /tmp/ccetTm8w.s:2135   .bss.pxOverflowTimerList:0000000000000000 $d
+     /tmp/ccetTm8w.s:2139   .bss.pxOverflowTimerList:0000000000000000 pxOverflowTimerList
+     /tmp/ccetTm8w.s:2142   .bss.ucStaticTimerQueueStorage.1:0000000000000000 $d
+     /tmp/ccetTm8w.s:2146   .bss.ucStaticTimerQueueStorage.1:0000000000000000 ucStaticTimerQueueStorage.1
+     /tmp/ccetTm8w.s:2149   .bss.xActiveTimerList1:0000000000000000 $d
+     /tmp/ccetTm8w.s:2153   .bss.xActiveTimerList1:0000000000000000 xActiveTimerList1
+     /tmp/ccetTm8w.s:2156   .bss.xActiveTimerList2:0000000000000000 $d
+     /tmp/ccetTm8w.s:2160   .bss.xActiveTimerList2:0000000000000000 xActiveTimerList2
+     /tmp/ccetTm8w.s:2163   .bss.xLastTime.2:0000000000000000 $d
+     /tmp/ccetTm8w.s:2167   .bss.xLastTime.2:0000000000000000 xLastTime.2
+     /tmp/ccetTm8w.s:2170   .bss.xStaticTimerQueue.0:0000000000000000 $d
+     /tmp/ccetTm8w.s:2174   .bss.xStaticTimerQueue.0:0000000000000000 xStaticTimerQueue.0
+     /tmp/ccetTm8w.s:2177   .bss.xTimerQueue:0000000000000000 $d
+     /tmp/ccetTm8w.s:2181   .bss.xTimerQueue:0000000000000000 xTimerQueue
+     /tmp/ccetTm8w.s:2184   .bss.xTimerTaskHandle:0000000000000000 $d
+     /tmp/ccetTm8w.s:2188   .bss.xTimerTaskHandle:0000000000000000 xTimerTaskHandle
+     /tmp/ccetTm8w.s:708    .text.prvProcessReceivedCommands:000000000000005f $d
+     /tmp/ccetTm8w.s:708    .text.prvProcessReceivedCommands:0000000000000060 $t
 
 UNDEFINED SYMBOLS
 vListInsert
@@ -4226,7 +4226,7 @@ xQueueReceive
 vPortEnterCritical
 vPortExitCritical
 vListInitialise
-ARM GAS  /tmp/ccI5gi9p.s 			page 72
+ARM GAS  /tmp/ccetTm8w.s 			page 72
 
 
 xQueueGenericCreateStatic

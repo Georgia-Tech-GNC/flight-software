@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccJL7WIV.s 			page 1
+ARM GAS  /tmp/ccXO2gDf.s 			page 1
 
 
    1              		.cpu cortex-m7
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccJL7WIV.s 			page 1
   38              		.arch armv7e-m
   39              		.syntax unified
   40              		.thumb
-ARM GAS  /tmp/ccJL7WIV.s 			page 2
+ARM GAS  /tmp/ccXO2gDf.s 			page 2
 
 
   41              		.thumb_func
@@ -107,8 +107,8 @@ ARM GAS  /tmp/ccJL7WIV.s 			page 1
   39:../Core/Src/port_layer.c **** uint8_t sdio_mb_storage[256];
   40:../Core/Src/port_layer.c **** StaticMessageBuffer_t sdio_mb_buff;
   41:../Core/Src/port_layer.c **** 
-  42:../Core/Src/port_layer.c **** uint8_t telemetry_uart_rx_buf[UART2_RX_BUFFER_SIZE];
-  43:../Core/Src/port_layer.c **** uint8_t state_uart_rx_buf[UART3_RX_BUFFER_SIZE];
+  42:../Core/Src/port_layer.c **** uint8_t telemetry_uart_rx_buf[TELEMETRY_RX_BUFFER_SIZE];
+  43:../Core/Src/port_layer.c **** uint8_t state_uart_rx_buf[STATE_RX_BUFFER_SIZE];
   44:../Core/Src/port_layer.c **** 
   45:../Core/Src/port_layer.c **** int port_init(void) {
   47              		.loc 1 45 21 view -0
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccJL7WIV.s 			page 1
   51 0000 10B5     		push	{r4, lr}
   52              	.LCFI0:
   53              		.cfi_def_cfa_offset 8
-ARM GAS  /tmp/ccJL7WIV.s 			page 3
+ARM GAS  /tmp/ccXO2gDf.s 			page 3
 
 
   54              		.cfi_offset 4, -8
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccJL7WIV.s 			page 1
   96 003a 564B     		ldr	r3, .L16+20
   97 003c 0093     		str	r3, [sp]
   98 003e 564B     		ldr	r3, .L16+24
-ARM GAS  /tmp/ccJL7WIV.s 			page 4
+ARM GAS  /tmp/ccXO2gDf.s 			page 4
 
 
   99 0040 0122     		movs	r2, #1
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccJL7WIV.s 			page 1
   66:../Core/Src/port_layer.c ****     g_sdio_task_handle = xTaskCreateStatic(sdio_task, "flash_task", 4096, NULL, tskIDLE_PRIORITY, s
  145              		.loc 1 66 5 is_stmt 1 view .LVU24
  146              		.loc 1 66 26 is_stmt 0 view .LVU25
-ARM GAS  /tmp/ccJL7WIV.s 			page 5
+ARM GAS  /tmp/ccXO2gDf.s 			page 5
 
 
  147 008a 4B4B     		ldr	r3, .L16+56
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccJL7WIV.s 			page 1
  195 00dc 4348     		ldr	r0, .L16+108
  196 00de FFF7FEFF 		bl	xTaskCreateStatic
  197              	.LVL7:
-ARM GAS  /tmp/ccJL7WIV.s 			page 6
+ARM GAS  /tmp/ccXO2gDf.s 			page 6
 
 
  198              		.loc 1 72 32 view .LVU36
@@ -357,8 +357,8 @@ ARM GAS  /tmp/ccJL7WIV.s 			page 1
   80:../Core/Src/port_layer.c **** 
   81:../Core/Src/port_layer.c ****     /* Begin listening over uart */
   82:../Core/Src/port_layer.c ****     
-  83:../Core/Src/port_layer.c ****     if (HAL_UARTEx_ReceiveToIdle_DMA(&telemetry_uart, telemetry_uart_rx_buf, UART2_RX_BUFFER_SIZE) 
-ARM GAS  /tmp/ccJL7WIV.s 			page 7
+  83:../Core/Src/port_layer.c ****     if (HAL_UARTEx_ReceiveToIdle_IT(&telemetry_uart, telemetry_uart_rx_buf, TELEMETRY_RX_BUFFER_SIZ
+ARM GAS  /tmp/ccXO2gDf.s 			page 7
 
 
  244              		.loc 1 83 5 is_stmt 1 view .LVU49
@@ -366,7 +366,7 @@ ARM GAS  /tmp/ccJL7WIV.s 			page 1
  246 0128 1022     		movs	r2, #16
  247 012a 3C49     		ldr	r1, .L16+156
  248 012c 3C48     		ldr	r0, .L16+160
- 249 012e FFF7FEFF 		bl	HAL_UARTEx_ReceiveToIdle_DMA
+ 249 012e FFF7FEFF 		bl	HAL_UARTEx_ReceiveToIdle_IT
  250              	.LVL10:
  251              		.loc 1 83 8 view .LVU51
  252 0132 08B1     		cbz	r0, .L15
@@ -386,13 +386,13 @@ ARM GAS  /tmp/ccJL7WIV.s 			page 1
   87:../Core/Src/port_layer.c ****     }
   88:../Core/Src/port_layer.c ****     
   89:../Core/Src/port_layer.c **** 
-  90:../Core/Src/port_layer.c ****     if (HAL_UARTEx_ReceiveToIdle_DMA(&state_uart, state_uart_rx_buf, UART3_RX_BUFFER_SIZE) != HAL_O
+  90:../Core/Src/port_layer.c ****     if (HAL_UARTEx_ReceiveToIdle_IT(&state_uart, state_uart_rx_buf, STATE_RX_BUFFER_SIZE) != HAL_OK
  263              		.loc 1 90 5 view .LVU54
  264              		.loc 1 90 9 is_stmt 0 view .LVU55
  265 0142 4FF48072 		mov	r2, #256
  266 0146 3849     		ldr	r1, .L16+168
  267 0148 3848     		ldr	r0, .L16+172
- 268 014a FFF7FEFF 		bl	HAL_UARTEx_ReceiveToIdle_DMA
+ 268 014a FFF7FEFF 		bl	HAL_UARTEx_ReceiveToIdle_IT
  269              	.LVL12:
  270              		.loc 1 90 8 view .LVU56
  271 014e A0B9     		cbnz	r0, .L13
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccJL7WIV.s 			page 1
  285 0158 10BD     		pop	{r4, pc}
  286              	.L4:
  287              	.LCFI3:
-ARM GAS  /tmp/ccJL7WIV.s 			page 8
+ARM GAS  /tmp/ccXO2gDf.s 			page 8
 
 
  288              		.cfi_restore_state
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccJL7WIV.s 			page 1
  333 0198 00000000 		.word	.LANCHOR5
  334 019c 00000000 		.word	.LANCHOR7
  335 01a0 00000000 		.word	.LANCHOR9
-ARM GAS  /tmp/ccJL7WIV.s 			page 9
+ARM GAS  /tmp/ccXO2gDf.s 			page 9
 
 
  336 01a4 00000000 		.word	.LANCHOR8
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccJL7WIV.s 			page 1
  390              		.cfi_def_cfa_offset 8
  391              		.cfi_offset 3, -8
  392              		.cfi_offset 14, -4
-ARM GAS  /tmp/ccJL7WIV.s 			page 10
+ARM GAS  /tmp/ccXO2gDf.s 			page 10
 
 
   98:../Core/Src/port_layer.c ****     vTaskStartScheduler();
@@ -550,405 +550,398 @@ ARM GAS  /tmp/ccJL7WIV.s 			page 1
  397 0006 08BD     		pop	{r3, pc}
  398              		.cfi_endproc
  399              	.LFE149:
- 401              		.global	uart_rx_count
- 402              		.global	prev_size_uart_state
- 403              		.global	prev_size_uart_telemetry
- 404              		.global	state_uart_rx_buf
- 405              		.global	telemetry_uart_rx_buf
- 406              		.global	sdio_mb_buff
- 407              		.global	sdio_mb_storage
- 408              		.global	g_sdio_mb_handle
- 409              		.global	state_rx_sb_buff
- 410              		.global	state_rx_sb_storage
- 411              		.global	g_state_rx_sb_handle
- 412              		.global	telemetry_tx_mb_buff
- 413              		.global	telemetry_tx_mb_storage
- 414              		.global	g_telemetry_tx_mb_handle
- 415              		.global	telemetry_rx_sb_buff
- 416              		.global	telemetry_rx_sb_storage
- 417              		.global	g_telemetry_rx_sb_handle
- 418              		.global	state_mutex_buff
- 419              		.global	g_state_mutex_handle
- 420              		.global	state_rx_task_buff
- 421              		.global	state_rx_task_stack
- 422              		.global	g_state_rx_task_handle
- 423              		.global	telemetry_rx_task_buff
- 424              		.global	telemetry_rx_task_stack
- 425              		.global	g_telemetry_rx_task_handle
- 426              		.global	telemetry_tx_task_buff
- 427              		.global	telemetry_tx_task_stack
- 428              		.global	g_telemetry_tx_task_handle
- 429              		.global	sdio_task_buff
- 430              		.global	sdio_task_stack
- 431              		.global	g_sdio_task_handle
- 432              		.global	test_task_buff
- 433              		.global	test_task_stack
- 434              		.global	g_test_task_handle
- 435              		.section	.bss.g_sdio_mb_handle,"aw",%nobits
- 436              		.align	2
- 437              		.set	.LANCHOR13,. + 0
- 440              	g_sdio_mb_handle:
- 441 0000 00000000 		.space	4
- 442              		.section	.bss.g_sdio_task_handle,"aw",%nobits
- 443              		.align	2
- 444              		.set	.LANCHOR15,. + 0
- 447              	g_sdio_task_handle:
- 448 0000 00000000 		.space	4
- 449              		.section	.bss.g_state_mutex_handle,"aw",%nobits
- 450              		.align	2
- 451              		.set	.LANCHOR1,. + 0
- 454              	g_state_mutex_handle:
-ARM GAS  /tmp/ccJL7WIV.s 			page 11
+ 401              		.global	prev_size_uart_state
+ 402              		.global	prev_size_uart_telemetry
+ 403              		.global	state_uart_rx_buf
+ 404              		.global	telemetry_uart_rx_buf
+ 405              		.global	sdio_mb_buff
+ 406              		.global	sdio_mb_storage
+ 407              		.global	g_sdio_mb_handle
+ 408              		.global	state_rx_sb_buff
+ 409              		.global	state_rx_sb_storage
+ 410              		.global	g_state_rx_sb_handle
+ 411              		.global	telemetry_tx_mb_buff
+ 412              		.global	telemetry_tx_mb_storage
+ 413              		.global	g_telemetry_tx_mb_handle
+ 414              		.global	telemetry_rx_sb_buff
+ 415              		.global	telemetry_rx_sb_storage
+ 416              		.global	g_telemetry_rx_sb_handle
+ 417              		.global	state_mutex_buff
+ 418              		.global	g_state_mutex_handle
+ 419              		.global	state_rx_task_buff
+ 420              		.global	state_rx_task_stack
+ 421              		.global	g_state_rx_task_handle
+ 422              		.global	telemetry_rx_task_buff
+ 423              		.global	telemetry_rx_task_stack
+ 424              		.global	g_telemetry_rx_task_handle
+ 425              		.global	telemetry_tx_task_buff
+ 426              		.global	telemetry_tx_task_stack
+ 427              		.global	g_telemetry_tx_task_handle
+ 428              		.global	sdio_task_buff
+ 429              		.global	sdio_task_stack
+ 430              		.global	g_sdio_task_handle
+ 431              		.global	test_task_buff
+ 432              		.global	test_task_stack
+ 433              		.global	g_test_task_handle
+ 434              		.section	.bss.g_sdio_mb_handle,"aw",%nobits
+ 435              		.align	2
+ 436              		.set	.LANCHOR13,. + 0
+ 439              	g_sdio_mb_handle:
+ 440 0000 00000000 		.space	4
+ 441              		.section	.bss.g_sdio_task_handle,"aw",%nobits
+ 442              		.align	2
+ 443              		.set	.LANCHOR15,. + 0
+ 446              	g_sdio_task_handle:
+ 447 0000 00000000 		.space	4
+ 448              		.section	.bss.g_state_mutex_handle,"aw",%nobits
+ 449              		.align	2
+ 450              		.set	.LANCHOR1,. + 0
+ 453              	g_state_mutex_handle:
+ 454 0000 00000000 		.space	4
+ARM GAS  /tmp/ccXO2gDf.s 			page 11
 
 
- 455 0000 00000000 		.space	4
- 456              		.section	.bss.g_state_rx_sb_handle,"aw",%nobits
- 457              		.align	2
- 458              		.set	.LANCHOR10,. + 0
- 461              	g_state_rx_sb_handle:
- 462 0000 00000000 		.space	4
- 463              		.section	.bss.g_state_rx_task_handle,"aw",%nobits
- 464              		.align	2
- 465              		.set	.LANCHOR21,. + 0
- 468              	g_state_rx_task_handle:
- 469 0000 00000000 		.space	4
- 470              		.section	.bss.g_telemetry_rx_sb_handle,"aw",%nobits
- 471              		.align	2
- 472              		.set	.LANCHOR4,. + 0
- 475              	g_telemetry_rx_sb_handle:
- 476 0000 00000000 		.space	4
- 477              		.section	.bss.g_telemetry_rx_task_handle,"aw",%nobits
- 478              		.align	2
- 479              		.set	.LANCHOR19,. + 0
- 482              	g_telemetry_rx_task_handle:
- 483 0000 00000000 		.space	4
- 484              		.section	.bss.g_telemetry_tx_mb_handle,"aw",%nobits
- 485              		.align	2
- 486              		.set	.LANCHOR7,. + 0
- 489              	g_telemetry_tx_mb_handle:
- 490 0000 00000000 		.space	4
- 491              		.section	.bss.g_telemetry_tx_task_handle,"aw",%nobits
- 492              		.align	2
- 493              		.set	.LANCHOR17,. + 0
- 496              	g_telemetry_tx_task_handle:
- 497 0000 00000000 		.space	4
- 498              		.section	.bss.g_test_task_handle,"aw",%nobits
- 499              		.align	2
- 500              		.set	.LANCHOR23,. + 0
- 503              	g_test_task_handle:
- 504 0000 00000000 		.space	4
- 505              		.section	.bss.prev_size_uart_state,"aw",%nobits
- 506              		.align	1
- 509              	prev_size_uart_state:
- 510 0000 0000     		.space	2
- 511              		.section	.bss.prev_size_uart_telemetry,"aw",%nobits
- 512              		.align	1
- 515              	prev_size_uart_telemetry:
- 516 0000 0000     		.space	2
- 517              		.section	.bss.sdio_mb_buff,"aw",%nobits
- 518              		.align	2
- 519              		.set	.LANCHOR12,. + 0
- 522              	sdio_mb_buff:
- 523 0000 00000000 		.space	40
- 523      00000000 
- 523      00000000 
- 523      00000000 
- 523      00000000 
- 524              		.section	.bss.sdio_mb_storage,"aw",%nobits
- 525              		.align	2
- 526              		.set	.LANCHOR11,. + 0
- 529              	sdio_mb_storage:
-ARM GAS  /tmp/ccJL7WIV.s 			page 12
+ 455              		.section	.bss.g_state_rx_sb_handle,"aw",%nobits
+ 456              		.align	2
+ 457              		.set	.LANCHOR10,. + 0
+ 460              	g_state_rx_sb_handle:
+ 461 0000 00000000 		.space	4
+ 462              		.section	.bss.g_state_rx_task_handle,"aw",%nobits
+ 463              		.align	2
+ 464              		.set	.LANCHOR21,. + 0
+ 467              	g_state_rx_task_handle:
+ 468 0000 00000000 		.space	4
+ 469              		.section	.bss.g_telemetry_rx_sb_handle,"aw",%nobits
+ 470              		.align	2
+ 471              		.set	.LANCHOR4,. + 0
+ 474              	g_telemetry_rx_sb_handle:
+ 475 0000 00000000 		.space	4
+ 476              		.section	.bss.g_telemetry_rx_task_handle,"aw",%nobits
+ 477              		.align	2
+ 478              		.set	.LANCHOR19,. + 0
+ 481              	g_telemetry_rx_task_handle:
+ 482 0000 00000000 		.space	4
+ 483              		.section	.bss.g_telemetry_tx_mb_handle,"aw",%nobits
+ 484              		.align	2
+ 485              		.set	.LANCHOR7,. + 0
+ 488              	g_telemetry_tx_mb_handle:
+ 489 0000 00000000 		.space	4
+ 490              		.section	.bss.g_telemetry_tx_task_handle,"aw",%nobits
+ 491              		.align	2
+ 492              		.set	.LANCHOR17,. + 0
+ 495              	g_telemetry_tx_task_handle:
+ 496 0000 00000000 		.space	4
+ 497              		.section	.bss.g_test_task_handle,"aw",%nobits
+ 498              		.align	2
+ 499              		.set	.LANCHOR23,. + 0
+ 502              	g_test_task_handle:
+ 503 0000 00000000 		.space	4
+ 504              		.section	.bss.prev_size_uart_state,"aw",%nobits
+ 505              		.align	1
+ 508              	prev_size_uart_state:
+ 509 0000 0000     		.space	2
+ 510              		.section	.bss.prev_size_uart_telemetry,"aw",%nobits
+ 511              		.align	1
+ 514              	prev_size_uart_telemetry:
+ 515 0000 0000     		.space	2
+ 516              		.section	.bss.sdio_mb_buff,"aw",%nobits
+ 517              		.align	2
+ 518              		.set	.LANCHOR12,. + 0
+ 521              	sdio_mb_buff:
+ 522 0000 00000000 		.space	40
+ 522      00000000 
+ 522      00000000 
+ 522      00000000 
+ 522      00000000 
+ 523              		.section	.bss.sdio_mb_storage,"aw",%nobits
+ 524              		.align	2
+ 525              		.set	.LANCHOR11,. + 0
+ 528              	sdio_mb_storage:
+ 529 0000 00000000 		.space	256
+ARM GAS  /tmp/ccXO2gDf.s 			page 12
 
 
- 530 0000 00000000 		.space	256
- 530      00000000 
- 530      00000000 
- 530      00000000 
- 530      00000000 
- 531              		.section	.bss.sdio_task_buff,"aw",%nobits
- 532              		.align	2
- 533              		.set	.LANCHOR14,. + 0
- 536              	sdio_task_buff:
- 537 0000 00000000 		.space	92
- 537      00000000 
- 537      00000000 
- 537      00000000 
- 537      00000000 
- 538              		.section	.bss.sdio_task_stack,"aw",%nobits
- 539              		.align	2
- 542              	sdio_task_stack:
- 543 0000 00000000 		.space	16384
- 543      00000000 
- 543      00000000 
- 543      00000000 
- 543      00000000 
- 544              		.section	.bss.state_mutex_buff,"aw",%nobits
- 545              		.align	2
- 546              		.set	.LANCHOR0,. + 0
- 549              	state_mutex_buff:
- 550 0000 00000000 		.space	80
- 550      00000000 
- 550      00000000 
- 550      00000000 
- 550      00000000 
- 551              		.section	.bss.state_rx_sb_buff,"aw",%nobits
- 552              		.align	2
- 553              		.set	.LANCHOR9,. + 0
- 556              	state_rx_sb_buff:
- 557 0000 00000000 		.space	40
- 557      00000000 
- 557      00000000 
- 557      00000000 
- 557      00000000 
- 558              		.section	.bss.state_rx_sb_storage,"aw",%nobits
- 559              		.align	2
- 560              		.set	.LANCHOR8,. + 0
- 563              	state_rx_sb_storage:
- 564 0000 00000000 		.space	29
- 564      00000000 
- 564      00000000 
- 564      00000000 
- 564      00000000 
- 565              		.section	.bss.state_rx_task_buff,"aw",%nobits
- 566              		.align	2
- 567              		.set	.LANCHOR20,. + 0
- 570              	state_rx_task_buff:
- 571 0000 00000000 		.space	92
- 571      00000000 
- 571      00000000 
- 571      00000000 
-ARM GAS  /tmp/ccJL7WIV.s 			page 13
+ 529      00000000 
+ 529      00000000 
+ 529      00000000 
+ 529      00000000 
+ 530              		.section	.bss.sdio_task_buff,"aw",%nobits
+ 531              		.align	2
+ 532              		.set	.LANCHOR14,. + 0
+ 535              	sdio_task_buff:
+ 536 0000 00000000 		.space	92
+ 536      00000000 
+ 536      00000000 
+ 536      00000000 
+ 536      00000000 
+ 537              		.section	.bss.sdio_task_stack,"aw",%nobits
+ 538              		.align	2
+ 541              	sdio_task_stack:
+ 542 0000 00000000 		.space	16384
+ 542      00000000 
+ 542      00000000 
+ 542      00000000 
+ 542      00000000 
+ 543              		.section	.bss.state_mutex_buff,"aw",%nobits
+ 544              		.align	2
+ 545              		.set	.LANCHOR0,. + 0
+ 548              	state_mutex_buff:
+ 549 0000 00000000 		.space	80
+ 549      00000000 
+ 549      00000000 
+ 549      00000000 
+ 549      00000000 
+ 550              		.section	.bss.state_rx_sb_buff,"aw",%nobits
+ 551              		.align	2
+ 552              		.set	.LANCHOR9,. + 0
+ 555              	state_rx_sb_buff:
+ 556 0000 00000000 		.space	40
+ 556      00000000 
+ 556      00000000 
+ 556      00000000 
+ 556      00000000 
+ 557              		.section	.bss.state_rx_sb_storage,"aw",%nobits
+ 558              		.align	2
+ 559              		.set	.LANCHOR8,. + 0
+ 562              	state_rx_sb_storage:
+ 563 0000 00000000 		.space	29
+ 563      00000000 
+ 563      00000000 
+ 563      00000000 
+ 563      00000000 
+ 564              		.section	.bss.state_rx_task_buff,"aw",%nobits
+ 565              		.align	2
+ 566              		.set	.LANCHOR20,. + 0
+ 569              	state_rx_task_buff:
+ 570 0000 00000000 		.space	92
+ 570      00000000 
+ 570      00000000 
+ 570      00000000 
+ 570      00000000 
+ARM GAS  /tmp/ccXO2gDf.s 			page 13
 
 
- 571      00000000 
- 572              		.section	.bss.state_rx_task_stack,"aw",%nobits
- 573              		.align	2
- 576              	state_rx_task_stack:
- 577 0000 00000000 		.space	16384
- 577      00000000 
- 577      00000000 
- 577      00000000 
- 577      00000000 
- 578              		.section	.bss.state_uart_rx_buf,"aw",%nobits
- 579              		.align	2
- 580              		.set	.LANCHOR25,. + 0
- 583              	state_uart_rx_buf:
- 584 0000 00000000 		.space	256
- 584      00000000 
- 584      00000000 
- 584      00000000 
- 584      00000000 
- 585              		.section	.bss.telemetry_rx_sb_buff,"aw",%nobits
- 586              		.align	2
- 587              		.set	.LANCHOR3,. + 0
- 590              	telemetry_rx_sb_buff:
- 591 0000 00000000 		.space	40
- 591      00000000 
- 591      00000000 
- 591      00000000 
- 591      00000000 
- 592              		.section	.bss.telemetry_rx_sb_storage,"aw",%nobits
- 593              		.align	2
- 594              		.set	.LANCHOR2,. + 0
- 597              	telemetry_rx_sb_storage:
- 598 0000 00000000 		.space	17
- 598      00000000 
- 598      00000000 
- 598      00000000 
- 598      00
- 599              		.section	.bss.telemetry_rx_task_buff,"aw",%nobits
- 600              		.align	2
- 601              		.set	.LANCHOR18,. + 0
- 604              	telemetry_rx_task_buff:
- 605 0000 00000000 		.space	92
- 605      00000000 
- 605      00000000 
- 605      00000000 
- 605      00000000 
- 606              		.section	.bss.telemetry_rx_task_stack,"aw",%nobits
- 607              		.align	2
- 610              	telemetry_rx_task_stack:
- 611 0000 00000000 		.space	16384
- 611      00000000 
- 611      00000000 
- 611      00000000 
- 611      00000000 
- 612              		.section	.bss.telemetry_tx_mb_buff,"aw",%nobits
- 613              		.align	2
- 614              		.set	.LANCHOR6,. + 0
- 617              	telemetry_tx_mb_buff:
-ARM GAS  /tmp/ccJL7WIV.s 			page 14
+ 571              		.section	.bss.state_rx_task_stack,"aw",%nobits
+ 572              		.align	2
+ 575              	state_rx_task_stack:
+ 576 0000 00000000 		.space	16384
+ 576      00000000 
+ 576      00000000 
+ 576      00000000 
+ 576      00000000 
+ 577              		.section	.bss.state_uart_rx_buf,"aw",%nobits
+ 578              		.align	2
+ 579              		.set	.LANCHOR25,. + 0
+ 582              	state_uart_rx_buf:
+ 583 0000 00000000 		.space	256
+ 583      00000000 
+ 583      00000000 
+ 583      00000000 
+ 583      00000000 
+ 584              		.section	.bss.telemetry_rx_sb_buff,"aw",%nobits
+ 585              		.align	2
+ 586              		.set	.LANCHOR3,. + 0
+ 589              	telemetry_rx_sb_buff:
+ 590 0000 00000000 		.space	40
+ 590      00000000 
+ 590      00000000 
+ 590      00000000 
+ 590      00000000 
+ 591              		.section	.bss.telemetry_rx_sb_storage,"aw",%nobits
+ 592              		.align	2
+ 593              		.set	.LANCHOR2,. + 0
+ 596              	telemetry_rx_sb_storage:
+ 597 0000 00000000 		.space	17
+ 597      00000000 
+ 597      00000000 
+ 597      00000000 
+ 597      00
+ 598              		.section	.bss.telemetry_rx_task_buff,"aw",%nobits
+ 599              		.align	2
+ 600              		.set	.LANCHOR18,. + 0
+ 603              	telemetry_rx_task_buff:
+ 604 0000 00000000 		.space	92
+ 604      00000000 
+ 604      00000000 
+ 604      00000000 
+ 604      00000000 
+ 605              		.section	.bss.telemetry_rx_task_stack,"aw",%nobits
+ 606              		.align	2
+ 609              	telemetry_rx_task_stack:
+ 610 0000 00000000 		.space	16384
+ 610      00000000 
+ 610      00000000 
+ 610      00000000 
+ 610      00000000 
+ 611              		.section	.bss.telemetry_tx_mb_buff,"aw",%nobits
+ 612              		.align	2
+ 613              		.set	.LANCHOR6,. + 0
+ 616              	telemetry_tx_mb_buff:
+ 617 0000 00000000 		.space	40
+ARM GAS  /tmp/ccXO2gDf.s 			page 14
 
 
- 618 0000 00000000 		.space	40
- 618      00000000 
- 618      00000000 
- 618      00000000 
- 618      00000000 
- 619              		.section	.bss.telemetry_tx_mb_storage,"aw",%nobits
- 620              		.align	2
- 621              		.set	.LANCHOR5,. + 0
- 624              	telemetry_tx_mb_storage:
- 625 0000 00000000 		.space	1032
- 625      00000000 
- 625      00000000 
- 625      00000000 
- 625      00000000 
- 626              		.section	.bss.telemetry_tx_task_buff,"aw",%nobits
- 627              		.align	2
- 628              		.set	.LANCHOR16,. + 0
- 631              	telemetry_tx_task_buff:
- 632 0000 00000000 		.space	92
- 632      00000000 
- 632      00000000 
- 632      00000000 
- 632      00000000 
- 633              		.section	.bss.telemetry_tx_task_stack,"aw",%nobits
- 634              		.align	2
- 637              	telemetry_tx_task_stack:
- 638 0000 00000000 		.space	16384
- 638      00000000 
- 638      00000000 
- 638      00000000 
- 638      00000000 
- 639              		.section	.bss.telemetry_uart_rx_buf,"aw",%nobits
- 640              		.align	2
- 641              		.set	.LANCHOR24,. + 0
- 644              	telemetry_uart_rx_buf:
- 645 0000 00000000 		.space	16
- 645      00000000 
- 645      00000000 
- 645      00000000 
- 646              		.section	.bss.test_task_buff,"aw",%nobits
- 647              		.align	2
- 648              		.set	.LANCHOR22,. + 0
- 651              	test_task_buff:
- 652 0000 00000000 		.space	92
- 652      00000000 
- 652      00000000 
- 652      00000000 
- 652      00000000 
- 653              		.section	.bss.test_task_stack,"aw",%nobits
- 654              		.align	2
- 657              	test_task_stack:
- 658 0000 00000000 		.space	32768
- 658      00000000 
- 658      00000000 
- 658      00000000 
- 658      00000000 
- 659              		.section	.bss.uart_rx_count,"aw",%nobits
-ARM GAS  /tmp/ccJL7WIV.s 			page 15
+ 617      00000000 
+ 617      00000000 
+ 617      00000000 
+ 617      00000000 
+ 618              		.section	.bss.telemetry_tx_mb_storage,"aw",%nobits
+ 619              		.align	2
+ 620              		.set	.LANCHOR5,. + 0
+ 623              	telemetry_tx_mb_storage:
+ 624 0000 00000000 		.space	1032
+ 624      00000000 
+ 624      00000000 
+ 624      00000000 
+ 624      00000000 
+ 625              		.section	.bss.telemetry_tx_task_buff,"aw",%nobits
+ 626              		.align	2
+ 627              		.set	.LANCHOR16,. + 0
+ 630              	telemetry_tx_task_buff:
+ 631 0000 00000000 		.space	92
+ 631      00000000 
+ 631      00000000 
+ 631      00000000 
+ 631      00000000 
+ 632              		.section	.bss.telemetry_tx_task_stack,"aw",%nobits
+ 633              		.align	2
+ 636              	telemetry_tx_task_stack:
+ 637 0000 00000000 		.space	16384
+ 637      00000000 
+ 637      00000000 
+ 637      00000000 
+ 637      00000000 
+ 638              		.section	.bss.telemetry_uart_rx_buf,"aw",%nobits
+ 639              		.align	2
+ 640              		.set	.LANCHOR24,. + 0
+ 643              	telemetry_uart_rx_buf:
+ 644 0000 00000000 		.space	16
+ 644      00000000 
+ 644      00000000 
+ 644      00000000 
+ 645              		.section	.bss.test_task_buff,"aw",%nobits
+ 646              		.align	2
+ 647              		.set	.LANCHOR22,. + 0
+ 650              	test_task_buff:
+ 651 0000 00000000 		.space	92
+ 651      00000000 
+ 651      00000000 
+ 651      00000000 
+ 651      00000000 
+ 652              		.section	.bss.test_task_stack,"aw",%nobits
+ 653              		.align	2
+ 656              	test_task_stack:
+ 657 0000 00000000 		.space	32768
+ 657      00000000 
+ 657      00000000 
+ 657      00000000 
+ 657      00000000 
+ 658              		.text
+ 659              	.Letext0:
+ARM GAS  /tmp/ccXO2gDf.s 			page 15
 
 
- 660              		.align	1
- 663              	uart_rx_count:
- 664 0000 0000     		.space	2
- 665              		.text
- 666              	.Letext0:
- 667              		.file 2 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stddef.h"
- 668              		.file 3 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stdint.h"
- 669              		.file 4 "Core/Inc/portmacro.h"
- 670              		.file 5 "../Core/FreeRTOS-Kernel/include/FreeRTOS.h"
- 671              		.file 6 "../Core/FreeRTOS-Kernel/include/task.h"
- 672              		.file 7 "../Core/FreeRTOS-Kernel/include/stream_buffer.h"
- 673              		.file 8 "../Core/FreeRTOS-Kernel/include/message_buffer.h"
- 674              		.file 9 "../Core/FreeRTOS-Kernel/include/queue.h"
- 675              		.file 10 "../Core/FreeRTOS-Kernel/include/semphr.h"
- 676              		.file 11 "Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h725xx.h"
- 677              		.file 12 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_def.h"
- 678              		.file 13 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dma.h"
- 679              		.file 14 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h"
- 680              		.file 15 "../Core/Include/globals.h"
- 681              		.file 16 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h"
-ARM GAS  /tmp/ccJL7WIV.s 			page 16
+ 660              		.file 2 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stddef.h"
+ 661              		.file 3 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stdint.h"
+ 662              		.file 4 "Core/Inc/portmacro.h"
+ 663              		.file 5 "../Core/FreeRTOS-Kernel/include/FreeRTOS.h"
+ 664              		.file 6 "../Core/FreeRTOS-Kernel/include/task.h"
+ 665              		.file 7 "../Core/FreeRTOS-Kernel/include/stream_buffer.h"
+ 666              		.file 8 "../Core/FreeRTOS-Kernel/include/message_buffer.h"
+ 667              		.file 9 "../Core/FreeRTOS-Kernel/include/queue.h"
+ 668              		.file 10 "../Core/FreeRTOS-Kernel/include/semphr.h"
+ 669              		.file 11 "Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h725xx.h"
+ 670              		.file 12 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_def.h"
+ 671              		.file 13 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dma.h"
+ 672              		.file 14 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h"
+ 673              		.file 15 "../Core/Include/globals.h"
+ 674              		.file 16 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h"
+ARM GAS  /tmp/ccXO2gDf.s 			page 16
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 port_layer.c
-     /tmp/ccJL7WIV.s:17     .rodata.port_init.str1.4:0000000000000000 $d
-     /tmp/ccJL7WIV.s:36     .text.port_init:0000000000000000 $t
-     /tmp/ccJL7WIV.s:44     .text.port_init:0000000000000000 port_init
-     /tmp/ccJL7WIV.s:327    .text.port_init:0000000000000180 $d
-     /tmp/ccJL7WIV.s:542    .bss.sdio_task_stack:0000000000000000 sdio_task_stack
-     /tmp/ccJL7WIV.s:637    .bss.telemetry_tx_task_stack:0000000000000000 telemetry_tx_task_stack
-     /tmp/ccJL7WIV.s:610    .bss.telemetry_rx_task_stack:0000000000000000 telemetry_rx_task_stack
-     /tmp/ccJL7WIV.s:576    .bss.state_rx_task_stack:0000000000000000 state_rx_task_stack
-     /tmp/ccJL7WIV.s:657    .bss.test_task_stack:0000000000000000 test_task_stack
-     /tmp/ccJL7WIV.s:375    .text.port_start:0000000000000000 $t
-     /tmp/ccJL7WIV.s:382    .text.port_start:0000000000000000 port_start
-     /tmp/ccJL7WIV.s:663    .bss.uart_rx_count:0000000000000000 uart_rx_count
-     /tmp/ccJL7WIV.s:509    .bss.prev_size_uart_state:0000000000000000 prev_size_uart_state
-     /tmp/ccJL7WIV.s:515    .bss.prev_size_uart_telemetry:0000000000000000 prev_size_uart_telemetry
-     /tmp/ccJL7WIV.s:583    .bss.state_uart_rx_buf:0000000000000000 state_uart_rx_buf
-     /tmp/ccJL7WIV.s:644    .bss.telemetry_uart_rx_buf:0000000000000000 telemetry_uart_rx_buf
-     /tmp/ccJL7WIV.s:522    .bss.sdio_mb_buff:0000000000000000 sdio_mb_buff
-     /tmp/ccJL7WIV.s:529    .bss.sdio_mb_storage:0000000000000000 sdio_mb_storage
-     /tmp/ccJL7WIV.s:440    .bss.g_sdio_mb_handle:0000000000000000 g_sdio_mb_handle
-     /tmp/ccJL7WIV.s:556    .bss.state_rx_sb_buff:0000000000000000 state_rx_sb_buff
-     /tmp/ccJL7WIV.s:563    .bss.state_rx_sb_storage:0000000000000000 state_rx_sb_storage
-     /tmp/ccJL7WIV.s:461    .bss.g_state_rx_sb_handle:0000000000000000 g_state_rx_sb_handle
-     /tmp/ccJL7WIV.s:617    .bss.telemetry_tx_mb_buff:0000000000000000 telemetry_tx_mb_buff
-     /tmp/ccJL7WIV.s:624    .bss.telemetry_tx_mb_storage:0000000000000000 telemetry_tx_mb_storage
-     /tmp/ccJL7WIV.s:489    .bss.g_telemetry_tx_mb_handle:0000000000000000 g_telemetry_tx_mb_handle
-     /tmp/ccJL7WIV.s:590    .bss.telemetry_rx_sb_buff:0000000000000000 telemetry_rx_sb_buff
-     /tmp/ccJL7WIV.s:597    .bss.telemetry_rx_sb_storage:0000000000000000 telemetry_rx_sb_storage
-     /tmp/ccJL7WIV.s:475    .bss.g_telemetry_rx_sb_handle:0000000000000000 g_telemetry_rx_sb_handle
-     /tmp/ccJL7WIV.s:549    .bss.state_mutex_buff:0000000000000000 state_mutex_buff
-     /tmp/ccJL7WIV.s:454    .bss.g_state_mutex_handle:0000000000000000 g_state_mutex_handle
-     /tmp/ccJL7WIV.s:570    .bss.state_rx_task_buff:0000000000000000 state_rx_task_buff
-     /tmp/ccJL7WIV.s:468    .bss.g_state_rx_task_handle:0000000000000000 g_state_rx_task_handle
-     /tmp/ccJL7WIV.s:604    .bss.telemetry_rx_task_buff:0000000000000000 telemetry_rx_task_buff
-     /tmp/ccJL7WIV.s:482    .bss.g_telemetry_rx_task_handle:0000000000000000 g_telemetry_rx_task_handle
-     /tmp/ccJL7WIV.s:631    .bss.telemetry_tx_task_buff:0000000000000000 telemetry_tx_task_buff
-     /tmp/ccJL7WIV.s:496    .bss.g_telemetry_tx_task_handle:0000000000000000 g_telemetry_tx_task_handle
-     /tmp/ccJL7WIV.s:536    .bss.sdio_task_buff:0000000000000000 sdio_task_buff
-     /tmp/ccJL7WIV.s:447    .bss.g_sdio_task_handle:0000000000000000 g_sdio_task_handle
-     /tmp/ccJL7WIV.s:651    .bss.test_task_buff:0000000000000000 test_task_buff
-     /tmp/ccJL7WIV.s:503    .bss.g_test_task_handle:0000000000000000 g_test_task_handle
-     /tmp/ccJL7WIV.s:436    .bss.g_sdio_mb_handle:0000000000000000 $d
-     /tmp/ccJL7WIV.s:443    .bss.g_sdio_task_handle:0000000000000000 $d
-     /tmp/ccJL7WIV.s:450    .bss.g_state_mutex_handle:0000000000000000 $d
-     /tmp/ccJL7WIV.s:457    .bss.g_state_rx_sb_handle:0000000000000000 $d
-     /tmp/ccJL7WIV.s:464    .bss.g_state_rx_task_handle:0000000000000000 $d
-     /tmp/ccJL7WIV.s:471    .bss.g_telemetry_rx_sb_handle:0000000000000000 $d
-     /tmp/ccJL7WIV.s:478    .bss.g_telemetry_rx_task_handle:0000000000000000 $d
-     /tmp/ccJL7WIV.s:485    .bss.g_telemetry_tx_mb_handle:0000000000000000 $d
-     /tmp/ccJL7WIV.s:492    .bss.g_telemetry_tx_task_handle:0000000000000000 $d
-     /tmp/ccJL7WIV.s:499    .bss.g_test_task_handle:0000000000000000 $d
-     /tmp/ccJL7WIV.s:506    .bss.prev_size_uart_state:0000000000000000 $d
-     /tmp/ccJL7WIV.s:512    .bss.prev_size_uart_telemetry:0000000000000000 $d
-     /tmp/ccJL7WIV.s:518    .bss.sdio_mb_buff:0000000000000000 $d
-     /tmp/ccJL7WIV.s:525    .bss.sdio_mb_storage:0000000000000000 $d
-     /tmp/ccJL7WIV.s:532    .bss.sdio_task_buff:0000000000000000 $d
-ARM GAS  /tmp/ccJL7WIV.s 			page 17
+     /tmp/ccXO2gDf.s:17     .rodata.port_init.str1.4:0000000000000000 $d
+     /tmp/ccXO2gDf.s:36     .text.port_init:0000000000000000 $t
+     /tmp/ccXO2gDf.s:44     .text.port_init:0000000000000000 port_init
+     /tmp/ccXO2gDf.s:327    .text.port_init:0000000000000180 $d
+     /tmp/ccXO2gDf.s:541    .bss.sdio_task_stack:0000000000000000 sdio_task_stack
+     /tmp/ccXO2gDf.s:636    .bss.telemetry_tx_task_stack:0000000000000000 telemetry_tx_task_stack
+     /tmp/ccXO2gDf.s:609    .bss.telemetry_rx_task_stack:0000000000000000 telemetry_rx_task_stack
+     /tmp/ccXO2gDf.s:575    .bss.state_rx_task_stack:0000000000000000 state_rx_task_stack
+     /tmp/ccXO2gDf.s:656    .bss.test_task_stack:0000000000000000 test_task_stack
+     /tmp/ccXO2gDf.s:375    .text.port_start:0000000000000000 $t
+     /tmp/ccXO2gDf.s:382    .text.port_start:0000000000000000 port_start
+     /tmp/ccXO2gDf.s:508    .bss.prev_size_uart_state:0000000000000000 prev_size_uart_state
+     /tmp/ccXO2gDf.s:514    .bss.prev_size_uart_telemetry:0000000000000000 prev_size_uart_telemetry
+     /tmp/ccXO2gDf.s:582    .bss.state_uart_rx_buf:0000000000000000 state_uart_rx_buf
+     /tmp/ccXO2gDf.s:643    .bss.telemetry_uart_rx_buf:0000000000000000 telemetry_uart_rx_buf
+     /tmp/ccXO2gDf.s:521    .bss.sdio_mb_buff:0000000000000000 sdio_mb_buff
+     /tmp/ccXO2gDf.s:528    .bss.sdio_mb_storage:0000000000000000 sdio_mb_storage
+     /tmp/ccXO2gDf.s:439    .bss.g_sdio_mb_handle:0000000000000000 g_sdio_mb_handle
+     /tmp/ccXO2gDf.s:555    .bss.state_rx_sb_buff:0000000000000000 state_rx_sb_buff
+     /tmp/ccXO2gDf.s:562    .bss.state_rx_sb_storage:0000000000000000 state_rx_sb_storage
+     /tmp/ccXO2gDf.s:460    .bss.g_state_rx_sb_handle:0000000000000000 g_state_rx_sb_handle
+     /tmp/ccXO2gDf.s:616    .bss.telemetry_tx_mb_buff:0000000000000000 telemetry_tx_mb_buff
+     /tmp/ccXO2gDf.s:623    .bss.telemetry_tx_mb_storage:0000000000000000 telemetry_tx_mb_storage
+     /tmp/ccXO2gDf.s:488    .bss.g_telemetry_tx_mb_handle:0000000000000000 g_telemetry_tx_mb_handle
+     /tmp/ccXO2gDf.s:589    .bss.telemetry_rx_sb_buff:0000000000000000 telemetry_rx_sb_buff
+     /tmp/ccXO2gDf.s:596    .bss.telemetry_rx_sb_storage:0000000000000000 telemetry_rx_sb_storage
+     /tmp/ccXO2gDf.s:474    .bss.g_telemetry_rx_sb_handle:0000000000000000 g_telemetry_rx_sb_handle
+     /tmp/ccXO2gDf.s:548    .bss.state_mutex_buff:0000000000000000 state_mutex_buff
+     /tmp/ccXO2gDf.s:453    .bss.g_state_mutex_handle:0000000000000000 g_state_mutex_handle
+     /tmp/ccXO2gDf.s:569    .bss.state_rx_task_buff:0000000000000000 state_rx_task_buff
+     /tmp/ccXO2gDf.s:467    .bss.g_state_rx_task_handle:0000000000000000 g_state_rx_task_handle
+     /tmp/ccXO2gDf.s:603    .bss.telemetry_rx_task_buff:0000000000000000 telemetry_rx_task_buff
+     /tmp/ccXO2gDf.s:481    .bss.g_telemetry_rx_task_handle:0000000000000000 g_telemetry_rx_task_handle
+     /tmp/ccXO2gDf.s:630    .bss.telemetry_tx_task_buff:0000000000000000 telemetry_tx_task_buff
+     /tmp/ccXO2gDf.s:495    .bss.g_telemetry_tx_task_handle:0000000000000000 g_telemetry_tx_task_handle
+     /tmp/ccXO2gDf.s:535    .bss.sdio_task_buff:0000000000000000 sdio_task_buff
+     /tmp/ccXO2gDf.s:446    .bss.g_sdio_task_handle:0000000000000000 g_sdio_task_handle
+     /tmp/ccXO2gDf.s:650    .bss.test_task_buff:0000000000000000 test_task_buff
+     /tmp/ccXO2gDf.s:502    .bss.g_test_task_handle:0000000000000000 g_test_task_handle
+     /tmp/ccXO2gDf.s:435    .bss.g_sdio_mb_handle:0000000000000000 $d
+     /tmp/ccXO2gDf.s:442    .bss.g_sdio_task_handle:0000000000000000 $d
+     /tmp/ccXO2gDf.s:449    .bss.g_state_mutex_handle:0000000000000000 $d
+     /tmp/ccXO2gDf.s:456    .bss.g_state_rx_sb_handle:0000000000000000 $d
+     /tmp/ccXO2gDf.s:463    .bss.g_state_rx_task_handle:0000000000000000 $d
+     /tmp/ccXO2gDf.s:470    .bss.g_telemetry_rx_sb_handle:0000000000000000 $d
+     /tmp/ccXO2gDf.s:477    .bss.g_telemetry_rx_task_handle:0000000000000000 $d
+     /tmp/ccXO2gDf.s:484    .bss.g_telemetry_tx_mb_handle:0000000000000000 $d
+     /tmp/ccXO2gDf.s:491    .bss.g_telemetry_tx_task_handle:0000000000000000 $d
+     /tmp/ccXO2gDf.s:498    .bss.g_test_task_handle:0000000000000000 $d
+     /tmp/ccXO2gDf.s:505    .bss.prev_size_uart_state:0000000000000000 $d
+     /tmp/ccXO2gDf.s:511    .bss.prev_size_uart_telemetry:0000000000000000 $d
+     /tmp/ccXO2gDf.s:517    .bss.sdio_mb_buff:0000000000000000 $d
+     /tmp/ccXO2gDf.s:524    .bss.sdio_mb_storage:0000000000000000 $d
+     /tmp/ccXO2gDf.s:531    .bss.sdio_task_buff:0000000000000000 $d
+     /tmp/ccXO2gDf.s:538    .bss.sdio_task_stack:0000000000000000 $d
+ARM GAS  /tmp/ccXO2gDf.s 			page 17
 
 
-     /tmp/ccJL7WIV.s:539    .bss.sdio_task_stack:0000000000000000 $d
-     /tmp/ccJL7WIV.s:545    .bss.state_mutex_buff:0000000000000000 $d
-     /tmp/ccJL7WIV.s:552    .bss.state_rx_sb_buff:0000000000000000 $d
-     /tmp/ccJL7WIV.s:559    .bss.state_rx_sb_storage:0000000000000000 $d
-     /tmp/ccJL7WIV.s:566    .bss.state_rx_task_buff:0000000000000000 $d
-     /tmp/ccJL7WIV.s:573    .bss.state_rx_task_stack:0000000000000000 $d
-     /tmp/ccJL7WIV.s:579    .bss.state_uart_rx_buf:0000000000000000 $d
-     /tmp/ccJL7WIV.s:586    .bss.telemetry_rx_sb_buff:0000000000000000 $d
-     /tmp/ccJL7WIV.s:593    .bss.telemetry_rx_sb_storage:0000000000000000 $d
-     /tmp/ccJL7WIV.s:600    .bss.telemetry_rx_task_buff:0000000000000000 $d
-     /tmp/ccJL7WIV.s:607    .bss.telemetry_rx_task_stack:0000000000000000 $d
-     /tmp/ccJL7WIV.s:613    .bss.telemetry_tx_mb_buff:0000000000000000 $d
-     /tmp/ccJL7WIV.s:620    .bss.telemetry_tx_mb_storage:0000000000000000 $d
-     /tmp/ccJL7WIV.s:627    .bss.telemetry_tx_task_buff:0000000000000000 $d
-     /tmp/ccJL7WIV.s:634    .bss.telemetry_tx_task_stack:0000000000000000 $d
-     /tmp/ccJL7WIV.s:640    .bss.telemetry_uart_rx_buf:0000000000000000 $d
-     /tmp/ccJL7WIV.s:647    .bss.test_task_buff:0000000000000000 $d
-     /tmp/ccJL7WIV.s:654    .bss.test_task_stack:0000000000000000 $d
-     /tmp/ccJL7WIV.s:660    .bss.uart_rx_count:0000000000000000 $d
+     /tmp/ccXO2gDf.s:544    .bss.state_mutex_buff:0000000000000000 $d
+     /tmp/ccXO2gDf.s:551    .bss.state_rx_sb_buff:0000000000000000 $d
+     /tmp/ccXO2gDf.s:558    .bss.state_rx_sb_storage:0000000000000000 $d
+     /tmp/ccXO2gDf.s:565    .bss.state_rx_task_buff:0000000000000000 $d
+     /tmp/ccXO2gDf.s:572    .bss.state_rx_task_stack:0000000000000000 $d
+     /tmp/ccXO2gDf.s:578    .bss.state_uart_rx_buf:0000000000000000 $d
+     /tmp/ccXO2gDf.s:585    .bss.telemetry_rx_sb_buff:0000000000000000 $d
+     /tmp/ccXO2gDf.s:592    .bss.telemetry_rx_sb_storage:0000000000000000 $d
+     /tmp/ccXO2gDf.s:599    .bss.telemetry_rx_task_buff:0000000000000000 $d
+     /tmp/ccXO2gDf.s:606    .bss.telemetry_rx_task_stack:0000000000000000 $d
+     /tmp/ccXO2gDf.s:612    .bss.telemetry_tx_mb_buff:0000000000000000 $d
+     /tmp/ccXO2gDf.s:619    .bss.telemetry_tx_mb_storage:0000000000000000 $d
+     /tmp/ccXO2gDf.s:626    .bss.telemetry_tx_task_buff:0000000000000000 $d
+     /tmp/ccXO2gDf.s:633    .bss.telemetry_tx_task_stack:0000000000000000 $d
+     /tmp/ccXO2gDf.s:639    .bss.telemetry_uart_rx_buf:0000000000000000 $d
+     /tmp/ccXO2gDf.s:646    .bss.test_task_buff:0000000000000000 $d
+     /tmp/ccXO2gDf.s:653    .bss.test_task_stack:0000000000000000 $d
 
 UNDEFINED SYMBOLS
 xQueueCreateMutexStatic
 xStreamBufferGenericCreateStatic
 xTaskCreateStatic
-HAL_UARTEx_ReceiveToIdle_DMA
+HAL_UARTEx_ReceiveToIdle_IT
 HAL_UART_Transmit_DMA
 sdio_task
 telemetry_tx_task

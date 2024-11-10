@@ -60,7 +60,7 @@ file_path = find_file_with_ending(directory_to_search, file_ending)
 lines_to_remove = 10
 #remove_bad_lines(file_path, bad_handlers, lines_to_remove)
 comment_bad_lines(file_path, bad_handlers, lines_to_remove)
-
+ 
 # Fix stm32[..]xx_it.h - Remove handlers defined by FreeRTOS
 directory_to_search = "MainMCU/"+mcu+"/Core/Inc/"
 file_ending = 'xx_it.h'

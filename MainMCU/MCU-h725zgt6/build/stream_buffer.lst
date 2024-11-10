@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccyt9wyD.s 			page 1
+ARM GAS  /tmp/ccjKuAAf.s 			page 1
 
 
    1              		.cpu cortex-m7
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
   29:../Core/FreeRTOS-Kernel/stream_buffer.c **** /* Standard includes. */
   30:../Core/FreeRTOS-Kernel/stream_buffer.c **** #include <string.h>
   31:../Core/FreeRTOS-Kernel/stream_buffer.c **** 
-ARM GAS  /tmp/ccyt9wyD.s 			page 2
+ARM GAS  /tmp/ccjKuAAf.s 			page 2
 
 
   32:../Core/FreeRTOS-Kernel/stream_buffer.c **** /* Defining MPU_WRAPPERS_INCLUDED_FROM_API_FILE prevents task.h from redefining
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
   86:../Core/FreeRTOS-Kernel/stream_buffer.c ****     #if ( configUSE_SB_COMPLETED_CALLBACK == 1 )
   87:../Core/FreeRTOS-Kernel/stream_buffer.c ****         #define prvRECEIVE_COMPLETED( pxStreamBuffer )                                           \
   88:../Core/FreeRTOS-Kernel/stream_buffer.c ****     do {                                                                                         \
-ARM GAS  /tmp/ccyt9wyD.s 			page 3
+ARM GAS  /tmp/ccjKuAAf.s 			page 3
 
 
   89:../Core/FreeRTOS-Kernel/stream_buffer.c ****         if( ( pxStreamBuffer )->pxReceiveCompletedCallback != NULL )                             \
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  143:../Core/FreeRTOS-Kernel/stream_buffer.c ****  * or #defined the notification macro away, then provide a default
  144:../Core/FreeRTOS-Kernel/stream_buffer.c ****  * implementation that uses task notifications.
  145:../Core/FreeRTOS-Kernel/stream_buffer.c ****  */
-ARM GAS  /tmp/ccyt9wyD.s 			page 4
+ARM GAS  /tmp/ccjKuAAf.s 			page 4
 
 
  146:../Core/FreeRTOS-Kernel/stream_buffer.c ****     #ifndef sbSEND_COMPLETED
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  200:../Core/FreeRTOS-Kernel/stream_buffer.c ****     } while( 0 )
  201:../Core/FreeRTOS-Kernel/stream_buffer.c ****     #endif /* sbSEND_COMPLETE_FROM_ISR */
  202:../Core/FreeRTOS-Kernel/stream_buffer.c **** 
-ARM GAS  /tmp/ccyt9wyD.s 			page 5
+ARM GAS  /tmp/ccjKuAAf.s 			page 5
 
 
  203:../Core/FreeRTOS-Kernel/stream_buffer.c **** 
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  257:../Core/FreeRTOS-Kernel/stream_buffer.c **** static size_t prvBytesInBuffer( const StreamBuffer_t * const pxStreamBuffer ) PRIVILEGED_FUNCTION;
  258:../Core/FreeRTOS-Kernel/stream_buffer.c **** 
  259:../Core/FreeRTOS-Kernel/stream_buffer.c **** /*
-ARM GAS  /tmp/ccyt9wyD.s 			page 6
+ARM GAS  /tmp/ccjKuAAf.s 			page 6
 
 
  260:../Core/FreeRTOS-Kernel/stream_buffer.c ****  * Add xCount bytes from pucData into the pxStreamBuffer's data storage area.
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  314:../Core/FreeRTOS-Kernel/stream_buffer.c ****                                       size_t xCount,
  315:../Core/FreeRTOS-Kernel/stream_buffer.c ****                                       size_t xTail ) PRIVILEGED_FUNCTION;
  316:../Core/FreeRTOS-Kernel/stream_buffer.c **** 
-ARM GAS  /tmp/ccyt9wyD.s 			page 7
+ARM GAS  /tmp/ccjKuAAf.s 			page 7
 
 
  317:../Core/FreeRTOS-Kernel/stream_buffer.c **** /*
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  371:../Core/FreeRTOS-Kernel/stream_buffer.c ****             xTriggerLevelBytes = ( size_t ) 1;
  372:../Core/FreeRTOS-Kernel/stream_buffer.c ****         }
  373:../Core/FreeRTOS-Kernel/stream_buffer.c **** 
-ARM GAS  /tmp/ccyt9wyD.s 			page 8
+ARM GAS  /tmp/ccjKuAAf.s 			page 8
 
 
  374:../Core/FreeRTOS-Kernel/stream_buffer.c ****         /* A stream buffer requires a StreamBuffer_t structure and a buffer.
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  428:../Core/FreeRTOS-Kernel/stream_buffer.c ****                                                            size_t xTriggerLevelBytes,
  429:../Core/FreeRTOS-Kernel/stream_buffer.c ****                                                            BaseType_t xStreamBufferType,
  430:../Core/FreeRTOS-Kernel/stream_buffer.c ****                                                            uint8_t * const pucStreamBufferStorageAr
-ARM GAS  /tmp/ccyt9wyD.s 			page 9
+ARM GAS  /tmp/ccjKuAAf.s 			page 9
 
 
  431:../Core/FreeRTOS-Kernel/stream_buffer.c ****                                                            StaticStreamBuffer_t * const pxStaticStr
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  485:../Core/FreeRTOS-Kernel/stream_buffer.c ****         }
  486:../Core/FreeRTOS-Kernel/stream_buffer.c ****         #endif /* configASSERT_DEFINED */
  487:../Core/FreeRTOS-Kernel/stream_buffer.c **** 
-ARM GAS  /tmp/ccyt9wyD.s 			page 10
+ARM GAS  /tmp/ccjKuAAf.s 			page 10
 
 
  488:../Core/FreeRTOS-Kernel/stream_buffer.c ****         if( ( pucStreamBufferStorageArea != NULL ) && ( pxStaticStreamBuffer != NULL ) )
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  542:../Core/FreeRTOS-Kernel/stream_buffer.c ****             *ppxStaticStreamBuffer = ( StaticStreamBuffer_t * ) pxStreamBuffer;
  543:../Core/FreeRTOS-Kernel/stream_buffer.c ****             xReturn = pdTRUE;
  544:../Core/FreeRTOS-Kernel/stream_buffer.c ****         }
-ARM GAS  /tmp/ccyt9wyD.s 			page 11
+ARM GAS  /tmp/ccjKuAAf.s 			page 11
 
 
  545:../Core/FreeRTOS-Kernel/stream_buffer.c ****         else
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  599:../Core/FreeRTOS-Kernel/stream_buffer.c **** 
  600:../Core/FreeRTOS-Kernel/stream_buffer.c ****     #if ( configUSE_TRACE_FACILITY == 1 )
  601:../Core/FreeRTOS-Kernel/stream_buffer.c ****         UBaseType_t uxStreamBufferNumber;
-ARM GAS  /tmp/ccyt9wyD.s 			page 12
+ARM GAS  /tmp/ccjKuAAf.s 			page 12
 
 
  602:../Core/FreeRTOS-Kernel/stream_buffer.c ****     #endif
@@ -718,7 +718,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  656:../Core/FreeRTOS-Kernel/stream_buffer.c **** {
  657:../Core/FreeRTOS-Kernel/stream_buffer.c ****     StreamBuffer_t * const pxStreamBuffer = xStreamBuffer;
  658:../Core/FreeRTOS-Kernel/stream_buffer.c ****     BaseType_t xReturn = pdFAIL;
-ARM GAS  /tmp/ccyt9wyD.s 			page 13
+ARM GAS  /tmp/ccjKuAAf.s 			page 13
 
 
  659:../Core/FreeRTOS-Kernel/stream_buffer.c ****     StreamBufferCallbackFunction_t pxSendCallback = NULL, pxReceiveCallback = NULL;
@@ -778,7 +778,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  713:../Core/FreeRTOS-Kernel/stream_buffer.c **** 
  714:../Core/FreeRTOS-Kernel/stream_buffer.c ****     traceRETURN_xStreamBufferResetFromISR( xReturn );
  715:../Core/FreeRTOS-Kernel/stream_buffer.c **** 
-ARM GAS  /tmp/ccyt9wyD.s 			page 14
+ARM GAS  /tmp/ccjKuAAf.s 			page 14
 
 
  716:../Core/FreeRTOS-Kernel/stream_buffer.c ****     return xReturn;
@@ -838,7 +838,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  770:../Core/FreeRTOS-Kernel/stream_buffer.c ****         xSpace = pxStreamBuffer->xLength + pxStreamBuffer->xTail;
  771:../Core/FreeRTOS-Kernel/stream_buffer.c ****         xSpace -= pxStreamBuffer->xHead;
  772:../Core/FreeRTOS-Kernel/stream_buffer.c ****     } while( xOriginalTail != pxStreamBuffer->xTail );
-ARM GAS  /tmp/ccyt9wyD.s 			page 15
+ARM GAS  /tmp/ccjKuAAf.s 			page 15
 
 
  773:../Core/FreeRTOS-Kernel/stream_buffer.c **** 
@@ -898,7 +898,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  827:../Core/FreeRTOS-Kernel/stream_buffer.c **** 
  828:../Core/FreeRTOS-Kernel/stream_buffer.c ****     /* This send function is used to write to both message buffers and stream
  829:../Core/FreeRTOS-Kernel/stream_buffer.c ****      * buffers.  If this is a message buffer then the space needed must be
-ARM GAS  /tmp/ccyt9wyD.s 			page 16
+ARM GAS  /tmp/ccjKuAAf.s 			page 16
 
 
  830:../Core/FreeRTOS-Kernel/stream_buffer.c ****      * increased by the amount of bytes needed to store the length of the
@@ -958,7 +958,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  884:../Core/FreeRTOS-Kernel/stream_buffer.c ****                     /* Should only be one writer. */
  885:../Core/FreeRTOS-Kernel/stream_buffer.c ****                     configASSERT( pxStreamBuffer->xTaskWaitingToSend == NULL );
  886:../Core/FreeRTOS-Kernel/stream_buffer.c ****                     pxStreamBuffer->xTaskWaitingToSend = xTaskGetCurrentTaskHandle();
-ARM GAS  /tmp/ccyt9wyD.s 			page 17
+ARM GAS  /tmp/ccjKuAAf.s 			page 17
 
 
  887:../Core/FreeRTOS-Kernel/stream_buffer.c ****                 }
@@ -1018,7 +1018,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  941:../Core/FreeRTOS-Kernel/stream_buffer.c **** /*-----------------------------------------------------------*/
  942:../Core/FreeRTOS-Kernel/stream_buffer.c **** 
  943:../Core/FreeRTOS-Kernel/stream_buffer.c **** size_t xStreamBufferSendFromISR( StreamBufferHandle_t xStreamBuffer,
-ARM GAS  /tmp/ccyt9wyD.s 			page 18
+ARM GAS  /tmp/ccjKuAAf.s 			page 18
 
 
  944:../Core/FreeRTOS-Kernel/stream_buffer.c ****                                  const void * pvTxData,
@@ -1078,7 +1078,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  998:../Core/FreeRTOS-Kernel/stream_buffer.c **** }
  999:../Core/FreeRTOS-Kernel/stream_buffer.c **** /*-----------------------------------------------------------*/
 1000:../Core/FreeRTOS-Kernel/stream_buffer.c **** 
-ARM GAS  /tmp/ccyt9wyD.s 			page 19
+ARM GAS  /tmp/ccjKuAAf.s 			page 19
 
 
 1001:../Core/FreeRTOS-Kernel/stream_buffer.c **** static size_t prvWriteMessageToBuffer( StreamBuffer_t * const pxStreamBuffer,
@@ -1138,7 +1138,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
 1055:../Core/FreeRTOS-Kernel/stream_buffer.c ****                              void * pvRxData,
 1056:../Core/FreeRTOS-Kernel/stream_buffer.c ****                              size_t xBufferLengthBytes,
 1057:../Core/FreeRTOS-Kernel/stream_buffer.c ****                              TickType_t xTicksToWait )
-ARM GAS  /tmp/ccyt9wyD.s 			page 20
+ARM GAS  /tmp/ccjKuAAf.s 			page 20
 
 
 1058:../Core/FreeRTOS-Kernel/stream_buffer.c **** {
@@ -1198,7 +1198,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
 1112:../Core/FreeRTOS-Kernel/stream_buffer.c ****             {
 1113:../Core/FreeRTOS-Kernel/stream_buffer.c ****                 mtCOVERAGE_TEST_MARKER();
 1114:../Core/FreeRTOS-Kernel/stream_buffer.c ****             }
-ARM GAS  /tmp/ccyt9wyD.s 			page 21
+ARM GAS  /tmp/ccjKuAAf.s 			page 21
 
 
 1115:../Core/FreeRTOS-Kernel/stream_buffer.c ****         }
@@ -1258,7 +1258,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
 1169:../Core/FreeRTOS-Kernel/stream_buffer.c **** 
 1170:../Core/FreeRTOS-Kernel/stream_buffer.c **** size_t xStreamBufferNextMessageLengthBytes( StreamBufferHandle_t xStreamBuffer )
 1171:../Core/FreeRTOS-Kernel/stream_buffer.c **** {
-ARM GAS  /tmp/ccyt9wyD.s 			page 22
+ARM GAS  /tmp/ccjKuAAf.s 			page 22
 
 
 1172:../Core/FreeRTOS-Kernel/stream_buffer.c ****     StreamBuffer_t * const pxStreamBuffer = xStreamBuffer;
@@ -1318,7 +1318,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
 1226:../Core/FreeRTOS-Kernel/stream_buffer.c **** 
 1227:../Core/FreeRTOS-Kernel/stream_buffer.c ****     /* This receive function is used by both message buffers, which store
 1228:../Core/FreeRTOS-Kernel/stream_buffer.c ****      * discrete messages, and stream buffers, which store a continuous stream of
-ARM GAS  /tmp/ccyt9wyD.s 			page 23
+ARM GAS  /tmp/ccjKuAAf.s 			page 23
 
 
 1229:../Core/FreeRTOS-Kernel/stream_buffer.c ****      * bytes.  Discrete messages include an additional
@@ -1378,7 +1378,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
 1283:../Core/FreeRTOS-Kernel/stream_buffer.c ****     configMESSAGE_BUFFER_LENGTH_TYPE xTempNextMessageLength;
 1284:../Core/FreeRTOS-Kernel/stream_buffer.c ****     size_t xNextTail = pxStreamBuffer->xTail;
 1285:../Core/FreeRTOS-Kernel/stream_buffer.c **** 
-ARM GAS  /tmp/ccyt9wyD.s 			page 24
+ARM GAS  /tmp/ccjKuAAf.s 			page 24
 
 
 1286:../Core/FreeRTOS-Kernel/stream_buffer.c ****     if( ( pxStreamBuffer->ucFlags & sbFLAGS_IS_MESSAGE_BUFFER ) != ( uint8_t ) 0 )
@@ -1438,7 +1438,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
 1340:../Core/FreeRTOS-Kernel/stream_buffer.c ****     configASSERT( pxStreamBuffer );
 1341:../Core/FreeRTOS-Kernel/stream_buffer.c **** 
 1342:../Core/FreeRTOS-Kernel/stream_buffer.c ****     /* True if no bytes are available. */
-ARM GAS  /tmp/ccyt9wyD.s 			page 25
+ARM GAS  /tmp/ccjKuAAf.s 			page 25
 
 
 1343:../Core/FreeRTOS-Kernel/stream_buffer.c ****     xTail = pxStreamBuffer->xTail;
@@ -1498,7 +1498,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
 1397:../Core/FreeRTOS-Kernel/stream_buffer.c **** /*-----------------------------------------------------------*/
 1398:../Core/FreeRTOS-Kernel/stream_buffer.c **** 
 1399:../Core/FreeRTOS-Kernel/stream_buffer.c **** BaseType_t xStreamBufferSendCompletedFromISR( StreamBufferHandle_t xStreamBuffer,
-ARM GAS  /tmp/ccyt9wyD.s 			page 26
+ARM GAS  /tmp/ccjKuAAf.s 			page 26
 
 
 1400:../Core/FreeRTOS-Kernel/stream_buffer.c ****                                               BaseType_t * pxHigherPriorityTaskWoken )
@@ -1558,7 +1558,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
 1454:../Core/FreeRTOS-Kernel/stream_buffer.c ****         if( ( pxStreamBuffer )->xTaskWaitingToSend != NULL )
 1455:../Core/FreeRTOS-Kernel/stream_buffer.c ****         {
 1456:../Core/FreeRTOS-Kernel/stream_buffer.c ****             ( void ) xTaskNotifyIndexedFromISR( ( pxStreamBuffer )->xTaskWaitingToSend,
-ARM GAS  /tmp/ccyt9wyD.s 			page 27
+ARM GAS  /tmp/ccjKuAAf.s 			page 27
 
 
 1457:../Core/FreeRTOS-Kernel/stream_buffer.c ****                                                 ( pxStreamBuffer )->uxNotificationIndex,
@@ -1618,7 +1618,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
 1511:../Core/FreeRTOS-Kernel/stream_buffer.c ****     {
 1512:../Core/FreeRTOS-Kernel/stream_buffer.c ****         xHead -= pxStreamBuffer->xLength;
 1513:../Core/FreeRTOS-Kernel/stream_buffer.c ****     }
-ARM GAS  /tmp/ccyt9wyD.s 			page 28
+ARM GAS  /tmp/ccjKuAAf.s 			page 28
 
 
 1514:../Core/FreeRTOS-Kernel/stream_buffer.c ****     else
@@ -1678,7 +1678,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
 1568:../Core/FreeRTOS-Kernel/stream_buffer.c **** {
   28              		.loc 1 1568 1 view -0
   29              		.cfi_startproc
-ARM GAS  /tmp/ccyt9wyD.s 			page 29
+ARM GAS  /tmp/ccjKuAAf.s 			page 29
 
 
   30              		@ args = 0, pretend = 0, frame = 0
@@ -1738,7 +1738,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
   68              		.thumb
   69              		.thumb_func
   70              		.fpu fpv5-d16
-ARM GAS  /tmp/ccyt9wyD.s 			page 30
+ARM GAS  /tmp/ccjKuAAf.s 			page 30
 
 
   72              	prvInitialiseNewStreamBuffer:
@@ -1798,7 +1798,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  102              	.LVL8:
 1610:../Core/FreeRTOS-Kernel/stream_buffer.c ****     pxStreamBuffer->pucBuffer = pucBuffer;
  103              		.loc 1 1610 5 is_stmt 1 view .LVU22
-ARM GAS  /tmp/ccyt9wyD.s 			page 31
+ARM GAS  /tmp/ccjKuAAf.s 			page 31
 
 
  104              		.loc 1 1610 31 is_stmt 0 view .LVU23
@@ -1858,7 +1858,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  136              		.cfi_startproc
  137              		@ args = 0, pretend = 0, frame = 0
  138              		@ frame_needed = 0, uses_anonymous_args = 0
-ARM GAS  /tmp/ccyt9wyD.s 			page 32
+ARM GAS  /tmp/ccjKuAAf.s 			page 32
 
 
 1481:../Core/FreeRTOS-Kernel/stream_buffer.c ****     size_t xFirstLength;
@@ -1918,7 +1918,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  180              	.L6:
 1505:../Core/FreeRTOS-Kernel/stream_buffer.c ****     }
  181              		.loc 1 1505 33 is_stmt 1 view .LVU49
-ARM GAS  /tmp/ccyt9wyD.s 			page 33
+ARM GAS  /tmp/ccjKuAAf.s 			page 33
 
 
 1508:../Core/FreeRTOS-Kernel/stream_buffer.c **** 
@@ -1978,7 +1978,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
 1006:../Core/FreeRTOS-Kernel/stream_buffer.c ****     size_t xNextHead = pxStreamBuffer->xHead;
  225              		.loc 1 1006 1 is_stmt 1 view -0
  226              		.cfi_startproc
-ARM GAS  /tmp/ccyt9wyD.s 			page 34
+ARM GAS  /tmp/ccjKuAAf.s 			page 34
 
 
  227              		@ args = 4, pretend = 0, frame = 8
@@ -2038,7 +2038,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  268              	.LVL21:
 1050:../Core/FreeRTOS-Kernel/stream_buffer.c **** }
  269              		.loc 1 1050 5 is_stmt 1 view .LVU77
-ARM GAS  /tmp/ccyt9wyD.s 			page 35
+ARM GAS  /tmp/ccjKuAAf.s 			page 35
 
 
 1050:../Core/FreeRTOS-Kernel/stream_buffer.c **** }
@@ -2098,7 +2098,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
 1047:../Core/FreeRTOS-Kernel/stream_buffer.c ****     }
  313              		.loc 1 1047 9 is_stmt 1 view .LVU89
 1047:../Core/FreeRTOS-Kernel/stream_buffer.c ****     }
-ARM GAS  /tmp/ccyt9wyD.s 			page 36
+ARM GAS  /tmp/ccjKuAAf.s 			page 36
 
 
  314              		.loc 1 1047 33 is_stmt 0 view .LVU90
@@ -2158,7 +2158,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  362 0012 28BF     		it	cs
  363 0014 1546     		movcs	r5, r2
  364              	.LVL32:
-ARM GAS  /tmp/ccyt9wyD.s 			page 37
+ARM GAS  /tmp/ccjKuAAf.s 			page 37
 
 
 1539:../Core/FreeRTOS-Kernel/stream_buffer.c ****     configASSERT( ( xTail + xFirstLength ) <= pxStreamBuffer->xLength );
@@ -2218,7 +2218,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  401              		.loc 1 1563 5 is_stmt 1 view .LVU116
  402              	.L18:
 1564:../Core/FreeRTOS-Kernel/stream_buffer.c **** /*-----------------------------------------------------------*/
-ARM GAS  /tmp/ccyt9wyD.s 			page 38
+ARM GAS  /tmp/ccjKuAAf.s 			page 38
 
 
  403              		.loc 1 1564 1 is_stmt 0 view .LVU117
@@ -2278,7 +2278,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  451              		.loc 1 1284 12 is_stmt 0 view .LVU125
  452 000c 0368     		ldr	r3, [r0]
  453              	.LVL42:
-ARM GAS  /tmp/ccyt9wyD.s 			page 39
+ARM GAS  /tmp/ccjKuAAf.s 			page 39
 
 
 1286:../Core/FreeRTOS-Kernel/stream_buffer.c ****     {
@@ -2338,7 +2338,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  496              	.LVL50:
 1291:../Core/FreeRTOS-Kernel/stream_buffer.c **** 
  497              		.loc 1 1291 9 is_stmt 1 view .LVU138
-ARM GAS  /tmp/ccyt9wyD.s 			page 40
+ARM GAS  /tmp/ccjKuAAf.s 			page 40
 
 
 1291:../Core/FreeRTOS-Kernel/stream_buffer.c **** 
@@ -2398,7 +2398,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  539              		.align	1
  540              		.global	xStreamBufferGenericCreateStatic
  541              		.syntax unified
-ARM GAS  /tmp/ccyt9wyD.s 			page 41
+ARM GAS  /tmp/ccjKuAAf.s 			page 41
 
 
  542              		.thumb
@@ -2458,7 +2458,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  460:../Core/FreeRTOS-Kernel/stream_buffer.c ****         {
  583              		.loc 1 460 11 is_stmt 0 view .LVU167
  584 000e 012A     		cmp	r2, #1
-ARM GAS  /tmp/ccyt9wyD.s 			page 42
+ARM GAS  /tmp/ccjKuAAf.s 			page 42
 
 
  585 0010 1AD0     		beq	.L35
@@ -2518,7 +2518,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  626              	.L30:
  518:../Core/FreeRTOS-Kernel/stream_buffer.c ****     #endif /* ( configSUPPORT_STATIC_ALLOCATION == 1 ) */
  627              		.loc 1 518 5 view .LVU181
-ARM GAS  /tmp/ccyt9wyD.s 			page 43
+ARM GAS  /tmp/ccjKuAAf.s 			page 43
 
 
  628 0040 04B0     		add	sp, sp, #16
@@ -2578,7 +2578,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  674              		.loc 1 526 5 is_stmt 1 view -0
  675              		.cfi_startproc
  676              		@ args = 0, pretend = 0, frame = 0
-ARM GAS  /tmp/ccyt9wyD.s 			page 44
+ARM GAS  /tmp/ccjKuAAf.s 			page 44
 
 
  677              		@ frame_needed = 0, uses_anonymous_args = 0
@@ -2638,7 +2638,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  552:../Core/FreeRTOS-Kernel/stream_buffer.c ****     }
  712              		.loc 1 552 9 view .LVU211
  553:../Core/FreeRTOS-Kernel/stream_buffer.c ****     #endif /* configSUPPORT_STATIC_ALLOCATION */
-ARM GAS  /tmp/ccyt9wyD.s 			page 45
+ARM GAS  /tmp/ccjKuAAf.s 			page 45
 
 
  713              		.loc 1 553 5 is_stmt 0 view .LVU212
@@ -2698,7 +2698,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  757              		.loc 1 587 18 is_stmt 0 view .LVU224
  758 000c 2822     		movs	r2, #40
  759 000e 0021     		movs	r1, #0
-ARM GAS  /tmp/ccyt9wyD.s 			page 46
+ARM GAS  /tmp/ccjKuAAf.s 			page 46
 
 
  760 0010 FFF7FEFF 		bl	memset
@@ -2758,7 +2758,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  804              	.LVL86:
  617:../Core/FreeRTOS-Kernel/stream_buffer.c ****     {
  805              		.loc 1 617 5 is_stmt 1 view .LVU237
-ARM GAS  /tmp/ccyt9wyD.s 			page 47
+ARM GAS  /tmp/ccjKuAAf.s 			page 47
 
 
  806 0008 FFF7FEFF 		bl	vPortEnterCritical
@@ -2818,7 +2818,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  847 0026 0193     		str	r3, [sp, #4]
  848 0028 237F     		ldrb	r3, [r4, #28]	@ zero_extendqisi2
  849 002a 0093     		str	r3, [sp]
-ARM GAS  /tmp/ccyt9wyD.s 			page 48
+ARM GAS  /tmp/ccjKuAAf.s 			page 48
 
 
  850 002c E368     		ldr	r3, [r4, #12]
@@ -2878,7 +2878,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  897              	.LVL97:
  658:../Core/FreeRTOS-Kernel/stream_buffer.c ****     StreamBufferCallbackFunction_t pxSendCallback = NULL, pxReceiveCallback = NULL;
  898              		.loc 1 658 5 view .LVU260
-ARM GAS  /tmp/ccyt9wyD.s 			page 49
+ARM GAS  /tmp/ccjKuAAf.s 			page 49
 
 
  659:../Core/FreeRTOS-Kernel/stream_buffer.c ****     UBaseType_t uxSavedInterruptStatus;
@@ -2938,7 +2938,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
   34:Core/Inc/portmacro.h **** #ifdef __cplusplus
   35:Core/Inc/portmacro.h ****     extern "C" {
   36:Core/Inc/portmacro.h **** #endif
-ARM GAS  /tmp/ccyt9wyD.s 			page 50
+ARM GAS  /tmp/ccjKuAAf.s 			page 50
 
 
   37:Core/Inc/portmacro.h **** /* *INDENT-ON* */
@@ -2998,7 +2998,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
   91:Core/Inc/portmacro.h ****          * within the specified behaviour for the architecture. */ \
   92:Core/Inc/portmacro.h ****         __asm volatile ( "dsb" ::: "memory" );                     \
   93:Core/Inc/portmacro.h ****         __asm volatile ( "isb" );                                  \
-ARM GAS  /tmp/ccyt9wyD.s 			page 51
+ARM GAS  /tmp/ccjKuAAf.s 			page 51
 
 
   94:Core/Inc/portmacro.h ****     }
@@ -3058,7 +3058,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  148:Core/Inc/portmacro.h ****     __attribute__( ( always_inline ) ) static inline uint8_t ucPortCountLeadingZeros( uint32_t ulBi
  149:Core/Inc/portmacro.h ****     {
  150:Core/Inc/portmacro.h ****         uint8_t ucReturn;
-ARM GAS  /tmp/ccyt9wyD.s 			page 52
+ARM GAS  /tmp/ccjKuAAf.s 			page 52
 
 
  151:Core/Inc/portmacro.h **** 
@@ -3118,7 +3118,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  205:Core/Inc/portmacro.h ****     return xReturn;
  206:Core/Inc/portmacro.h **** }
  207:Core/Inc/portmacro.h **** 
-ARM GAS  /tmp/ccyt9wyD.s 			page 53
+ARM GAS  /tmp/ccjKuAAf.s 			page 53
 
 
  208:Core/Inc/portmacro.h **** /*-----------------------------------------------------------*/
@@ -3178,7 +3178,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  246:Core/Inc/portmacro.h ****     return ulOriginalBASEPRI;
  928              		.loc 2 246 5 view .LVU272
  929              		.loc 2 246 5 is_stmt 0 view .LVU273
-ARM GAS  /tmp/ccyt9wyD.s 			page 54
+ARM GAS  /tmp/ccjKuAAf.s 			page 54
 
 
  930              		.thumb
@@ -3238,7 +3238,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  970              	.LCFI23:
  971              		.cfi_restore_state
  717:../Core/FreeRTOS-Kernel/stream_buffer.c **** /*-----------------------------------------------------------*/
-ARM GAS  /tmp/ccyt9wyD.s 			page 55
+ARM GAS  /tmp/ccjKuAAf.s 			page 55
 
 
  972              		.loc 1 717 1 view .LVU285
@@ -3298,7 +3298,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  722:../Core/FreeRTOS-Kernel/stream_buffer.c ****     StreamBuffer_t * const pxStreamBuffer = xStreamBuffer;
  1018              		.loc 1 722 1 is_stmt 1 view -0
  1019              		.cfi_startproc
-ARM GAS  /tmp/ccyt9wyD.s 			page 56
+ARM GAS  /tmp/ccjKuAAf.s 			page 56
 
 
  1020              		@ args = 0, pretend = 0, frame = 0
@@ -3358,7 +3358,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  750:../Core/FreeRTOS-Kernel/stream_buffer.c **** }
  1057              		.loc 1 750 5 view .LVU314
  751:../Core/FreeRTOS-Kernel/stream_buffer.c **** /*-----------------------------------------------------------*/
-ARM GAS  /tmp/ccyt9wyD.s 			page 57
+ARM GAS  /tmp/ccjKuAAf.s 			page 57
 
 
  1058              		.loc 1 751 1 is_stmt 0 view .LVU315
@@ -3418,7 +3418,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  1101              	.LVL115:
  771:../Core/FreeRTOS-Kernel/stream_buffer.c ****     } while( xOriginalTail != pxStreamBuffer->xTail );
  1102              		.loc 1 771 9 is_stmt 1 discriminator 1 view .LVU329
-ARM GAS  /tmp/ccyt9wyD.s 			page 58
+ARM GAS  /tmp/ccjKuAAf.s 			page 58
 
 
  771:../Core/FreeRTOS-Kernel/stream_buffer.c ****     } while( xOriginalTail != pxStreamBuffer->xTail );
@@ -3478,7 +3478,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  1143              		.thumb
  1144              		.thumb_func
  1145              		.fpu fpv5-d16
-ARM GAS  /tmp/ccyt9wyD.s 			page 59
+ARM GAS  /tmp/ccjKuAAf.s 			page 59
 
 
  1147              	xStreamBufferBytesAvailable:
@@ -3538,7 +3538,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  812:../Core/FreeRTOS-Kernel/stream_buffer.c ****     StreamBuffer_t * const pxStreamBuffer = xStreamBuffer;
  1191              		.loc 1 812 1 is_stmt 0 view .LVU357
  1192 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
-ARM GAS  /tmp/ccyt9wyD.s 			page 60
+ARM GAS  /tmp/ccjKuAAf.s 			page 60
 
 
  1193              	.LCFI27:
@@ -3598,7 +3598,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  834:../Core/FreeRTOS-Kernel/stream_buffer.c **** 
  1232              		.loc 1 834 24 is_stmt 0 view .LVU373
  1233 001a 3E1D     		adds	r6, r7, #4
-ARM GAS  /tmp/ccyt9wyD.s 			page 61
+ARM GAS  /tmp/ccjKuAAf.s 			page 61
 
 
  1234              	.LVL127:
@@ -3658,7 +3658,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  879:../Core/FreeRTOS-Kernel/stream_buffer.c ****                 {
  1272              		.loc 1 879 17 is_stmt 1 view .LVU390
  879:../Core/FreeRTOS-Kernel/stream_buffer.c ****                 {
-ARM GAS  /tmp/ccyt9wyD.s 			page 62
+ARM GAS  /tmp/ccjKuAAf.s 			page 62
 
 
  1273              		.loc 1 879 19 is_stmt 0 view .LVU391
@@ -3718,7 +3718,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  1312 0066 04A8     		add	r0, sp, #16
  1313 0068 FFF7FEFF 		bl	xTaskCheckForTimeOut
  1314              	.LVL140:
-ARM GAS  /tmp/ccyt9wyD.s 			page 63
+ARM GAS  /tmp/ccjKuAAf.s 			page 63
 
 
  899:../Core/FreeRTOS-Kernel/stream_buffer.c ****     }
@@ -3778,7 +3778,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  915:../Core/FreeRTOS-Kernel/stream_buffer.c **** 
  1355              		.loc 1 915 15 is_stmt 0 view .LVU421
  1356 008c 0096     		str	r6, [sp]
-ARM GAS  /tmp/ccyt9wyD.s 			page 64
+ARM GAS  /tmp/ccjKuAAf.s 			page 64
 
 
  1357 008e 2B46     		mov	r3, r5
@@ -3838,7 +3838,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  1399              		.loc 1 924 13 view .LVU433
  1400 00b6 2369     		ldr	r3, [r4, #16]
  1401 00b8 43B1     		cbz	r3, .L81
-ARM GAS  /tmp/ccyt9wyD.s 			page 65
+ARM GAS  /tmp/ccjKuAAf.s 			page 65
 
 
  924:../Core/FreeRTOS-Kernel/stream_buffer.c ****         }
@@ -3898,7 +3898,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  1447              		.cfi_offset 4, -28
  1448              		.cfi_offset 5, -24
  1449              		.cfi_offset 6, -20
-ARM GAS  /tmp/ccyt9wyD.s 			page 66
+ARM GAS  /tmp/ccjKuAAf.s 			page 66
 
 
  1450              		.cfi_offset 7, -16
@@ -3958,7 +3958,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  1488              		.loc 1 970 14 view .LVU460
  1489 001e 0346     		mov	r3, r0
  1490              	.LVL163:
-ARM GAS  /tmp/ccyt9wyD.s 			page 67
+ARM GAS  /tmp/ccjKuAAf.s 			page 67
 
 
  971:../Core/FreeRTOS-Kernel/stream_buffer.c **** 
@@ -4018,7 +4018,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  1533              		.loc 1 977 65 view .LVU472
  1534 0042 E368     		ldr	r3, [r4, #12]
  977:../Core/FreeRTOS-Kernel/stream_buffer.c ****         {
-ARM GAS  /tmp/ccyt9wyD.s 			page 68
+ARM GAS  /tmp/ccjKuAAf.s 			page 68
 
 
  1535              		.loc 1 977 11 view .LVU473
@@ -4078,7 +4078,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  1578 0072 616A     		ldr	r1, [r4, #36]
  1579 0074 FFF7FEFF 		bl	xTaskGenericNotifyFromISR
  1580              	.LVL174:
-ARM GAS  /tmp/ccyt9wyD.s 			page 69
+ARM GAS  /tmp/ccjKuAAf.s 			page 69
 
 
  982:../Core/FreeRTOS-Kernel/stream_buffer.c ****         }
@@ -4138,7 +4138,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  1627 0000 2DE9F043 		push	{r4, r5, r6, r7, r8, r9, lr}
  1628              	.LCFI35:
  1629              		.cfi_def_cfa_offset 28
-ARM GAS  /tmp/ccyt9wyD.s 			page 70
+ARM GAS  /tmp/ccjKuAAf.s 			page 70
 
 
  1630              		.cfi_offset 4, -28
@@ -4198,7 +4198,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  1670 0022 4FF00408 		mov	r8, #4
  1671              	.L93:
  1672              	.LVL182:
-ARM GAS  /tmp/ccyt9wyD.s 			page 71
+ARM GAS  /tmp/ccjKuAAf.s 			page 71
 
 
 1087:../Core/FreeRTOS-Kernel/stream_buffer.c ****     {
@@ -4258,7 +4258,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
 1123:../Core/FreeRTOS-Kernel/stream_buffer.c **** 
  1712              		.loc 1 1123 51 is_stmt 0 view .LVU526
  1713 0054 0023     		movs	r3, #0
-ARM GAS  /tmp/ccyt9wyD.s 			page 72
+ARM GAS  /tmp/ccjKuAAf.s 			page 72
 
 
  1714 0056 2361     		str	r3, [r4, #16]
@@ -4318,7 +4318,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  1754 007a FFF7FEFF 		bl	prvBytesInBuffer
  1755              	.LVL198:
 1135:../Core/FreeRTOS-Kernel/stream_buffer.c ****     }
-ARM GAS  /tmp/ccyt9wyD.s 			page 73
+ARM GAS  /tmp/ccjKuAAf.s 			page 73
 
 
  1756              		.loc 1 1135 27 view .LVU541
@@ -4378,7 +4378,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  1797 009c 0028     		cmp	r0, #0
  1798 009e F2D0     		beq	.L92
 1150:../Core/FreeRTOS-Kernel/stream_buffer.c ****             prvRECEIVE_COMPLETED( xStreamBuffer );
-ARM GAS  /tmp/ccyt9wyD.s 			page 74
+ARM GAS  /tmp/ccjKuAAf.s 			page 74
 
 
  1799              		.loc 1 1150 73 is_stmt 1 view .LVU555
@@ -4438,7 +4438,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
 1173:../Core/FreeRTOS-Kernel/stream_buffer.c ****     configMESSAGE_BUFFER_LENGTH_TYPE xTempReturn;
  1845              		.loc 1 1173 5 view .LVU566
 1174:../Core/FreeRTOS-Kernel/stream_buffer.c **** 
-ARM GAS  /tmp/ccyt9wyD.s 			page 75
+ARM GAS  /tmp/ccjKuAAf.s 			page 75
 
 
  1846              		.loc 1 1174 5 view .LVU567
@@ -4498,7 +4498,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  1885              	.L105:
 1211:../Core/FreeRTOS-Kernel/stream_buffer.c **** /*-----------------------------------------------------------*/
  1886              		.loc 1 1211 1 is_stmt 0 view .LVU583
-ARM GAS  /tmp/ccyt9wyD.s 			page 76
+ARM GAS  /tmp/ccjKuAAf.s 			page 76
 
 
  1887 001c 02B0     		add	sp, sp, #8
@@ -4558,7 +4558,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  1935              		.cfi_offset 4, -24
  1936              		.cfi_offset 5, -20
  1937              		.cfi_offset 6, -16
-ARM GAS  /tmp/ccyt9wyD.s 			page 77
+ARM GAS  /tmp/ccjKuAAf.s 			page 77
 
 
  1938              		.cfi_offset 7, -12
@@ -4618,7 +4618,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  1977 0024 0025     		movs	r5, #0
  1978              	.LVL223:
 1267:../Core/FreeRTOS-Kernel/stream_buffer.c ****     }
-ARM GAS  /tmp/ccyt9wyD.s 			page 78
+ARM GAS  /tmp/ccjKuAAf.s 			page 78
 
 
  1979              		.loc 1 1267 33 is_stmt 1 view .LVU607
@@ -4678,7 +4678,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  2020              		.loc 1 1258 13 view .LVU620
 1258:../Core/FreeRTOS-Kernel/stream_buffer.c ****         }
  2021              		.loc 1 1258 13 view .LVU621
-ARM GAS  /tmp/ccyt9wyD.s 			page 79
+ARM GAS  /tmp/ccjKuAAf.s 			page 79
 
 
  2022              	.LBB34:
@@ -4738,7 +4738,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
 1258:../Core/FreeRTOS-Kernel/stream_buffer.c ****         }
  2066              		.loc 1 1258 13 discriminator 3 view .LVU632
  2067              	.LVL233:
-ARM GAS  /tmp/ccyt9wyD.s 			page 80
+ARM GAS  /tmp/ccjKuAAf.s 			page 80
 
 
  2068              	.LBB36:
@@ -4798,7 +4798,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  2111              	.LVL235:
 1345:../Core/FreeRTOS-Kernel/stream_buffer.c ****     {
  2112              		.loc 1 1345 5 is_stmt 1 view .LVU644
-ARM GAS  /tmp/ccyt9wyD.s 			page 81
+ARM GAS  /tmp/ccjKuAAf.s 			page 81
 
 
 1345:../Core/FreeRTOS-Kernel/stream_buffer.c ****     {
@@ -4858,7 +4858,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  2157              		.loc 1 1363 5 view .LVU656
 1364:../Core/FreeRTOS-Kernel/stream_buffer.c **** 
  2158              		.loc 1 1364 5 view .LVU657
-ARM GAS  /tmp/ccyt9wyD.s 			page 82
+ARM GAS  /tmp/ccjKuAAf.s 			page 82
 
 
  2159              	.LVL240:
@@ -4918,7 +4918,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  2197 001e FAE7     		b	.L127
  2198              		.cfi_endproc
  2199              	.LFE20:
-ARM GAS  /tmp/ccyt9wyD.s 			page 83
+ARM GAS  /tmp/ccjKuAAf.s 			page 83
 
 
  2201              		.section	.text.xStreamBufferSendCompletedFromISR,"ax",%progbits
@@ -4978,7 +4978,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  2245 000e 83F31188 	   msr basepri, r3                                         
  2246 0012 BFF36F8F 	   isb                                                     
  2247 0016 BFF34F8F 	   dsb                                                     
-ARM GAS  /tmp/ccyt9wyD.s 			page 84
+ARM GAS  /tmp/ccjKuAAf.s 			page 84
 
 
  2248 001a 62B6     	   cpsie i                                                 
@@ -5038,7 +5038,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  2288              		.loc 1 1430 5 is_stmt 1 view .LVU698
  2289              	.LBB40:
  2290              	.LBI40:
-ARM GAS  /tmp/ccyt9wyD.s 			page 85
+ARM GAS  /tmp/ccjKuAAf.s 			page 85
 
 
  250:Core/Inc/portmacro.h **** {
@@ -5098,7 +5098,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  2338              		@ args = 0, pretend = 0, frame = 0
  2339              		@ frame_needed = 0, uses_anonymous_args = 0
 1440:../Core/FreeRTOS-Kernel/stream_buffer.c ****     StreamBuffer_t * const pxStreamBuffer = xStreamBuffer;
-ARM GAS  /tmp/ccyt9wyD.s 			page 86
+ARM GAS  /tmp/ccjKuAAf.s 			page 86
 
 
  2340              		.loc 1 1440 1 is_stmt 0 view .LVU708
@@ -5158,7 +5158,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  2382              		.loc 1 1454 9 is_stmt 1 view .LVU720
 1454:../Core/FreeRTOS-Kernel/stream_buffer.c ****         {
  2383              		.loc 1 1454 31 is_stmt 0 view .LVU721
-ARM GAS  /tmp/ccyt9wyD.s 			page 87
+ARM GAS  /tmp/ccjKuAAf.s 			page 87
 
 
  2384 001c 4369     		ldr	r3, [r0, #20]
@@ -5218,7 +5218,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  2425              		.syntax unified
  2426              	.LBE45:
  2427              	.LBE44:
-ARM GAS  /tmp/ccyt9wyD.s 			page 88
+ARM GAS  /tmp/ccjKuAAf.s 			page 88
 
 
 1471:../Core/FreeRTOS-Kernel/stream_buffer.c **** 
@@ -5278,7 +5278,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  2468              		.loc 1 1644 102 view .LVU744
 1645:../Core/FreeRTOS-Kernel/stream_buffer.c **** 
 1646:../Core/FreeRTOS-Kernel/stream_buffer.c ****     return pxStreamBuffer->uxNotificationIndex;
-ARM GAS  /tmp/ccyt9wyD.s 			page 89
+ARM GAS  /tmp/ccjKuAAf.s 			page 89
 
 
  2469              		.loc 1 1646 5 view .LVU745
@@ -5338,7 +5338,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  2503              		.loc 1 1668 64 is_stmt 1 view .LVU757
 1669:../Core/FreeRTOS-Kernel/stream_buffer.c **** }
  2504              		.loc 1 1669 1 is_stmt 0 view .LVU758
-ARM GAS  /tmp/ccyt9wyD.s 			page 90
+ARM GAS  /tmp/ccjKuAAf.s 			page 90
 
 
  2505 0002 7047     		bx	lr
@@ -5398,7 +5398,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
 1686:../Core/FreeRTOS-Kernel/stream_buffer.c ****     #if ( configUSE_TRACE_FACILITY == 1 )
 1687:../Core/FreeRTOS-Kernel/stream_buffer.c **** 
 1688:../Core/FreeRTOS-Kernel/stream_buffer.c ****     void vStreamBufferSetStreamBufferNumber( StreamBufferHandle_t xStreamBuffer,
-ARM GAS  /tmp/ccyt9wyD.s 			page 91
+ARM GAS  /tmp/ccjKuAAf.s 			page 91
 
 
 1689:../Core/FreeRTOS-Kernel/stream_buffer.c ****                                              UBaseType_t uxStreamBufferNumber )
@@ -5458,7 +5458,7 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  2582 0000 007F     		ldrb	r0, [r0, #28]	@ zero_extendqisi2
  2583              	.LVL275:
 1710:../Core/FreeRTOS-Kernel/stream_buffer.c ****     }
-ARM GAS  /tmp/ccyt9wyD.s 			page 92
+ARM GAS  /tmp/ccjKuAAf.s 			page 92
 
 
  2584              		.loc 1 1710 5 view .LVU776
@@ -5474,70 +5474,70 @@ ARM GAS  /tmp/ccyt9wyD.s 			page 1
  2595              		.file 6 "../Core/FreeRTOS-Kernel/include/task.h"
  2596              		.file 7 "../Core/FreeRTOS-Kernel/include/stream_buffer.h"
  2597              		.file 8 "<built-in>"
-ARM GAS  /tmp/ccyt9wyD.s 			page 93
+ARM GAS  /tmp/ccjKuAAf.s 			page 93
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 stream_buffer.c
-     /tmp/ccyt9wyD.s:17     .text.prvBytesInBuffer:0000000000000000 $t
-     /tmp/ccyt9wyD.s:24     .text.prvBytesInBuffer:0000000000000000 prvBytesInBuffer
-     /tmp/ccyt9wyD.s:66     .text.prvInitialiseNewStreamBuffer:0000000000000000 $t
-     /tmp/ccyt9wyD.s:72     .text.prvInitialiseNewStreamBuffer:0000000000000000 prvInitialiseNewStreamBuffer
-     /tmp/ccyt9wyD.s:126    .text.prvWriteBytesToBuffer:0000000000000000 $t
-     /tmp/ccyt9wyD.s:132    .text.prvWriteBytesToBuffer:0000000000000000 prvWriteBytesToBuffer
-     /tmp/ccyt9wyD.s:216    .text.prvWriteMessageToBuffer:0000000000000000 $t
-     /tmp/ccyt9wyD.s:222    .text.prvWriteMessageToBuffer:0000000000000000 prvWriteMessageToBuffer
-     /tmp/ccyt9wyD.s:327    .text.prvReadBytesFromBuffer:0000000000000000 $t
-     /tmp/ccyt9wyD.s:333    .text.prvReadBytesFromBuffer:0000000000000000 prvReadBytesFromBuffer
-     /tmp/ccyt9wyD.s:419    .text.prvReadMessageFromBuffer:0000000000000000 $t
-     /tmp/ccyt9wyD.s:425    .text.prvReadMessageFromBuffer:0000000000000000 prvReadMessageFromBuffer
-     /tmp/ccyt9wyD.s:539    .text.xStreamBufferGenericCreateStatic:0000000000000000 $t
-     /tmp/ccyt9wyD.s:546    .text.xStreamBufferGenericCreateStatic:0000000000000000 xStreamBufferGenericCreateStatic
-     /tmp/ccyt9wyD.s:664    .text.xStreamBufferGetStaticBuffers:0000000000000000 $t
-     /tmp/ccyt9wyD.s:671    .text.xStreamBufferGetStaticBuffers:0000000000000000 xStreamBufferGetStaticBuffers
-     /tmp/ccyt9wyD.s:719    .text.vStreamBufferDelete:0000000000000000 $t
-     /tmp/ccyt9wyD.s:726    .text.vStreamBufferDelete:0000000000000000 vStreamBufferDelete
-     /tmp/ccyt9wyD.s:769    .text.xStreamBufferReset:0000000000000000 $t
-     /tmp/ccyt9wyD.s:776    .text.xStreamBufferReset:0000000000000000 xStreamBufferReset
-     /tmp/ccyt9wyD.s:871    .text.xStreamBufferResetFromISR:0000000000000000 $t
-     /tmp/ccyt9wyD.s:878    .text.xStreamBufferResetFromISR:0000000000000000 xStreamBufferResetFromISR
-     /tmp/ccyt9wyD.s:1008   .text.xStreamBufferSetTriggerLevel:0000000000000000 $t
-     /tmp/ccyt9wyD.s:1015   .text.xStreamBufferSetTriggerLevel:0000000000000000 xStreamBufferSetTriggerLevel
-     /tmp/ccyt9wyD.s:1064   .text.xStreamBufferSpacesAvailable:0000000000000000 $t
-     /tmp/ccyt9wyD.s:1071   .text.xStreamBufferSpacesAvailable:0000000000000000 xStreamBufferSpacesAvailable
-     /tmp/ccyt9wyD.s:1140   .text.xStreamBufferBytesAvailable:0000000000000000 $t
-     /tmp/ccyt9wyD.s:1147   .text.xStreamBufferBytesAvailable:0000000000000000 xStreamBufferBytesAvailable
-     /tmp/ccyt9wyD.s:1177   .text.xStreamBufferSend:0000000000000000 $t
-     /tmp/ccyt9wyD.s:1184   .text.xStreamBufferSend:0000000000000000 xStreamBufferSend
-     /tmp/ccyt9wyD.s:1429   .text.xStreamBufferSendFromISR:0000000000000000 $t
-     /tmp/ccyt9wyD.s:1436   .text.xStreamBufferSendFromISR:0000000000000000 xStreamBufferSendFromISR
-     /tmp/ccyt9wyD.s:1612   .text.xStreamBufferReceive:0000000000000000 $t
-     /tmp/ccyt9wyD.s:1619   .text.xStreamBufferReceive:0000000000000000 xStreamBufferReceive
-     /tmp/ccyt9wyD.s:1830   .text.xStreamBufferNextMessageLengthBytes:0000000000000000 $t
-     /tmp/ccyt9wyD.s:1837   .text.xStreamBufferNextMessageLengthBytes:0000000000000000 xStreamBufferNextMessageLengthBytes
-     /tmp/ccyt9wyD.s:1917   .text.xStreamBufferReceiveFromISR:0000000000000000 $t
-     /tmp/ccyt9wyD.s:1924   .text.xStreamBufferReceiveFromISR:0000000000000000 xStreamBufferReceiveFromISR
-     /tmp/ccyt9wyD.s:2088   .text.xStreamBufferIsEmpty:0000000000000000 $t
-     /tmp/ccyt9wyD.s:2095   .text.xStreamBufferIsEmpty:0000000000000000 xStreamBufferIsEmpty
-     /tmp/ccyt9wyD.s:2136   .text.xStreamBufferIsFull:0000000000000000 $t
-     /tmp/ccyt9wyD.s:2143   .text.xStreamBufferIsFull:0000000000000000 xStreamBufferIsFull
-     /tmp/ccyt9wyD.s:2202   .text.xStreamBufferSendCompletedFromISR:0000000000000000 $t
-     /tmp/ccyt9wyD.s:2209   .text.xStreamBufferSendCompletedFromISR:0000000000000000 xStreamBufferSendCompletedFromISR
-     /tmp/ccyt9wyD.s:2326   .text.xStreamBufferReceiveCompletedFromISR:0000000000000000 $t
-     /tmp/ccyt9wyD.s:2333   .text.xStreamBufferReceiveCompletedFromISR:0000000000000000 xStreamBufferReceiveCompletedFromISR
-     /tmp/ccyt9wyD.s:2450   .text.uxStreamBufferGetStreamBufferNotificationIndex:0000000000000000 $t
-     /tmp/ccyt9wyD.s:2457   .text.uxStreamBufferGetStreamBufferNotificationIndex:0000000000000000 uxStreamBufferGetStreamBufferNotificationIndex
-     /tmp/ccyt9wyD.s:2479   .text.vStreamBufferSetStreamBufferNotificationIndex:0000000000000000 $t
-     /tmp/ccyt9wyD.s:2486   .text.vStreamBufferSetStreamBufferNotificationIndex:0000000000000000 vStreamBufferSetStreamBufferNotificationIndex
-     /tmp/ccyt9wyD.s:2510   .text.uxStreamBufferGetStreamBufferNumber:0000000000000000 $t
-     /tmp/ccyt9wyD.s:2517   .text.uxStreamBufferGetStreamBufferNumber:0000000000000000 uxStreamBufferGetStreamBufferNumber
-     /tmp/ccyt9wyD.s:2537   .text.vStreamBufferSetStreamBufferNumber:0000000000000000 $t
-     /tmp/ccyt9wyD.s:2544   .text.vStreamBufferSetStreamBufferNumber:0000000000000000 vStreamBufferSetStreamBufferNumber
-     /tmp/ccyt9wyD.s:2563   .text.ucStreamBufferGetStreamBufferType:0000000000000000 $t
-ARM GAS  /tmp/ccyt9wyD.s 			page 94
+     /tmp/ccjKuAAf.s:17     .text.prvBytesInBuffer:0000000000000000 $t
+     /tmp/ccjKuAAf.s:24     .text.prvBytesInBuffer:0000000000000000 prvBytesInBuffer
+     /tmp/ccjKuAAf.s:66     .text.prvInitialiseNewStreamBuffer:0000000000000000 $t
+     /tmp/ccjKuAAf.s:72     .text.prvInitialiseNewStreamBuffer:0000000000000000 prvInitialiseNewStreamBuffer
+     /tmp/ccjKuAAf.s:126    .text.prvWriteBytesToBuffer:0000000000000000 $t
+     /tmp/ccjKuAAf.s:132    .text.prvWriteBytesToBuffer:0000000000000000 prvWriteBytesToBuffer
+     /tmp/ccjKuAAf.s:216    .text.prvWriteMessageToBuffer:0000000000000000 $t
+     /tmp/ccjKuAAf.s:222    .text.prvWriteMessageToBuffer:0000000000000000 prvWriteMessageToBuffer
+     /tmp/ccjKuAAf.s:327    .text.prvReadBytesFromBuffer:0000000000000000 $t
+     /tmp/ccjKuAAf.s:333    .text.prvReadBytesFromBuffer:0000000000000000 prvReadBytesFromBuffer
+     /tmp/ccjKuAAf.s:419    .text.prvReadMessageFromBuffer:0000000000000000 $t
+     /tmp/ccjKuAAf.s:425    .text.prvReadMessageFromBuffer:0000000000000000 prvReadMessageFromBuffer
+     /tmp/ccjKuAAf.s:539    .text.xStreamBufferGenericCreateStatic:0000000000000000 $t
+     /tmp/ccjKuAAf.s:546    .text.xStreamBufferGenericCreateStatic:0000000000000000 xStreamBufferGenericCreateStatic
+     /tmp/ccjKuAAf.s:664    .text.xStreamBufferGetStaticBuffers:0000000000000000 $t
+     /tmp/ccjKuAAf.s:671    .text.xStreamBufferGetStaticBuffers:0000000000000000 xStreamBufferGetStaticBuffers
+     /tmp/ccjKuAAf.s:719    .text.vStreamBufferDelete:0000000000000000 $t
+     /tmp/ccjKuAAf.s:726    .text.vStreamBufferDelete:0000000000000000 vStreamBufferDelete
+     /tmp/ccjKuAAf.s:769    .text.xStreamBufferReset:0000000000000000 $t
+     /tmp/ccjKuAAf.s:776    .text.xStreamBufferReset:0000000000000000 xStreamBufferReset
+     /tmp/ccjKuAAf.s:871    .text.xStreamBufferResetFromISR:0000000000000000 $t
+     /tmp/ccjKuAAf.s:878    .text.xStreamBufferResetFromISR:0000000000000000 xStreamBufferResetFromISR
+     /tmp/ccjKuAAf.s:1008   .text.xStreamBufferSetTriggerLevel:0000000000000000 $t
+     /tmp/ccjKuAAf.s:1015   .text.xStreamBufferSetTriggerLevel:0000000000000000 xStreamBufferSetTriggerLevel
+     /tmp/ccjKuAAf.s:1064   .text.xStreamBufferSpacesAvailable:0000000000000000 $t
+     /tmp/ccjKuAAf.s:1071   .text.xStreamBufferSpacesAvailable:0000000000000000 xStreamBufferSpacesAvailable
+     /tmp/ccjKuAAf.s:1140   .text.xStreamBufferBytesAvailable:0000000000000000 $t
+     /tmp/ccjKuAAf.s:1147   .text.xStreamBufferBytesAvailable:0000000000000000 xStreamBufferBytesAvailable
+     /tmp/ccjKuAAf.s:1177   .text.xStreamBufferSend:0000000000000000 $t
+     /tmp/ccjKuAAf.s:1184   .text.xStreamBufferSend:0000000000000000 xStreamBufferSend
+     /tmp/ccjKuAAf.s:1429   .text.xStreamBufferSendFromISR:0000000000000000 $t
+     /tmp/ccjKuAAf.s:1436   .text.xStreamBufferSendFromISR:0000000000000000 xStreamBufferSendFromISR
+     /tmp/ccjKuAAf.s:1612   .text.xStreamBufferReceive:0000000000000000 $t
+     /tmp/ccjKuAAf.s:1619   .text.xStreamBufferReceive:0000000000000000 xStreamBufferReceive
+     /tmp/ccjKuAAf.s:1830   .text.xStreamBufferNextMessageLengthBytes:0000000000000000 $t
+     /tmp/ccjKuAAf.s:1837   .text.xStreamBufferNextMessageLengthBytes:0000000000000000 xStreamBufferNextMessageLengthBytes
+     /tmp/ccjKuAAf.s:1917   .text.xStreamBufferReceiveFromISR:0000000000000000 $t
+     /tmp/ccjKuAAf.s:1924   .text.xStreamBufferReceiveFromISR:0000000000000000 xStreamBufferReceiveFromISR
+     /tmp/ccjKuAAf.s:2088   .text.xStreamBufferIsEmpty:0000000000000000 $t
+     /tmp/ccjKuAAf.s:2095   .text.xStreamBufferIsEmpty:0000000000000000 xStreamBufferIsEmpty
+     /tmp/ccjKuAAf.s:2136   .text.xStreamBufferIsFull:0000000000000000 $t
+     /tmp/ccjKuAAf.s:2143   .text.xStreamBufferIsFull:0000000000000000 xStreamBufferIsFull
+     /tmp/ccjKuAAf.s:2202   .text.xStreamBufferSendCompletedFromISR:0000000000000000 $t
+     /tmp/ccjKuAAf.s:2209   .text.xStreamBufferSendCompletedFromISR:0000000000000000 xStreamBufferSendCompletedFromISR
+     /tmp/ccjKuAAf.s:2326   .text.xStreamBufferReceiveCompletedFromISR:0000000000000000 $t
+     /tmp/ccjKuAAf.s:2333   .text.xStreamBufferReceiveCompletedFromISR:0000000000000000 xStreamBufferReceiveCompletedFromISR
+     /tmp/ccjKuAAf.s:2450   .text.uxStreamBufferGetStreamBufferNotificationIndex:0000000000000000 $t
+     /tmp/ccjKuAAf.s:2457   .text.uxStreamBufferGetStreamBufferNotificationIndex:0000000000000000 uxStreamBufferGetStreamBufferNotificationIndex
+     /tmp/ccjKuAAf.s:2479   .text.vStreamBufferSetStreamBufferNotificationIndex:0000000000000000 $t
+     /tmp/ccjKuAAf.s:2486   .text.vStreamBufferSetStreamBufferNotificationIndex:0000000000000000 vStreamBufferSetStreamBufferNotificationIndex
+     /tmp/ccjKuAAf.s:2510   .text.uxStreamBufferGetStreamBufferNumber:0000000000000000 $t
+     /tmp/ccjKuAAf.s:2517   .text.uxStreamBufferGetStreamBufferNumber:0000000000000000 uxStreamBufferGetStreamBufferNumber
+     /tmp/ccjKuAAf.s:2537   .text.vStreamBufferSetStreamBufferNumber:0000000000000000 $t
+     /tmp/ccjKuAAf.s:2544   .text.vStreamBufferSetStreamBufferNumber:0000000000000000 vStreamBufferSetStreamBufferNumber
+     /tmp/ccjKuAAf.s:2563   .text.ucStreamBufferGetStreamBufferType:0000000000000000 $t
+ARM GAS  /tmp/ccjKuAAf.s 			page 94
 
 
-     /tmp/ccyt9wyD.s:2570   .text.ucStreamBufferGetStreamBufferType:0000000000000000 ucStreamBufferGetStreamBufferType
+     /tmp/ccjKuAAf.s:2570   .text.ucStreamBufferGetStreamBufferType:0000000000000000 ucStreamBufferGetStreamBufferType
 
 UNDEFINED SYMBOLS
 memset

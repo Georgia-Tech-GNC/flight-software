@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccv3l3yF.s 			page 1
+ARM GAS  /tmp/ccKSNybv.s 			page 1
 
 
    1              		.cpu cortex-m7
@@ -16,22 +16,17 @@ ARM GAS  /tmp/ccv3l3yF.s 			page 1
   13              		.text
   14              	.Ltext0:
   15              		.cfi_sections	.debug_frame
-  16              		.section	.rodata.telemetry_test_task.str1.4,"aMS",%progbits,1
-  17              		.align	2
-  18              	.LC0:
-  19 0000 25640D0A 		.ascii	"%d\015\012\000"
-  19      00
-  20              		.section	.text.telemetry_test_task,"ax",%progbits
-  21              		.align	1
-  22              		.global	telemetry_test_task
-  23              		.arch armv7e-m
-  24              		.syntax unified
-  25              		.thumb
-  26              		.thumb_func
-  27              		.fpu fpv5-d16
-  29              	telemetry_test_task:
-  30              	.LFB148:
-  31              		.file 1 "../Core/Tests/Src/telemetry_test.c"
+  16              		.section	.text.telemetry_test_task,"ax",%progbits
+  17              		.align	1
+  18              		.global	telemetry_test_task
+  19              		.arch armv7e-m
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  23              		.fpu fpv5-d16
+  25              	telemetry_test_task:
+  26              	.LFB148:
+  27              		.file 1 "../Core/Tests/Src/telemetry_test.c"
    1:../Core/Tests/Src/telemetry_test.c **** #include "telemetry_test.h"
    2:../Core/Tests/Src/telemetry_test.c **** #include "telemetry.h"
    3:../Core/Tests/Src/telemetry_test.c **** #include "stdint.h"
@@ -43,103 +38,56 @@ ARM GAS  /tmp/ccv3l3yF.s 			page 1
    9:../Core/Tests/Src/telemetry_test.c **** #include "globals.h"
   10:../Core/Tests/Src/telemetry_test.c **** #include "port_config.h"
   11:../Core/Tests/Src/telemetry_test.c **** 
-  12:../Core/Tests/Src/telemetry_test.c **** extern uint16_t uart_rx_count;
+  12:../Core/Tests/Src/telemetry_test.c **** void telemetry_test_task(void *args) {
+  28              		.loc 1 12 38 view -0
+  29              		.cfi_startproc
+  30              		@ Volatile: function does not return.
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              	.LVL0:
+  34              		.loc 1 12 38 is_stmt 0 view .LVU1
+  35 0000 08B5     		push	{r3, lr}
+  36              	.LCFI0:
+  37              		.cfi_def_cfa_offset 8
+  38              		.cfi_offset 3, -8
+  39              		.cfi_offset 14, -4
+  40              	.LVL1:
+  41              	.L2:
   13:../Core/Tests/Src/telemetry_test.c **** 
-  14:../Core/Tests/Src/telemetry_test.c **** void telemetry_test_task(void *args) {
-  32              		.loc 1 14 38 view -0
-  33              		.cfi_startproc
-  34              		@ Volatile: function does not return.
-  35              		@ args = 0, pretend = 0, frame = 24
-  36              		@ frame_needed = 0, uses_anonymous_args = 0
-  37              	.LVL0:
-  38              		.loc 1 14 38 is_stmt 0 view .LVU1
-  39 0000 00B5     		push	{lr}
-  40              	.LCFI0:
-  41              		.cfi_def_cfa_offset 4
-  42              		.cfi_offset 14, -4
-  43 0002 87B0     		sub	sp, sp, #28
-ARM GAS  /tmp/ccv3l3yF.s 			page 2
-
-
-  44              	.LCFI1:
-  45              		.cfi_def_cfa_offset 32
-  46              	.LVL1:
-  47              	.L2:
+  14:../Core/Tests/Src/telemetry_test.c ****     uint8_t rx[2];
+  42              		.loc 1 14 5 is_stmt 1 discriminator 1 view .LVU2
   15:../Core/Tests/Src/telemetry_test.c **** 
-  16:../Core/Tests/Src/telemetry_test.c ****     uint8_t rx[2];
-  48              		.loc 1 16 5 is_stmt 1 discriminator 1 view .LVU2
-  17:../Core/Tests/Src/telemetry_test.c **** 
-  18:../Core/Tests/Src/telemetry_test.c ****     while (1) {
-  49              		.loc 1 18 5 discriminator 1 view .LVU3
-  50              	.LBB2:
-  19:../Core/Tests/Src/telemetry_test.c ****         char s[19];
-  51              		.loc 1 19 9 discriminator 1 view .LVU4
-  20:../Core/Tests/Src/telemetry_test.c ****         sprintf(s, "%d\r\n", uart_rx_count);
-  52              		.loc 1 20 9 discriminator 1 view .LVU5
-  53 0004 0A4B     		ldr	r3, .L4
-  54 0006 1A88     		ldrh	r2, [r3]
-  55 0008 0A49     		ldr	r1, .L4+4
-  56 000a 01A8     		add	r0, sp, #4
-  57 000c FFF7FEFF 		bl	sprintf
-  58              	.LVL2:
-  21:../Core/Tests/Src/telemetry_test.c ****         HAL_UART_Transmit(&telemetry_uart, s, strlen(s), HAL_MAX_DELAY);
-  59              		.loc 1 21 9 discriminator 1 view .LVU6
-  60              		.loc 1 21 47 is_stmt 0 discriminator 1 view .LVU7
-  61 0010 01A8     		add	r0, sp, #4
-  62 0012 FFF7FEFF 		bl	strlen
-  63              	.LVL3:
-  64              		.loc 1 21 9 discriminator 1 view .LVU8
-  65 0016 4FF0FF33 		mov	r3, #-1
-  66 001a 82B2     		uxth	r2, r0
-  67 001c 01A9     		add	r1, sp, #4
-  68 001e 0648     		ldr	r0, .L4+8
-  69 0020 FFF7FEFF 		bl	HAL_UART_Transmit
-  70              	.LVL4:
-  22:../Core/Tests/Src/telemetry_test.c **** 
-  23:../Core/Tests/Src/telemetry_test.c ****         vTaskDelay(1000);
-  71              		.loc 1 23 9 is_stmt 1 discriminator 1 view .LVU9
-  72 0024 4FF47A70 		mov	r0, #1000
-  73 0028 FFF7FEFF 		bl	vTaskDelay
-  74              	.LVL5:
-  75              	.LBE2:
-  18:../Core/Tests/Src/telemetry_test.c ****         char s[19];
-  76              		.loc 1 18 11 discriminator 1 view .LVU10
-  77 002c EAE7     		b	.L2
-  78              	.L5:
-  79 002e 00BF     		.align	2
-  80              	.L4:
-  81 0030 00000000 		.word	uart_rx_count
-  82 0034 00000000 		.word	.LC0
-  83 0038 00000000 		.word	huart4
-  84              		.cfi_endproc
-  85              	.LFE148:
-  87              		.text
-  88              	.Letext0:
-  89              		.file 2 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stdint.h"
-  90              		.file 3 "Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h725xx.h"
-  91              		.file 4 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_def.h"
-ARM GAS  /tmp/ccv3l3yF.s 			page 3
+  16:../Core/Tests/Src/telemetry_test.c ****     while (1) {
+ARM GAS  /tmp/ccKSNybv.s 			page 2
 
 
-  92              		.file 5 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dma.h"
-  93              		.file 6 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h"
-  94              		.file 7 "../Core/Include/globals.h"
-  95              		.file 8 "<built-in>"
-  96              		.file 9 "../Core/FreeRTOS-Kernel/include/task.h"
-ARM GAS  /tmp/ccv3l3yF.s 			page 4
+  43              		.loc 1 16 5 discriminator 1 view .LVU3
+  44              	.LBB2:
+  17:../Core/Tests/Src/telemetry_test.c ****         char s[19];
+  45              		.loc 1 17 9 discriminator 1 view .LVU4
+  18:../Core/Tests/Src/telemetry_test.c **** 
+  19:../Core/Tests/Src/telemetry_test.c ****         vTaskDelay(1000);
+  46              		.loc 1 19 9 discriminator 1 view .LVU5
+  47 0002 4FF47A70 		mov	r0, #1000
+  48 0006 FFF7FEFF 		bl	vTaskDelay
+  49              	.LVL2:
+  50              	.LBE2:
+  16:../Core/Tests/Src/telemetry_test.c ****         char s[19];
+  51              		.loc 1 16 11 discriminator 1 view .LVU6
+  52 000a FAE7     		b	.L2
+  53              		.cfi_endproc
+  54              	.LFE148:
+  56              		.text
+  57              	.Letext0:
+  58              		.file 2 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stdint.h"
+  59              		.file 3 "../Core/FreeRTOS-Kernel/include/task.h"
+ARM GAS  /tmp/ccKSNybv.s 			page 3
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 telemetry_test.c
-     /tmp/ccv3l3yF.s:17     .rodata.telemetry_test_task.str1.4:0000000000000000 $d
-     /tmp/ccv3l3yF.s:21     .text.telemetry_test_task:0000000000000000 $t
-     /tmp/ccv3l3yF.s:29     .text.telemetry_test_task:0000000000000000 telemetry_test_task
-     /tmp/ccv3l3yF.s:81     .text.telemetry_test_task:0000000000000030 $d
+     /tmp/ccKSNybv.s:17     .text.telemetry_test_task:0000000000000000 $t
+     /tmp/ccKSNybv.s:25     .text.telemetry_test_task:0000000000000000 telemetry_test_task
 
 UNDEFINED SYMBOLS
-sprintf
-strlen
-HAL_UART_Transmit
 vTaskDelay
-uart_rx_count
-huart4

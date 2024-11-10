@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccV9TjMG.s 			page 1
+ARM GAS  /tmp/ccdxB9EQ.s 			page 1
 
 
    1              		.cpu cortex-m7
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccV9TjMG.s 			page 1
   28:../Core/Src/w25q.c ****   HAL_UART_Transmit(&huart2, "Updated status\r\n", 16, HAL_MAX_DELAY);
   29:../Core/Src/w25q.c **** 
   30:../Core/Src/w25q.c **** #if W25Q_MEM_FLASH_SIZE > 128
-ARM GAS  /tmp/ccV9TjMG.s 			page 2
+ARM GAS  /tmp/ccdxB9EQ.s 			page 2
 
 
   31:../Core/Src/w25q.c **** 
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccV9TjMG.s 			page 1
   85:../Core/Src/w25q.c **** 
   86:../Core/Src/w25q.c ****   err = w25q_read_status_reg(device, &sr[0], 1);
   87:../Core/Src/w25q.c ****   if (err != W25Q_ERR_OK) {
-ARM GAS  /tmp/ccV9TjMG.s 			page 3
+ARM GAS  /tmp/ccdxB9EQ.s 			page 3
 
 
   88:../Core/Src/w25q.c ****     return err;
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccV9TjMG.s 			page 1
   38              	.LFE152:
   40              		.section	.text.w25q_read_id,"ax",%progbits
   41              		.align	1
-ARM GAS  /tmp/ccV9TjMG.s 			page 4
+ARM GAS  /tmp/ccdxB9EQ.s 			page 4
 
 
   42              		.weak	w25q_read_id
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccV9TjMG.s 			page 1
   90              		.section	.text.w25q_enter_4_byte_mode,"ax",%progbits
   91              		.align	1
   92              		.weak	w25q_enter_4_byte_mode
-ARM GAS  /tmp/ccV9TjMG.s 			page 5
+ARM GAS  /tmp/ccdxB9EQ.s 			page 5
 
 
   93              		.syntax unified
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccV9TjMG.s 			page 1
  140              		.section	.text.w25q_update_status_struct,"ax",%progbits
  141              		.align	1
  142              		.global	w25q_update_status_struct
-ARM GAS  /tmp/ccV9TjMG.s 			page 6
+ARM GAS  /tmp/ccdxB9EQ.s 			page 6
 
 
  143              		.syntax unified
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccV9TjMG.s 			page 1
  188              		.loc 1 91 3 is_stmt 1 view .LVU28
   91:../Core/Src/w25q.c ****   if (err != W25Q_ERR_OK) {
  189              		.loc 1 91 9 is_stmt 0 view .LVU29
-ARM GAS  /tmp/ccV9TjMG.s 			page 7
+ARM GAS  /tmp/ccdxB9EQ.s 			page 7
 
 
  190 0014 0222     		movs	r2, #2
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccV9TjMG.s 			page 1
  235              		.cfi_startproc
  236              		@ args = 0, pretend = 0, frame = 8
  237              		@ frame_needed = 0, uses_anonymous_args = 0
-ARM GAS  /tmp/ccV9TjMG.s 			page 8
+ARM GAS  /tmp/ccdxB9EQ.s 			page 8
 
 
  106:../Core/Src/w25q.c ****   enum w25q_err err;
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccV9TjMG.s 			page 1
  277 0028 02B0     		add	sp, sp, #8
  278              	.LCFI6:
  279              		.cfi_def_cfa_offset 8
-ARM GAS  /tmp/ccV9TjMG.s 			page 9
+ARM GAS  /tmp/ccdxB9EQ.s 			page 9
 
 
  280              		@ sp needed
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccV9TjMG.s 			page 1
  321 002e 0000     		.align	2
  322              	.LC3:
  323 0030 536F6D65 		.ascii	"Something2 \015\012\000"
-ARM GAS  /tmp/ccV9TjMG.s 			page 10
+ARM GAS  /tmp/ccdxB9EQ.s 			page 10
 
 
  323      7468696E 
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccV9TjMG.s 			page 1
   11:../Core/Src/w25q.c ****     return err;
  363              		.loc 1 11 6 is_stmt 0 view .LVU68
  364 000e 08B1     		cbz	r0, .L20
-ARM GAS  /tmp/ccV9TjMG.s 			page 11
+ARM GAS  /tmp/ccdxB9EQ.s 			page 11
 
 
  365              	.L15:
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccV9TjMG.s 			page 1
  407              		.loc 1 23 9 is_stmt 0 view .LVU80
  408 0040 2046     		mov	r0, r4
  409 0042 FFF7FEFF 		bl	w25q_update_status_struct
-ARM GAS  /tmp/ccV9TjMG.s 			page 12
+ARM GAS  /tmp/ccdxB9EQ.s 			page 12
 
 
  410              	.LVL26:
@@ -718,7 +718,7 @@ ARM GAS  /tmp/ccV9TjMG.s 			page 1
  450              		.loc 1 62 7 is_stmt 1 view .LVU94
  451 007e 4FF0FF33 		mov	r3, #-1
  452 0082 0F22     		movs	r2, #15
-ARM GAS  /tmp/ccV9TjMG.s 			page 13
+ARM GAS  /tmp/ccdxB9EQ.s 			page 13
 
 
  453 0084 1449     		ldr	r1, .L22+16
@@ -778,7 +778,7 @@ ARM GAS  /tmp/ccV9TjMG.s 			page 1
  494              		.loc 1 76 9 is_stmt 0 view .LVU107
  495 00c0 2046     		mov	r0, r4
  496 00c2 FFF7FEFF 		bl	w25q_update_status_struct
-ARM GAS  /tmp/ccV9TjMG.s 			page 14
+ARM GAS  /tmp/ccdxB9EQ.s 			page 14
 
 
  497              	.LVL37:
@@ -838,7 +838,7 @@ ARM GAS  /tmp/ccV9TjMG.s 			page 1
  547              	w25q_read_data:
  548              	.LVL40:
  549              	.LFB151:
-ARM GAS  /tmp/ccV9TjMG.s 			page 15
+ARM GAS  /tmp/ccdxB9EQ.s 			page 15
 
 
  122:../Core/Src/w25q.c ****   if (page_num >= W25Q_PAGE_COUNT || len == 0 || len > 256 ||
@@ -898,7 +898,7 @@ ARM GAS  /tmp/ccV9TjMG.s 			page 1
  125:../Core/Src/w25q.c ****   }
  592              		.loc 1 125 12 view .LVU126
  593 002a 0220     		movs	r0, #2
-ARM GAS  /tmp/ccV9TjMG.s 			page 16
+ARM GAS  /tmp/ccdxB9EQ.s 			page 16
 
 
  594              	.LVL46:
@@ -958,7 +958,7 @@ ARM GAS  /tmp/ccV9TjMG.s 			page 1
  640              		.align	1
  641              		.weak	w25q_erase_sector
  642              		.syntax unified
-ARM GAS  /tmp/ccV9TjMG.s 			page 17
+ARM GAS  /tmp/ccdxB9EQ.s 			page 17
 
 
  643              		.thumb
@@ -1018,7 +1018,7 @@ ARM GAS  /tmp/ccV9TjMG.s 			page 1
  690              		.align	1
  691              		.weak	w25q_erase_chip
  692              		.syntax unified
-ARM GAS  /tmp/ccV9TjMG.s 			page 18
+ARM GAS  /tmp/ccdxB9EQ.s 			page 18
 
 
  693              		.thumb
@@ -1078,7 +1078,7 @@ ARM GAS  /tmp/ccV9TjMG.s 			page 1
  742              		.file 3 "Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h725xx.h"
  743              		.file 4 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_def.h"
  744              		.file 5 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dma.h"
-ARM GAS  /tmp/ccV9TjMG.s 			page 19
+ARM GAS  /tmp/ccdxB9EQ.s 			page 19
 
 
  745              		.file 6 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h"
@@ -1086,45 +1086,45 @@ ARM GAS  /tmp/ccV9TjMG.s 			page 1
  747              		.file 8 "../Core/Include/globals.h"
  748              		.file 9 "/usr/include/newlib/string.h"
  749              		.file 10 "<built-in>"
-ARM GAS  /tmp/ccV9TjMG.s 			page 20
+ARM GAS  /tmp/ccdxB9EQ.s 			page 20
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 w25q.c
-     /tmp/ccV9TjMG.s:17     .text.w25q_delay:0000000000000000 $t
-     /tmp/ccV9TjMG.s:25     .text.w25q_delay:0000000000000000 w25q_delay
-     /tmp/ccV9TjMG.s:41     .text.w25q_read_id:0000000000000000 $t
-     /tmp/ccV9TjMG.s:48     .text.w25q_read_id:0000000000000000 w25q_read_id
-     /tmp/ccV9TjMG.s:66     .text.w25q_write_enable:0000000000000000 $t
-     /tmp/ccV9TjMG.s:73     .text.w25q_write_enable:0000000000000000 w25q_write_enable
-     /tmp/ccV9TjMG.s:91     .text.w25q_enter_4_byte_mode:0000000000000000 $t
-     /tmp/ccV9TjMG.s:98     .text.w25q_enter_4_byte_mode:0000000000000000 w25q_enter_4_byte_mode
-     /tmp/ccV9TjMG.s:116    .text.w25q_read_status_reg:0000000000000000 $t
-     /tmp/ccV9TjMG.s:123    .text.w25q_read_status_reg:0000000000000000 w25q_read_status_reg
-     /tmp/ccV9TjMG.s:141    .text.w25q_update_status_struct:0000000000000000 $t
-     /tmp/ccV9TjMG.s:148    .text.w25q_update_status_struct:0000000000000000 w25q_update_status_struct
-     /tmp/ccV9TjMG.s:224    .text.w25q_is_busy:0000000000000000 $t
-     /tmp/ccV9TjMG.s:231    .text.w25q_is_busy:0000000000000000 w25q_is_busy
-     /tmp/ccV9TjMG.s:287    .text.w25q_write_status_reg:0000000000000000 $t
-     /tmp/ccV9TjMG.s:294    .text.w25q_write_status_reg:0000000000000000 w25q_write_status_reg
-     /tmp/ccV9TjMG.s:312    .rodata.w25q_init.str1.4:0000000000000000 $d
-     /tmp/ccV9TjMG.s:331    .text.w25q_init:0000000000000000 $t
-     /tmp/ccV9TjMG.s:338    .text.w25q_init:0000000000000000 w25q_init
-     /tmp/ccV9TjMG.s:504    .text.w25q_init:00000000000000c8 $d
-     /tmp/ccV9TjMG.s:515    .text.w25q_read_raw:0000000000000000 $t
-     /tmp/ccV9TjMG.s:522    .text.w25q_read_raw:0000000000000000 w25q_read_raw
-     /tmp/ccV9TjMG.s:540    .text.w25q_read_data:0000000000000000 $t
-     /tmp/ccV9TjMG.s:547    .text.w25q_read_data:0000000000000000 w25q_read_data
-     /tmp/ccV9TjMG.s:615    .text.w25q_write_raw:0000000000000000 $t
-     /tmp/ccV9TjMG.s:622    .text.w25q_write_raw:0000000000000000 w25q_write_raw
-     /tmp/ccV9TjMG.s:640    .text.w25q_erase_sector:0000000000000000 $t
-     /tmp/ccV9TjMG.s:647    .text.w25q_erase_sector:0000000000000000 w25q_erase_sector
-     /tmp/ccV9TjMG.s:665    .text.w25q_erase_block:0000000000000000 $t
-     /tmp/ccV9TjMG.s:672    .text.w25q_erase_block:0000000000000000 w25q_erase_block
-     /tmp/ccV9TjMG.s:690    .text.w25q_erase_chip:0000000000000000 $t
-     /tmp/ccV9TjMG.s:697    .text.w25q_erase_chip:0000000000000000 w25q_erase_chip
-     /tmp/ccV9TjMG.s:715    .text.w25q_reset:0000000000000000 $t
-     /tmp/ccV9TjMG.s:722    .text.w25q_reset:0000000000000000 w25q_reset
+     /tmp/ccdxB9EQ.s:17     .text.w25q_delay:0000000000000000 $t
+     /tmp/ccdxB9EQ.s:25     .text.w25q_delay:0000000000000000 w25q_delay
+     /tmp/ccdxB9EQ.s:41     .text.w25q_read_id:0000000000000000 $t
+     /tmp/ccdxB9EQ.s:48     .text.w25q_read_id:0000000000000000 w25q_read_id
+     /tmp/ccdxB9EQ.s:66     .text.w25q_write_enable:0000000000000000 $t
+     /tmp/ccdxB9EQ.s:73     .text.w25q_write_enable:0000000000000000 w25q_write_enable
+     /tmp/ccdxB9EQ.s:91     .text.w25q_enter_4_byte_mode:0000000000000000 $t
+     /tmp/ccdxB9EQ.s:98     .text.w25q_enter_4_byte_mode:0000000000000000 w25q_enter_4_byte_mode
+     /tmp/ccdxB9EQ.s:116    .text.w25q_read_status_reg:0000000000000000 $t
+     /tmp/ccdxB9EQ.s:123    .text.w25q_read_status_reg:0000000000000000 w25q_read_status_reg
+     /tmp/ccdxB9EQ.s:141    .text.w25q_update_status_struct:0000000000000000 $t
+     /tmp/ccdxB9EQ.s:148    .text.w25q_update_status_struct:0000000000000000 w25q_update_status_struct
+     /tmp/ccdxB9EQ.s:224    .text.w25q_is_busy:0000000000000000 $t
+     /tmp/ccdxB9EQ.s:231    .text.w25q_is_busy:0000000000000000 w25q_is_busy
+     /tmp/ccdxB9EQ.s:287    .text.w25q_write_status_reg:0000000000000000 $t
+     /tmp/ccdxB9EQ.s:294    .text.w25q_write_status_reg:0000000000000000 w25q_write_status_reg
+     /tmp/ccdxB9EQ.s:312    .rodata.w25q_init.str1.4:0000000000000000 $d
+     /tmp/ccdxB9EQ.s:331    .text.w25q_init:0000000000000000 $t
+     /tmp/ccdxB9EQ.s:338    .text.w25q_init:0000000000000000 w25q_init
+     /tmp/ccdxB9EQ.s:504    .text.w25q_init:00000000000000c8 $d
+     /tmp/ccdxB9EQ.s:515    .text.w25q_read_raw:0000000000000000 $t
+     /tmp/ccdxB9EQ.s:522    .text.w25q_read_raw:0000000000000000 w25q_read_raw
+     /tmp/ccdxB9EQ.s:540    .text.w25q_read_data:0000000000000000 $t
+     /tmp/ccdxB9EQ.s:547    .text.w25q_read_data:0000000000000000 w25q_read_data
+     /tmp/ccdxB9EQ.s:615    .text.w25q_write_raw:0000000000000000 $t
+     /tmp/ccdxB9EQ.s:622    .text.w25q_write_raw:0000000000000000 w25q_write_raw
+     /tmp/ccdxB9EQ.s:640    .text.w25q_erase_sector:0000000000000000 $t
+     /tmp/ccdxB9EQ.s:647    .text.w25q_erase_sector:0000000000000000 w25q_erase_sector
+     /tmp/ccdxB9EQ.s:665    .text.w25q_erase_block:0000000000000000 $t
+     /tmp/ccdxB9EQ.s:672    .text.w25q_erase_block:0000000000000000 w25q_erase_block
+     /tmp/ccdxB9EQ.s:690    .text.w25q_erase_chip:0000000000000000 $t
+     /tmp/ccdxB9EQ.s:697    .text.w25q_erase_chip:0000000000000000 w25q_erase_chip
+     /tmp/ccdxB9EQ.s:715    .text.w25q_reset:0000000000000000 $t
+     /tmp/ccdxB9EQ.s:722    .text.w25q_reset:0000000000000000 w25q_reset
 
 UNDEFINED SYMBOLS
 sprintf

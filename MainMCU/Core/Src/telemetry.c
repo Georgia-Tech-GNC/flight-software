@@ -131,15 +131,23 @@ void rx_process_byte(uint8_t byte, uint8_t *packet_buffer, uint8_t *packet_buffe
     int next_packet_buffer_size = process_incoming_byte(byte, packet_buffer, *packet_buffer_size);
 
     if (next_packet_buffer_size < 0) {
-        next_packet_buffer_size = -next_packet_buffer_size;
+        *packet_buffer_size = 0;
+        next_packet_buffer_size *= -1;
 
         if (verify_packet(packet_buffer, next_packet_buffer_size)) {
-            int extracted_buffer_size = next_packet_buffer_size - 5;
-            int message_id = extract_packet(packet_buffer, next_packet_buffer_size, extracted_buffer);
-
-            if (message_id != 1) return;
+            int command_id = is_command_packet(packet_buffer, next_packet_buffer_size);
+            if (command_id == -1) {
+                return;
+            }
+            process_command(command_id);
         }
-    } else {
+    } else if (next_packet_buffer_size < MAX_PACKET_SIZE) {
         *packet_buffer_size = next_packet_buffer_size;
+    } else {
+        *packet_buffer_size = 0;
     }
+}
+
+void process_command(int command_it) {
+
 }

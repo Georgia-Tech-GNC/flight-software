@@ -79,9 +79,13 @@ int port_init(void) {
     if (g_test_task_handle == NULL) return 0;
 
     /* Begin listening over uart */
+    
     if (HAL_UARTEx_ReceiveToIdle_DMA(&telemetry_uart, telemetry_uart_rx_buf, UART2_RX_BUFFER_SIZE) != HAL_OK) {
         return 0;
+    } else {
+        HAL_UART_Transmit_DMA(&telemetry_uart, "Init ok\r\n", 9);
     }
+    
 
     if (HAL_UARTEx_ReceiveToIdle_DMA(&state_uart, state_uart_rx_buf, UART3_RX_BUFFER_SIZE) != HAL_OK) {
         return 0;
@@ -96,8 +100,12 @@ void port_start(void) {
 
 uint16_t prev_size_uart_telemetry = 0;
 uint16_t prev_size_uart_state = 0;
-
+uint16_t uart_rx_count = 0;
+/*
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
+    uart_rx_count ++;
+    // HAL_UART_Transmit_DMA(&telemetry_uart, "Received bytes\r\n", 16);
+    
     if (huart->Instance == telemetry_uart.Instance) {
         if (size < prev_size_uart_telemetry) {
             prev_size_uart_telemetry = 0;
@@ -113,4 +121,4 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
         xStreamBufferSendFromISR(g_telemetry_rx_sb_handle, state_uart_rx_buf + prev_size_uart_state, size - prev_size_uart_state, NULL);
         prev_size_uart_state = size;
     }
-}
+}*/

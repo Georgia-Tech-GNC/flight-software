@@ -20,6 +20,8 @@
 #include "main.h"
 #include "string.h"
 #include "fatfs.h"
+#include "stdio.h"
+#include "string.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -81,7 +83,8 @@ static void MX_USART6_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+uint8_t n_bytes = 0;
+uint8_t rx_buf[16];
 /* USER CODE END 0 */
 
 /**
@@ -121,20 +124,25 @@ int main(void)
   MX_USB_OTG_FS_PCD_Init();
   MX_FATFS_Init();
   MX_USART6_UART_Init();
-  /* USER CODE BEGIN 2 */
-  port_init();
-  port_start();
-  /* USER CODE END 2 */
+  HAL_UART_Receive_IT(&debug_uart, rx_buf, 16);
 
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
   while (1)
   {
-    /* USER CODE END WHILE */
-
     /* USER CODE BEGIN 3 */
+    char buf[20];
+    sprintf(buf, "Received: %d\r\n", n_bytes);
+    HAL_UART_Transmit(&huart3, buf, strlen(buf), HAL_MAX_DELAY);
   }
   /* USER CODE END 3 */
+}
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+	n_bytes ++;
+}
+
+void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
+  n_bytes ++;
 }
 
 /**

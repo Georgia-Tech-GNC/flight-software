@@ -25,7 +25,9 @@ extern UART_HandleTypeDef debug_uart;
 
 extern SPI_HandleTypeDef sd_spi;
 
+#ifdef MCU_H725ZGT6
 extern OSPI_HandleTypeDef flash_spi;
+#endif
 
 extern uint8_t *g_current_state;
 

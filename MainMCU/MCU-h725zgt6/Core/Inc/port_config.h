@@ -4,6 +4,8 @@
 #include "stm32h7xx_hal.h"
 
 /* Change these to the values for your board */
+#define MCU_H725ZGT6
+
 #define SD_CS_GPIO_PORT     GPIOG
 #define SD_CS_PIN           GPIO_PIN_10
 

@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccsNoCqF.s 			page 1
+ARM GAS  /tmp/ccB8Aur4.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccsNoCqF.s 			page 1
   27:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c ****   * @{
   28:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c ****   */
   29:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c **** 
-ARM GAS  /tmp/ccsNoCqF.s 			page 2
+ARM GAS  /tmp/ccB8Aur4.s 			page 2
 
 
   30:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c **** /** @defgroup PCDEx PCDEx
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccsNoCqF.s 			page 1
   73:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c ****   uint32_t Tx_Offset;
   41              		.loc 1 73 3 view .LVU3
   74:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c **** 
-ARM GAS  /tmp/ccsNoCqF.s 			page 3
+ARM GAS  /tmp/ccB8Aur4.s 			page 3
 
 
   75:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c ****   /*  TXn min size = 16 words. (n  : Transmit FIFO index)
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccsNoCqF.s 			page 1
   66              		.cfi_def_cfa_offset 0
   67 0014 7047     		bx	lr
   68              	.LVL4:
-ARM GAS  /tmp/ccsNoCqF.s 			page 4
+ARM GAS  /tmp/ccB8Aur4.s 			page 4
 
 
   69              	.L2:
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccsNoCqF.s 			page 1
  108 003a F2D3     		bcc	.L5
  100:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c ****   }
  109              		.loc 1 100 5 is_stmt 1 view .LVU30
-ARM GAS  /tmp/ccsNoCqF.s 			page 5
+ARM GAS  /tmp/ccB8Aur4.s 			page 5
 
 
  100:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c ****   }
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccsNoCqF.s 			page 1
  152              		.align	1
  153              		.weak	HAL_PCDEx_LPM_Callback
  154              		.syntax unified
-ARM GAS  /tmp/ccsNoCqF.s 			page 6
+ARM GAS  /tmp/ccB8Aur4.s 			page 6
 
 
  155              		.thumb
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccsNoCqF.s 			page 1
  166:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c ****   uint32_t tickstart = HAL_GetTick();
  167:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c **** 
  168:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c ****   /* Enable DCD : Data Contact Detect */
-ARM GAS  /tmp/ccsNoCqF.s 			page 7
+ARM GAS  /tmp/ccB8Aur4.s 			page 7
 
 
  169:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c ****   USBx->GCCFG |= USB_OTG_GCCFG_DCDEN;
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccsNoCqF.s 			page 1
  223:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c **** #else
  224:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c ****       HAL_PCDEx_BCD_Callback(hpcd, PCD_BCD_CHARGING_DOWNSTREAM_PORT);
  225:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c **** #endif /* USE_HAL_PCD_REGISTER_CALLBACKS */
-ARM GAS  /tmp/ccsNoCqF.s 			page 8
+ARM GAS  /tmp/ccB8Aur4.s 			page 8
 
 
  226:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c ****     }
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccsNoCqF.s 			page 1
  280:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c **** {
  281:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c ****   USB_OTG_GlobalTypeDef *USBx = hpcd->Instance;
  282:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c **** 
-ARM GAS  /tmp/ccsNoCqF.s 			page 9
+ARM GAS  /tmp/ccB8Aur4.s 			page 9
 
 
  283:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c ****   USBx->GCCFG &= ~(USB_OTG_GCCFG_SDEN);
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccsNoCqF.s 			page 1
  316:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c ****   * @param  hpcd PCD handle
  317:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c ****   * @param  msg LPM message
  318:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c ****   * @retval HAL status
-ARM GAS  /tmp/ccsNoCqF.s 			page 10
+ARM GAS  /tmp/ccB8Aur4.s 			page 10
 
 
  319:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c ****   */
@@ -570,18 +570,18 @@ ARM GAS  /tmp/ccsNoCqF.s 			page 1
  201              		.file 4 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h"
  202              		.file 5 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_usb.h"
  203              		.file 6 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd.h"
-ARM GAS  /tmp/ccsNoCqF.s 			page 11
+ARM GAS  /tmp/ccB8Aur4.s 			page 11
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 stm32f4xx_hal_pcd_ex.c
-     /tmp/ccsNoCqF.s:18     .text.HAL_PCDEx_SetTxFiFo:0000000000000000 $t
-     /tmp/ccsNoCqF.s:26     .text.HAL_PCDEx_SetTxFiFo:0000000000000000 HAL_PCDEx_SetTxFiFo
-     /tmp/ccsNoCqF.s:122    .text.HAL_PCDEx_SetRxFiFo:0000000000000000 $t
-     /tmp/ccsNoCqF.s:129    .text.HAL_PCDEx_SetRxFiFo:0000000000000000 HAL_PCDEx_SetRxFiFo
-     /tmp/ccsNoCqF.s:152    .text.HAL_PCDEx_LPM_Callback:0000000000000000 $t
-     /tmp/ccsNoCqF.s:159    .text.HAL_PCDEx_LPM_Callback:0000000000000000 HAL_PCDEx_LPM_Callback
-     /tmp/ccsNoCqF.s:175    .text.HAL_PCDEx_BCD_Callback:0000000000000000 $t
-     /tmp/ccsNoCqF.s:182    .text.HAL_PCDEx_BCD_Callback:0000000000000000 HAL_PCDEx_BCD_Callback
+     /tmp/ccB8Aur4.s:18     .text.HAL_PCDEx_SetTxFiFo:0000000000000000 $t
+     /tmp/ccB8Aur4.s:26     .text.HAL_PCDEx_SetTxFiFo:0000000000000000 HAL_PCDEx_SetTxFiFo
+     /tmp/ccB8Aur4.s:122    .text.HAL_PCDEx_SetRxFiFo:0000000000000000 $t
+     /tmp/ccB8Aur4.s:129    .text.HAL_PCDEx_SetRxFiFo:0000000000000000 HAL_PCDEx_SetRxFiFo
+     /tmp/ccB8Aur4.s:152    .text.HAL_PCDEx_LPM_Callback:0000000000000000 $t
+     /tmp/ccB8Aur4.s:159    .text.HAL_PCDEx_LPM_Callback:0000000000000000 HAL_PCDEx_LPM_Callback
+     /tmp/ccB8Aur4.s:175    .text.HAL_PCDEx_BCD_Callback:0000000000000000 $t
+     /tmp/ccB8Aur4.s:182    .text.HAL_PCDEx_BCD_Callback:0000000000000000 HAL_PCDEx_BCD_Callback
 
 NO UNDEFINED SYMBOLS

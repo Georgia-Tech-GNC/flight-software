@@ -22,7 +22,10 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "packet_encode.h"
 #include "port_layer.h"
+#include "string.h"
+#include "stdio.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -32,7 +35,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define MESSAGE_MAX_SIZE 32
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -75,6 +78,8 @@ static void MX_OCTOSPI1_Init(void);
 /* USER CODE BEGIN 0 */
 
 /* USER CODE END 0 */
+uint16_t n_bytes = 0;
+uint8_t rx_buf[16];
 
 /**
   * @brief  The application entry point.
@@ -116,17 +121,48 @@ int main(void)
   //port_init();
   //port_start();
   /* USER CODE END 2 */
-
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  HAL_UARTEx_ReceiveToIdle_IT(&telemetry_uart, rx_buf, MESSAGE_MAX_SIZE);
+
   while (1)
   {
-    /* USER CODE END WHILE */
-    HAL_UART_Transmit(&telemetry_uart, "kms\r\n", 5, HAL_MAX_DELAY);
-    HAL_Delay(1000);
     /* USER CODE BEGIN 3 */
+    char buf[20];
+    sprintf(buf, "Received: %d\r\n", messages_recieved);
+    HAL_UART_Transmit(&debug_uart, buf, strlen(buf), HAL_MAX_DELAY);
+    HAL_Delay(100);
   }
   /* USER CODE END 3 */
+}
+
+uint8_t messages_recieved = 0;
+uint8_t message_buffer[MESSAGE_MAX_SIZE];
+uint16_t message_buffer_size = 0;
+uint8_t rx_buffer[MESSAGE_MAX_SIZE];
+uint16_t prev_size = 0;
+
+void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
+  for (int i = prev_size; i < size; i ++){
+    uint16_t next_buffer_size = process_incoming_byte(rx_buffer[i], message_buffer, message_buffer_size);
+
+    if (next_buffer_size < 0) {
+      message_buffer_size = 0;
+      messages_recieved ++;
+    } else if (next_buffer_size < MESSAGE_MAX_SIZE) {
+      //avoid buffer overflow
+      message_buffer_size = next_buffer_size;
+    } else {
+      message_buffer_size = 0;
+    }
+  }
+
+  if (size == MESSAGE_MAX_SIZE) {
+    HAL_UARTEx_ReceiveToIdle_IT(&telemetry_uart, rx_buf, MESSAGE_MAX_SIZE);
+    prev_size = 0;
+  } else {
+    prev_size = size;
+  }
 }
 
 /**

@@ -1,4 +1,4 @@
-ARM GAS  /tmp/cc4blM2Z.s 			page 1
+ARM GAS  /tmp/ccjKnGdG.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/cc4blM2Z.s 			page 1
   29:Core/Src/port.c **** /*-----------------------------------------------------------
   30:Core/Src/port.c **** * Implementation of functions defined in portable.h for the ARM CM7 port.
   31:Core/Src/port.c **** *----------------------------------------------------------*/
-ARM GAS  /tmp/cc4blM2Z.s 			page 2
+ARM GAS  /tmp/ccjKnGdG.s 			page 2
 
 
   32:Core/Src/port.c **** 
@@ -118,7 +118,7 @@ ARM GAS  /tmp/cc4blM2Z.s 			page 1
   86:Core/Src/port.c **** #define portINITIAL_XPSR                      ( 0x01000000 )
   87:Core/Src/port.c **** #define portINITIAL_EXC_RETURN                ( 0xfffffffd )
   88:Core/Src/port.c **** 
-ARM GAS  /tmp/cc4blM2Z.s 			page 3
+ARM GAS  /tmp/ccjKnGdG.s 			page 3
 
 
   89:Core/Src/port.c **** /* The systick is a 24-bit counter. */
@@ -178,7 +178,7 @@ ARM GAS  /tmp/cc4blM2Z.s 			page 1
  143:Core/Src/port.c ****  */
  144:Core/Src/port.c **** static void vPortEnableVFP( void ) __attribute__( ( naked ) );
  145:Core/Src/port.c **** 
-ARM GAS  /tmp/cc4blM2Z.s 			page 4
+ARM GAS  /tmp/ccjKnGdG.s 			page 4
 
 
  146:Core/Src/port.c **** /*
@@ -238,7 +238,7 @@ ARM GAS  /tmp/cc4blM2Z.s 			page 1
  200:Core/Src/port.c ****     /* Simulate the stack frame as it would be created by a context switch
  201:Core/Src/port.c ****      * interrupt. */
  202:Core/Src/port.c **** 
-ARM GAS  /tmp/cc4blM2Z.s 			page 5
+ARM GAS  /tmp/ccjKnGdG.s 			page 5
 
 
  203:Core/Src/port.c ****     /* Offset added to account for the way the MCU uses the stack on entry/exit
@@ -298,7 +298,7 @@ ARM GAS  /tmp/cc4blM2Z.s 			page 1
    1:Core/Inc/portmacro.h **** /*
    2:Core/Inc/portmacro.h ****  * FreeRTOS Kernel V11.1.0
    3:Core/Inc/portmacro.h ****  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-ARM GAS  /tmp/cc4blM2Z.s 			page 6
+ARM GAS  /tmp/ccjKnGdG.s 			page 6
 
 
    4:Core/Inc/portmacro.h ****  *
@@ -358,7 +358,7 @@ ARM GAS  /tmp/cc4blM2Z.s 			page 1
   58:Core/Inc/portmacro.h **** typedef portSTACK_TYPE   StackType_t;
   59:Core/Inc/portmacro.h **** typedef long             BaseType_t;
   60:Core/Inc/portmacro.h **** typedef unsigned long    UBaseType_t;
-ARM GAS  /tmp/cc4blM2Z.s 			page 7
+ARM GAS  /tmp/ccjKnGdG.s 			page 7
 
 
   61:Core/Inc/portmacro.h **** 
@@ -418,7 +418,7 @@ ARM GAS  /tmp/cc4blM2Z.s 			page 1
  115:Core/Inc/portmacro.h **** extern void vPortEnterCritical( void );
  116:Core/Inc/portmacro.h **** extern void vPortExitCritical( void );
  117:Core/Inc/portmacro.h **** #define portSET_INTERRUPT_MASK_FROM_ISR()         ulPortRaiseBASEPRI()
-ARM GAS  /tmp/cc4blM2Z.s 			page 8
+ARM GAS  /tmp/ccjKnGdG.s 			page 8
 
 
  118:Core/Inc/portmacro.h **** #define portCLEAR_INTERRUPT_MASK_FROM_ISR( x )    vPortSetBASEPRI( x )
@@ -478,7 +478,7 @@ ARM GAS  /tmp/cc4blM2Z.s 			page 1
  172:Core/Inc/portmacro.h **** /*-----------------------------------------------------------*/
  173:Core/Inc/portmacro.h **** 
  174:Core/Inc/portmacro.h **** #ifdef configASSERT
-ARM GAS  /tmp/cc4blM2Z.s 			page 9
+ARM GAS  /tmp/ccjKnGdG.s 			page 9
 
 
  175:Core/Inc/portmacro.h ****     void vPortValidateInterruptPriority( void );
@@ -538,7 +538,7 @@ ARM GAS  /tmp/cc4blM2Z.s 			page 1
   59              	.LVL0:
   60              		.thumb
   61              		.syntax unified
-ARM GAS  /tmp/cc4blM2Z.s 			page 10
+ARM GAS  /tmp/ccjKnGdG.s 			page 10
 
 
   62              	.L2:
@@ -598,7 +598,7 @@ ARM GAS  /tmp/cc4blM2Z.s 			page 1
  264:Core/Src/port.c ****         "   msr basepri, r0                 \n"
  265:Core/Src/port.c ****         "   bx r14                          \n"
  266:Core/Src/port.c ****         "                                   \n"
-ARM GAS  /tmp/cc4blM2Z.s 			page 11
+ARM GAS  /tmp/ccjKnGdG.s 			page 11
 
 
  267:Core/Src/port.c ****         "   .align 4                        \n"
@@ -658,7 +658,7 @@ ARM GAS  /tmp/cc4blM2Z.s 			page 1
  116              		.syntax unified
  117              		.cfi_endproc
  118              	.LFE7:
-ARM GAS  /tmp/cc4blM2Z.s 			page 12
+ARM GAS  /tmp/ccjKnGdG.s 			page 12
 
 
  120              		.section	.text.vPortEnableVFP,"ax",%progbits
@@ -718,7 +718,7 @@ ARM GAS  /tmp/cc4blM2Z.s 			page 1
  341:Core/Src/port.c ****         volatile uint8_t ucMaxPriorityValue;
  342:Core/Src/port.c **** 
  343:Core/Src/port.c ****         /* Determine the maximum priority from which ISR safe FreeRTOS API
-ARM GAS  /tmp/cc4blM2Z.s 			page 13
+ARM GAS  /tmp/ccjKnGdG.s 			page 13
 
 
  344:Core/Src/port.c ****          * functions can be called.  ISR safe functions are those that end in
@@ -778,7 +778,7 @@ ARM GAS  /tmp/cc4blM2Z.s 			page 1
  398:Core/Src/port.c ****              * The following assert ensures that the sub-priority bit in the
  399:Core/Src/port.c ****              * configMAX_SYSCALL_INTERRUPT_PRIORITY is clear to avoid the above mentioned
  400:Core/Src/port.c ****              * confusion. */
-ARM GAS  /tmp/cc4blM2Z.s 			page 14
+ARM GAS  /tmp/ccjKnGdG.s 			page 14
 
 
  401:Core/Src/port.c ****             configASSERT( ( configMAX_SYSCALL_INTERRUPT_PRIORITY & 0x1U ) == 0U );
@@ -838,7 +838,7 @@ ARM GAS  /tmp/cc4blM2Z.s 			page 1
  455:Core/Src/port.c **** 
  456:Core/Src/port.c **** void vPortEndScheduler( void )
  457:Core/Src/port.c **** {
-ARM GAS  /tmp/cc4blM2Z.s 			page 15
+ARM GAS  /tmp/ccjKnGdG.s 			page 15
 
 
  458:Core/Src/port.c ****     /* Not implemented in ports where there is nothing to return to.
@@ -898,7 +898,7 @@ ARM GAS  /tmp/cc4blM2Z.s 			page 1
  512:Core/Src/port.c ****         "   stmdb sp!, {r0, r3}                 \n"
  513:Core/Src/port.c ****         "   mov r0, %0                          \n"
  514:Core/Src/port.c ****         "   cpsid i                             \n" /* ARM Cortex-M7 r0p1 Errata 837070 workaround.
-ARM GAS  /tmp/cc4blM2Z.s 			page 16
+ARM GAS  /tmp/ccjKnGdG.s 			page 16
 
 
  515:Core/Src/port.c ****         "   msr basepri, r0                     \n"
@@ -958,7 +958,7 @@ ARM GAS  /tmp/cc4blM2Z.s 			page 1
  569:Core/Src/port.c ****         }
  570:Core/Src/port.c ****         else
  571:Core/Src/port.c ****         {
-ARM GAS  /tmp/cc4blM2Z.s 			page 17
+ARM GAS  /tmp/ccjKnGdG.s 			page 17
 
 
  572:Core/Src/port.c ****             traceISR_EXIT();
@@ -1018,7 +1018,7 @@ ARM GAS  /tmp/cc4blM2Z.s 			page 1
  626:Core/Src/port.c ****             /* Calculate the reload value required to wait xExpectedIdleTime
  627:Core/Src/port.c ****              * tick periods.  -1 is used because this code normally executes part
  628:Core/Src/port.c ****              * way through the first tick period.  But if the SysTick IRQ is now
-ARM GAS  /tmp/cc4blM2Z.s 			page 18
+ARM GAS  /tmp/ccjKnGdG.s 			page 18
 
 
  629:Core/Src/port.c ****              * pending, then clear the IRQ, suppressing the first tick, and correct
@@ -1078,7 +1078,7 @@ ARM GAS  /tmp/cc4blM2Z.s 			page 1
  683:Core/Src/port.c ****             __asm volatile ( "cpsid i" ::: "memory" );
  684:Core/Src/port.c ****             __asm volatile ( "dsb" );
  685:Core/Src/port.c ****             __asm volatile ( "isb" );
-ARM GAS  /tmp/cc4blM2Z.s 			page 19
+ARM GAS  /tmp/ccjKnGdG.s 			page 19
 
 
  686:Core/Src/port.c **** 
@@ -1138,7 +1138,7 @@ ARM GAS  /tmp/cc4blM2Z.s 			page 1
  740:Core/Src/port.c ****                     }
  741:Core/Src/port.c ****                 }
  742:Core/Src/port.c ****                 #endif /* portNVIC_SYSTICK_CLK_BIT_CONFIG */
-ARM GAS  /tmp/cc4blM2Z.s 			page 20
+ARM GAS  /tmp/ccjKnGdG.s 			page 20
 
 
  743:Core/Src/port.c **** 
@@ -1198,7 +1198,7 @@ ARM GAS  /tmp/cc4blM2Z.s 			page 1
  797:Core/Src/port.c **** #endif /* #if configUSE_TICKLESS_IDLE */
  798:Core/Src/port.c **** /*-----------------------------------------------------------*/
  799:Core/Src/port.c **** 
-ARM GAS  /tmp/cc4blM2Z.s 			page 21
+ARM GAS  /tmp/ccjKnGdG.s 			page 21
 
 
  800:Core/Src/port.c **** /*
@@ -1258,7 +1258,7 @@ ARM GAS  /tmp/cc4blM2Z.s 			page 1
  836:Core/Src/port.c ****         "   .ltorg                      \n"
  837:Core/Src/port.c ****     );
  838:Core/Src/port.c **** }
-ARM GAS  /tmp/cc4blM2Z.s 			page 22
+ARM GAS  /tmp/ccjKnGdG.s 			page 22
 
 
  146              		.loc 1 838 1 is_stmt 0 view .LVU19
@@ -1318,7 +1318,7 @@ ARM GAS  /tmp/cc4blM2Z.s 			page 1
  189              	.LVL5:
  215:Core/Src/port.c **** 
  190              		.loc 1 215 5 view .LVU33
-ARM GAS  /tmp/cc4blM2Z.s 			page 23
+ARM GAS  /tmp/ccjKnGdG.s 			page 23
 
 
  215:Core/Src/port.c **** 
@@ -1378,7 +1378,7 @@ ARM GAS  /tmp/cc4blM2Z.s 			page 1
  237 000e BFF36F8F 	   isb                             
  238 0012 4FF00000 	   mov r0, #0                      
  239 0016 80F31188 	   msr basepri, r0                 
-ARM GAS  /tmp/cc4blM2Z.s 			page 24
+ARM GAS  /tmp/ccjKnGdG.s 			page 24
 
 
  240 001a 7047     	   bx r14                          
@@ -1438,7 +1438,7 @@ ARM GAS  /tmp/cc4blM2Z.s 			page 1
  291              		.loc 2 210 30 view .LVU50
  292              	.LBB15:
  212:Core/Inc/portmacro.h **** 
-ARM GAS  /tmp/cc4blM2Z.s 			page 25
+ARM GAS  /tmp/ccjKnGdG.s 			page 25
 
 
  293              		.loc 2 212 5 view .LVU51
@@ -1498,7 +1498,7 @@ ARM GAS  /tmp/cc4blM2Z.s 			page 1
  484:Core/Src/port.c **** 
  342              		.loc 1 484 5 view .LVU60
  484:Core/Src/port.c **** 
-ARM GAS  /tmp/cc4blM2Z.s 			page 26
+ARM GAS  /tmp/ccjKnGdG.s 			page 26
 
 
  343              		.loc 1 484 22 is_stmt 0 view .LVU61
@@ -1558,7 +1558,7 @@ ARM GAS  /tmp/cc4blM2Z.s 			page 1
  252:Core/Inc/portmacro.h ****     __asm volatile
  357              		.loc 2 252 5 view .LVU66
  358              		.syntax unified
-ARM GAS  /tmp/cc4blM2Z.s 			page 27
+ARM GAS  /tmp/ccjKnGdG.s 			page 27
 
 
  359              	@ 252 "Core/Inc/portmacro.h" 1
@@ -1618,7 +1618,7 @@ ARM GAS  /tmp/cc4blM2Z.s 			page 1
  412 0026 80F31188 	   msr basepri, r0                     
  413 002a BFF34F8F 	   dsb                                 
  414 002e BFF36F8F 	   isb                                 
-ARM GAS  /tmp/cc4blM2Z.s 			page 28
+ARM GAS  /tmp/ccjKnGdG.s 			page 28
 
 
  415 0032 62B6     	   cpsie i                             
@@ -1678,7 +1678,7 @@ ARM GAS  /tmp/cc4blM2Z.s 			page 1
  210:Core/Inc/portmacro.h **** {
  468              		.loc 2 210 30 view .LVU74
  469              	.LBB19:
-ARM GAS  /tmp/cc4blM2Z.s 			page 29
+ARM GAS  /tmp/ccjKnGdG.s 			page 29
 
 
  212:Core/Inc/portmacro.h **** 
@@ -1738,7 +1738,7 @@ ARM GAS  /tmp/cc4blM2Z.s 			page 1
  512              	@ 0 "" 2
  513              	.LVL13:
  514              		.loc 2 252 5 is_stmt 0 view .LVU88
-ARM GAS  /tmp/cc4blM2Z.s 			page 30
+ARM GAS  /tmp/ccjKnGdG.s 			page 30
 
 
  515              		.thumb
@@ -1798,7 +1798,7 @@ ARM GAS  /tmp/cc4blM2Z.s 			page 1
  559              		.loc 1 821 31 is_stmt 0 view .LVU100
  560 001a 0723     		movs	r3, #7
  561 001c 1361     		str	r3, [r2, #16]
-ARM GAS  /tmp/cc4blM2Z.s 			page 31
+ARM GAS  /tmp/ccjKnGdG.s 			page 31
 
 
  822:Core/Src/port.c **** /*-----------------------------------------------------------*/
@@ -1858,7 +1858,7 @@ ARM GAS  /tmp/cc4blM2Z.s 			page 1
  608              		.loc 1 424 5 is_stmt 1 view .LVU110
  424:Core/Src/port.c **** 
  609              		.loc 1 424 24 is_stmt 0 view .LVU111
-ARM GAS  /tmp/cc4blM2Z.s 			page 32
+ARM GAS  /tmp/ccjKnGdG.s 			page 32
 
 
  610 001e 0025     		movs	r5, #0
@@ -1918,54 +1918,54 @@ ARM GAS  /tmp/cc4blM2Z.s 			page 1
  656              		.file 3 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stdint.h"
  657              		.file 4 "../Core/FreeRTOS-Kernel/include/projdefs.h"
  658              		.file 5 "../Core/FreeRTOS-Kernel/include/task.h"
-ARM GAS  /tmp/cc4blM2Z.s 			page 33
+ARM GAS  /tmp/ccjKnGdG.s 			page 33
 
 
  659              		.file 6 "../Core/Include/FreeRTOSConfig.h"
-ARM GAS  /tmp/cc4blM2Z.s 			page 34
+ARM GAS  /tmp/ccjKnGdG.s 			page 34
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 port.c
-     /tmp/cc4blM2Z.s:18     .text.prvTaskExitError:0000000000000000 $t
-     /tmp/cc4blM2Z.s:25     .text.prvTaskExitError:0000000000000000 prvTaskExitError
-     /tmp/cc4blM2Z.s:83     .text.prvPortStartFirstTask:0000000000000000 $t
-     /tmp/cc4blM2Z.s:89     .text.prvPortStartFirstTask:0000000000000000 prvPortStartFirstTask
-     /tmp/cc4blM2Z.s:111    .text.prvPortStartFirstTask:0000000000000022 $d
-     /tmp/cc4blM2Z.s:111    .text.prvPortStartFirstTask:0000000000000024 $d
-     /tmp/cc4blM2Z.s:121    .text.vPortEnableVFP:0000000000000000 $t
-     /tmp/cc4blM2Z.s:127    .text.vPortEnableVFP:0000000000000000 vPortEnableVFP
-     /tmp/cc4blM2Z.s:143    .text.vPortEnableVFP:000000000000000e $d
-     /tmp/cc4blM2Z.s:143    .text.vPortEnableVFP:0000000000000010 $d
-     /tmp/cc4blM2Z.s:153    .text.pxPortInitialiseStack:0000000000000000 $t
-     /tmp/cc4blM2Z.s:160    .text.pxPortInitialiseStack:0000000000000000 pxPortInitialiseStack
-     /tmp/cc4blM2Z.s:210    .text.pxPortInitialiseStack:0000000000000028 $d
-     /tmp/cc4blM2Z.s:215    .text.SVC_Handler:0000000000000000 $t
-     /tmp/cc4blM2Z.s:222    .text.SVC_Handler:0000000000000000 SVC_Handler
-     /tmp/cc4blM2Z.s:243    .text.SVC_Handler:0000000000000020 pxCurrentTCBConst2
-     /tmp/cc4blM2Z.s:243    .text.SVC_Handler:0000000000000020 $d
-     /tmp/cc4blM2Z.s:253    .text.vPortEndScheduler:0000000000000000 $t
-     /tmp/cc4blM2Z.s:260    .text.vPortEndScheduler:0000000000000000 vPortEndScheduler
-     /tmp/cc4blM2Z.s:274    .text.vPortEnterCritical:0000000000000000 $t
-     /tmp/cc4blM2Z.s:281    .text.vPortEnterCritical:0000000000000000 vPortEnterCritical
-     /tmp/cc4blM2Z.s:322    .text.vPortEnterCritical:0000000000000020 $d
-     /tmp/cc4blM2Z.s:327    .text.vPortExitCritical:0000000000000000 $t
-     /tmp/cc4blM2Z.s:334    .text.vPortExitCritical:0000000000000000 vPortExitCritical
-     /tmp/cc4blM2Z.s:374    .text.vPortExitCritical:0000000000000010 $d
-     /tmp/cc4blM2Z.s:379    .text.PendSV_Handler:0000000000000000 $t
-     /tmp/cc4blM2Z.s:386    .text.PendSV_Handler:0000000000000000 PendSV_Handler
-     /tmp/cc4blM2Z.s:437    .text.PendSV_Handler:0000000000000060 pxCurrentTCBConst
-     /tmp/cc4blM2Z.s:437    .text.PendSV_Handler:0000000000000060 $d
-     /tmp/cc4blM2Z.s:447    .text.SysTick_Handler:0000000000000000 $t
-     /tmp/cc4blM2Z.s:454    .text.SysTick_Handler:0000000000000000 SysTick_Handler
-     /tmp/cc4blM2Z.s:525    .text.vPortSetupTimerInterrupt:0000000000000000 $t
-     /tmp/cc4blM2Z.s:532    .text.vPortSetupTimerInterrupt:0000000000000000 vPortSetupTimerInterrupt
-     /tmp/cc4blM2Z.s:567    .text.vPortSetupTimerInterrupt:0000000000000020 $d
-     /tmp/cc4blM2Z.s:573    .text.xPortStartScheduler:0000000000000000 $t
-     /tmp/cc4blM2Z.s:580    .text.xPortStartScheduler:0000000000000000 xPortStartScheduler
-     /tmp/cc4blM2Z.s:643    .text.xPortStartScheduler:000000000000004c $d
-     /tmp/cc4blM2Z.s:648    .data.uxCriticalNesting:0000000000000000 $d
-     /tmp/cc4blM2Z.s:652    .data.uxCriticalNesting:0000000000000000 uxCriticalNesting
+     /tmp/ccjKnGdG.s:18     .text.prvTaskExitError:0000000000000000 $t
+     /tmp/ccjKnGdG.s:25     .text.prvTaskExitError:0000000000000000 prvTaskExitError
+     /tmp/ccjKnGdG.s:83     .text.prvPortStartFirstTask:0000000000000000 $t
+     /tmp/ccjKnGdG.s:89     .text.prvPortStartFirstTask:0000000000000000 prvPortStartFirstTask
+     /tmp/ccjKnGdG.s:111    .text.prvPortStartFirstTask:0000000000000022 $d
+     /tmp/ccjKnGdG.s:111    .text.prvPortStartFirstTask:0000000000000024 $d
+     /tmp/ccjKnGdG.s:121    .text.vPortEnableVFP:0000000000000000 $t
+     /tmp/ccjKnGdG.s:127    .text.vPortEnableVFP:0000000000000000 vPortEnableVFP
+     /tmp/ccjKnGdG.s:143    .text.vPortEnableVFP:000000000000000e $d
+     /tmp/ccjKnGdG.s:143    .text.vPortEnableVFP:0000000000000010 $d
+     /tmp/ccjKnGdG.s:153    .text.pxPortInitialiseStack:0000000000000000 $t
+     /tmp/ccjKnGdG.s:160    .text.pxPortInitialiseStack:0000000000000000 pxPortInitialiseStack
+     /tmp/ccjKnGdG.s:210    .text.pxPortInitialiseStack:0000000000000028 $d
+     /tmp/ccjKnGdG.s:215    .text.SVC_Handler:0000000000000000 $t
+     /tmp/ccjKnGdG.s:222    .text.SVC_Handler:0000000000000000 SVC_Handler
+     /tmp/ccjKnGdG.s:243    .text.SVC_Handler:0000000000000020 pxCurrentTCBConst2
+     /tmp/ccjKnGdG.s:243    .text.SVC_Handler:0000000000000020 $d
+     /tmp/ccjKnGdG.s:253    .text.vPortEndScheduler:0000000000000000 $t
+     /tmp/ccjKnGdG.s:260    .text.vPortEndScheduler:0000000000000000 vPortEndScheduler
+     /tmp/ccjKnGdG.s:274    .text.vPortEnterCritical:0000000000000000 $t
+     /tmp/ccjKnGdG.s:281    .text.vPortEnterCritical:0000000000000000 vPortEnterCritical
+     /tmp/ccjKnGdG.s:322    .text.vPortEnterCritical:0000000000000020 $d
+     /tmp/ccjKnGdG.s:327    .text.vPortExitCritical:0000000000000000 $t
+     /tmp/ccjKnGdG.s:334    .text.vPortExitCritical:0000000000000000 vPortExitCritical
+     /tmp/ccjKnGdG.s:374    .text.vPortExitCritical:0000000000000010 $d
+     /tmp/ccjKnGdG.s:379    .text.PendSV_Handler:0000000000000000 $t
+     /tmp/ccjKnGdG.s:386    .text.PendSV_Handler:0000000000000000 PendSV_Handler
+     /tmp/ccjKnGdG.s:437    .text.PendSV_Handler:0000000000000060 pxCurrentTCBConst
+     /tmp/ccjKnGdG.s:437    .text.PendSV_Handler:0000000000000060 $d
+     /tmp/ccjKnGdG.s:447    .text.SysTick_Handler:0000000000000000 $t
+     /tmp/ccjKnGdG.s:454    .text.SysTick_Handler:0000000000000000 SysTick_Handler
+     /tmp/ccjKnGdG.s:525    .text.vPortSetupTimerInterrupt:0000000000000000 $t
+     /tmp/ccjKnGdG.s:532    .text.vPortSetupTimerInterrupt:0000000000000000 vPortSetupTimerInterrupt
+     /tmp/ccjKnGdG.s:567    .text.vPortSetupTimerInterrupt:0000000000000020 $d
+     /tmp/ccjKnGdG.s:573    .text.xPortStartScheduler:0000000000000000 $t
+     /tmp/ccjKnGdG.s:580    .text.xPortStartScheduler:0000000000000000 xPortStartScheduler
+     /tmp/ccjKnGdG.s:643    .text.xPortStartScheduler:000000000000004c $d
+     /tmp/ccjKnGdG.s:648    .data.uxCriticalNesting:0000000000000000 $d
+     /tmp/ccjKnGdG.s:652    .data.uxCriticalNesting:0000000000000000 uxCriticalNesting
 
 UNDEFINED SYMBOLS
 pxCurrentTCB

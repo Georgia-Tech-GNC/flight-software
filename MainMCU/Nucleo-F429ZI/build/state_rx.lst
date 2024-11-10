@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccFmOBHK.s 			page 1
+ARM GAS  /tmp/ccrZfxOt.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccFmOBHK.s 			page 1
   40              		.cfi_offset 14, -4
   41 0002 85B0     		sub	sp, sp, #20
   42              	.LCFI1:
-ARM GAS  /tmp/ccFmOBHK.s 			page 2
+ARM GAS  /tmp/ccrZfxOt.s 			page 2
 
 
   43              		.cfi_def_cfa_offset 32
@@ -84,7 +84,7 @@ ARM GAS  /tmp/ccFmOBHK.s 			page 1
   54              		.loc 1 25 13 is_stmt 1 view .LVU5
   55              		.loc 1 25 27 is_stmt 0 view .LVU6
   56 0008 4FF0FF33 		mov	r3, #-1
-  57 000c C4F11002 		rsb	r2, r4, #16
+  57 000c C4F10E02 		rsb	r2, r4, #14
   58 0010 2919     		adds	r1, r5, r4
   59 0012 0E48     		ldr	r0, .L8
   60 0014 0068     		ldr	r0, [r0]
@@ -100,7 +100,7 @@ ARM GAS  /tmp/ccFmOBHK.s 			page 1
   69              	.LBE3:
   24:../Core/Src/state_rx.c ****             size_t read = xStreamBufferReceive(g_state_rx_sb_handle, state_rx_buff + total_read, ST
   70              		.loc 1 24 15 is_stmt 1 view .LVU10
-  71 001c 0F2C     		cmp	r4, #15
+  71 001c 0D2C     		cmp	r4, #13
   72 001e F3D9     		bls	.L3
   27:../Core/Src/state_rx.c ****         }
   28:../Core/Src/state_rx.c **** 
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccFmOBHK.s 			page 1
   82 002c 01D0     		beq	.L7
   83              	.LVL6:
   84              	.L4:
-ARM GAS  /tmp/ccFmOBHK.s 			page 3
+ARM GAS  /tmp/ccrZfxOt.s 			page 3
 
 
   85              		.loc 1 30 12 view .LVU14
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccFmOBHK.s 			page 1
  128 0054 00000000 		.word	.LANCHOR0
  129              		.cfi_endproc
  130              	.LFE138:
-ARM GAS  /tmp/ccFmOBHK.s 			page 4
+ARM GAS  /tmp/ccrZfxOt.s 			page 4
 
 
  132              		.global	g_current_state
@@ -186,10 +186,10 @@ ARM GAS  /tmp/ccFmOBHK.s 			page 1
  134              		.section	.bss._g_current_state,"aw",%nobits
  135              		.align	2
  138              	_g_current_state:
- 139 0000 00000000 		.space	16
+ 139 0000 00000000 		.space	14
  139      00000000 
  139      00000000 
- 139      00000000 
+ 139      0000
  140              		.section	.data.g_current_state,"aw"
  141              		.align	2
  142              		.set	.LANCHOR0,. + 0
@@ -204,18 +204,18 @@ ARM GAS  /tmp/ccFmOBHK.s 			page 1
  153              		.file 6 "../Core/FreeRTOS-Kernel/include/queue.h"
  154              		.file 7 "../Core/FreeRTOS-Kernel/include/semphr.h"
  155              		.file 8 "../Core/Include/globals.h"
-ARM GAS  /tmp/ccFmOBHK.s 			page 5
+ARM GAS  /tmp/ccrZfxOt.s 			page 5
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 state_rx.c
-     /tmp/ccFmOBHK.s:18     .text.state_rx_task:0000000000000000 $t
-     /tmp/ccFmOBHK.s:26     .text.state_rx_task:0000000000000000 state_rx_task
-     /tmp/ccFmOBHK.s:126    .text.state_rx_task:000000000000004c $d
-     /tmp/ccFmOBHK.s:145    .data.g_current_state:0000000000000000 g_current_state
-     /tmp/ccFmOBHK.s:138    .bss._g_current_state:0000000000000000 _g_current_state
-     /tmp/ccFmOBHK.s:135    .bss._g_current_state:0000000000000000 $d
-     /tmp/ccFmOBHK.s:141    .data.g_current_state:0000000000000000 $d
+     /tmp/ccrZfxOt.s:18     .text.state_rx_task:0000000000000000 $t
+     /tmp/ccrZfxOt.s:26     .text.state_rx_task:0000000000000000 state_rx_task
+     /tmp/ccrZfxOt.s:126    .text.state_rx_task:000000000000004c $d
+     /tmp/ccrZfxOt.s:145    .data.g_current_state:0000000000000000 g_current_state
+     /tmp/ccrZfxOt.s:138    .bss._g_current_state:0000000000000000 _g_current_state
+     /tmp/ccrZfxOt.s:135    .bss._g_current_state:0000000000000000 $d
+     /tmp/ccrZfxOt.s:141    .data.g_current_state:0000000000000000 $d
 
 UNDEFINED SYMBOLS
 xStreamBufferReceive

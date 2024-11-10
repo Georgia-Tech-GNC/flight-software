@@ -7,7 +7,7 @@
 #include <stdio.h>
 
 // Uncomment this line to include SQL macros
-#define INCLUDE_PROTOCOL_SQL_MACROS
+// #define INCLUDE_PROTOCOL_SQL_MACROS
 
 //****************************************************************************************************
 //****************************************************************************************************

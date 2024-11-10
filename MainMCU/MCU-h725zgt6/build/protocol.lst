@@ -1,4 +1,4 @@
-ARM GAS  /tmp/cc7wHYiN.s 			page 1
+ARM GAS  /tmp/cczBeItk.s 			page 1
 
 
    1              		.cpu cortex-m7
@@ -58,7 +58,7 @@ ARM GAS  /tmp/cc7wHYiN.s 			page 1
   37 0002 04D1     		bne	.L3
   20:../Core/Src/protocol.c **** 	if (packet[1] != COMMAND_MSG_ID) return -1; // Incorrect command id
   38              		.loc 1 20 2 is_stmt 1 view .LVU3
-ARM GAS  /tmp/cc7wHYiN.s 			page 2
+ARM GAS  /tmp/cczBeItk.s 			page 2
 
 
   39              		.loc 1 20 12 is_stmt 0 view .LVU4
@@ -118,7 +118,7 @@ ARM GAS  /tmp/cc7wHYiN.s 			page 1
   26:../Core/Src/protocol.c **** }
   87              		.loc 1 26 1 view .LVU16
   88 0004 7047     		bx	lr
-ARM GAS  /tmp/cc7wHYiN.s 			page 3
+ARM GAS  /tmp/cczBeItk.s 			page 3
 
 
   89              		.cfi_endproc
@@ -178,7 +178,7 @@ ARM GAS  /tmp/cc7wHYiN.s 			page 1
  138              		.loc 1 35 5 is_stmt 0 view .LVU25
  139 0000 0229     		cmp	r1, #2
  140 0002 05D1     		bne	.L9
-ARM GAS  /tmp/cc7wHYiN.s 			page 4
+ARM GAS  /tmp/cczBeItk.s 			page 4
 
 
   36:../Core/Src/protocol.c **** 	destination->command_id = buffer[0];
@@ -238,7 +238,7 @@ ARM GAS  /tmp/cc7wHYiN.s 			page 1
  189              	.L13:
  190 000a 03       		.byte	(.L17-.L13)/2
  191 000b 0E       		.byte	(.L18-.L13)/2
-ARM GAS  /tmp/cc7wHYiN.s 			page 5
+ARM GAS  /tmp/cczBeItk.s 			page 5
 
 
  192 000c 05       		.byte	(.L15-.L13)/2
@@ -298,7 +298,7 @@ ARM GAS  /tmp/cc7wHYiN.s 			page 1
  232              		.syntax unified
  233              		.thumb
  234              		.thumb_func
-ARM GAS  /tmp/cc7wHYiN.s 			page 6
+ARM GAS  /tmp/cczBeItk.s 			page 6
 
 
  235              		.fpu fpv5-d16
@@ -337,7 +337,7 @@ ARM GAS  /tmp/cc7wHYiN.s 			page 1
  266              		.fpu fpv5-d16
  268              	RocketStateVector_encode:
  269              	.LVL19:
- 270              	.LFB10:
+ 270              	.LFB9:
   61:../Core/Src/protocol.c **** 
   62:../Core/Src/protocol.c **** #ifdef INCLUDE_PROTOCOL_SQL_MACROS
   63:../Core/Src/protocol.c **** 	
@@ -358,7 +358,7 @@ ARM GAS  /tmp/cc7wHYiN.s 			page 1
   78:../Core/Src/protocol.c **** 			} 
   79:../Core/Src/protocol.c ****     	    case ROCKETSERVODEFLECTION_MSG_ID: {
   80:../Core/Src/protocol.c ****         if (data_size != ROCKETSERVODEFLECTION_SIZE) {
-ARM GAS  /tmp/cc7wHYiN.s 			page 7
+ARM GAS  /tmp/cczBeItk.s 			page 7
 
 
   81:../Core/Src/protocol.c ****           printf("warning: wrong data size!\n");
@@ -418,7 +418,7 @@ ARM GAS  /tmp/cc7wHYiN.s 			page 1
  280 0004 4368     		ldr	r3, [r0, #4]	@ unaligned
  281 0006 4B60     		str	r3, [r1, #4]	@ unaligned
  126:../Core/Src/protocol.c **** 		memcpy(output + 8, &input->velocity_z, 4);
-ARM GAS  /tmp/cc7wHYiN.s 			page 8
+ARM GAS  /tmp/cczBeItk.s 			page 8
 
 
  282              		.loc 1 126 3 view .LVU58
@@ -475,10 +475,10 @@ ARM GAS  /tmp/cc7wHYiN.s 			page 1
  320              		.loc 1 139 1 is_stmt 0 view .LVU70
  321 003c 7047     		bx	lr
  322              		.cfi_endproc
- 323              	.LFE10:
+ 323              	.LFE9:
  325              		.section	.text.RocketStateVector_decode,"ax",%progbits
  326              		.align	1
-ARM GAS  /tmp/cc7wHYiN.s 			page 9
+ARM GAS  /tmp/cczBeItk.s 			page 9
 
 
  327              		.global	RocketStateVector_decode
@@ -488,7 +488,7 @@ ARM GAS  /tmp/cc7wHYiN.s 			page 1
  331              		.fpu fpv5-d16
  333              	RocketStateVector_decode:
  334              	.LVL20:
- 335              	.LFB11:
+ 335              	.LFB10:
  140:../Core/Src/protocol.c **** 
  141:../Core/Src/protocol.c **** void RocketStateVector_decode(uint8_t *input, struct RocketStateVector *output) {
  336              		.loc 1 141 81 is_stmt 1 view -0
@@ -538,7 +538,7 @@ ARM GAS  /tmp/cc7wHYiN.s 			page 1
  370 0026 4B62     		str	r3, [r1, #36]	@ unaligned
  152:../Core/Src/protocol.c **** 		memcpy(&output->position_x, input + 40, 4);
  371              		.loc 1 152 3 view .LVU82
-ARM GAS  /tmp/cc7wHYiN.s 			page 10
+ARM GAS  /tmp/cczBeItk.s 			page 10
 
 
  372 0028 836A     		ldr	r3, [r0, #40]	@ unaligned
@@ -562,7 +562,7 @@ ARM GAS  /tmp/cc7wHYiN.s 			page 1
  385              		.loc 1 157 1 is_stmt 0 view .LVU86
  386 003c 7047     		bx	lr
  387              		.cfi_endproc
- 388              	.LFE11:
+ 388              	.LFE10:
  390              		.section	.text.RocketServoDeflection_encode,"ax",%progbits
  391              		.align	1
  392              		.global	RocketServoDeflection_encode
@@ -572,7 +572,7 @@ ARM GAS  /tmp/cc7wHYiN.s 			page 1
  396              		.fpu fpv5-d16
  398              	RocketServoDeflection_encode:
  399              	.LVL21:
- 400              	.LFB12:
+ 400              	.LFB11:
  158:../Core/Src/protocol.c **** 
  159:../Core/Src/protocol.c **** 
  160:../Core/Src/protocol.c **** void RocketServoDeflection_encode(struct RocketServoDeflection *input, uint8_t *output) {
@@ -598,7 +598,7 @@ ARM GAS  /tmp/cc7wHYiN.s 			page 1
  416 000c C368     		ldr	r3, [r0, #12]	@ unaligned
  417 000e CB60     		str	r3, [r1, #12]	@ unaligned
  165:../Core/Src/protocol.c **** 		memcpy(output + 16, &input->timestamp, 8);
-ARM GAS  /tmp/cc7wHYiN.s 			page 11
+ARM GAS  /tmp/cczBeItk.s 			page 11
 
 
  418              		.loc 1 165 3 view .LVU92
@@ -611,7 +611,7 @@ ARM GAS  /tmp/cc7wHYiN.s 			page 1
  423              		.loc 1 167 1 is_stmt 0 view .LVU93
  424 0018 7047     		bx	lr
  425              		.cfi_endproc
- 426              	.LFE12:
+ 426              	.LFE11:
  428              		.section	.text.RocketServoDeflection_decode,"ax",%progbits
  429              		.align	1
  430              		.global	RocketServoDeflection_decode
@@ -621,7 +621,7 @@ ARM GAS  /tmp/cc7wHYiN.s 			page 1
  434              		.fpu fpv5-d16
  436              	RocketServoDeflection_decode:
  437              	.LVL22:
- 438              	.LFB13:
+ 438              	.LFB12:
  168:../Core/Src/protocol.c **** 
  169:../Core/Src/protocol.c **** void RocketServoDeflection_decode(uint8_t *input, struct RocketServoDeflection *output) {
  439              		.loc 1 169 89 is_stmt 1 view -0
@@ -656,9 +656,9 @@ ARM GAS  /tmp/cc7wHYiN.s 			page 1
  461              		.loc 1 176 1 is_stmt 0 view .LVU100
  462 0018 7047     		bx	lr
  463              		.cfi_endproc
- 464              	.LFE13:
+ 464              	.LFE12:
  466              		.section	.text.RocketState_encode,"ax",%progbits
-ARM GAS  /tmp/cc7wHYiN.s 			page 12
+ARM GAS  /tmp/cczBeItk.s 			page 12
 
 
  467              		.align	1
@@ -669,7 +669,7 @@ ARM GAS  /tmp/cc7wHYiN.s 			page 1
  472              		.fpu fpv5-d16
  474              	RocketState_encode:
  475              	.LVL23:
- 476              	.LFB14:
+ 476              	.LFB13:
  177:../Core/Src/protocol.c **** 
  178:../Core/Src/protocol.c **** 
  179:../Core/Src/protocol.c **** void RocketState_encode(struct RocketState *input, uint8_t *output) {
@@ -709,7 +709,7 @@ ARM GAS  /tmp/cc7wHYiN.s 			page 1
  502              		.loc 1 187 1 is_stmt 0 view .LVU108
  503 0020 7047     		bx	lr
  504              		.cfi_endproc
- 505              	.LFE14:
+ 505              	.LFE13:
  507              		.section	.text.RocketState_decode,"ax",%progbits
  508              		.align	1
  509              		.global	RocketState_decode
@@ -718,11 +718,11 @@ ARM GAS  /tmp/cc7wHYiN.s 			page 1
  512              		.thumb_func
  513              		.fpu fpv5-d16
  515              	RocketState_decode:
-ARM GAS  /tmp/cc7wHYiN.s 			page 13
+ARM GAS  /tmp/cczBeItk.s 			page 13
 
 
  516              	.LVL24:
- 517              	.LFB15:
+ 517              	.LFB14:
  188:../Core/Src/protocol.c **** 
  189:../Core/Src/protocol.c **** void RocketState_decode(uint8_t *input, struct RocketState *output) {
  518              		.loc 1 189 69 is_stmt 1 view -0
@@ -761,7 +761,7 @@ ARM GAS  /tmp/cc7wHYiN.s 			page 1
  543              		.loc 1 197 1 is_stmt 0 view .LVU116
  544 0020 7047     		bx	lr
  545              		.cfi_endproc
- 546              	.LFE15:
+ 546              	.LFE14:
  548              		.section	.text.RocketGroundEKF_encode,"ax",%progbits
  549              		.align	1
  550              		.global	RocketGroundEKF_encode
@@ -771,14 +771,14 @@ ARM GAS  /tmp/cc7wHYiN.s 			page 1
  554              		.fpu fpv5-d16
  556              	RocketGroundEKF_encode:
  557              	.LVL25:
- 558              	.LFB16:
+ 558              	.LFB15:
  198:../Core/Src/protocol.c **** 
  199:../Core/Src/protocol.c **** 
  200:../Core/Src/protocol.c **** void RocketGroundEKF_encode(struct RocketGroundEKF *input, uint8_t *output) {
  559              		.loc 1 200 77 is_stmt 1 view -0
  560              		.cfi_startproc
  561              		@ args = 0, pretend = 0, frame = 0
-ARM GAS  /tmp/cc7wHYiN.s 			page 14
+ARM GAS  /tmp/cczBeItk.s 			page 14
 
 
  562              		@ frame_needed = 0, uses_anonymous_args = 0
@@ -818,7 +818,7 @@ ARM GAS  /tmp/cc7wHYiN.s 			page 1
  587              		.loc 1 209 1 is_stmt 0 view .LVU125
  588 0020 7047     		bx	lr
  589              		.cfi_endproc
- 590              	.LFE16:
+ 590              	.LFE15:
  592              		.section	.text.RocketGroundEKF_decode,"ax",%progbits
  593              		.align	1
  594              		.global	RocketGroundEKF_decode
@@ -828,7 +828,7 @@ ARM GAS  /tmp/cc7wHYiN.s 			page 1
  598              		.fpu fpv5-d16
  600              	RocketGroundEKF_decode:
  601              	.LVL26:
- 602              	.LFB17:
+ 602              	.LFB16:
  210:../Core/Src/protocol.c **** 
  211:../Core/Src/protocol.c **** void RocketGroundEKF_decode(uint8_t *input, struct RocketGroundEKF *output) {
  603              		.loc 1 211 77 is_stmt 1 view -0
@@ -838,7 +838,7 @@ ARM GAS  /tmp/cc7wHYiN.s 			page 1
  607              		@ link register save eliminated.
  212:../Core/Src/protocol.c **** 		memcpy(&output->pn_matrix_d1, input + 0, 4);
  608              		.loc 1 212 3 view .LVU127
-ARM GAS  /tmp/cc7wHYiN.s 			page 15
+ARM GAS  /tmp/cczBeItk.s 			page 15
 
 
  609 0000 0368     		ldr	r3, [r0]	@ unaligned
@@ -874,7 +874,7 @@ ARM GAS  /tmp/cc7wHYiN.s 			page 1
  631              		.loc 1 220 1 is_stmt 0 view .LVU134
  632 0020 7047     		bx	lr
  633              		.cfi_endproc
- 634              	.LFE17:
+ 634              	.LFE16:
  636              		.section	.text.RocketSensorData_encode,"ax",%progbits
  637              		.align	1
  638              		.global	RocketSensorData_encode
@@ -884,7 +884,7 @@ ARM GAS  /tmp/cc7wHYiN.s 			page 1
  642              		.fpu fpv5-d16
  644              	RocketSensorData_encode:
  645              	.LVL27:
- 646              	.LFB18:
+ 646              	.LFB17:
  221:../Core/Src/protocol.c **** 
  222:../Core/Src/protocol.c **** 
  223:../Core/Src/protocol.c **** void RocketSensorData_encode(struct RocketSensorData *input, uint8_t *output) {
@@ -898,7 +898,7 @@ ARM GAS  /tmp/cc7wHYiN.s 			page 1
  653 0000 0368     		ldr	r3, [r0]	@ unaligned
  654 0002 0B60     		str	r3, [r1]	@ unaligned
  225:../Core/Src/protocol.c **** 		memcpy(output + 4, &input->accelerometer_y, 4);
-ARM GAS  /tmp/cc7wHYiN.s 			page 16
+ARM GAS  /tmp/cczBeItk.s 			page 16
 
 
  655              		.loc 1 225 3 view .LVU137
@@ -958,7 +958,7 @@ ARM GAS  /tmp/cc7wHYiN.s 			page 1
  696 003a 8B63     		str	r3, [r1, #56]	@ unaligned
  239:../Core/Src/protocol.c **** 		memcpy(output + 60, &input->gyro_bias_z, 4);
  697              		.loc 1 239 3 view .LVU151
-ARM GAS  /tmp/cc7wHYiN.s 			page 17
+ARM GAS  /tmp/cczBeItk.s 			page 17
 
 
  698 003c C36B     		ldr	r3, [r0, #60]	@ unaligned
@@ -990,7 +990,7 @@ ARM GAS  /tmp/cc7wHYiN.s 			page 1
  717              		.loc 1 246 1 is_stmt 0 view .LVU157
  718 0058 7047     		bx	lr
  719              		.cfi_endproc
- 720              	.LFE18:
+ 720              	.LFE17:
  722              		.section	.text.RocketSensorData_decode,"ax",%progbits
  723              		.align	1
  724              		.global	RocketSensorData_decode
@@ -1000,7 +1000,7 @@ ARM GAS  /tmp/cc7wHYiN.s 			page 1
  728              		.fpu fpv5-d16
  730              	RocketSensorData_decode:
  731              	.LVL28:
- 732              	.LFB19:
+ 732              	.LFB18:
  247:../Core/Src/protocol.c **** 
  248:../Core/Src/protocol.c **** void RocketSensorData_decode(uint8_t *input, struct RocketSensorData *output) {
  733              		.loc 1 248 79 is_stmt 1 view -0
@@ -1018,7 +1018,7 @@ ARM GAS  /tmp/cc7wHYiN.s 			page 1
  743 0006 4B60     		str	r3, [r1, #4]	@ unaligned
  251:../Core/Src/protocol.c **** 		memcpy(&output->accelerometer_z, input + 8, 4);
  744              		.loc 1 251 3 view .LVU161
-ARM GAS  /tmp/cc7wHYiN.s 			page 18
+ARM GAS  /tmp/cczBeItk.s 			page 18
 
 
  745 0008 8368     		ldr	r3, [r0, #8]	@ unaligned
@@ -1078,7 +1078,7 @@ ARM GAS  /tmp/cc7wHYiN.s 			page 1
  265:../Core/Src/protocol.c **** 		memcpy(&output->gps_offset_x, input + 64, 4);
  786              		.loc 1 265 3 view .LVU175
  787 0040 036C     		ldr	r3, [r0, #64]	@ unaligned
-ARM GAS  /tmp/cc7wHYiN.s 			page 19
+ARM GAS  /tmp/cczBeItk.s 			page 19
 
 
  788 0042 0B64     		str	r3, [r1, #64]	@ unaligned
@@ -1105,611 +1105,52 @@ ARM GAS  /tmp/cc7wHYiN.s 			page 1
  803              		.loc 1 271 1 is_stmt 0 view .LVU180
  804 0058 7047     		bx	lr
  805              		.cfi_endproc
- 806              	.LFE19:
- 808              		.section	.rodata.convert_data_msg_to_sql_cmd.str1.4,"aMS",%progbits,1
- 809              		.align	2
- 810              	.LC0:
- 811 0000 7761726E 		.ascii	"warning: wrong data size!\000"
- 811      696E673A 
- 811      2077726F 
- 811      6E672064 
- 811      61746120 
- 812 001a 0000     		.align	2
- 813              	.LC1:
- 814 001c 494E5345 		.ascii	"INSERT INTO ROCKETSTATEVECTOR VALUES ('%.10E', '%.1"
- 814      52542049 
- 814      4E544F20 
- 814      524F434B 
- 814      45545354 
- 815 004f 3045272C 		.ascii	"0E', '%.10E', '%.10E', '%.10E', '%.10E', '%.10E', '"
- 815      2027252E 
- 815      31304527 
- 815      2C202725 
- 815      2E313045 
- 816 0082 252E3130 		.ascii	"%.10E', '%.10E', '%.10E', '%.10E', '%.10E', '%.10E'"
- 816      45272C20 
- 816      27252E31 
- 816      3045272C 
- 816      2027252E 
- 817 00b5 2C202725 		.ascii	", '%lld');\000"
- 817      6C6C6427 
- 817      293B00
- 818              		.align	2
- 819              	.LC2:
- 820 00c0 494E5345 		.ascii	"INSERT INTO ROCKETSERVODEFLECTION VALUES ('%.10E', "
- 820      52542049 
-ARM GAS  /tmp/cc7wHYiN.s 			page 20
-
-
- 820      4E544F20 
- 820      524F434B 
- 820      45545345 
- 821 00f3 27252E31 		.ascii	"'%.10E', '%.10E', '%.10E', '%lld');\000"
- 821      3045272C 
- 821      2027252E 
- 821      31304527 
- 821      2C202725 
- 822 0117 00       		.align	2
- 823              	.LC3:
- 824 0118 494E5345 		.ascii	"INSERT INTO ROCKETSTATE VALUES ('%d', '%d', '%d', '"
- 824      52542049 
- 824      4E544F20 
- 824      524F434B 
- 824      45545354 
- 825 014b 2564272C 		.ascii	"%d', '%d', '%lld');\000"
- 825      20272564 
- 825      272C2027 
- 825      256C6C64 
- 825      27293B00 
- 826 015f 00       		.align	2
- 827              	.LC4:
- 828 0160 494E5345 		.ascii	"INSERT INTO ROCKETGROUNDEKF VALUES ('%.10E', '%.10E"
- 828      52542049 
- 828      4E544F20 
- 828      524F434B 
- 828      45544752 
- 829 0193 272C2027 		.ascii	"', '%.10E', '%.10E', '%.10E', '%.10E', '%lld');\000"
- 829      252E3130 
- 829      45272C20 
- 829      27252E31 
- 829      3045272C 
- 830 01c3 00       		.align	2
- 831              	.LC5:
- 832 01c4 494E5345 		.ascii	"INSERT INTO ROCKETSENSORDATA VALUES ('%.10E', '%.10"
- 832      52542049 
- 832      4E544F20 
- 832      524F434B 
- 832      45545345 
- 833 01f7 45272C20 		.ascii	"E', '%.10E', '%.10E', '%.10E', '%.10E', '%.10E', '%"
- 833      27252E31 
- 833      3045272C 
- 833      2027252E 
- 833      31304527 
- 834 022a 2E313045 		.ascii	".10E', '%.10E', '%.10E', '%.10E', '%.10E', '%.10E',"
- 834      272C2027 
- 834      252E3130 
- 834      45272C20 
- 834      27252E31 
- 835 025d 2027252E 		.ascii	" '%.10E', '%.10E', '%.10E', '%.10E', '%.10E', '%.10"
- 835      31304527 
- 835      2C202725 
- 835      2E313045 
- 835      272C2027 
- 836 0290 45272C20 		.ascii	"E', '%.10E', '%lld');\000"
- 836      27252E31 
- 836      3045272C 
-ARM GAS  /tmp/cc7wHYiN.s 			page 21
-
-
- 836      2027256C 
- 836      6C642729 
- 837              		.section	.text.convert_data_msg_to_sql_cmd,"ax",%progbits
- 838              		.align	1
- 839              		.global	convert_data_msg_to_sql_cmd
- 840              		.syntax unified
- 841              		.thumb
- 842              		.thumb_func
- 843              		.fpu fpv5-d16
- 845              	convert_data_msg_to_sql_cmd:
- 846              	.LVL29:
- 847              	.LFB9:
-  64:../Core/Src/protocol.c ****     bool convert_data_msg_to_sql_cmd(int message_id, uint8_t *data, size_t data_size, char *sql_cmd
- 848              		.loc 1 64 102 is_stmt 1 view -0
- 849              		.cfi_startproc
- 850              		@ args = 0, pretend = 0, frame = 88
- 851              		@ frame_needed = 0, uses_anonymous_args = 0
-  64:../Core/Src/protocol.c ****     bool convert_data_msg_to_sql_cmd(int message_id, uint8_t *data, size_t data_size, char *sql_cmd
- 852              		.loc 1 64 102 is_stmt 0 view .LVU182
- 853 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
- 854              	.LCFI0:
- 855              		.cfi_def_cfa_offset 24
- 856              		.cfi_offset 4, -24
- 857              		.cfi_offset 5, -20
- 858              		.cfi_offset 6, -16
- 859              		.cfi_offset 7, -12
- 860              		.cfi_offset 8, -8
- 861              		.cfi_offset 14, -4
- 862 0004 BEB0     		sub	sp, sp, #248
- 863              	.LCFI1:
- 864              		.cfi_def_cfa_offset 272
- 865 0006 0446     		mov	r4, r0
- 866 0008 0F46     		mov	r7, r1
- 867 000a 1546     		mov	r5, r2
- 868 000c 9846     		mov	r8, r3
-  65:../Core/Src/protocol.c **** 		if (!is_data_send_msg(message_id)) {
- 869              		.loc 1 65 3 is_stmt 1 view .LVU183
-  65:../Core/Src/protocol.c **** 		if (!is_data_send_msg(message_id)) {
- 870              		.loc 1 65 8 is_stmt 0 view .LVU184
- 871 000e FFF7FEFF 		bl	is_data_send_msg
- 872              	.LVL30:
-  65:../Core/Src/protocol.c **** 		if (!is_data_send_msg(message_id)) {
- 873              		.loc 1 65 6 view .LVU185
- 874 0012 0646     		mov	r6, r0
- 875 0014 0028     		cmp	r0, #0
- 876 0016 66D0     		beq	.L31
-  69:../Core/Src/protocol.c **** 		switch (message_id) {
- 877              		.loc 1 69 3 is_stmt 1 view .LVU186
- 878 0018 A4F10A0C 		sub	ip, r4, #10
- 879 001c BCF1040F 		cmp	ip, #4
- 880 0020 00F27781 		bhi	.L43
- 881 0024 DFE80CF0 		tbb	[pc, ip]
- 882              	.L33:
- 883 0028 03       		.byte	(.L37-.L33)/2
- 884 0029 67       		.byte	(.L36-.L33)/2
- 885 002a 92       		.byte	(.L35-.L33)/2
- 886 002b B2       		.byte	(.L34-.L33)/2
-ARM GAS  /tmp/cc7wHYiN.s 			page 22
-
-
- 887 002c E9       		.byte	(.L32-.L33)/2
- 888 002d 00       		.p2align 1
- 889              	.L37:
- 890              	.LBB2:
-  71:../Core/Src/protocol.c ****         if (data_size != ROCKETSTATEVECTOR_SIZE) {
- 891              		.loc 1 71 9 view .LVU187
-  71:../Core/Src/protocol.c ****         if (data_size != ROCKETSTATEVECTOR_SIZE) {
- 892              		.loc 1 71 12 is_stmt 0 view .LVU188
- 893 002e 3C2D     		cmp	r5, #60
- 894 0030 5DD1     		bne	.L45
- 895              	.L38:
-  74:../Core/Src/protocol.c **** 				struct RocketStateVector cvt_data;
- 896              		.loc 1 74 5 is_stmt 1 view .LVU189
-  75:../Core/Src/protocol.c **** 				RocketStateVector_decode(data, &cvt_data);
- 897              		.loc 1 75 5 view .LVU190
- 898 0032 28A9     		add	r1, sp, #160
- 899 0034 3846     		mov	r0, r7
- 900 0036 FFF7FEFF 		bl	RocketStateVector_decode
- 901              	.LVL31:
-  76:../Core/Src/protocol.c **** 				ROCKETSTATEVECTOR_SQL_ADD_ENTRY(sql_cmd, &cvt_data);
- 902              		.loc 1 76 5 view .LVU191
- 903 003a DDE93623 		ldrd	r2, [sp, #216]
- 904 003e CDE91823 		strd	r2, [sp, #96]
- 905 0042 9DED347A 		vldr.32	s14, [sp, #208]
- 906 0046 B7EEC77A 		vcvt.f64.f32	d7, s14
- 907 004a 8DED167B 		vstr.64	d7, [sp, #88]
- 908 004e 9DED337A 		vldr.32	s14, [sp, #204]
- 909 0052 B7EEC77A 		vcvt.f64.f32	d7, s14
- 910 0056 8DED147B 		vstr.64	d7, [sp, #80]
- 911 005a 9DED327A 		vldr.32	s14, [sp, #200]
- 912 005e B7EEC77A 		vcvt.f64.f32	d7, s14
- 913 0062 8DED127B 		vstr.64	d7, [sp, #72]
- 914 0066 9DED317A 		vldr.32	s14, [sp, #196]
- 915 006a B7EEC77A 		vcvt.f64.f32	d7, s14
- 916 006e 8DED107B 		vstr.64	d7, [sp, #64]
- 917 0072 9DED307A 		vldr.32	s14, [sp, #192]
- 918 0076 B7EEC77A 		vcvt.f64.f32	d7, s14
- 919 007a 8DED0E7B 		vstr.64	d7, [sp, #56]
- 920 007e 9DED2F7A 		vldr.32	s14, [sp, #188]
- 921 0082 B7EEC77A 		vcvt.f64.f32	d7, s14
- 922 0086 8DED0C7B 		vstr.64	d7, [sp, #48]
- 923 008a 9DED2E7A 		vldr.32	s14, [sp, #184]
- 924 008e B7EEC77A 		vcvt.f64.f32	d7, s14
- 925 0092 8DED0A7B 		vstr.64	d7, [sp, #40]
- 926 0096 9DED2D7A 		vldr.32	s14, [sp, #180]
- 927 009a B7EEC77A 		vcvt.f64.f32	d7, s14
- 928 009e 8DED087B 		vstr.64	d7, [sp, #32]
- 929 00a2 9DED2C7A 		vldr.32	s14, [sp, #176]
- 930 00a6 B7EEC77A 		vcvt.f64.f32	d7, s14
- 931 00aa 8DED067B 		vstr.64	d7, [sp, #24]
- 932 00ae 9DED2B7A 		vldr.32	s14, [sp, #172]
- 933 00b2 B7EEC77A 		vcvt.f64.f32	d7, s14
- 934 00b6 8DED047B 		vstr.64	d7, [sp, #16]
- 935 00ba 9DED2A7A 		vldr.32	s14, [sp, #168]
- 936 00be B7EEC77A 		vcvt.f64.f32	d7, s14
- 937 00c2 8DED027B 		vstr.64	d7, [sp, #8]
- 938 00c6 9DED297A 		vldr.32	s14, [sp, #164]
-ARM GAS  /tmp/cc7wHYiN.s 			page 23
-
-
- 939 00ca B7EEC77A 		vcvt.f64.f32	d7, s14
- 940 00ce 8DED007B 		vstr.64	d7, [sp]
- 941 00d2 DDED287A 		vldr.32	s15, [sp, #160]
- 942 00d6 B7EEE77A 		vcvt.f64.f32	d7, s15
- 943 00da 53EC172B 		vmov	r2, r3, d7
- 944 00de 8E49     		ldr	r1, .L50
- 945 00e0 4046     		mov	r0, r8
- 946 00e2 FFF7FEFF 		bl	sprintf
- 947              	.LVL32:
-  76:../Core/Src/protocol.c **** 				ROCKETSTATEVECTOR_SQL_ADD_ENTRY(sql_cmd, &cvt_data);
- 948              		.loc 1 76 56 view .LVU192
-  77:../Core/Src/protocol.c **** 				return true;
- 949              		.loc 1 77 5 view .LVU193
- 950              	.L31:
-  77:../Core/Src/protocol.c **** 				return true;
- 951              		.loc 1 77 5 is_stmt 0 view .LVU194
- 952              	.LBE2:
- 118:../Core/Src/protocol.c **** 	}
- 953              		.loc 1 118 2 discriminator 1 view .LVU195
- 954 00e6 3046     		mov	r0, r6
- 955 00e8 3EB0     		add	sp, sp, #248
- 956              	.LCFI2:
- 957              		.cfi_remember_state
- 958              		.cfi_def_cfa_offset 24
- 959              		@ sp needed
- 960 00ea BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
- 961              	.LVL33:
- 962              	.L45:
- 963              	.LCFI3:
- 964              		.cfi_restore_state
- 965              	.LBB3:
-  72:../Core/Src/protocol.c ****           printf("warning: wrong data size!\n");
- 966              		.loc 1 72 11 is_stmt 1 view .LVU196
- 967 00ee 8B48     		ldr	r0, .L50+4
- 968 00f0 FFF7FEFF 		bl	puts
- 969              	.LVL34:
- 970 00f4 9DE7     		b	.L38
- 971              	.L36:
-  72:../Core/Src/protocol.c ****           printf("warning: wrong data size!\n");
- 972              		.loc 1 72 11 is_stmt 0 view .LVU197
- 973              	.LBE3:
- 974              	.LBB4:
-  80:../Core/Src/protocol.c ****         if (data_size != ROCKETSERVODEFLECTION_SIZE) {
- 975              		.loc 1 80 9 is_stmt 1 view .LVU198
-  80:../Core/Src/protocol.c ****         if (data_size != ROCKETSERVODEFLECTION_SIZE) {
- 976              		.loc 1 80 12 is_stmt 0 view .LVU199
- 977 00f6 182D     		cmp	r5, #24
- 978 00f8 24D1     		bne	.L46
- 979              	.L39:
-  83:../Core/Src/protocol.c **** 				struct RocketServoDeflection cvt_data;
- 980              		.loc 1 83 5 is_stmt 1 view .LVU200
-  84:../Core/Src/protocol.c **** 				RocketServoDeflection_decode(data, &cvt_data);
- 981              		.loc 1 84 5 view .LVU201
- 982 00fa 28A9     		add	r1, sp, #160
- 983 00fc 3846     		mov	r0, r7
- 984 00fe FFF7FEFF 		bl	RocketServoDeflection_decode
- 985              	.LVL35:
-ARM GAS  /tmp/cc7wHYiN.s 			page 24
-
-
-  85:../Core/Src/protocol.c **** 				ROCKETSERVODEFLECTION_SQL_ADD_ENTRY(sql_cmd, &cvt_data);
- 986              		.loc 1 85 5 view .LVU202
- 987 0102 DDE92C23 		ldrd	r2, [sp, #176]
- 988 0106 CDE90623 		strd	r2, [sp, #24]
- 989 010a 9DED2B7A 		vldr.32	s14, [sp, #172]
- 990 010e B7EEC77A 		vcvt.f64.f32	d7, s14
- 991 0112 8DED047B 		vstr.64	d7, [sp, #16]
- 992 0116 9DED2A7A 		vldr.32	s14, [sp, #168]
- 993 011a B7EEC77A 		vcvt.f64.f32	d7, s14
- 994 011e 8DED027B 		vstr.64	d7, [sp, #8]
- 995 0122 9DED297A 		vldr.32	s14, [sp, #164]
- 996 0126 B7EEC77A 		vcvt.f64.f32	d7, s14
- 997 012a 8DED007B 		vstr.64	d7, [sp]
- 998 012e DDED287A 		vldr.32	s15, [sp, #160]
- 999 0132 B7EEE77A 		vcvt.f64.f32	d7, s15
- 1000 0136 53EC172B 		vmov	r2, r3, d7
- 1001 013a 7949     		ldr	r1, .L50+8
- 1002 013c 4046     		mov	r0, r8
- 1003 013e FFF7FEFF 		bl	sprintf
- 1004              	.LVL36:
-  85:../Core/Src/protocol.c **** 				ROCKETSERVODEFLECTION_SQL_ADD_ENTRY(sql_cmd, &cvt_data);
- 1005              		.loc 1 85 60 view .LVU203
-  86:../Core/Src/protocol.c **** 				return true;
- 1006              		.loc 1 86 5 view .LVU204
- 1007 0142 D0E7     		b	.L31
- 1008              	.L46:
-  81:../Core/Src/protocol.c ****           printf("warning: wrong data size!\n");
- 1009              		.loc 1 81 11 view .LVU205
- 1010 0144 7548     		ldr	r0, .L50+4
- 1011 0146 FFF7FEFF 		bl	puts
- 1012              	.LVL37:
- 1013 014a D6E7     		b	.L39
- 1014              	.L35:
-  81:../Core/Src/protocol.c ****           printf("warning: wrong data size!\n");
- 1015              		.loc 1 81 11 is_stmt 0 view .LVU206
- 1016              	.LBE4:
- 1017              	.LBB5:
-  89:../Core/Src/protocol.c ****         if (data_size != ROCKETSTATE_SIZE) {
- 1018              		.loc 1 89 9 is_stmt 1 view .LVU207
-  89:../Core/Src/protocol.c ****         if (data_size != ROCKETSTATE_SIZE) {
- 1019              		.loc 1 89 12 is_stmt 0 view .LVU208
- 1020 014c 0D2D     		cmp	r5, #13
- 1021 014e 19D1     		bne	.L47
- 1022              	.L40:
-  92:../Core/Src/protocol.c **** 				struct RocketState cvt_data;
- 1023              		.loc 1 92 5 is_stmt 1 view .LVU209
-  93:../Core/Src/protocol.c **** 				RocketState_decode(data, &cvt_data);
- 1024              		.loc 1 93 5 view .LVU210
- 1025 0150 28A9     		add	r1, sp, #160
- 1026 0152 3846     		mov	r0, r7
- 1027 0154 FFF7FEFF 		bl	RocketState_decode
- 1028              	.LVL38:
-  94:../Core/Src/protocol.c **** 				ROCKETSTATE_SQL_ADD_ENTRY(sql_cmd, &cvt_data);
- 1029              		.loc 1 94 5 view .LVU211
- 1030 0158 9DF8A230 		ldrb	r3, [sp, #162]	@ zero_extendqisi2
- 1031 015c 9DF8A320 		ldrb	r2, [sp, #163]	@ zero_extendqisi2
- 1032 0160 9DF8A410 		ldrb	r1, [sp, #164]	@ zero_extendqisi2
-ARM GAS  /tmp/cc7wHYiN.s 			page 25
-
-
- 1033 0164 DDE92A45 		ldrd	r4, [sp, #168]
- 1034              	.LVL39:
-  94:../Core/Src/protocol.c **** 				ROCKETSTATE_SQL_ADD_ENTRY(sql_cmd, &cvt_data);
- 1035              		.loc 1 94 5 is_stmt 0 view .LVU212
- 1036 0168 CDE90445 		strd	r4, [sp, #16]
- 1037 016c 0291     		str	r1, [sp, #8]
- 1038 016e 0192     		str	r2, [sp, #4]
- 1039 0170 0093     		str	r3, [sp]
- 1040 0172 9DF8A130 		ldrb	r3, [sp, #161]	@ zero_extendqisi2
- 1041 0176 9DF8A020 		ldrb	r2, [sp, #160]	@ zero_extendqisi2
- 1042 017a 6A49     		ldr	r1, .L50+12
- 1043 017c 4046     		mov	r0, r8
- 1044 017e FFF7FEFF 		bl	sprintf
- 1045              	.LVL40:
-  94:../Core/Src/protocol.c **** 				ROCKETSTATE_SQL_ADD_ENTRY(sql_cmd, &cvt_data);
- 1046              		.loc 1 94 50 is_stmt 1 view .LVU213
-  95:../Core/Src/protocol.c **** 				return true;
- 1047              		.loc 1 95 5 view .LVU214
- 1048 0182 B0E7     		b	.L31
- 1049              	.LVL41:
- 1050              	.L47:
-  90:../Core/Src/protocol.c ****           printf("warning: wrong data size!\n");
- 1051              		.loc 1 90 11 view .LVU215
- 1052 0184 6548     		ldr	r0, .L50+4
- 1053 0186 FFF7FEFF 		bl	puts
- 1054              	.LVL42:
- 1055 018a E1E7     		b	.L40
- 1056              	.L34:
-  90:../Core/Src/protocol.c ****           printf("warning: wrong data size!\n");
- 1057              		.loc 1 90 11 is_stmt 0 view .LVU216
- 1058              	.LBE5:
- 1059              	.LBB6:
-  98:../Core/Src/protocol.c ****         if (data_size != ROCKETGROUNDEKF_SIZE) {
- 1060              		.loc 1 98 9 is_stmt 1 view .LVU217
-  98:../Core/Src/protocol.c ****         if (data_size != ROCKETGROUNDEKF_SIZE) {
- 1061              		.loc 1 98 12 is_stmt 0 view .LVU218
- 1062 018c 202D     		cmp	r5, #32
- 1063 018e 30D1     		bne	.L48
- 1064              	.L41:
- 101:../Core/Src/protocol.c **** 				struct RocketGroundEKF cvt_data;
- 1065              		.loc 1 101 5 is_stmt 1 view .LVU219
- 102:../Core/Src/protocol.c **** 				RocketGroundEKF_decode(data, &cvt_data);
- 1066              		.loc 1 102 5 view .LVU220
- 1067 0190 28A9     		add	r1, sp, #160
- 1068 0192 3846     		mov	r0, r7
- 1069 0194 FFF7FEFF 		bl	RocketGroundEKF_decode
- 1070              	.LVL43:
- 103:../Core/Src/protocol.c **** 				ROCKETGROUNDEKF_SQL_ADD_ENTRY(sql_cmd, &cvt_data);
- 1071              		.loc 1 103 5 view .LVU221
- 1072 0198 DDE92E23 		ldrd	r2, [sp, #184]
- 1073 019c CDE90A23 		strd	r2, [sp, #40]
- 1074 01a0 9DED2D7A 		vldr.32	s14, [sp, #180]
- 1075 01a4 B7EEC77A 		vcvt.f64.f32	d7, s14
- 1076 01a8 8DED087B 		vstr.64	d7, [sp, #32]
- 1077 01ac 9DED2C7A 		vldr.32	s14, [sp, #176]
- 1078 01b0 B7EEC77A 		vcvt.f64.f32	d7, s14
- 1079 01b4 8DED067B 		vstr.64	d7, [sp, #24]
-ARM GAS  /tmp/cc7wHYiN.s 			page 26
-
-
- 1080 01b8 9DED2B7A 		vldr.32	s14, [sp, #172]
- 1081 01bc B7EEC77A 		vcvt.f64.f32	d7, s14
- 1082 01c0 8DED047B 		vstr.64	d7, [sp, #16]
- 1083 01c4 9DED2A7A 		vldr.32	s14, [sp, #168]
- 1084 01c8 B7EEC77A 		vcvt.f64.f32	d7, s14
- 1085 01cc 8DED027B 		vstr.64	d7, [sp, #8]
- 1086 01d0 9DED297A 		vldr.32	s14, [sp, #164]
- 1087 01d4 B7EEC77A 		vcvt.f64.f32	d7, s14
- 1088 01d8 8DED007B 		vstr.64	d7, [sp]
- 1089 01dc DDED287A 		vldr.32	s15, [sp, #160]
- 1090 01e0 B7EEE77A 		vcvt.f64.f32	d7, s15
- 1091 01e4 53EC172B 		vmov	r2, r3, d7
- 1092 01e8 4F49     		ldr	r1, .L50+16
- 1093 01ea 4046     		mov	r0, r8
- 1094 01ec FFF7FEFF 		bl	sprintf
- 1095              	.LVL44:
- 103:../Core/Src/protocol.c **** 				ROCKETGROUNDEKF_SQL_ADD_ENTRY(sql_cmd, &cvt_data);
- 1096              		.loc 1 103 54 view .LVU222
- 104:../Core/Src/protocol.c **** 				return true;
- 1097              		.loc 1 104 5 view .LVU223
- 1098 01f0 79E7     		b	.L31
- 1099              	.L48:
-  99:../Core/Src/protocol.c ****           printf("warning: wrong data size!\n");
- 1100              		.loc 1 99 11 view .LVU224
- 1101 01f2 4A48     		ldr	r0, .L50+4
- 1102 01f4 FFF7FEFF 		bl	puts
- 1103              	.LVL45:
- 1104 01f8 CAE7     		b	.L41
- 1105              	.L32:
-  99:../Core/Src/protocol.c ****           printf("warning: wrong data size!\n");
- 1106              		.loc 1 99 11 is_stmt 0 view .LVU225
- 1107              	.LBE6:
- 1108              	.LBB7:
- 107:../Core/Src/protocol.c ****         if (data_size != ROCKETSENSORDATA_SIZE) {
- 1109              		.loc 1 107 9 is_stmt 1 view .LVU226
- 107:../Core/Src/protocol.c ****         if (data_size != ROCKETSENSORDATA_SIZE) {
- 1110              		.loc 1 107 12 is_stmt 0 view .LVU227
- 1111 01fa 582D     		cmp	r5, #88
- 1112 01fc 40F08580 		bne	.L49
- 1113              	.L42:
- 110:../Core/Src/protocol.c **** 				struct RocketSensorData cvt_data;
- 1114              		.loc 1 110 5 is_stmt 1 view .LVU228
- 111:../Core/Src/protocol.c **** 				RocketSensorData_decode(data, &cvt_data);
- 1115              		.loc 1 111 5 view .LVU229
- 1116 0200 28A9     		add	r1, sp, #160
- 1117 0202 3846     		mov	r0, r7
- 1118 0204 FFF7FEFF 		bl	RocketSensorData_decode
- 1119              	.LVL46:
- 112:../Core/Src/protocol.c **** 				ROCKETSENSORDATA_SQL_ADD_ENTRY(sql_cmd, &cvt_data);
- 1120              		.loc 1 112 5 view .LVU230
- 1121 0208 DDE93C23 		ldrd	r2, [sp, #240]
- 1122 020c CDE92623 		strd	r2, [sp, #152]
- 1123 0210 9DED3B7A 		vldr.32	s14, [sp, #236]
- 1124 0214 B7EEC77A 		vcvt.f64.f32	d7, s14
- 1125 0218 8DED247B 		vstr.64	d7, [sp, #144]
- 1126 021c 9DED3A7A 		vldr.32	s14, [sp, #232]
- 1127 0220 B7EEC77A 		vcvt.f64.f32	d7, s14
-ARM GAS  /tmp/cc7wHYiN.s 			page 27
-
-
- 1128 0224 8DED227B 		vstr.64	d7, [sp, #136]
- 1129 0228 9DED397A 		vldr.32	s14, [sp, #228]
- 1130 022c B7EEC77A 		vcvt.f64.f32	d7, s14
- 1131 0230 8DED207B 		vstr.64	d7, [sp, #128]
- 1132 0234 9DED387A 		vldr.32	s14, [sp, #224]
- 1133 0238 B7EEC77A 		vcvt.f64.f32	d7, s14
- 1134 023c 8DED1E7B 		vstr.64	d7, [sp, #120]
- 1135 0240 9DED377A 		vldr.32	s14, [sp, #220]
- 1136 0244 B7EEC77A 		vcvt.f64.f32	d7, s14
- 1137 0248 8DED1C7B 		vstr.64	d7, [sp, #112]
- 1138 024c 9DED367A 		vldr.32	s14, [sp, #216]
- 1139 0250 B7EEC77A 		vcvt.f64.f32	d7, s14
- 1140 0254 8DED1A7B 		vstr.64	d7, [sp, #104]
- 1141 0258 9DED357A 		vldr.32	s14, [sp, #212]
- 1142 025c B7EEC77A 		vcvt.f64.f32	d7, s14
- 1143 0260 8DED187B 		vstr.64	d7, [sp, #96]
- 1144 0264 9DED347A 		vldr.32	s14, [sp, #208]
- 1145 0268 B7EEC77A 		vcvt.f64.f32	d7, s14
- 1146 026c 8DED167B 		vstr.64	d7, [sp, #88]
- 1147 0270 9DED337A 		vldr.32	s14, [sp, #204]
- 1148 0274 B7EEC77A 		vcvt.f64.f32	d7, s14
- 1149 0278 8DED147B 		vstr.64	d7, [sp, #80]
- 1150 027c 9DED327A 		vldr.32	s14, [sp, #200]
- 1151 0280 B7EEC77A 		vcvt.f64.f32	d7, s14
- 1152 0284 8DED127B 		vstr.64	d7, [sp, #72]
- 1153 0288 9DED317A 		vldr.32	s14, [sp, #196]
- 1154 028c B7EEC77A 		vcvt.f64.f32	d7, s14
- 1155 0290 8DED107B 		vstr.64	d7, [sp, #64]
- 1156 0294 9DED307A 		vldr.32	s14, [sp, #192]
- 1157 0298 B7EEC77A 		vcvt.f64.f32	d7, s14
- 1158 029c 8DED0E7B 		vstr.64	d7, [sp, #56]
- 1159 02a0 9DED2F7A 		vldr.32	s14, [sp, #188]
- 1160 02a4 B7EEC77A 		vcvt.f64.f32	d7, s14
- 1161 02a8 8DED0C7B 		vstr.64	d7, [sp, #48]
- 1162 02ac 9DED2E7A 		vldr.32	s14, [sp, #184]
- 1163 02b0 B7EEC77A 		vcvt.f64.f32	d7, s14
- 1164 02b4 8DED0A7B 		vstr.64	d7, [sp, #40]
- 1165 02b8 9DED2D7A 		vldr.32	s14, [sp, #180]
- 1166 02bc B7EEC77A 		vcvt.f64.f32	d7, s14
- 1167 02c0 8DED087B 		vstr.64	d7, [sp, #32]
- 1168 02c4 9DED2C7A 		vldr.32	s14, [sp, #176]
- 1169 02c8 B7EEC77A 		vcvt.f64.f32	d7, s14
- 1170 02cc 8DED067B 		vstr.64	d7, [sp, #24]
- 1171 02d0 9DED2B7A 		vldr.32	s14, [sp, #172]
- 1172 02d4 B7EEC77A 		vcvt.f64.f32	d7, s14
- 1173 02d8 8DED047B 		vstr.64	d7, [sp, #16]
- 1174 02dc 9DED2A7A 		vldr.32	s14, [sp, #168]
- 1175 02e0 B7EEC77A 		vcvt.f64.f32	d7, s14
- 1176 02e4 8DED027B 		vstr.64	d7, [sp, #8]
- 1177 02e8 9DED297A 		vldr.32	s14, [sp, #164]
- 1178 02ec B7EEC77A 		vcvt.f64.f32	d7, s14
- 1179 02f0 8DED007B 		vstr.64	d7, [sp]
- 1180 02f4 DDED287A 		vldr.32	s15, [sp, #160]
- 1181 02f8 B7EEE77A 		vcvt.f64.f32	d7, s15
- 1182 02fc 53EC172B 		vmov	r2, r3, d7
- 1183 0300 0A49     		ldr	r1, .L50+20
- 1184 0302 4046     		mov	r0, r8
-ARM GAS  /tmp/cc7wHYiN.s 			page 28
-
-
- 1185 0304 FFF7FEFF 		bl	sprintf
- 1186              	.LVL47:
- 112:../Core/Src/protocol.c **** 				ROCKETSENSORDATA_SQL_ADD_ENTRY(sql_cmd, &cvt_data);
- 1187              		.loc 1 112 55 view .LVU231
- 113:../Core/Src/protocol.c **** 				return true;
- 1188              		.loc 1 113 5 view .LVU232
- 1189 0308 EDE6     		b	.L31
- 1190              	.L49:
- 108:../Core/Src/protocol.c ****           printf("warning: wrong data size!\n");
- 1191              		.loc 1 108 11 view .LVU233
- 1192 030a 0448     		ldr	r0, .L50+4
- 1193 030c FFF7FEFF 		bl	puts
- 1194              	.LVL48:
- 1195 0310 76E7     		b	.L42
- 1196              	.L43:
- 108:../Core/Src/protocol.c ****           printf("warning: wrong data size!\n");
- 1197              		.loc 1 108 11 is_stmt 0 view .LVU234
- 1198              	.LBE7:
-  69:../Core/Src/protocol.c **** 		switch (message_id) {
- 1199              		.loc 1 69 3 view .LVU235
- 1200 0312 0026     		movs	r6, #0
- 1201 0314 E7E6     		b	.L31
- 1202              	.L51:
- 1203 0316 00BF     		.align	2
- 1204              	.L50:
- 1205 0318 1C000000 		.word	.LC1
- 1206 031c 00000000 		.word	.LC0
- 1207 0320 C0000000 		.word	.LC2
- 1208 0324 18010000 		.word	.LC3
- 1209 0328 60010000 		.word	.LC4
- 1210 032c C4010000 		.word	.LC5
- 1211              		.cfi_endproc
- 1212              	.LFE9:
- 1214              		.text
- 1215              	.Letext0:
- 1216              		.file 2 "/usr/include/newlib/machine/_default_types.h"
- 1217              		.file 3 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stddef.h"
- 1218              		.file 4 "/usr/include/newlib/sys/_stdint.h"
- 1219              		.file 5 "../Core/Include/protocol.h"
- 1220              		.file 6 "/usr/include/newlib/stdio.h"
- 1221              		.file 7 "<built-in>"
-ARM GAS  /tmp/cc7wHYiN.s 			page 29
+ 806              	.LFE18:
+ 808              		.text
+ 809              	.Letext0:
+ 810              		.file 2 "/usr/include/newlib/machine/_default_types.h"
+ 811              		.file 3 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stddef.h"
+ 812              		.file 4 "/usr/include/newlib/sys/_stdint.h"
+ 813              		.file 5 "../Core/Include/protocol.h"
+ARM GAS  /tmp/cczBeItk.s 			page 20
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 protocol.c
-     /tmp/cc7wHYiN.s:17     .text.is_command_packet:0000000000000000 $t
-     /tmp/cc7wHYiN.s:25     .text.is_command_packet:0000000000000000 is_command_packet
-     /tmp/cc7wHYiN.s:68     .text.reformat_as_command_ack_packet:0000000000000000 $t
-     /tmp/cc7wHYiN.s:75     .text.reformat_as_command_ack_packet:0000000000000000 reformat_as_command_ack_packet
-     /tmp/cc7wHYiN.s:93     .text.generate_command_payload:0000000000000000 $t
-     /tmp/cc7wHYiN.s:100    .text.generate_command_payload:0000000000000000 generate_command_payload
-     /tmp/cc7wHYiN.s:122    .text.extract_command:0000000000000000 $t
-     /tmp/cc7wHYiN.s:129    .text.extract_command:0000000000000000 extract_command
-     /tmp/cc7wHYiN.s:167    .text.get_msg_size:0000000000000000 $t
-     /tmp/cc7wHYiN.s:174    .text.get_msg_size:0000000000000000 get_msg_size
-     /tmp/cc7wHYiN.s:190    .text.get_msg_size:000000000000000a $d
-     /tmp/cc7wHYiN.s:230    .text.is_data_send_msg:0000000000000000 $t
-     /tmp/cc7wHYiN.s:237    .text.is_data_send_msg:0000000000000000 is_data_send_msg
-     /tmp/cc7wHYiN.s:261    .text.RocketStateVector_encode:0000000000000000 $t
-     /tmp/cc7wHYiN.s:268    .text.RocketStateVector_encode:0000000000000000 RocketStateVector_encode
-     /tmp/cc7wHYiN.s:326    .text.RocketStateVector_decode:0000000000000000 $t
-     /tmp/cc7wHYiN.s:333    .text.RocketStateVector_decode:0000000000000000 RocketStateVector_decode
-     /tmp/cc7wHYiN.s:391    .text.RocketServoDeflection_encode:0000000000000000 $t
-     /tmp/cc7wHYiN.s:398    .text.RocketServoDeflection_encode:0000000000000000 RocketServoDeflection_encode
-     /tmp/cc7wHYiN.s:429    .text.RocketServoDeflection_decode:0000000000000000 $t
-     /tmp/cc7wHYiN.s:436    .text.RocketServoDeflection_decode:0000000000000000 RocketServoDeflection_decode
-     /tmp/cc7wHYiN.s:467    .text.RocketState_encode:0000000000000000 $t
-     /tmp/cc7wHYiN.s:474    .text.RocketState_encode:0000000000000000 RocketState_encode
-     /tmp/cc7wHYiN.s:508    .text.RocketState_decode:0000000000000000 $t
-     /tmp/cc7wHYiN.s:515    .text.RocketState_decode:0000000000000000 RocketState_decode
-     /tmp/cc7wHYiN.s:549    .text.RocketGroundEKF_encode:0000000000000000 $t
-     /tmp/cc7wHYiN.s:556    .text.RocketGroundEKF_encode:0000000000000000 RocketGroundEKF_encode
-     /tmp/cc7wHYiN.s:593    .text.RocketGroundEKF_decode:0000000000000000 $t
-     /tmp/cc7wHYiN.s:600    .text.RocketGroundEKF_decode:0000000000000000 RocketGroundEKF_decode
-     /tmp/cc7wHYiN.s:637    .text.RocketSensorData_encode:0000000000000000 $t
-     /tmp/cc7wHYiN.s:644    .text.RocketSensorData_encode:0000000000000000 RocketSensorData_encode
-     /tmp/cc7wHYiN.s:723    .text.RocketSensorData_decode:0000000000000000 $t
-     /tmp/cc7wHYiN.s:730    .text.RocketSensorData_decode:0000000000000000 RocketSensorData_decode
-     /tmp/cc7wHYiN.s:809    .rodata.convert_data_msg_to_sql_cmd.str1.4:0000000000000000 $d
-     /tmp/cc7wHYiN.s:838    .text.convert_data_msg_to_sql_cmd:0000000000000000 $t
-     /tmp/cc7wHYiN.s:845    .text.convert_data_msg_to_sql_cmd:0000000000000000 convert_data_msg_to_sql_cmd
-     /tmp/cc7wHYiN.s:883    .text.convert_data_msg_to_sql_cmd:0000000000000028 $d
-     /tmp/cc7wHYiN.s:1205   .text.convert_data_msg_to_sql_cmd:0000000000000318 $d
-     /tmp/cc7wHYiN.s:195    .text.get_msg_size:000000000000000f $d
-     /tmp/cc7wHYiN.s:195    .text.get_msg_size:0000000000000010 $t
-     /tmp/cc7wHYiN.s:888    .text.convert_data_msg_to_sql_cmd:000000000000002d $d
-     /tmp/cc7wHYiN.s:888    .text.convert_data_msg_to_sql_cmd:000000000000002e $t
+     /tmp/cczBeItk.s:17     .text.is_command_packet:0000000000000000 $t
+     /tmp/cczBeItk.s:25     .text.is_command_packet:0000000000000000 is_command_packet
+     /tmp/cczBeItk.s:68     .text.reformat_as_command_ack_packet:0000000000000000 $t
+     /tmp/cczBeItk.s:75     .text.reformat_as_command_ack_packet:0000000000000000 reformat_as_command_ack_packet
+     /tmp/cczBeItk.s:93     .text.generate_command_payload:0000000000000000 $t
+     /tmp/cczBeItk.s:100    .text.generate_command_payload:0000000000000000 generate_command_payload
+     /tmp/cczBeItk.s:122    .text.extract_command:0000000000000000 $t
+     /tmp/cczBeItk.s:129    .text.extract_command:0000000000000000 extract_command
+     /tmp/cczBeItk.s:167    .text.get_msg_size:0000000000000000 $t
+     /tmp/cczBeItk.s:174    .text.get_msg_size:0000000000000000 get_msg_size
+     /tmp/cczBeItk.s:190    .text.get_msg_size:000000000000000a $d
+     /tmp/cczBeItk.s:230    .text.is_data_send_msg:0000000000000000 $t
+     /tmp/cczBeItk.s:237    .text.is_data_send_msg:0000000000000000 is_data_send_msg
+     /tmp/cczBeItk.s:261    .text.RocketStateVector_encode:0000000000000000 $t
+     /tmp/cczBeItk.s:268    .text.RocketStateVector_encode:0000000000000000 RocketStateVector_encode
+     /tmp/cczBeItk.s:326    .text.RocketStateVector_decode:0000000000000000 $t
+     /tmp/cczBeItk.s:333    .text.RocketStateVector_decode:0000000000000000 RocketStateVector_decode
+     /tmp/cczBeItk.s:391    .text.RocketServoDeflection_encode:0000000000000000 $t
+     /tmp/cczBeItk.s:398    .text.RocketServoDeflection_encode:0000000000000000 RocketServoDeflection_encode
+     /tmp/cczBeItk.s:429    .text.RocketServoDeflection_decode:0000000000000000 $t
+     /tmp/cczBeItk.s:436    .text.RocketServoDeflection_decode:0000000000000000 RocketServoDeflection_decode
+     /tmp/cczBeItk.s:467    .text.RocketState_encode:0000000000000000 $t
+     /tmp/cczBeItk.s:474    .text.RocketState_encode:0000000000000000 RocketState_encode
+     /tmp/cczBeItk.s:508    .text.RocketState_decode:0000000000000000 $t
+     /tmp/cczBeItk.s:515    .text.RocketState_decode:0000000000000000 RocketState_decode
+     /tmp/cczBeItk.s:549    .text.RocketGroundEKF_encode:0000000000000000 $t
+     /tmp/cczBeItk.s:556    .text.RocketGroundEKF_encode:0000000000000000 RocketGroundEKF_encode
+     /tmp/cczBeItk.s:593    .text.RocketGroundEKF_decode:0000000000000000 $t
+     /tmp/cczBeItk.s:600    .text.RocketGroundEKF_decode:0000000000000000 RocketGroundEKF_decode
+     /tmp/cczBeItk.s:637    .text.RocketSensorData_encode:0000000000000000 $t
+     /tmp/cczBeItk.s:644    .text.RocketSensorData_encode:0000000000000000 RocketSensorData_encode
+     /tmp/cczBeItk.s:723    .text.RocketSensorData_decode:0000000000000000 $t
+     /tmp/cczBeItk.s:730    .text.RocketSensorData_decode:0000000000000000 RocketSensorData_decode
+     /tmp/cczBeItk.s:195    .text.get_msg_size:000000000000000f $d
+     /tmp/cczBeItk.s:195    .text.get_msg_size:0000000000000010 $t
 
-UNDEFINED SYMBOLS
-sprintf
-puts
+NO UNDEFINED SYMBOLS

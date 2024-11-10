@@ -3,6 +3,8 @@
 
 #include "stm32f4xx_hal.h"
 
+#define NUCLEO_F429ZI
+
 #define SD_CS_GPIO_PORT     GPIOA
 #define SD_CS_PIN           GPIO_PIN_4
 

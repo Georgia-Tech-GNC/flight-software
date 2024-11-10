@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccwc1oQV.s 			page 1
+ARM GAS  /tmp/ccFGE13L.s 			page 1
 
 
    1              		.cpu cortex-m7
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccwc1oQV.s 			page 1
   28:../Core/Src/telemetry.c **** 
   29:../Core/Src/telemetry.c **** /**
   30:../Core/Src/telemetry.c ****  * Queue a message to be sent
-ARM GAS  /tmp/ccwc1oQV.s 			page 2
+ARM GAS  /tmp/ccFGE13L.s 			page 2
 
 
   31:../Core/Src/telemetry.c ****  * @param payload The payload of the message
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccwc1oQV.s 			page 1
   49:../Core/Src/telemetry.c ****     return 1;
   65              		.loc 1 49 12 view .LVU11
   66 0022 0120     		movs	r0, #1
-ARM GAS  /tmp/ccwc1oQV.s 			page 3
+ARM GAS  /tmp/ccFGE13L.s 			page 3
 
 
   67              	.LVL5:
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccwc1oQV.s 			page 1
  112              		.thumb
  113              		.thumb_func
  114              		.fpu fpv5-d16
-ARM GAS  /tmp/ccwc1oQV.s 			page 4
+ARM GAS  /tmp/ccFGE13L.s 			page 4
 
 
  116              	uart_transmit_message:
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccwc1oQV.s 			page 1
  154 0022 07CA     		ldm	r2, {r0, r1, r2}
  155 0024 03C3     		stmia	r3!, {r0, r1}
  156 0026 1A80     		strh	r2, [r3]	@ movhi
-ARM GAS  /tmp/ccwc1oQV.s 			page 5
+ARM GAS  /tmp/ccFGE13L.s 			page 5
 
 
   67:../Core/Src/telemetry.c **** 
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccwc1oQV.s 			page 1
  186              	.LCFI7:
  187              		.cfi_restore_state
   84:../Core/Src/telemetry.c ****         HAL_UART_Transmit(&debug_uart, "bad", 3, HAL_MAX_DELAY);
-ARM GAS  /tmp/ccwc1oQV.s 			page 6
+ARM GAS  /tmp/ccFGE13L.s 			page 6
 
 
  188              		.loc 1 84 9 is_stmt 1 view .LVU31
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccwc1oQV.s 			page 1
  238              		.loc 1 19 5 discriminator 1 view .LVU37
   21:../Core/Src/telemetry.c ****         xMessageBufferReceive(g_telemetry_tx_mb_handle, tx_temp_message_buffer, TX_PACKET_BUFFER_SI
  239              		.loc 1 21 5 discriminator 1 view .LVU38
-ARM GAS  /tmp/ccwc1oQV.s 			page 7
+ARM GAS  /tmp/ccFGE13L.s 			page 7
 
 
  240              	.LBB2:
@@ -418,32 +418,34 @@ ARM GAS  /tmp/ccwc1oQV.s 			page 1
  108:../Core/Src/telemetry.c ****     uint8_t packet_buffer_size = 0;
  109:../Core/Src/telemetry.c **** 
  110:../Core/Src/telemetry.c ****     while (1) {
-ARM GAS  /tmp/ccwc1oQV.s 			page 8
+ARM GAS  /tmp/ccFGE13L.s 			page 8
 
 
  111:../Core/Src/telemetry.c ****         /* Wait for new bytes to read */
  112:../Core/Src/telemetry.c ****         int bytes_read = xStreamBufferReceive(g_telemetry_rx_sb_handle, bytes_to_process, 128, port
  113:../Core/Src/telemetry.c ****         
- 114:../Core/Src/telemetry.c ****         /* Process them */
- 115:../Core/Src/telemetry.c ****         for (int i = 0; i < bytes_read; i ++) {
- 116:../Core/Src/telemetry.c ****             rx_process_byte(bytes_to_process[i], packet_buffer, &packet_buffer_size, extracted_buff
- 117:../Core/Src/telemetry.c ****         }
- 118:../Core/Src/telemetry.c ****     }
- 119:../Core/Src/telemetry.c **** }
- 120:../Core/Src/telemetry.c **** 
- 121:../Core/Src/telemetry.c **** /**
- 122:../Core/Src/telemetry.c ****  * Process a single byte of incoming data
- 123:../Core/Src/telemetry.c ****  * @param byte The byte to process
- 124:../Core/Src/telemetry.c ****  * @param packet_buffer The buffer to hold the incoming packet
- 125:../Core/Src/telemetry.c ****  * @param packet_buffer_size The current size of the incoming packet buffer
- 126:../Core/Src/telemetry.c ****  * @param extracted_buffer The buffer to hold the extracted packet
- 127:../Core/Src/telemetry.c ****  */
- 128:../Core/Src/telemetry.c **** void rx_process_byte(uint8_t byte, uint8_t *packet_buffer, uint8_t *packet_buffer_size, uint8_t *ex
- 276              		.loc 1 128 116 view -0
+ 114:../Core/Src/telemetry.c ****         HAL_UART_Transmit(&telemetry_uart, "Received bytes\r\n", 16, HAL_MAX_DELAY);
+ 115:../Core/Src/telemetry.c **** 
+ 116:../Core/Src/telemetry.c ****         /* Process them */
+ 117:../Core/Src/telemetry.c ****         for (int i = 0; i < bytes_read; i ++) {
+ 118:../Core/Src/telemetry.c ****             rx_process_byte(bytes_to_process[i], packet_buffer, &packet_buffer_size, extracted_buff
+ 119:../Core/Src/telemetry.c ****         }
+ 120:../Core/Src/telemetry.c ****     }
+ 121:../Core/Src/telemetry.c **** }
+ 122:../Core/Src/telemetry.c **** 
+ 123:../Core/Src/telemetry.c **** /**
+ 124:../Core/Src/telemetry.c ****  * Process a single byte of incoming data
+ 125:../Core/Src/telemetry.c ****  * @param byte The byte to process
+ 126:../Core/Src/telemetry.c ****  * @param packet_buffer The buffer to hold the incoming packet
+ 127:../Core/Src/telemetry.c ****  * @param packet_buffer_size The current size of the incoming packet buffer
+ 128:../Core/Src/telemetry.c ****  * @param extracted_buffer The buffer to hold the extracted packet
+ 129:../Core/Src/telemetry.c ****  */
+ 130:../Core/Src/telemetry.c **** void rx_process_byte(uint8_t byte, uint8_t *packet_buffer, uint8_t *packet_buffer_size, uint8_t *ex
+ 276              		.loc 1 130 116 view -0
  277              		.cfi_startproc
  278              		@ args = 0, pretend = 0, frame = 0
  279              		@ frame_needed = 0, uses_anonymous_args = 0
- 280              		.loc 1 128 116 is_stmt 0 view .LVU44
+ 280              		.loc 1 130 116 is_stmt 0 view .LVU44
  281 0000 70B5     		push	{r4, r5, r6, lr}
  282              	.LCFI10:
  283              		.cfi_def_cfa_offset 16
@@ -454,221 +456,246 @@ ARM GAS  /tmp/ccwc1oQV.s 			page 1
  288 0002 0E46     		mov	r6, r1
  289 0004 1446     		mov	r4, r2
  290 0006 1D46     		mov	r5, r3
- 129:../Core/Src/telemetry.c ****     int next_packet_buffer_size = process_incoming_byte(byte, packet_buffer, *packet_buffer_size);
- 291              		.loc 1 129 5 is_stmt 1 view .LVU45
- 292              		.loc 1 129 35 is_stmt 0 view .LVU46
+ 131:../Core/Src/telemetry.c ****     int next_packet_buffer_size = process_incoming_byte(byte, packet_buffer, *packet_buffer_size);
+ 291              		.loc 1 131 5 is_stmt 1 view .LVU45
+ 292              		.loc 1 131 35 is_stmt 0 view .LVU46
  293 0008 1278     		ldrb	r2, [r2]	@ zero_extendqisi2
  294              	.LVL21:
- 295              		.loc 1 129 35 view .LVU47
+ 295              		.loc 1 131 35 view .LVU47
  296 000a FFF7FEFF 		bl	process_incoming_byte
  297              	.LVL22:
- 130:../Core/Src/telemetry.c **** 
- 131:../Core/Src/telemetry.c ****     if (next_packet_buffer_size < 0) {
- 298              		.loc 1 131 5 is_stmt 1 view .LVU48
- 299              		.loc 1 131 8 is_stmt 0 view .LVU49
+ 132:../Core/Src/telemetry.c **** 
+ 133:../Core/Src/telemetry.c ****     if (next_packet_buffer_size < 0) {
+ 298              		.loc 1 133 5 is_stmt 1 view .LVU48
+ 299              		.loc 1 133 8 is_stmt 0 view .LVU49
  300 000e 0028     		cmp	r0, #0
- 301              		.loc 1 131 8 view .LVU50
+ 301              		.loc 1 133 8 view .LVU50
  302 0010 01DB     		blt	.L23
- 132:../Core/Src/telemetry.c ****         next_packet_buffer_size = -next_packet_buffer_size;
- 133:../Core/Src/telemetry.c **** 
- 134:../Core/Src/telemetry.c ****         if (verify_packet(packet_buffer, next_packet_buffer_size)) {
- 135:../Core/Src/telemetry.c ****             int extracted_buffer_size = next_packet_buffer_size - 5;
- 136:../Core/Src/telemetry.c ****             int message_id = extract_packet(packet_buffer, next_packet_buffer_size, extracted_buffe
- 137:../Core/Src/telemetry.c **** 
- 138:../Core/Src/telemetry.c ****             if (message_id != 1) return;
- 139:../Core/Src/telemetry.c ****         }
- 140:../Core/Src/telemetry.c ****     } else {
-ARM GAS  /tmp/ccwc1oQV.s 			page 9
+ 134:../Core/Src/telemetry.c ****         next_packet_buffer_size = -next_packet_buffer_size;
+ 135:../Core/Src/telemetry.c **** 
+ 136:../Core/Src/telemetry.c ****         if (verify_packet(packet_buffer, next_packet_buffer_size)) {
+ 137:../Core/Src/telemetry.c ****             int extracted_buffer_size = next_packet_buffer_size - 5;
+ 138:../Core/Src/telemetry.c ****             int message_id = extract_packet(packet_buffer, next_packet_buffer_size, extracted_buffe
+ 139:../Core/Src/telemetry.c **** 
+ 140:../Core/Src/telemetry.c ****             if (message_id != 1) return;
+ARM GAS  /tmp/ccFGE13L.s 			page 9
 
 
- 141:../Core/Src/telemetry.c ****         *packet_buffer_size = next_packet_buffer_size;
- 303              		.loc 1 141 9 is_stmt 1 view .LVU51
- 304              		.loc 1 141 29 is_stmt 0 view .LVU52
+ 141:../Core/Src/telemetry.c ****         }
+ 142:../Core/Src/telemetry.c ****     } else {
+ 143:../Core/Src/telemetry.c ****         *packet_buffer_size = next_packet_buffer_size;
+ 303              		.loc 1 143 9 is_stmt 1 view .LVU51
+ 304              		.loc 1 143 29 is_stmt 0 view .LVU52
  305 0012 2070     		strb	r0, [r4]
  306              	.LVL23:
  307              	.L19:
- 142:../Core/Src/telemetry.c ****     }
- 143:../Core/Src/telemetry.c **** }...
- 308              		.loc 1 143 1 view .LVU53
+ 144:../Core/Src/telemetry.c ****     }
+ 145:../Core/Src/telemetry.c **** }...
+ 308              		.loc 1 145 1 view .LVU53
  309 0014 70BD     		pop	{r4, r5, r6, pc}
  310              	.LVL24:
  311              	.L23:
- 132:../Core/Src/telemetry.c ****         next_packet_buffer_size = -next_packet_buffer_size;
- 312              		.loc 1 132 9 is_stmt 1 view .LVU54
- 132:../Core/Src/telemetry.c ****         next_packet_buffer_size = -next_packet_buffer_size;
- 313              		.loc 1 132 33 is_stmt 0 view .LVU55
+ 134:../Core/Src/telemetry.c ****         next_packet_buffer_size = -next_packet_buffer_size;
+ 312              		.loc 1 134 9 is_stmt 1 view .LVU54
+ 134:../Core/Src/telemetry.c ****         next_packet_buffer_size = -next_packet_buffer_size;
+ 313              		.loc 1 134 33 is_stmt 0 view .LVU55
  314 0016 4442     		rsbs	r4, r0, #0
  315              	.LVL25:
- 134:../Core/Src/telemetry.c ****         if (verify_packet(packet_buffer, next_packet_buffer_size)) {
- 316              		.loc 1 134 9 is_stmt 1 view .LVU56
- 134:../Core/Src/telemetry.c ****         if (verify_packet(packet_buffer, next_packet_buffer_size)) {
- 317              		.loc 1 134 13 is_stmt 0 view .LVU57
+ 136:../Core/Src/telemetry.c ****         if (verify_packet(packet_buffer, next_packet_buffer_size)) {
+ 316              		.loc 1 136 9 is_stmt 1 view .LVU56
+ 136:../Core/Src/telemetry.c ****         if (verify_packet(packet_buffer, next_packet_buffer_size)) {
+ 317              		.loc 1 136 13 is_stmt 0 view .LVU57
  318 0018 2146     		mov	r1, r4
  319 001a 3046     		mov	r0, r6
  320 001c FFF7FEFF 		bl	verify_packet
  321              	.LVL26:
- 134:../Core/Src/telemetry.c ****         if (verify_packet(packet_buffer, next_packet_buffer_size)) {
- 322              		.loc 1 134 12 view .LVU58
+ 136:../Core/Src/telemetry.c ****         if (verify_packet(packet_buffer, next_packet_buffer_size)) {
+ 322              		.loc 1 136 12 view .LVU58
  323 0020 0028     		cmp	r0, #0
  324 0022 F7D0     		beq	.L19
  325              	.LBB3:
- 135:../Core/Src/telemetry.c ****             int extracted_buffer_size = next_packet_buffer_size - 5;
- 326              		.loc 1 135 13 is_stmt 1 view .LVU59
+ 137:../Core/Src/telemetry.c ****             int extracted_buffer_size = next_packet_buffer_size - 5;
+ 326              		.loc 1 137 13 is_stmt 1 view .LVU59
  327              	.LVL27:
- 136:../Core/Src/telemetry.c ****             int message_id = extract_packet(packet_buffer, next_packet_buffer_size, extracted_buffe
- 328              		.loc 1 136 13 view .LVU60
- 136:../Core/Src/telemetry.c ****             int message_id = extract_packet(packet_buffer, next_packet_buffer_size, extracted_buffe
- 329              		.loc 1 136 30 is_stmt 0 view .LVU61
+ 138:../Core/Src/telemetry.c ****             int message_id = extract_packet(packet_buffer, next_packet_buffer_size, extracted_buffe
+ 328              		.loc 1 138 13 view .LVU60
+ 138:../Core/Src/telemetry.c ****             int message_id = extract_packet(packet_buffer, next_packet_buffer_size, extracted_buffe
+ 329              		.loc 1 138 30 is_stmt 0 view .LVU61
  330 0024 2A46     		mov	r2, r5
  331 0026 2146     		mov	r1, r4
  332 0028 3046     		mov	r0, r6
  333 002a FFF7FEFF 		bl	extract_packet
  334              	.LVL28:
- 138:../Core/Src/telemetry.c ****             if (message_id != 1) return;
- 335              		.loc 1 138 13 is_stmt 1 view .LVU62
+ 140:../Core/Src/telemetry.c ****             if (message_id != 1) return;
+ 335              		.loc 1 140 13 is_stmt 1 view .LVU62
  336 002e F1E7     		b	.L19
  337              	.LBE3:
  338              		.cfi_endproc
  339              	.LFE155:
- 341              		.section	.text.telemetry_rx_task,"ax",%progbits
- 342              		.align	1
- 343              		.global	telemetry_rx_task
- 344              		.syntax unified
- 345              		.thumb
- 346              		.thumb_func
- 347              		.fpu fpv5-d16
- 349              	telemetry_rx_task:
-ARM GAS  /tmp/ccwc1oQV.s 			page 10
+ 341              		.section	.rodata.telemetry_rx_task.str1.4,"aMS",%progbits,1
+ 342              		.align	2
+ 343              	.LC5:
+ 344 0000 52656365 		.ascii	"Received bytes\015\012\000"
+ 344      69766564 
+ 344      20627974 
+ARM GAS  /tmp/ccFGE13L.s 			page 10
 
 
- 350              	.LVL29:
- 351              	.LFB154:
+ 344      65730D0A 
+ 344      00
+ 345              		.section	.text.telemetry_rx_task,"ax",%progbits
+ 346              		.align	1
+ 347              		.global	telemetry_rx_task
+ 348              		.syntax unified
+ 349              		.thumb
+ 350              		.thumb_func
+ 351              		.fpu fpv5-d16
+ 353              	telemetry_rx_task:
+ 354              	.LVL29:
+ 355              	.LFB154:
   97:../Core/Src/telemetry.c **** void telemetry_rx_task(void *args) {
- 352              		.loc 1 97 36 view -0
- 353              		.cfi_startproc
- 354              		@ args = 0, pretend = 0, frame = 48
- 355              		@ frame_needed = 0, uses_anonymous_args = 0
+ 356              		.loc 1 97 36 view -0
+ 357              		.cfi_startproc
+ 358              		@ args = 0, pretend = 0, frame = 48
+ 359              		@ frame_needed = 0, uses_anonymous_args = 0
   97:../Core/Src/telemetry.c **** void telemetry_rx_task(void *args) {
- 356              		.loc 1 97 36 is_stmt 0 view .LVU64
- 357 0000 30B5     		push	{r4, r5, lr}
- 358              	.LCFI11:
- 359              		.cfi_def_cfa_offset 12
- 360              		.cfi_offset 4, -12
- 361              		.cfi_offset 5, -8
- 362              		.cfi_offset 14, -4
- 363 0002 8DB0     		sub	sp, sp, #52
- 364              	.LCFI12:
- 365              		.cfi_def_cfa_offset 64
+ 360              		.loc 1 97 36 is_stmt 0 view .LVU64
+ 361 0000 30B5     		push	{r4, r5, lr}
+ 362              	.LCFI11:
+ 363              		.cfi_def_cfa_offset 12
+ 364              		.cfi_offset 4, -12
+ 365              		.cfi_offset 5, -8
+ 366              		.cfi_offset 14, -4
+ 367 0002 8DB0     		sub	sp, sp, #52
+ 368              	.LCFI12:
+ 369              		.cfi_def_cfa_offset 64
   99:../Core/Src/telemetry.c ****     uint8_t bytes_to_process[16];
- 366              		.loc 1 99 5 is_stmt 1 view .LVU65
+ 370              		.loc 1 99 5 is_stmt 1 view .LVU65
  102:../Core/Src/telemetry.c ****     uint8_t extracted_buffer[9];
- 367              		.loc 1 102 5 view .LVU66
+ 371              		.loc 1 102 5 view .LVU66
  105:../Core/Src/telemetry.c ****     uint8_t packet_buffer[9];
- 368              		.loc 1 105 5 view .LVU67
+ 372              		.loc 1 105 5 view .LVU67
  108:../Core/Src/telemetry.c ****     uint8_t packet_buffer_size = 0;
- 369              		.loc 1 108 5 view .LVU68
+ 373              		.loc 1 108 5 view .LVU68
  108:../Core/Src/telemetry.c ****     uint8_t packet_buffer_size = 0;
- 370              		.loc 1 108 13 is_stmt 0 view .LVU69
- 371 0004 0023     		movs	r3, #0
- 372 0006 8DF80730 		strb	r3, [sp, #7]
- 373              	.LVL30:
- 374              	.L27:
+ 374              		.loc 1 108 13 is_stmt 0 view .LVU69
+ 375 0004 0023     		movs	r3, #0
+ 376 0006 8DF80730 		strb	r3, [sp, #7]
+ 377              	.LVL30:
+ 378              	.L27:
  110:../Core/Src/telemetry.c ****     while (1) {
- 375              		.loc 1 110 5 is_stmt 1 view .LVU70
- 376              	.LBB4:
+ 379              		.loc 1 110 5 is_stmt 1 view .LVU70
+ 380              	.LBB4:
  112:../Core/Src/telemetry.c ****         int bytes_read = xStreamBufferReceive(g_telemetry_rx_sb_handle, bytes_to_process, 128, port
- 377              		.loc 1 112 9 view .LVU71
+ 381              		.loc 1 112 9 view .LVU71
  112:../Core/Src/telemetry.c ****         int bytes_read = xStreamBufferReceive(g_telemetry_rx_sb_handle, bytes_to_process, 128, port
- 378              		.loc 1 112 26 is_stmt 0 view .LVU72
- 379 000a 4FF0FF33 		mov	r3, #-1
- 380 000e 8022     		movs	r2, #128
- 381 0010 08A9     		add	r1, sp, #32
- 382 0012 0B48     		ldr	r0, .L29
- 383 0014 0068     		ldr	r0, [r0]
- 384 0016 FFF7FEFF 		bl	xStreamBufferReceive
- 385              	.LVL31:
- 386 001a 0446     		mov	r4, r0
- 387              	.LVL32:
- 115:../Core/Src/telemetry.c ****         for (int i = 0; i < bytes_read; i ++) {
- 388              		.loc 1 115 9 is_stmt 1 view .LVU73
- 389              	.LBB5:
- 115:../Core/Src/telemetry.c ****         for (int i = 0; i < bytes_read; i ++) {
- 390              		.loc 1 115 14 view .LVU74
- 115:../Core/Src/telemetry.c ****         for (int i = 0; i < bytes_read; i ++) {
- 391              		.loc 1 115 18 is_stmt 0 view .LVU75
- 392 001c 0025     		movs	r5, #0
- 393              	.LVL33:
-ARM GAS  /tmp/ccwc1oQV.s 			page 11
+ 382              		.loc 1 112 26 is_stmt 0 view .LVU72
+ 383 000a 4FF0FF33 		mov	r3, #-1
+ 384 000e 8022     		movs	r2, #128
+ 385 0010 08A9     		add	r1, sp, #32
+ 386 0012 0E48     		ldr	r0, .L29
+ 387 0014 0068     		ldr	r0, [r0]
+ 388 0016 FFF7FEFF 		bl	xStreamBufferReceive
+ 389              	.LVL31:
+ 390 001a 0446     		mov	r4, r0
+ARM GAS  /tmp/ccFGE13L.s 			page 11
 
 
- 394              	.L25:
- 115:../Core/Src/telemetry.c ****         for (int i = 0; i < bytes_read; i ++) {
- 395              		.loc 1 115 25 is_stmt 1 discriminator 1 view .LVU76
- 115:../Core/Src/telemetry.c ****         for (int i = 0; i < bytes_read; i ++) {
- 396              		.loc 1 115 9 is_stmt 0 discriminator 1 view .LVU77
- 397 001e A542     		cmp	r5, r4
- 398 0020 F3DA     		bge	.L27
- 116:../Core/Src/telemetry.c ****             rx_process_byte(bytes_to_process[i], packet_buffer, &packet_buffer_size, extracted_buff
- 399              		.loc 1 116 13 is_stmt 1 discriminator 3 view .LVU78
- 400 0022 05F13003 		add	r3, r5, #48
- 401 0026 0DEB0300 		add	r0, sp, r3
- 402 002a 05AB     		add	r3, sp, #20
- 403 002c 0DF10702 		add	r2, sp, #7
- 404 0030 02A9     		add	r1, sp, #8
- 405 0032 10F8100C 		ldrb	r0, [r0, #-16]	@ zero_extendqisi2
- 406 0036 FFF7FEFF 		bl	rx_process_byte
- 407              	.LVL34:
- 115:../Core/Src/telemetry.c ****         for (int i = 0; i < bytes_read; i ++) {
- 408              		.loc 1 115 41 discriminator 3 view .LVU79
- 115:../Core/Src/telemetry.c ****         for (int i = 0; i < bytes_read; i ++) {
- 409              		.loc 1 115 43 is_stmt 0 discriminator 3 view .LVU80
- 410 003a 0135     		adds	r5, r5, #1
- 411              	.LVL35:
- 115:../Core/Src/telemetry.c ****         for (int i = 0; i < bytes_read; i ++) {
- 412              		.loc 1 115 43 discriminator 3 view .LVU81
- 413 003c EFE7     		b	.L25
- 414              	.L30:
- 415 003e 00BF     		.align	2
- 416              	.L29:
- 417 0040 00000000 		.word	g_telemetry_rx_sb_handle
- 418              	.LBE5:
- 419              	.LBE4:
- 420              		.cfi_endproc
- 421              	.LFE154:
- 423              		.text
- 424              	.Letext0:
- 425              		.file 2 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stdint.h"
- 426              		.file 3 "../Core/Include/telemetry.h"
- 427              		.file 4 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stddef.h"
- 428              		.file 5 "Core/Inc/portmacro.h"
- 429              		.file 6 "../Core/FreeRTOS-Kernel/include/stream_buffer.h"
- 430              		.file 7 "../Core/FreeRTOS-Kernel/include/message_buffer.h"
- 431              		.file 8 "Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h725xx.h"
- 432              		.file 9 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_def.h"
- 433              		.file 10 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dma.h"
- 434              		.file 11 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h"
- 435              		.file 12 "../Core/Include/globals.h"
- 436              		.file 13 "../Core/Include/packet_encode.h"
-ARM GAS  /tmp/ccwc1oQV.s 			page 12
+ 391              	.LVL32:
+ 114:../Core/Src/telemetry.c ****         HAL_UART_Transmit(&telemetry_uart, "Received bytes\r\n", 16, HAL_MAX_DELAY);
+ 392              		.loc 1 114 9 is_stmt 1 view .LVU73
+ 393 001c 4FF0FF33 		mov	r3, #-1
+ 394 0020 1022     		movs	r2, #16
+ 395 0022 0B49     		ldr	r1, .L29+4
+ 396 0024 0B48     		ldr	r0, .L29+8
+ 397              	.LVL33:
+ 114:../Core/Src/telemetry.c ****         HAL_UART_Transmit(&telemetry_uart, "Received bytes\r\n", 16, HAL_MAX_DELAY);
+ 398              		.loc 1 114 9 is_stmt 0 view .LVU74
+ 399 0026 FFF7FEFF 		bl	HAL_UART_Transmit
+ 400              	.LVL34:
+ 117:../Core/Src/telemetry.c ****         for (int i = 0; i < bytes_read; i ++) {
+ 401              		.loc 1 117 9 is_stmt 1 view .LVU75
+ 402              	.LBB5:
+ 117:../Core/Src/telemetry.c ****         for (int i = 0; i < bytes_read; i ++) {
+ 403              		.loc 1 117 14 view .LVU76
+ 117:../Core/Src/telemetry.c ****         for (int i = 0; i < bytes_read; i ++) {
+ 404              		.loc 1 117 18 is_stmt 0 view .LVU77
+ 405 002a 0025     		movs	r5, #0
+ 406              	.LVL35:
+ 407              	.L25:
+ 117:../Core/Src/telemetry.c ****         for (int i = 0; i < bytes_read; i ++) {
+ 408              		.loc 1 117 25 is_stmt 1 discriminator 1 view .LVU78
+ 117:../Core/Src/telemetry.c ****         for (int i = 0; i < bytes_read; i ++) {
+ 409              		.loc 1 117 9 is_stmt 0 discriminator 1 view .LVU79
+ 410 002c A542     		cmp	r5, r4
+ 411 002e ECDA     		bge	.L27
+ 118:../Core/Src/telemetry.c ****             rx_process_byte(bytes_to_process[i], packet_buffer, &packet_buffer_size, extracted_buff
+ 412              		.loc 1 118 13 is_stmt 1 discriminator 3 view .LVU80
+ 413 0030 05F13003 		add	r3, r5, #48
+ 414 0034 0DEB0300 		add	r0, sp, r3
+ 415 0038 05AB     		add	r3, sp, #20
+ 416 003a 0DF10702 		add	r2, sp, #7
+ 417 003e 02A9     		add	r1, sp, #8
+ 418 0040 10F8100C 		ldrb	r0, [r0, #-16]	@ zero_extendqisi2
+ 419 0044 FFF7FEFF 		bl	rx_process_byte
+ 420              	.LVL36:
+ 117:../Core/Src/telemetry.c ****         for (int i = 0; i < bytes_read; i ++) {
+ 421              		.loc 1 117 41 discriminator 3 view .LVU81
+ 117:../Core/Src/telemetry.c ****         for (int i = 0; i < bytes_read; i ++) {
+ 422              		.loc 1 117 43 is_stmt 0 discriminator 3 view .LVU82
+ 423 0048 0135     		adds	r5, r5, #1
+ 424              	.LVL37:
+ 117:../Core/Src/telemetry.c ****         for (int i = 0; i < bytes_read; i ++) {
+ 425              		.loc 1 117 43 discriminator 3 view .LVU83
+ 426 004a EFE7     		b	.L25
+ 427              	.L30:
+ 428              		.align	2
+ 429              	.L29:
+ 430 004c 00000000 		.word	g_telemetry_rx_sb_handle
+ 431 0050 00000000 		.word	.LC5
+ 432 0054 00000000 		.word	huart4
+ 433              	.LBE5:
+ 434              	.LBE4:
+ 435              		.cfi_endproc
+ 436              	.LFE154:
+ARM GAS  /tmp/ccFGE13L.s 			page 12
+
+
+ 438              		.text
+ 439              	.Letext0:
+ 440              		.file 2 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stdint.h"
+ 441              		.file 3 "../Core/Include/telemetry.h"
+ 442              		.file 4 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stddef.h"
+ 443              		.file 5 "Core/Inc/portmacro.h"
+ 444              		.file 6 "../Core/FreeRTOS-Kernel/include/stream_buffer.h"
+ 445              		.file 7 "../Core/FreeRTOS-Kernel/include/message_buffer.h"
+ 446              		.file 8 "Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h725xx.h"
+ 447              		.file 9 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_def.h"
+ 448              		.file 10 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dma.h"
+ 449              		.file 11 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h"
+ 450              		.file 12 "../Core/Include/globals.h"
+ 451              		.file 13 "../Core/Include/packet_encode.h"
+ARM GAS  /tmp/ccFGE13L.s 			page 13
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 telemetry.c
-     /tmp/ccwc1oQV.s:17     .text.send_message:0000000000000000 $t
-     /tmp/ccwc1oQV.s:25     .text.send_message:0000000000000000 send_message
-     /tmp/ccwc1oQV.s:88     .text.send_message:0000000000000030 $d
-     /tmp/ccwc1oQV.s:93     .rodata.uart_transmit_message.str1.4:0000000000000000 $d
-     /tmp/ccwc1oQV.s:109    .text.uart_transmit_message:0000000000000000 $t
-     /tmp/ccwc1oQV.s:116    .text.uart_transmit_message:0000000000000000 uart_transmit_message
-     /tmp/ccwc1oQV.s:202    .text.uart_transmit_message:0000000000000060 $d
-     /tmp/ccwc1oQV.s:213    .text.telemetry_tx_task:0000000000000000 $t
-     /tmp/ccwc1oQV.s:220    .text.telemetry_tx_task:0000000000000000 telemetry_tx_task
-     /tmp/ccwc1oQV.s:261    .text.telemetry_tx_task:0000000000000024 $d
-     /tmp/ccwc1oQV.s:266    .text.rx_process_byte:0000000000000000 $t
-     /tmp/ccwc1oQV.s:273    .text.rx_process_byte:0000000000000000 rx_process_byte
-     /tmp/ccwc1oQV.s:342    .text.telemetry_rx_task:0000000000000000 $t
-     /tmp/ccwc1oQV.s:349    .text.telemetry_rx_task:0000000000000000 telemetry_rx_task
-     /tmp/ccwc1oQV.s:417    .text.telemetry_rx_task:0000000000000040 $d
+     /tmp/ccFGE13L.s:17     .text.send_message:0000000000000000 $t
+     /tmp/ccFGE13L.s:25     .text.send_message:0000000000000000 send_message
+     /tmp/ccFGE13L.s:88     .text.send_message:0000000000000030 $d
+     /tmp/ccFGE13L.s:93     .rodata.uart_transmit_message.str1.4:0000000000000000 $d
+     /tmp/ccFGE13L.s:109    .text.uart_transmit_message:0000000000000000 $t
+     /tmp/ccFGE13L.s:116    .text.uart_transmit_message:0000000000000000 uart_transmit_message
+     /tmp/ccFGE13L.s:202    .text.uart_transmit_message:0000000000000060 $d
+     /tmp/ccFGE13L.s:213    .text.telemetry_tx_task:0000000000000000 $t
+     /tmp/ccFGE13L.s:220    .text.telemetry_tx_task:0000000000000000 telemetry_tx_task
+     /tmp/ccFGE13L.s:261    .text.telemetry_tx_task:0000000000000024 $d
+     /tmp/ccFGE13L.s:266    .text.rx_process_byte:0000000000000000 $t
+     /tmp/ccFGE13L.s:273    .text.rx_process_byte:0000000000000000 rx_process_byte
+     /tmp/ccFGE13L.s:342    .rodata.telemetry_rx_task.str1.4:0000000000000000 $d
+     /tmp/ccFGE13L.s:346    .text.telemetry_rx_task:0000000000000000 $t
+     /tmp/ccFGE13L.s:353    .text.telemetry_rx_task:0000000000000000 telemetry_rx_task
+     /tmp/ccFGE13L.s:430    .text.telemetry_rx_task:000000000000004c $d
 
 UNDEFINED SYMBOLS
 xStreamBufferSend

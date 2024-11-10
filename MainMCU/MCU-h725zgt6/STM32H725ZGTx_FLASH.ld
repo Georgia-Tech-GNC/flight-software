@@ -177,8 +177,6 @@ SECTIONS
     . = ALIGN(8);
   } >DTCMRAM
 
-  
-
   /* Remove information from the standard libraries */
   /DISCARD/ :
   {

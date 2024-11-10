@@ -21,6 +21,10 @@ int is_command_packet(uint8_t* packet, size_t packet_size) {
 	return packet[4];
 }
 
+int get_command_uuid(uint8_t* packet) {
+	return packet[5];
+}
+
 void reformat_as_command_ack_packet(uint8_t* packet) {
 	packet[1] = COMMAND_ACK_MSG_ID;
 }
@@ -50,13 +54,15 @@ int get_msg_size(int message_id) {
 			return ROCKETGROUNDEKF_SIZE;
     	case ROCKETSENSORDATA_MSG_ID:
 			return ROCKETSENSORDATA_SIZE;
+    	case ROCKETANALOGFEEDBACKDATA_MSG_ID:
+			return ROCKETANALOGFEEDBACKDATA_SIZE;
     	default:
 			return -1;
 	}
 }
 
 bool is_data_send_msg(int message_id) {
-	return (message_id >= 10) && (message_id <= 10 + 5);
+	return (message_id >= 10) && (message_id <= 10 + 6);
 }
 
 #ifdef INCLUDE_PROTOCOL_SQL_MACROS
@@ -112,6 +118,15 @@ bool is_data_send_msg(int message_id) {
 				ROCKETSENSORDATA_SQL_ADD_ENTRY(sql_cmd, &cvt_data);
 				return true;
 			} 
+    	    case ROCKETANALOGFEEDBACKDATA_MSG_ID: {
+        if (data_size != ROCKETANALOGFEEDBACKDATA_SIZE) {
+          printf("warning: wrong data size!\n");
+        }
+				struct RocketAnalogFeedbackData cvt_data;
+				RocketAnalogFeedbackData_decode(data, &cvt_data);
+				ROCKETANALOGFEEDBACKDATA_SQL_ADD_ENTRY(sql_cmd, &cvt_data);
+				return true;
+			} 
     		default:
 				return false;
 		}
@@ -124,17 +139,14 @@ void RocketStateVector_encode(struct RocketStateVector *input, uint8_t *output) 
 		memcpy(output + 0, &input->velocity_x, 4);
 		memcpy(output + 4, &input->velocity_y, 4);
 		memcpy(output + 8, &input->velocity_z, 4);
-		memcpy(output + 12, &input->angular_velocity_x, 4);
-		memcpy(output + 16, &input->angular_velocity_y, 4);
-		memcpy(output + 20, &input->angular_velocity_z, 4);
-		memcpy(output + 24, &input->attitude_w, 4);
-		memcpy(output + 28, &input->attitude_x, 4);
-		memcpy(output + 32, &input->attitude_y, 4);
-		memcpy(output + 36, &input->attitude_z, 4);
-		memcpy(output + 40, &input->position_x, 4);
-		memcpy(output + 44, &input->position_y, 4);
-		memcpy(output + 48, &input->position_z, 4);
-		memcpy(output + 52, &input->timestamp, 8);
+		memcpy(output + 12, &input->attitude_w, 4);
+		memcpy(output + 16, &input->attitude_x, 4);
+		memcpy(output + 20, &input->attitude_y, 4);
+		memcpy(output + 24, &input->attitude_z, 4);
+		memcpy(output + 28, &input->position_x, 4);
+		memcpy(output + 32, &input->position_y, 4);
+		memcpy(output + 36, &input->position_z, 4);
+		memcpy(output + 40, &input->timestamp, 8);
 
 }
 
@@ -142,17 +154,14 @@ void RocketStateVector_decode(uint8_t *input, struct RocketStateVector *output) 
 		memcpy(&output->velocity_x, input + 0, 4);
 		memcpy(&output->velocity_y, input + 4, 4);
 		memcpy(&output->velocity_z, input + 8, 4);
-		memcpy(&output->angular_velocity_x, input + 12, 4);
-		memcpy(&output->angular_velocity_y, input + 16, 4);
-		memcpy(&output->angular_velocity_z, input + 20, 4);
-		memcpy(&output->attitude_w, input + 24, 4);
-		memcpy(&output->attitude_x, input + 28, 4);
-		memcpy(&output->attitude_y, input + 32, 4);
-		memcpy(&output->attitude_z, input + 36, 4);
-		memcpy(&output->position_x, input + 40, 4);
-		memcpy(&output->position_y, input + 44, 4);
-		memcpy(&output->position_z, input + 48, 4);
-		memcpy(&output->timestamp, input + 52, 8);
+		memcpy(&output->attitude_w, input + 12, 4);
+		memcpy(&output->attitude_x, input + 16, 4);
+		memcpy(&output->attitude_y, input + 20, 4);
+		memcpy(&output->attitude_z, input + 24, 4);
+		memcpy(&output->position_x, input + 28, 4);
+		memcpy(&output->position_y, input + 32, 4);
+		memcpy(&output->position_z, input + 36, 4);
+		memcpy(&output->timestamp, input + 40, 8);
 
 }
 
@@ -181,8 +190,7 @@ void RocketState_encode(struct RocketState *input, uint8_t *output) {
 		memcpy(output + 1, &input->firing_channel_1, 1);
 		memcpy(output + 2, &input->firing_channel_2, 1);
 		memcpy(output + 3, &input->firing_channel_3, 1);
-		memcpy(output + 4, &input->firing_channel_4, 1);
-		memcpy(output + 5, &input->timestamp, 8);
+		memcpy(output + 4, &input->timestamp, 8);
 
 }
 
@@ -191,8 +199,7 @@ void RocketState_decode(uint8_t *input, struct RocketState *output) {
 		memcpy(&output->firing_channel_1, input + 1, 1);
 		memcpy(&output->firing_channel_2, input + 2, 1);
 		memcpy(&output->firing_channel_3, input + 3, 1);
-		memcpy(&output->firing_channel_4, input + 4, 1);
-		memcpy(&output->timestamp, input + 5, 8);
+		memcpy(&output->timestamp, input + 4, 8);
 
 }
 
@@ -231,17 +238,7 @@ void RocketSensorData_encode(struct RocketSensorData *input, uint8_t *output) {
 		memcpy(output + 28, &input->gps_y, 4);
 		memcpy(output + 32, &input->gps_z, 4);
 		memcpy(output + 36, &input->barometer, 4);
-		memcpy(output + 40, &input->accel_bias_x, 4);
-		memcpy(output + 44, &input->accel_bias_y, 4);
-		memcpy(output + 48, &input->accel_bias_z, 4);
-		memcpy(output + 52, &input->gyro_bias_x, 4);
-		memcpy(output + 56, &input->gyro_bias_y, 4);
-		memcpy(output + 60, &input->gyro_bias_z, 4);
-		memcpy(output + 64, &input->gps_offset_x, 4);
-		memcpy(output + 68, &input->gps_offset_y, 4);
-		memcpy(output + 72, &input->gps_offset_z, 4);
-		memcpy(output + 76, &input->barometer_offset, 4);
-		memcpy(output + 80, &input->timestamp, 8);
+		memcpy(output + 40, &input->timestamp, 8);
 
 }
 
@@ -256,16 +253,29 @@ void RocketSensorData_decode(uint8_t *input, struct RocketSensorData *output) {
 		memcpy(&output->gps_y, input + 28, 4);
 		memcpy(&output->gps_z, input + 32, 4);
 		memcpy(&output->barometer, input + 36, 4);
-		memcpy(&output->accel_bias_x, input + 40, 4);
-		memcpy(&output->accel_bias_y, input + 44, 4);
-		memcpy(&output->accel_bias_z, input + 48, 4);
-		memcpy(&output->gyro_bias_x, input + 52, 4);
-		memcpy(&output->gyro_bias_y, input + 56, 4);
-		memcpy(&output->gyro_bias_z, input + 60, 4);
-		memcpy(&output->gps_offset_x, input + 64, 4);
-		memcpy(&output->gps_offset_y, input + 68, 4);
-		memcpy(&output->gps_offset_z, input + 72, 4);
-		memcpy(&output->barometer_offset, input + 76, 4);
-		memcpy(&output->timestamp, input + 80, 8);
+		memcpy(&output->timestamp, input + 40, 8);
+
+}
+
+
+void RocketAnalogFeedbackData_encode(struct RocketAnalogFeedbackData *input, uint8_t *output) {
+		memcpy(output + 0, &input->voltage_fb_33, 4);
+		memcpy(output + 4, &input->current_fb_33, 4);
+		memcpy(output + 8, &input->pyro_0_cont, 4);
+		memcpy(output + 12, &input->pyro_1_cont, 4);
+		memcpy(output + 16, &input->pyro_2_cont, 4);
+		memcpy(output + 20, &input->pyro_channel_deploy, 1);
+		memcpy(output + 21, &input->timestamp, 8);
+
+}
+
+void RocketAnalogFeedbackData_decode(uint8_t *input, struct RocketAnalogFeedbackData *output) {
+		memcpy(&output->voltage_fb_33, input + 0, 4);
+		memcpy(&output->current_fb_33, input + 4, 4);
+		memcpy(&output->pyro_0_cont, input + 8, 4);
+		memcpy(&output->pyro_1_cont, input + 12, 4);
+		memcpy(&output->pyro_2_cont, input + 16, 4);
+		memcpy(&output->pyro_channel_deploy, input + 20, 1);
+		memcpy(&output->timestamp, input + 21, 8);
 
 }

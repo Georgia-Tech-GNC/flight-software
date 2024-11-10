@@ -109,7 +109,7 @@ void telemetry_rx_task(void *args) {
 
     while (1) {
         /* Wait for new bytes to read */
-        int bytes_read = xStreamBufferReceive(g_telemetry_rx_sb_handle, bytes_to_process, 128, portMAX_DELAY);
+        int bytes_read = xStreamBufferReceive(g_telemetry_rx_sb_handle, bytes_to_process, 16, portMAX_DELAY);
         
         HAL_UART_Transmit(&telemetry_uart, "Received bytes\r\n", 16, HAL_MAX_DELAY);
 

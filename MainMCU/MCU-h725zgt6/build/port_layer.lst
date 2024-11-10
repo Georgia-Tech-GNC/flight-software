@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccxKR1Oy.s 			page 1
+ARM GAS  /tmp/ccJL7WIV.s 			page 1
 
 
    1              		.cpu cortex-m7
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccxKR1Oy.s 			page 1
   38              		.arch armv7e-m
   39              		.syntax unified
   40              		.thumb
-ARM GAS  /tmp/ccxKR1Oy.s 			page 2
+ARM GAS  /tmp/ccJL7WIV.s 			page 2
 
 
   41              		.thumb_func
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccxKR1Oy.s 			page 1
   51 0000 10B5     		push	{r4, lr}
   52              	.LCFI0:
   53              		.cfi_def_cfa_offset 8
-ARM GAS  /tmp/ccxKR1Oy.s 			page 3
+ARM GAS  /tmp/ccJL7WIV.s 			page 3
 
 
   54              		.cfi_offset 4, -8
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccxKR1Oy.s 			page 1
   96 003a 564B     		ldr	r3, .L16+20
   97 003c 0093     		str	r3, [sp]
   98 003e 564B     		ldr	r3, .L16+24
-ARM GAS  /tmp/ccxKR1Oy.s 			page 4
+ARM GAS  /tmp/ccJL7WIV.s 			page 4
 
 
   99 0040 0122     		movs	r2, #1
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccxKR1Oy.s 			page 1
   66:../Core/Src/port_layer.c ****     g_sdio_task_handle = xTaskCreateStatic(sdio_task, "flash_task", 4096, NULL, tskIDLE_PRIORITY, s
  145              		.loc 1 66 5 is_stmt 1 view .LVU24
  146              		.loc 1 66 26 is_stmt 0 view .LVU25
-ARM GAS  /tmp/ccxKR1Oy.s 			page 5
+ARM GAS  /tmp/ccJL7WIV.s 			page 5
 
 
  147 008a 4B4B     		ldr	r3, .L16+56
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccxKR1Oy.s 			page 1
  195 00dc 4348     		ldr	r0, .L16+108
  196 00de FFF7FEFF 		bl	xTaskCreateStatic
  197              	.LVL7:
-ARM GAS  /tmp/ccxKR1Oy.s 			page 6
+ARM GAS  /tmp/ccJL7WIV.s 			page 6
 
 
  198              		.loc 1 72 32 view .LVU36
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccxKR1Oy.s 			page 1
   81:../Core/Src/port_layer.c ****     /* Begin listening over uart */
   82:../Core/Src/port_layer.c ****     
   83:../Core/Src/port_layer.c ****     if (HAL_UARTEx_ReceiveToIdle_DMA(&telemetry_uart, telemetry_uart_rx_buf, UART2_RX_BUFFER_SIZE) 
-ARM GAS  /tmp/ccxKR1Oy.s 			page 7
+ARM GAS  /tmp/ccJL7WIV.s 			page 7
 
 
  244              		.loc 1 83 5 is_stmt 1 view .LVU49
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccxKR1Oy.s 			page 1
  285 0158 10BD     		pop	{r4, pc}
  286              	.L4:
  287              	.LCFI3:
-ARM GAS  /tmp/ccxKR1Oy.s 			page 8
+ARM GAS  /tmp/ccJL7WIV.s 			page 8
 
 
  288              		.cfi_restore_state
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccxKR1Oy.s 			page 1
  333 0198 00000000 		.word	.LANCHOR5
  334 019c 00000000 		.word	.LANCHOR7
  335 01a0 00000000 		.word	.LANCHOR9
-ARM GAS  /tmp/ccxKR1Oy.s 			page 9
+ARM GAS  /tmp/ccJL7WIV.s 			page 9
 
 
  336 01a4 00000000 		.word	.LANCHOR8
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccxKR1Oy.s 			page 1
  390              		.cfi_def_cfa_offset 8
  391              		.cfi_offset 3, -8
  392              		.cfi_offset 14, -4
-ARM GAS  /tmp/ccxKR1Oy.s 			page 10
+ARM GAS  /tmp/ccJL7WIV.s 			page 10
 
 
   98:../Core/Src/port_layer.c ****     vTaskStartScheduler();
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccxKR1Oy.s 			page 1
  450              		.align	2
  451              		.set	.LANCHOR1,. + 0
  454              	g_state_mutex_handle:
-ARM GAS  /tmp/ccxKR1Oy.s 			page 11
+ARM GAS  /tmp/ccJL7WIV.s 			page 11
 
 
  455 0000 00000000 		.space	4
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccxKR1Oy.s 			page 1
  525              		.align	2
  526              		.set	.LANCHOR11,. + 0
  529              	sdio_mb_storage:
-ARM GAS  /tmp/ccxKR1Oy.s 			page 12
+ARM GAS  /tmp/ccJL7WIV.s 			page 12
 
 
  530 0000 00000000 		.space	256
@@ -718,7 +718,7 @@ ARM GAS  /tmp/ccxKR1Oy.s 			page 1
  571      00000000 
  571      00000000 
  571      00000000 
-ARM GAS  /tmp/ccxKR1Oy.s 			page 13
+ARM GAS  /tmp/ccJL7WIV.s 			page 13
 
 
  571      00000000 
@@ -778,7 +778,7 @@ ARM GAS  /tmp/ccxKR1Oy.s 			page 1
  613              		.align	2
  614              		.set	.LANCHOR6,. + 0
  617              	telemetry_tx_mb_buff:
-ARM GAS  /tmp/ccxKR1Oy.s 			page 14
+ARM GAS  /tmp/ccJL7WIV.s 			page 14
 
 
  618 0000 00000000 		.space	40
@@ -838,7 +838,7 @@ ARM GAS  /tmp/ccxKR1Oy.s 			page 1
  658      00000000 
  658      00000000 
  659              		.section	.bss.uart_rx_count,"aw",%nobits
-ARM GAS  /tmp/ccxKR1Oy.s 			page 15
+ARM GAS  /tmp/ccJL7WIV.s 			page 15
 
 
  660              		.align	1
@@ -861,88 +861,88 @@ ARM GAS  /tmp/ccxKR1Oy.s 			page 1
  679              		.file 14 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h"
  680              		.file 15 "../Core/Include/globals.h"
  681              		.file 16 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h"
-ARM GAS  /tmp/ccxKR1Oy.s 			page 16
+ARM GAS  /tmp/ccJL7WIV.s 			page 16
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 port_layer.c
-     /tmp/ccxKR1Oy.s:17     .rodata.port_init.str1.4:0000000000000000 $d
-     /tmp/ccxKR1Oy.s:36     .text.port_init:0000000000000000 $t
-     /tmp/ccxKR1Oy.s:44     .text.port_init:0000000000000000 port_init
-     /tmp/ccxKR1Oy.s:327    .text.port_init:0000000000000180 $d
-     /tmp/ccxKR1Oy.s:542    .bss.sdio_task_stack:0000000000000000 sdio_task_stack
-     /tmp/ccxKR1Oy.s:637    .bss.telemetry_tx_task_stack:0000000000000000 telemetry_tx_task_stack
-     /tmp/ccxKR1Oy.s:610    .bss.telemetry_rx_task_stack:0000000000000000 telemetry_rx_task_stack
-     /tmp/ccxKR1Oy.s:576    .bss.state_rx_task_stack:0000000000000000 state_rx_task_stack
-     /tmp/ccxKR1Oy.s:657    .bss.test_task_stack:0000000000000000 test_task_stack
-     /tmp/ccxKR1Oy.s:375    .text.port_start:0000000000000000 $t
-     /tmp/ccxKR1Oy.s:382    .text.port_start:0000000000000000 port_start
-     /tmp/ccxKR1Oy.s:663    .bss.uart_rx_count:0000000000000000 uart_rx_count
-     /tmp/ccxKR1Oy.s:509    .bss.prev_size_uart_state:0000000000000000 prev_size_uart_state
-     /tmp/ccxKR1Oy.s:515    .bss.prev_size_uart_telemetry:0000000000000000 prev_size_uart_telemetry
-     /tmp/ccxKR1Oy.s:583    .bss.state_uart_rx_buf:0000000000000000 state_uart_rx_buf
-     /tmp/ccxKR1Oy.s:644    .bss.telemetry_uart_rx_buf:0000000000000000 telemetry_uart_rx_buf
-     /tmp/ccxKR1Oy.s:522    .bss.sdio_mb_buff:0000000000000000 sdio_mb_buff
-     /tmp/ccxKR1Oy.s:529    .bss.sdio_mb_storage:0000000000000000 sdio_mb_storage
-     /tmp/ccxKR1Oy.s:440    .bss.g_sdio_mb_handle:0000000000000000 g_sdio_mb_handle
-     /tmp/ccxKR1Oy.s:556    .bss.state_rx_sb_buff:0000000000000000 state_rx_sb_buff
-     /tmp/ccxKR1Oy.s:563    .bss.state_rx_sb_storage:0000000000000000 state_rx_sb_storage
-     /tmp/ccxKR1Oy.s:461    .bss.g_state_rx_sb_handle:0000000000000000 g_state_rx_sb_handle
-     /tmp/ccxKR1Oy.s:617    .bss.telemetry_tx_mb_buff:0000000000000000 telemetry_tx_mb_buff
-     /tmp/ccxKR1Oy.s:624    .bss.telemetry_tx_mb_storage:0000000000000000 telemetry_tx_mb_storage
-     /tmp/ccxKR1Oy.s:489    .bss.g_telemetry_tx_mb_handle:0000000000000000 g_telemetry_tx_mb_handle
-     /tmp/ccxKR1Oy.s:590    .bss.telemetry_rx_sb_buff:0000000000000000 telemetry_rx_sb_buff
-     /tmp/ccxKR1Oy.s:597    .bss.telemetry_rx_sb_storage:0000000000000000 telemetry_rx_sb_storage
-     /tmp/ccxKR1Oy.s:475    .bss.g_telemetry_rx_sb_handle:0000000000000000 g_telemetry_rx_sb_handle
-     /tmp/ccxKR1Oy.s:549    .bss.state_mutex_buff:0000000000000000 state_mutex_buff
-     /tmp/ccxKR1Oy.s:454    .bss.g_state_mutex_handle:0000000000000000 g_state_mutex_handle
-     /tmp/ccxKR1Oy.s:570    .bss.state_rx_task_buff:0000000000000000 state_rx_task_buff
-     /tmp/ccxKR1Oy.s:468    .bss.g_state_rx_task_handle:0000000000000000 g_state_rx_task_handle
-     /tmp/ccxKR1Oy.s:604    .bss.telemetry_rx_task_buff:0000000000000000 telemetry_rx_task_buff
-     /tmp/ccxKR1Oy.s:482    .bss.g_telemetry_rx_task_handle:0000000000000000 g_telemetry_rx_task_handle
-     /tmp/ccxKR1Oy.s:631    .bss.telemetry_tx_task_buff:0000000000000000 telemetry_tx_task_buff
-     /tmp/ccxKR1Oy.s:496    .bss.g_telemetry_tx_task_handle:0000000000000000 g_telemetry_tx_task_handle
-     /tmp/ccxKR1Oy.s:536    .bss.sdio_task_buff:0000000000000000 sdio_task_buff
-     /tmp/ccxKR1Oy.s:447    .bss.g_sdio_task_handle:0000000000000000 g_sdio_task_handle
-     /tmp/ccxKR1Oy.s:651    .bss.test_task_buff:0000000000000000 test_task_buff
-     /tmp/ccxKR1Oy.s:503    .bss.g_test_task_handle:0000000000000000 g_test_task_handle
-     /tmp/ccxKR1Oy.s:436    .bss.g_sdio_mb_handle:0000000000000000 $d
-     /tmp/ccxKR1Oy.s:443    .bss.g_sdio_task_handle:0000000000000000 $d
-     /tmp/ccxKR1Oy.s:450    .bss.g_state_mutex_handle:0000000000000000 $d
-     /tmp/ccxKR1Oy.s:457    .bss.g_state_rx_sb_handle:0000000000000000 $d
-     /tmp/ccxKR1Oy.s:464    .bss.g_state_rx_task_handle:0000000000000000 $d
-     /tmp/ccxKR1Oy.s:471    .bss.g_telemetry_rx_sb_handle:0000000000000000 $d
-     /tmp/ccxKR1Oy.s:478    .bss.g_telemetry_rx_task_handle:0000000000000000 $d
-     /tmp/ccxKR1Oy.s:485    .bss.g_telemetry_tx_mb_handle:0000000000000000 $d
-     /tmp/ccxKR1Oy.s:492    .bss.g_telemetry_tx_task_handle:0000000000000000 $d
-     /tmp/ccxKR1Oy.s:499    .bss.g_test_task_handle:0000000000000000 $d
-     /tmp/ccxKR1Oy.s:506    .bss.prev_size_uart_state:0000000000000000 $d
-     /tmp/ccxKR1Oy.s:512    .bss.prev_size_uart_telemetry:0000000000000000 $d
-     /tmp/ccxKR1Oy.s:518    .bss.sdio_mb_buff:0000000000000000 $d
-     /tmp/ccxKR1Oy.s:525    .bss.sdio_mb_storage:0000000000000000 $d
-     /tmp/ccxKR1Oy.s:532    .bss.sdio_task_buff:0000000000000000 $d
-ARM GAS  /tmp/ccxKR1Oy.s 			page 17
+     /tmp/ccJL7WIV.s:17     .rodata.port_init.str1.4:0000000000000000 $d
+     /tmp/ccJL7WIV.s:36     .text.port_init:0000000000000000 $t
+     /tmp/ccJL7WIV.s:44     .text.port_init:0000000000000000 port_init
+     /tmp/ccJL7WIV.s:327    .text.port_init:0000000000000180 $d
+     /tmp/ccJL7WIV.s:542    .bss.sdio_task_stack:0000000000000000 sdio_task_stack
+     /tmp/ccJL7WIV.s:637    .bss.telemetry_tx_task_stack:0000000000000000 telemetry_tx_task_stack
+     /tmp/ccJL7WIV.s:610    .bss.telemetry_rx_task_stack:0000000000000000 telemetry_rx_task_stack
+     /tmp/ccJL7WIV.s:576    .bss.state_rx_task_stack:0000000000000000 state_rx_task_stack
+     /tmp/ccJL7WIV.s:657    .bss.test_task_stack:0000000000000000 test_task_stack
+     /tmp/ccJL7WIV.s:375    .text.port_start:0000000000000000 $t
+     /tmp/ccJL7WIV.s:382    .text.port_start:0000000000000000 port_start
+     /tmp/ccJL7WIV.s:663    .bss.uart_rx_count:0000000000000000 uart_rx_count
+     /tmp/ccJL7WIV.s:509    .bss.prev_size_uart_state:0000000000000000 prev_size_uart_state
+     /tmp/ccJL7WIV.s:515    .bss.prev_size_uart_telemetry:0000000000000000 prev_size_uart_telemetry
+     /tmp/ccJL7WIV.s:583    .bss.state_uart_rx_buf:0000000000000000 state_uart_rx_buf
+     /tmp/ccJL7WIV.s:644    .bss.telemetry_uart_rx_buf:0000000000000000 telemetry_uart_rx_buf
+     /tmp/ccJL7WIV.s:522    .bss.sdio_mb_buff:0000000000000000 sdio_mb_buff
+     /tmp/ccJL7WIV.s:529    .bss.sdio_mb_storage:0000000000000000 sdio_mb_storage
+     /tmp/ccJL7WIV.s:440    .bss.g_sdio_mb_handle:0000000000000000 g_sdio_mb_handle
+     /tmp/ccJL7WIV.s:556    .bss.state_rx_sb_buff:0000000000000000 state_rx_sb_buff
+     /tmp/ccJL7WIV.s:563    .bss.state_rx_sb_storage:0000000000000000 state_rx_sb_storage
+     /tmp/ccJL7WIV.s:461    .bss.g_state_rx_sb_handle:0000000000000000 g_state_rx_sb_handle
+     /tmp/ccJL7WIV.s:617    .bss.telemetry_tx_mb_buff:0000000000000000 telemetry_tx_mb_buff
+     /tmp/ccJL7WIV.s:624    .bss.telemetry_tx_mb_storage:0000000000000000 telemetry_tx_mb_storage
+     /tmp/ccJL7WIV.s:489    .bss.g_telemetry_tx_mb_handle:0000000000000000 g_telemetry_tx_mb_handle
+     /tmp/ccJL7WIV.s:590    .bss.telemetry_rx_sb_buff:0000000000000000 telemetry_rx_sb_buff
+     /tmp/ccJL7WIV.s:597    .bss.telemetry_rx_sb_storage:0000000000000000 telemetry_rx_sb_storage
+     /tmp/ccJL7WIV.s:475    .bss.g_telemetry_rx_sb_handle:0000000000000000 g_telemetry_rx_sb_handle
+     /tmp/ccJL7WIV.s:549    .bss.state_mutex_buff:0000000000000000 state_mutex_buff
+     /tmp/ccJL7WIV.s:454    .bss.g_state_mutex_handle:0000000000000000 g_state_mutex_handle
+     /tmp/ccJL7WIV.s:570    .bss.state_rx_task_buff:0000000000000000 state_rx_task_buff
+     /tmp/ccJL7WIV.s:468    .bss.g_state_rx_task_handle:0000000000000000 g_state_rx_task_handle
+     /tmp/ccJL7WIV.s:604    .bss.telemetry_rx_task_buff:0000000000000000 telemetry_rx_task_buff
+     /tmp/ccJL7WIV.s:482    .bss.g_telemetry_rx_task_handle:0000000000000000 g_telemetry_rx_task_handle
+     /tmp/ccJL7WIV.s:631    .bss.telemetry_tx_task_buff:0000000000000000 telemetry_tx_task_buff
+     /tmp/ccJL7WIV.s:496    .bss.g_telemetry_tx_task_handle:0000000000000000 g_telemetry_tx_task_handle
+     /tmp/ccJL7WIV.s:536    .bss.sdio_task_buff:0000000000000000 sdio_task_buff
+     /tmp/ccJL7WIV.s:447    .bss.g_sdio_task_handle:0000000000000000 g_sdio_task_handle
+     /tmp/ccJL7WIV.s:651    .bss.test_task_buff:0000000000000000 test_task_buff
+     /tmp/ccJL7WIV.s:503    .bss.g_test_task_handle:0000000000000000 g_test_task_handle
+     /tmp/ccJL7WIV.s:436    .bss.g_sdio_mb_handle:0000000000000000 $d
+     /tmp/ccJL7WIV.s:443    .bss.g_sdio_task_handle:0000000000000000 $d
+     /tmp/ccJL7WIV.s:450    .bss.g_state_mutex_handle:0000000000000000 $d
+     /tmp/ccJL7WIV.s:457    .bss.g_state_rx_sb_handle:0000000000000000 $d
+     /tmp/ccJL7WIV.s:464    .bss.g_state_rx_task_handle:0000000000000000 $d
+     /tmp/ccJL7WIV.s:471    .bss.g_telemetry_rx_sb_handle:0000000000000000 $d
+     /tmp/ccJL7WIV.s:478    .bss.g_telemetry_rx_task_handle:0000000000000000 $d
+     /tmp/ccJL7WIV.s:485    .bss.g_telemetry_tx_mb_handle:0000000000000000 $d
+     /tmp/ccJL7WIV.s:492    .bss.g_telemetry_tx_task_handle:0000000000000000 $d
+     /tmp/ccJL7WIV.s:499    .bss.g_test_task_handle:0000000000000000 $d
+     /tmp/ccJL7WIV.s:506    .bss.prev_size_uart_state:0000000000000000 $d
+     /tmp/ccJL7WIV.s:512    .bss.prev_size_uart_telemetry:0000000000000000 $d
+     /tmp/ccJL7WIV.s:518    .bss.sdio_mb_buff:0000000000000000 $d
+     /tmp/ccJL7WIV.s:525    .bss.sdio_mb_storage:0000000000000000 $d
+     /tmp/ccJL7WIV.s:532    .bss.sdio_task_buff:0000000000000000 $d
+ARM GAS  /tmp/ccJL7WIV.s 			page 17
 
 
-     /tmp/ccxKR1Oy.s:539    .bss.sdio_task_stack:0000000000000000 $d
-     /tmp/ccxKR1Oy.s:545    .bss.state_mutex_buff:0000000000000000 $d
-     /tmp/ccxKR1Oy.s:552    .bss.state_rx_sb_buff:0000000000000000 $d
-     /tmp/ccxKR1Oy.s:559    .bss.state_rx_sb_storage:0000000000000000 $d
-     /tmp/ccxKR1Oy.s:566    .bss.state_rx_task_buff:0000000000000000 $d
-     /tmp/ccxKR1Oy.s:573    .bss.state_rx_task_stack:0000000000000000 $d
-     /tmp/ccxKR1Oy.s:579    .bss.state_uart_rx_buf:0000000000000000 $d
-     /tmp/ccxKR1Oy.s:586    .bss.telemetry_rx_sb_buff:0000000000000000 $d
-     /tmp/ccxKR1Oy.s:593    .bss.telemetry_rx_sb_storage:0000000000000000 $d
-     /tmp/ccxKR1Oy.s:600    .bss.telemetry_rx_task_buff:0000000000000000 $d
-     /tmp/ccxKR1Oy.s:607    .bss.telemetry_rx_task_stack:0000000000000000 $d
-     /tmp/ccxKR1Oy.s:613    .bss.telemetry_tx_mb_buff:0000000000000000 $d
-     /tmp/ccxKR1Oy.s:620    .bss.telemetry_tx_mb_storage:0000000000000000 $d
-     /tmp/ccxKR1Oy.s:627    .bss.telemetry_tx_task_buff:0000000000000000 $d
-     /tmp/ccxKR1Oy.s:634    .bss.telemetry_tx_task_stack:0000000000000000 $d
-     /tmp/ccxKR1Oy.s:640    .bss.telemetry_uart_rx_buf:0000000000000000 $d
-     /tmp/ccxKR1Oy.s:647    .bss.test_task_buff:0000000000000000 $d
-     /tmp/ccxKR1Oy.s:654    .bss.test_task_stack:0000000000000000 $d
-     /tmp/ccxKR1Oy.s:660    .bss.uart_rx_count:0000000000000000 $d
+     /tmp/ccJL7WIV.s:539    .bss.sdio_task_stack:0000000000000000 $d
+     /tmp/ccJL7WIV.s:545    .bss.state_mutex_buff:0000000000000000 $d
+     /tmp/ccJL7WIV.s:552    .bss.state_rx_sb_buff:0000000000000000 $d
+     /tmp/ccJL7WIV.s:559    .bss.state_rx_sb_storage:0000000000000000 $d
+     /tmp/ccJL7WIV.s:566    .bss.state_rx_task_buff:0000000000000000 $d
+     /tmp/ccJL7WIV.s:573    .bss.state_rx_task_stack:0000000000000000 $d
+     /tmp/ccJL7WIV.s:579    .bss.state_uart_rx_buf:0000000000000000 $d
+     /tmp/ccJL7WIV.s:586    .bss.telemetry_rx_sb_buff:0000000000000000 $d
+     /tmp/ccJL7WIV.s:593    .bss.telemetry_rx_sb_storage:0000000000000000 $d
+     /tmp/ccJL7WIV.s:600    .bss.telemetry_rx_task_buff:0000000000000000 $d
+     /tmp/ccJL7WIV.s:607    .bss.telemetry_rx_task_stack:0000000000000000 $d
+     /tmp/ccJL7WIV.s:613    .bss.telemetry_tx_mb_buff:0000000000000000 $d
+     /tmp/ccJL7WIV.s:620    .bss.telemetry_tx_mb_storage:0000000000000000 $d
+     /tmp/ccJL7WIV.s:627    .bss.telemetry_tx_task_buff:0000000000000000 $d
+     /tmp/ccJL7WIV.s:634    .bss.telemetry_tx_task_stack:0000000000000000 $d
+     /tmp/ccJL7WIV.s:640    .bss.telemetry_uart_rx_buf:0000000000000000 $d
+     /tmp/ccJL7WIV.s:647    .bss.test_task_buff:0000000000000000 $d
+     /tmp/ccJL7WIV.s:654    .bss.test_task_stack:0000000000000000 $d
+     /tmp/ccJL7WIV.s:660    .bss.uart_rx_count:0000000000000000 $d
 
 UNDEFINED SYMBOLS
 xQueueCreateMutexStatic

@@ -39,8 +39,8 @@ MessageBufferHandle_t g_sdio_mb_handle;
 uint8_t sdio_mb_storage[256];
 StaticMessageBuffer_t sdio_mb_buff;
 
-uint8_t telemetry_uart_rx_buf[TELEMETRY_RX_BUFFER_SIZE];
-uint8_t state_uart_rx_buf[STATE_RX_BUFFER_SIZE];
+uint8_t telemetry_uart_rx_buf[MAX_PACKET_SIZE_TELEMETRY];
+uint8_t state_uart_rx_buf[MAX_PACKET_SIZE_STATE];
 
 int port_init(void) {
     /* Create mutexes */
@@ -80,14 +80,14 @@ int port_init(void) {
 
     /* Begin listening over uart */
     
-    if (HAL_UARTEx_ReceiveToIdle_IT(&telemetry_uart, telemetry_uart_rx_buf, TELEMETRY_RX_BUFFER_SIZE) != HAL_OK) {
+    if (HAL_UARTEx_ReceiveToIdle_IT(&telemetry_uart, telemetry_uart_rx_buf, MAX_PACKET_SIZE_TELEMETRY) != HAL_OK) {
         return 0;
     } else {
         HAL_UART_Transmit_DMA(&telemetry_uart, "Init ok\r\n", 9);
     }
     
 
-    if (HAL_UARTEx_ReceiveToIdle_IT(&state_uart, state_uart_rx_buf, STATE_RX_BUFFER_SIZE) != HAL_OK) {
+    if (HAL_UARTEx_ReceiveToIdle_IT(&state_uart, state_uart_rx_buf, MAX_PACKET_SIZE_STATE) != HAL_OK) {
         return 0;
     }
     
@@ -100,7 +100,7 @@ void port_start(void) {
 
 uint16_t prev_size_uart_telemetry = 0;
 uint16_t prev_size_uart_state = 0;
-
+/*
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
     if (huart->Instance == telemetry_uart.Instance) {
         if (size < prev_size_uart_telemetry) {
@@ -124,4 +124,6 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
         } else {
             prev_size_uart_state = size;
         }
+    }
 }
+*/

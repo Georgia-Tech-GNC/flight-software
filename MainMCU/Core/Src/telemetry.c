@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include "telemetry.h"
 
 #include "FreeRTOS.h"
@@ -9,8 +11,9 @@
 
 #include "globals.h"
 
-void rx_process_byte(uint8_t byte, uint8_t *packet_buffer, uint8_t *packet_buffer_size, uint8_t *extracted_buffer);
+void rx_process_byte(uint8_t byte, uint8_t *packet_buffer, uint8_t *packet_buffer_size);
 int uart_transmit_message(Message *message, uint8_t *packet_buf);
+void process_command(int command_it);
 
 void telemetry_tx_task(void *args) {
     /* Buffer to store the generated packet */
@@ -98,9 +101,6 @@ void telemetry_rx_task(void *args) {
     /* Buffer to hold received bytes before they are processed */
     uint8_t bytes_to_process[16];
 
-    /* Buffer to hold the extracted packet */
-    uint8_t extracted_buffer[9];
-
     /* Buffer to hold the incoming packet before it is extracted */
     uint8_t packet_buffer[9];
 
@@ -115,7 +115,7 @@ void telemetry_rx_task(void *args) {
 
         /* Process them */
         for (int i = 0; i < bytes_read; i ++) {
-            rx_process_byte(bytes_to_process[i], packet_buffer, &packet_buffer_size, extracted_buffer);
+            rx_process_byte(bytes_to_process[i], packet_buffer, &packet_buffer_size);
         }
     }
 }
@@ -127,7 +127,7 @@ void telemetry_rx_task(void *args) {
  * @param packet_buffer_size The current size of the incoming packet buffer
  * @param extracted_buffer The buffer to hold the extracted packet
  */
-void rx_process_byte(uint8_t byte, uint8_t *packet_buffer, uint8_t *packet_buffer_size, uint8_t *extracted_buffer) {
+void rx_process_byte(uint8_t byte, uint8_t *packet_buffer, uint8_t *packet_buffer_size) {
     int next_packet_buffer_size = process_incoming_byte(byte, packet_buffer, *packet_buffer_size);
 
     if (next_packet_buffer_size < 0) {
@@ -141,7 +141,7 @@ void rx_process_byte(uint8_t byte, uint8_t *packet_buffer, uint8_t *packet_buffe
             }
             process_command(command_id);
         }
-    } else if (next_packet_buffer_size < MAX_PACKET_SIZE) {
+    } else if (next_packet_buffer_size < MAX_PACKET_SIZE_TELEMETRY) {
         *packet_buffer_size = next_packet_buffer_size;
     } else {
         *packet_buffer_size = 0;
@@ -149,5 +149,7 @@ void rx_process_byte(uint8_t byte, uint8_t *packet_buffer, uint8_t *packet_buffe
 }
 
 void process_command(int command_it) {
-
+    char buff[32];
+    sprintf(buff, "Received command id: %d.\r\n", command_it);
+    HAL_UART_Transmit(&debug_uart, buff, strlen(buff), HAL_MAX_DELAY);
 }

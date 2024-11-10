@@ -148,8 +148,12 @@ void rx_process_byte(uint8_t byte, uint8_t *packet_buffer, uint8_t *packet_buffe
     }
 }
 
-void process_command(int command_it) {
+/**
+ * Process ground station command
+ * @param command_id The id of the command to be processed
+ */
+void process_command(int command_id) {
     char buff[32];
-    sprintf(buff, "Received command id: %d.\r\n", command_it);
+    sprintf(buff, "Received command id: %d.\r\n", command_id);
     HAL_UART_Transmit(&debug_uart, buff, strlen(buff), HAL_MAX_DELAY);
 }

@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccO7mGbe.s 			page 1
+ARM GAS  /tmp/ccZSaW8W.s 			page 1
 
 
    1              		.cpu cortex-m7
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccO7mGbe.s 			page 1
   36 0002 0246     		mov	r2, r0
   37 0004 8C46     		mov	ip, r1
   21:../Core/Src/packet_encode.c ****     int last_stuffed_byte = 0;
-ARM GAS  /tmp/ccO7mGbe.s 			page 2
+ARM GAS  /tmp/ccZSaW8W.s 			page 2
 
 
   38              		.loc 1 21 5 is_stmt 1 view .LVU3
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccO7mGbe.s 			page 1
   77              	.LBB4:
   24:../Core/Src/packet_encode.c ****         if (data_to_encode[i] == 0x00) { // Add to internal linked list
   78              		.loc 1 24 36 is_stmt 1 view .LVU15
-ARM GAS  /tmp/ccO7mGbe.s 			page 3
+ARM GAS  /tmp/ccZSaW8W.s 			page 3
 
 
   24:../Core/Src/packet_encode.c ****         if (data_to_encode[i] == 0x00) { // Add to internal linked list
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccO7mGbe.s 			page 1
  118              	.L4:
   24:../Core/Src/packet_encode.c ****         if (data_to_encode[i] == 0x00) { // Add to internal linked list
  119              		.loc 1 24 36 is_stmt 1 discriminator 2 view .LVU31
-ARM GAS  /tmp/ccO7mGbe.s 			page 4
+ARM GAS  /tmp/ccZSaW8W.s 			page 4
 
 
   24:../Core/Src/packet_encode.c ****         if (data_to_encode[i] == 0x00) { // Add to internal linked list
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccO7mGbe.s 			page 1
   46:../Core/Src/packet_encode.c ****  */
   47:../Core/Src/packet_encode.c **** int generate_packet(const uint8_t *rawData, const uint8_t dataSize, uint8_t *packetizedData, const 
  157              		.loc 1 47 119 is_stmt 1 view -0
-ARM GAS  /tmp/ccO7mGbe.s 			page 5
+ARM GAS  /tmp/ccZSaW8W.s 			page 5
 
 
  158              		.cfi_startproc
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccO7mGbe.s 			page 1
  204 0024 291D     		adds	r1, r5, #4
  205 0026 2046     		mov	r0, r4
  206              	.LVL21:
-ARM GAS  /tmp/ccO7mGbe.s 			page 6
+ARM GAS  /tmp/ccZSaW8W.s 			page 6
 
 
  207              		.loc 1 55 19 view .LVU56
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccO7mGbe.s 			page 1
  242              		.loc 1 61 49 view .LVU71
  243 0044 F6E7     		b	.L20
  244              		.cfi_endproc
-ARM GAS  /tmp/ccO7mGbe.s 			page 7
+ARM GAS  /tmp/ccZSaW8W.s 			page 7
 
 
  245              	.LFE4:
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccO7mGbe.s 			page 1
  280              	.LVL28:
   87:../Core/Src/packet_encode.c ****     while (next_cobs_byte < dataSize) {
  281              		.loc 1 87 11 is_stmt 1 view .LVU80
-ARM GAS  /tmp/ccO7mGbe.s 			page 8
+ARM GAS  /tmp/ccZSaW8W.s 			page 8
 
 
  282 000c 8B42     		cmp	r3, r1
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccO7mGbe.s 			page 1
   96:../Core/Src/packet_encode.c **** 
   97:../Core/Src/packet_encode.c ****         next_cobs_byte += increment;
   98:../Core/Src/packet_encode.c ****     } 
-ARM GAS  /tmp/ccO7mGbe.s 			page 9
+ARM GAS  /tmp/ccZSaW8W.s 			page 9
 
 
   99:../Core/Src/packet_encode.c **** 
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccO7mGbe.s 			page 1
  371              		.fpu fpv5-d16
  373              	extract_packet:
  374              	.LVL41:
-ARM GAS  /tmp/ccO7mGbe.s 			page 10
+ARM GAS  /tmp/ccZSaW8W.s 			page 10
 
 
  375              	.LFB6:
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccO7mGbe.s 			page 1
  407              	.LBB8:
  124:../Core/Src/packet_encode.c ****     while (next_cobs_byte < dataSize - 1) {
  125:../Core/Src/packet_encode.c ****         int increment = rawData[next_cobs_byte];
-ARM GAS  /tmp/ccO7mGbe.s 			page 11
+ARM GAS  /tmp/ccZSaW8W.s 			page 11
 
 
  126:../Core/Src/packet_encode.c ****         if (increment == 0) return 0;
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccO7mGbe.s 			page 1
  445              	.LVL49:
  446              		.loc 1 132 5 is_stmt 0 view .LVU132
  447 0032 0CF10401 		add	r1, ip, #4
-ARM GAS  /tmp/ccO7mGbe.s 			page 12
+ARM GAS  /tmp/ccZSaW8W.s 			page 12
 
 
  448              	.LVL50:
@@ -718,7 +718,7 @@ ARM GAS  /tmp/ccO7mGbe.s 			page 1
  147:../Core/Src/packet_encode.c ****     buffer[current_buffer_size] = inputted_byte;
  489              		.loc 1 147 5 is_stmt 1 view .LVU143
  490              		.loc 1 147 33 is_stmt 0 view .LVU144
-ARM GAS  /tmp/ccO7mGbe.s 			page 13
+ARM GAS  /tmp/ccZSaW8W.s 			page 13
 
 
  491 0004 8854     		strb	r0, [r1, r2]
@@ -778,7 +778,7 @@ ARM GAS  /tmp/ccO7mGbe.s 			page 1
  532 0022 0120     		movs	r0, #1
  533              	.LVL59:
  140:../Core/Src/packet_encode.c ****     }
-ARM GAS  /tmp/ccO7mGbe.s 			page 14
+ARM GAS  /tmp/ccZSaW8W.s 			page 14
 
 
  534              		.loc 1 140 16 view .LVU162
@@ -824,21 +824,21 @@ ARM GAS  /tmp/ccO7mGbe.s 			page 1
  567              		.file 3 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stddef.h"
  568              		.file 4 "../Core/Include/crc_hash.h"
  569              		.file 5 "<built-in>"
-ARM GAS  /tmp/ccO7mGbe.s 			page 15
+ARM GAS  /tmp/ccZSaW8W.s 			page 15
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 packet_encode.c
-     /tmp/ccO7mGbe.s:17     .text.cobs_encode:0000000000000000 $t
-     /tmp/ccO7mGbe.s:25     .text.cobs_encode:0000000000000000 cobs_encode
-     /tmp/ccO7mGbe.s:147    .text.generate_packet:0000000000000000 $t
-     /tmp/ccO7mGbe.s:154    .text.generate_packet:0000000000000000 generate_packet
-     /tmp/ccO7mGbe.s:248    .text.verify_packet:0000000000000000 $t
-     /tmp/ccO7mGbe.s:255    .text.verify_packet:0000000000000000 verify_packet
-     /tmp/ccO7mGbe.s:366    .text.extract_packet:0000000000000000 $t
-     /tmp/ccO7mGbe.s:373    .text.extract_packet:0000000000000000 extract_packet
-     /tmp/ccO7mGbe.s:468    .text.process_incoming_byte:0000000000000000 $t
-     /tmp/ccO7mGbe.s:475    .text.process_incoming_byte:0000000000000000 process_incoming_byte
+     /tmp/ccZSaW8W.s:17     .text.cobs_encode:0000000000000000 $t
+     /tmp/ccZSaW8W.s:25     .text.cobs_encode:0000000000000000 cobs_encode
+     /tmp/ccZSaW8W.s:147    .text.generate_packet:0000000000000000 $t
+     /tmp/ccZSaW8W.s:154    .text.generate_packet:0000000000000000 generate_packet
+     /tmp/ccZSaW8W.s:248    .text.verify_packet:0000000000000000 $t
+     /tmp/ccZSaW8W.s:255    .text.verify_packet:0000000000000000 verify_packet
+     /tmp/ccZSaW8W.s:366    .text.extract_packet:0000000000000000 $t
+     /tmp/ccZSaW8W.s:373    .text.extract_packet:0000000000000000 extract_packet
+     /tmp/ccZSaW8W.s:468    .text.process_incoming_byte:0000000000000000 $t
+     /tmp/ccZSaW8W.s:475    .text.process_incoming_byte:0000000000000000 process_incoming_byte
 
 UNDEFINED SYMBOLS
 memcpy

@@ -39,8 +39,8 @@ MessageBufferHandle_t g_sdio_mb_handle;
 uint8_t sdio_mb_storage[256];
 StaticMessageBuffer_t sdio_mb_buff;
 
-uint8_t telemetry_uart_rx_buf[UART2_RX_BUFFER_SIZE];
-uint8_t state_uart_rx_buf[UART3_RX_BUFFER_SIZE];
+uint8_t telemetry_uart_rx_buf[MAX_PACKET_SIZE_TELEMETRY];
+uint8_t state_uart_rx_buf[MAX_PACKET_SIZE_STATE];
 
 int port_init(void) {
     /* Create mutexes */
@@ -80,14 +80,14 @@ int port_init(void) {
 
     /* Begin listening over uart */
     
-    if (HAL_UARTEx_ReceiveToIdle_DMA(&telemetry_uart, telemetry_uart_rx_buf, UART2_RX_BUFFER_SIZE) != HAL_OK) {
+    if (HAL_UARTEx_ReceiveToIdle_IT(&telemetry_uart, telemetry_uart_rx_buf, MAX_PACKET_SIZE_TELEMETRY) != HAL_OK) {
         return 0;
     } else {
         HAL_UART_Transmit_DMA(&telemetry_uart, "Init ok\r\n", 9);
     }
     
 
-    if (HAL_UARTEx_ReceiveToIdle_DMA(&state_uart, state_uart_rx_buf, UART3_RX_BUFFER_SIZE) != HAL_OK) {
+    if (HAL_UARTEx_ReceiveToIdle_IT(&state_uart, state_uart_rx_buf, MAX_PACKET_SIZE_STATE) != HAL_OK) {
         return 0;
     }
     
@@ -100,25 +100,30 @@ void port_start(void) {
 
 uint16_t prev_size_uart_telemetry = 0;
 uint16_t prev_size_uart_state = 0;
-uint16_t uart_rx_count = 0;
 /*
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
-    uart_rx_count ++;
-    // HAL_UART_Transmit_DMA(&telemetry_uart, "Received bytes\r\n", 16);
-    
     if (huart->Instance == telemetry_uart.Instance) {
         if (size < prev_size_uart_telemetry) {
             prev_size_uart_telemetry = 0;
         }
 
         xStreamBufferSendFromISR(g_telemetry_rx_sb_handle, telemetry_uart_rx_buf + prev_size_uart_telemetry, size - prev_size_uart_telemetry, NULL);
-        prev_size_uart_telemetry = size;
+        if (size == MAX_PACKET_SIZE_TELEMETRY) {
+            prev_size_uart_telemetry = 0;
+        } else {
+            prev_size_uart_telemetry = size;
+        }
     } else if (huart->Instance == state_uart.Instance) {
         if (size < prev_size_uart_state) {
             prev_size_uart_state = 0;
         }
 
-        xStreamBufferSendFromISR(g_telemetry_rx_sb_handle, state_uart_rx_buf + prev_size_uart_state, size - prev_size_uart_state, NULL);
-        prev_size_uart_state = size;
+        xStreamBufferSendFromISR(g_state_rx_sb_handle, state_uart_rx_buf + prev_size_uart_state, size - prev_size_uart_state, NULL);
+        if (size == MAX_PACKET_SIZE_STATE) {
+            prev_size_uart_state = 0;
+        } else {
+            prev_size_uart_state = size;
+        }
     }
-}*/
+}
+*/

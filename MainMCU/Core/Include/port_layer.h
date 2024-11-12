@@ -18,9 +18,6 @@
 
 #include "tests.h"
 
-#define UART2_RX_BUFFER_SIZE 16
-#define UART3_RX_BUFFER_SIZE 256
-
 int port_init(void);
 void port_start(void);
 

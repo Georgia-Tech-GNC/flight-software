@@ -53,18 +53,24 @@ SPI_HandleTypeDef hspi1;
 UART_HandleTypeDef huart4;
 UART_HandleTypeDef huart5;
 UART_HandleTypeDef huart2;
+DMA_HandleTypeDef hdma_uart4_tx;
 
 /* USER CODE BEGIN PV */
 uint8_t messages_recieved = 0;
 uint8_t message_buffer[MESSAGE_MAX_SIZE];
 uint16_t message_buffer_size = 0;
 uint8_t rx_buffer[MESSAGE_MAX_SIZE];
+uint8_t ack_packet_buffer[MESSAGE_MAX_SIZE];
+uint16_t ack_packet_size = 0;
 uint16_t prev_size = 0;
+uint16_t n_bytes_received = 0;
+uint16_t n_times_recieved = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_UART4_Init(void);
 static void MX_UART5_Init(void);
@@ -83,6 +89,7 @@ static void MX_OCTOSPI1_Init(void);
   * @brief  The application entry point.
   * @retval int
   */
+
 int main(void)
 {
 
@@ -108,6 +115,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_SPI1_Init();
   MX_UART4_Init();
   MX_UART5_Init();
@@ -115,10 +123,37 @@ int main(void)
   MX_FATFS_Init();
   MX_OCTOSPI1_Init();
   /* USER CODE BEGIN 2 */
-  //port_init();  HAL_UART_Receive_IT(&telemetry_uart, rx_buffer, MESSAGE_MAX_SIZE);
+  if (port_init()) {
+    HAL_UART_Transmit(&debug_uart, "Port init success\r\n", 19, HAL_MAX_DELAY);
+  } else {
+    HAL_UART_Transmit(&debug_uart, "Port init failed\r\n", 18, HAL_MAX_DELAY);
+  }
+  port_start();
+  //HAL_UARTEx_ReceiveToIdle_IT(&huart4, rx_buffer, MESSAGE_MAX_SIZE);
 
-  //port_start();
-  HAL_UARTEx_ReceiveToIdle_IT(&huart4, rx_buffer, MESSAGE_MAX_SIZE);
+  /*
+  struct RocketStateVector state = {
+    .velocity_x = 1.0,
+    .velocity_y = 2.0,
+    .velocity_z = 3.0,
+    .attitude_w = 4.0,
+    .attitude_x = 5.0,
+    .attitude_y = 6.0,
+    .attitude_z = 7.0,
+    .position_x = 8.0,
+    .position_y = 9.0,
+    .position_z = 10.0,
+    .timestamp = 12345
+  };
+
+  uint8_t encoded[48];
+  RocketStateVector_encode(&state, encoded);
+
+  uint8_t packetized[48+5];
+  generate_packet(encoded, 48, packetized, ROCKETSTATEVECTOR_MSG_ID);
+
+  HAL_UART_Transmit_IT(&huart4, packetized, 48+5);
+  */
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -128,12 +163,17 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    /*
-    char buf[20];
-    sprintf(buf, "Received: %d\r\n", messages_recieved);
+    
+    char buf[40];
+    sprintf(buf, "Received: %d %d %d\r\n", n_bytes_received, n_times_recieved, messages_recieved);
     HAL_UART_Transmit(&debug_uart, buf, strlen(buf), HAL_MAX_DELAY);
-    HAL_Delay(1000);
-    */
+    HAL_Delay(100);
+
+    if (ack_packet_size != 0) {
+      HAL_UART_Transmit_IT(&huart4, ack_packet_buffer, ack_packet_size);
+      ack_packet_size = 0;
+    }
+    
   }
   /* USER CODE END 3 */
 }
@@ -310,7 +350,7 @@ static void MX_UART4_Init(void)
 
   /* USER CODE END UART4_Init 1 */
   huart4.Instance = UART4;
-  huart4.Init.BaudRate = 9600;
+  huart4.Init.BaudRate = 38400;
   huart4.Init.WordLength = UART_WORDLENGTH_8B;
   huart4.Init.StopBits = UART_STOPBITS_1;
   huart4.Init.Parity = UART_PARITY_NONE;
@@ -358,7 +398,7 @@ static void MX_UART5_Init(void)
 
   /* USER CODE END UART5_Init 1 */
   huart5.Instance = UART5;
-  huart5.Init.BaudRate = 9600;
+  huart5.Init.BaudRate = 115200;
   huart5.Init.WordLength = UART_WORDLENGTH_8B;
   huart5.Init.StopBits = UART_STOPBITS_1;
   huart5.Init.Parity = UART_PARITY_NONE;
@@ -406,7 +446,7 @@ static void MX_USART2_UART_Init(void)
 
   /* USER CODE END USART2_Init 1 */
   huart2.Instance = USART2;
-  huart2.Init.BaudRate = 9600;
+  huart2.Init.BaudRate = 115200;
   huart2.Init.WordLength = UART_WORDLENGTH_8B;
   huart2.Init.StopBits = UART_STOPBITS_1;
   huart2.Init.Parity = UART_PARITY_NONE;
@@ -435,6 +475,22 @@ static void MX_USART2_UART_Init(void)
   /* USER CODE BEGIN USART2_Init 2 */
 
   /* USER CODE END USART2_Init 2 */
+
+}
+
+/**
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void)
+{
+
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA1_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA1_Stream0_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Stream0_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Stream0_IRQn);
 
 }
 
@@ -477,21 +533,40 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
   //HAL_UART_Transmit(&debug_uart, "Received bytes\r\n", 16, HAL_MAX_DELAY);
 }
 
+/*
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
-  HAL_UART_Transmit(&huart2, "Received bytes\r\n", 16, HAL_MAX_DELAY);
+  //char buf2[100];
+  //sprintf(buf2, "Current size: %d, Prev size: %d\r\n", size, prev_size);
 
-  for (int i = prev_size; i < size; i ++){
-    uint16_t next_buffer_size = process_incoming_byte(rx_buffer[i], message_buffer, message_buffer_size);
+  //HAL_UART_Transmit(&debug_uart, buf2, strlen(buf2), HAL_MAX_DELAY);
+
+  n_times_recieved ++;
+  n_bytes_received += size;
+  
+  for (int i = 0; i < size; i ++) {
+    char msg[100];
+
+    int16_t next_buffer_size = process_incoming_byte(rx_buffer[i], message_buffer, message_buffer_size);
+
+    sprintf(msg, "Next buf size: %d, Cur buf size: %d\r\n", next_buffer_size, message_buffer_size);
+    HAL_UART_Transmit(&debug_uart, msg, strlen(msg), HAL_MAX_DELAY);
 
     if (next_buffer_size < 0) {
+
       message_buffer_size = 0;
 
       if (verify_packet(message_buffer, -next_buffer_size)) {
         uint8_t command_id = is_command_packet(message_buffer, -next_buffer_size);
-        char buf[20];
-        sprintf(buf, "Command: %d\r\n", command_id);
+
+        uint8_t rawData[2];
+        rawData[0] = command_id; // command id
+        rawData[1] = get_command_uuid(message_buffer); // command uuid
+        generate_packet(rawData, 2, ack_packet_buffer, COMMAND_ACK_MSG_ID);
+        // reformat_as_command_ack_packet(message_buffer);
+        // memcpy(ack_packet_buffer, message_buffer, -next_buffer_size);
+        ack_packet_size = -next_buffer_size;
+
         messages_recieved ++;
-        HAL_UART_Transmit(&debug_uart, buf, strlen(buf), HAL_MAX_DELAY);
       }
     } else if (next_buffer_size < MESSAGE_MAX_SIZE) {
       //avoid buffer overflow
@@ -501,14 +576,9 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
     }
   }
 
-  if (size == MESSAGE_MAX_SIZE) {
-    prev_size = 0;
-  } else {
-    prev_size = size;
-  }
-
   HAL_UARTEx_ReceiveToIdle_IT(&huart4, rx_buffer, MESSAGE_MAX_SIZE);
 }
+*/
 
 /* USER CODE END 4 */
 

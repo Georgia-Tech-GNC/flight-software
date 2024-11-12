@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccsHQGUa.s 			page 1
+ARM GAS  /tmp/ccjQP8PK.s 			page 1
 
 
    1              		.cpu cortex-m7
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
   50      49440D0A 
   50      00
   51 000d 000000   		.align	2
-ARM GAS  /tmp/ccsHQGUa.s 			page 2
+ARM GAS  /tmp/ccjQP8PK.s 			page 2
 
 
   52              	.LC1:
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
   94 000c FFF7FEFF 		bl	memset
   95              	.LVL5:
    9:../Core/Src/w25q_impl.c **** 
-ARM GAS  /tmp/ccsHQGUa.s 			page 3
+ARM GAS  /tmp/ccjQP8PK.s 			page 3
 
 
   10:../Core/Src/w25q_impl.c ****   cmd.OperationType = HAL_OSPI_OPTYPE_COMMON_CFG;
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
   31:../Core/Src/w25q_impl.c **** 
   32:../Core/Src/w25q_impl.c ****     HAL_UART_Transmit(&debug_uart, "Reading ID\r\n", 12, HAL_MAX_DELAY);
  129              		.loc 1 32 5 view .LVU32
-ARM GAS  /tmp/ccsHQGUa.s 			page 4
+ARM GAS  /tmp/ccjQP8PK.s 			page 4
 
 
  130 002c 4FF0FF33 		mov	r3, #-1
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  168              	.LVL11:
   49:../Core/Src/w25q_impl.c **** 
   50:../Core/Src/w25q_impl.c ****     HAL_UART_Transmit(&debug_uart, "ID read\r\n", 9, HAL_MAX_DELAY);
-ARM GAS  /tmp/ccsHQGUa.s 			page 5
+ARM GAS  /tmp/ccjQP8PK.s 			page 5
 
 
  169              		.loc 1 50 5 view .LVU42
@@ -298,7 +298,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  212              		.loc 1 45 12 is_stmt 0 view .LVU51
  213 00a0 0424     		movs	r4, #4
  214 00a2 EAE7     		b	.L5
-ARM GAS  /tmp/ccsHQGUa.s 			page 6
+ARM GAS  /tmp/ccjQP8PK.s 			page 6
 
 
  215              	.L11:
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
   61:../Core/Src/w25q_impl.c ****   cmd.Instruction = enable ? W25Q_WRITE_ENABLE : W25Q_WRITE_DISABLE;
  265              		.loc 1 61 3 view .LVU59
  266              		.loc 1 61 48 is_stmt 0 view .LVU60
-ARM GAS  /tmp/ccsHQGUa.s 			page 7
+ARM GAS  /tmp/ccjQP8PK.s 			page 7
 
 
  267 0010 DCB1     		cbz	r4, .L15
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
   81:../Core/Src/w25q_impl.c ****       HAL_OK) {
   82:../Core/Src/w25q_impl.c ****     return W25Q_ERR_SPI;
   83:../Core/Src/w25q_impl.c ****   }
-ARM GAS  /tmp/ccsHQGUa.s 			page 8
+ARM GAS  /tmp/ccjQP8PK.s 			page 8
 
 
   84:../Core/Src/w25q_impl.c **** 
@@ -478,7 +478,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  349              	.LVL25:
  350              	.LFB151:
   91:../Core/Src/w25q_impl.c **** 
-ARM GAS  /tmp/ccsHQGUa.s 			page 9
+ARM GAS  /tmp/ccjQP8PK.s 			page 9
 
 
   92:../Core/Src/w25q_impl.c **** enum w25q_err w25q_enter_4_byte_mode(struct w25q_device *device, bool enable) {
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  393 0020 0293     		str	r3, [sp, #8]
  101:../Core/Src/w25q_impl.c ****   cmd.InstructionMode = HAL_OSPI_INSTRUCTION_1_LINE;
  394              		.loc 1 101 3 is_stmt 1 discriminator 4 view .LVU97
-ARM GAS  /tmp/ccsHQGUa.s 			page 10
+ARM GAS  /tmp/ccjQP8PK.s 			page 10
 
 
  395              		.loc 1 101 23 is_stmt 0 discriminator 4 view .LVU98
@@ -598,7 +598,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  426 0042 0748     		ldr	r0, .L27
  427 0044 FFF7FEFF 		bl	HAL_GPIO_WritePin
  428              	.LVL31:
-ARM GAS  /tmp/ccsHQGUa.s 			page 11
+ARM GAS  /tmp/ccjQP8PK.s 			page 11
 
 
  125:../Core/Src/w25q_impl.c **** 
@@ -658,7 +658,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  132:../Core/Src/w25q_impl.c ****                                    uint8_t *reg_data, uint8_t reg_num) {
  476              		.loc 1 132 72 is_stmt 1 view -0
  477              		.cfi_startproc
-ARM GAS  /tmp/ccsHQGUa.s 			page 12
+ARM GAS  /tmp/ccjQP8PK.s 			page 12
 
 
  478              		@ args = 0, pretend = 0, frame = 80
@@ -718,7 +718,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  522 0022 01E0     		b	.L31
  523              	.L38:
  138:../Core/Src/w25q_impl.c ****     cmd.Instruction = W25Q_READ_SR1;
-ARM GAS  /tmp/ccsHQGUa.s 			page 13
+ARM GAS  /tmp/ccjQP8PK.s 			page 13
 
 
  524              		.loc 1 138 5 is_stmt 1 view .LVU136
@@ -778,7 +778,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  554              		.loc 1 165 3 view .LVU153
  555              		.loc 1 165 7 is_stmt 0 view .LVU154
  556 003e 41F28832 		movw	r2, #5000
-ARM GAS  /tmp/ccsHQGUa.s 			page 14
+ARM GAS  /tmp/ccjQP8PK.s 			page 14
 
 
  557 0042 6946     		mov	r1, sp
@@ -838,7 +838,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  595 006c 3523     		movs	r3, #53
  596 006e 0293     		str	r3, [sp, #8]
  597 0070 DAE7     		b	.L31
-ARM GAS  /tmp/ccsHQGUa.s 			page 15
+ARM GAS  /tmp/ccjQP8PK.s 			page 15
 
 
  598              	.L34:
@@ -898,7 +898,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  647              	.LVL46:
  648              	.L43:
  184:../Core/Src/w25q_impl.c ****     ;
-ARM GAS  /tmp/ccsHQGUa.s 			page 16
+ARM GAS  /tmp/ccjQP8PK.s 			page 16
 
 
  649              		.loc 1 184 5 discriminator 1 view .LVU170
@@ -958,7 +958,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  687 0032 29D0     		beq	.L53
  198:../Core/Src/w25q_impl.c ****     cmd.Instruction = W25Q_WRITE_SR2;
  199:../Core/Src/w25q_impl.c ****   } else if (reg_num == 3) {
-ARM GAS  /tmp/ccsHQGUa.s 			page 17
+ARM GAS  /tmp/ccjQP8PK.s 			page 17
 
 
  688              		.loc 1 199 10 is_stmt 1 view .LVU187
@@ -1018,7 +1018,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  219:../Core/Src/w25q_impl.c ****   cmd.SIOOMode = HAL_OSPI_SIOO_INST_EVERY_CMD;
  721              		.loc 1 219 3 view .LVU206
  220:../Core/Src/w25q_impl.c **** 
-ARM GAS  /tmp/ccsHQGUa.s 			page 18
+ARM GAS  /tmp/ccjQP8PK.s 			page 18
 
 
  221:../Core/Src/w25q_impl.c ****   HAL_GPIO_WritePin(FLASH_CS_GPIO_PORT, FLASH_CS_PIN, GPIO_PIN_RESET);
@@ -1078,7 +1078,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  760              		.cfi_def_cfa_offset 12
  761              		@ sp needed
  762 0086 30BD     		pop	{r4, r5, pc}
-ARM GAS  /tmp/ccsHQGUa.s 			page 19
+ARM GAS  /tmp/ccjQP8PK.s 			page 19
 
 
  763              	.L53:
@@ -1138,7 +1138,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  249:../Core/Src/w25q_impl.c **** //
  250:../Core/Src/w25q_impl.c **** // #if W25Q_MEM_FLASH_SIZE > 128U
  251:../Core/Src/w25q_impl.c **** //
-ARM GAS  /tmp/ccsHQGUa.s 			page 20
+ARM GAS  /tmp/ccjQP8PK.s 			page 20
 
 
  252:../Core/Src/w25q_impl.c **** //   cmd.Instruction = W25Q_READ_DATA_4B;
@@ -1198,7 +1198,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  811              		.cfi_offset 5, -16
  812              		.cfi_offset 6, -12
  813              		.cfi_offset 7, -8
-ARM GAS  /tmp/ccsHQGUa.s 			page 21
+ARM GAS  /tmp/ccjQP8PK.s 			page 21
 
 
  814              		.cfi_offset 14, -4
@@ -1258,7 +1258,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  314:../Core/Src/w25q_impl.c **** 
  315:../Core/Src/w25q_impl.c ****   cmd.Instruction = W25Q_FAST_READ_QUAD_IO;
  848              		.loc 1 315 3 view .LVU234
-ARM GAS  /tmp/ccsHQGUa.s 			page 22
+ARM GAS  /tmp/ccjQP8PK.s 			page 22
 
 
  849              		.loc 1 315 19 is_stmt 0 view .LVU235
@@ -1318,7 +1318,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  883              		.loc 1 335 3 is_stmt 1 view .LVU255
  336:../Core/Src/w25q_impl.c ****   cmd.SIOOMode = HAL_OSPI_SIOO_INST_EVERY_CMD;
  884              		.loc 1 336 3 view .LVU256
-ARM GAS  /tmp/ccsHQGUa.s 			page 23
+ARM GAS  /tmp/ccjQP8PK.s 			page 23
 
 
  337:../Core/Src/w25q_impl.c **** 
@@ -1378,7 +1378,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  922 007c 15B0     		add	sp, sp, #84
  923              	.LCFI23:
  924              		.cfi_remember_state
-ARM GAS  /tmp/ccsHQGUa.s 			page 24
+ARM GAS  /tmp/ccjQP8PK.s 			page 24
 
 
  925              		.cfi_def_cfa_offset 20
@@ -1438,7 +1438,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  366:../Core/Src/w25q_impl.c **** //   }
  367:../Core/Src/w25q_impl.c **** //
  368:../Core/Src/w25q_impl.c **** //   OSPI_RegularCmdTypeDef cmd = {0};
-ARM GAS  /tmp/ccsHQGUa.s 			page 25
+ARM GAS  /tmp/ccjQP8PK.s 			page 25
 
 
  369:../Core/Src/w25q_impl.c **** //
@@ -1498,7 +1498,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  971              	.LCFI25:
  972              		.cfi_def_cfa_offset 20
  973              		.cfi_offset 4, -20
-ARM GAS  /tmp/ccsHQGUa.s 			page 26
+ARM GAS  /tmp/ccjQP8PK.s 			page 26
 
 
  974              		.cfi_offset 5, -16
@@ -1558,7 +1558,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  1016              	.L66:
  426:../Core/Src/w25q_impl.c ****     return err;
  427:../Core/Src/w25q_impl.c ****   }
-ARM GAS  /tmp/ccsHQGUa.s 			page 27
+ARM GAS  /tmp/ccjQP8PK.s 			page 27
 
 
  428:../Core/Src/w25q_impl.c **** 
@@ -1618,7 +1618,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  1020              	.LCFI27:
  1021              		.cfi_remember_state
  1022              		.cfi_def_cfa_offset 20
-ARM GAS  /tmp/ccsHQGUa.s 			page 28
+ARM GAS  /tmp/ccjQP8PK.s 			page 28
 
 
  1023              		@ sp needed
@@ -1678,7 +1678,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  1060              		.loc 1 451 3 is_stmt 1 view .LVU303
  453:../Core/Src/w25q_impl.c **** 
  1061              		.loc 1 453 3 view .LVU304
-ARM GAS  /tmp/ccsHQGUa.s 			page 29
+ARM GAS  /tmp/ccjQP8PK.s 			page 29
 
 
  455:../Core/Src/w25q_impl.c ****   cmd.DataDtrMode = HAL_OSPI_DATA_DTR_DISABLE;
@@ -1738,7 +1738,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  1100 0080 4021     		movs	r1, #64
  1101 0082 0548     		ldr	r0, .L73
  1102 0084 FFF7FEFF 		bl	HAL_GPIO_WritePin
-ARM GAS  /tmp/ccsHQGUa.s 			page 30
+ARM GAS  /tmp/ccjQP8PK.s 			page 30
 
 
  1103              	.LVL82:
@@ -1798,7 +1798,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  1151              		.cfi_offset 14, -4
  1152 0002 94B0     		sub	sp, sp, #80
  1153              	.LCFI30:
-ARM GAS  /tmp/ccsHQGUa.s 			page 31
+ARM GAS  /tmp/ccjQP8PK.s 			page 31
 
 
  1154              		.cfi_def_cfa_offset 96
@@ -1858,7 +1858,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  503:../Core/Src/w25q_impl.c **** #else
  504:../Core/Src/w25q_impl.c **** 
  505:../Core/Src/w25q_impl.c ****   cmd.Instruction = W25Q_SECTOR_ERASE;
-ARM GAS  /tmp/ccsHQGUa.s 			page 32
+ARM GAS  /tmp/ccjQP8PK.s 			page 32
 
 
  506:../Core/Src/w25q_impl.c ****   cmd.AddressSize = HAL_OSPI_ADDRESS_24_BITS;
@@ -1918,7 +1918,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  1201              	.LVL91:
  494:../Core/Src/w25q_impl.c **** 
  1202              		.loc 1 494 26 view .LVU341
-ARM GAS  /tmp/ccsHQGUa.s 			page 33
+ARM GAS  /tmp/ccjQP8PK.s 			page 33
 
 
  1203 0030 FFF7FEFF 		bl	memset
@@ -1978,7 +1978,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  1236              		.loc 1 525 3 view .LVU362
  527:../Core/Src/w25q_impl.c **** 
  1237              		.loc 1 527 3 view .LVU363
-ARM GAS  /tmp/ccsHQGUa.s 			page 34
+ARM GAS  /tmp/ccjQP8PK.s 			page 34
 
 
  1238 004c 0022     		movs	r2, #0
@@ -2038,7 +2038,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  1281              	.L84:
  1282              		.align	2
  1283              	.L83:
-ARM GAS  /tmp/ccsHQGUa.s 			page 35
+ARM GAS  /tmp/ccjQP8PK.s 			page 35
 
 
  1284 0084 00180258 		.word	1476532224
@@ -2098,7 +2098,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  1332 001c 98BF     		it	ls
  1333 001e 0023     		movls	r3, #0
  1334              		.loc 1 548 6 view .LVU381
-ARM GAS  /tmp/ccsHQGUa.s 			page 36
+ARM GAS  /tmp/ccjQP8PK.s 			page 36
 
 
  1335 0020 002B     		cmp	r3, #0
@@ -2158,7 +2158,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  1371 0048 2046     		mov	r0, r4
  1372 004a FFF7FEFF 		bl	w25q_write_enable
  1373              	.LVL104:
-ARM GAS  /tmp/ccsHQGUa.s 			page 37
+ARM GAS  /tmp/ccjQP8PK.s 			page 37
 
 
  563:../Core/Src/w25q_impl.c ****   if (err != W25Q_ERR_OK) {
@@ -2218,7 +2218,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  594:../Core/Src/w25q_impl.c ****     cmd.AddressSize = HAL_OSPI_ADDRESS_24_BITS;
  595:../Core/Src/w25q_impl.c **** 
  596:../Core/Src/w25q_impl.c **** #endif
-ARM GAS  /tmp/ccsHQGUa.s 			page 38
+ARM GAS  /tmp/ccjQP8PK.s 			page 38
 
 
  597:../Core/Src/w25q_impl.c ****   }
@@ -2278,7 +2278,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  1429              	.LVL108:
  1430              		.loc 1 618 6 view .LVU422
  1431 0086 0746     		mov	r7, r0
-ARM GAS  /tmp/ccsHQGUa.s 			page 39
+ARM GAS  /tmp/ccjQP8PK.s 			page 39
 
 
  1432 0088 00BB     		cbnz	r0, .L95
@@ -2338,7 +2338,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  1467              		.loc 1 559 14 view .LVU432
  1468 00a6 CEE7     		b	.L88
  1469              	.L98:
-ARM GAS  /tmp/ccsHQGUa.s 			page 40
+ARM GAS  /tmp/ccjQP8PK.s 			page 40
 
 
  572:../Core/Src/w25q_impl.c **** 
@@ -2398,7 +2398,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  1514              		.section	.text.w25q_erase_chip,"ax",%progbits
  1515              		.align	1
  1516              		.global	w25q_erase_chip
-ARM GAS  /tmp/ccsHQGUa.s 			page 41
+ARM GAS  /tmp/ccjQP8PK.s 			page 41
 
 
  1517              		.syntax unified
@@ -2458,7 +2458,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  1562              	.LVL119:
  1563              	.L104:
  639:../Core/Src/w25q_impl.c ****     return err;
-ARM GAS  /tmp/ccsHQGUa.s 			page 42
+ARM GAS  /tmp/ccjQP8PK.s 			page 42
 
 
  640:../Core/Src/w25q_impl.c ****   }
@@ -2518,7 +2518,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  1578 0022 5022     		movs	r2, #80
  1579 0024 0021     		movs	r1, #0
  1580 0026 6846     		mov	r0, sp
-ARM GAS  /tmp/ccsHQGUa.s 			page 43
+ARM GAS  /tmp/ccjQP8PK.s 			page 43
 
 
  1581              	.LVL121:
@@ -2578,7 +2578,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  1616              	.LVL124:
  665:../Core/Src/w25q_impl.c ****       HAL_OK) {
  1617              		.loc 1 665 6 view .LVU477
-ARM GAS  /tmp/ccsHQGUa.s 			page 44
+ARM GAS  /tmp/ccjQP8PK.s 			page 44
 
 
  1618 004a 0546     		mov	r5, r0
@@ -2638,7 +2638,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  1664              		@ args = 0, pretend = 0, frame = 80
  1665              		@ frame_needed = 0, uses_anonymous_args = 0
  1666              		.loc 1 679 54 is_stmt 0 view .LVU487
-ARM GAS  /tmp/ccsHQGUa.s 			page 45
+ARM GAS  /tmp/ccjQP8PK.s 			page 45
 
 
  1667 0000 30B5     		push	{r4, r5, lr}
@@ -2698,7 +2698,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  693:../Core/Src/w25q_impl.c **** 
  694:../Core/Src/w25q_impl.c ****   // if (device->status.SUS) {
  695:../Core/Src/w25q_impl.c ****   //   w25q_write_resume();
-ARM GAS  /tmp/ccsHQGUa.s 			page 46
+ARM GAS  /tmp/ccjQP8PK.s 			page 46
 
 
  696:../Core/Src/w25q_impl.c ****   // }
@@ -2758,7 +2758,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  1735 003e FFF7FEFF 		bl	HAL_GPIO_WritePin
  1736              	.LVL132:
  720:../Core/Src/w25q_impl.c **** 
-ARM GAS  /tmp/ccsHQGUa.s 			page 47
+ARM GAS  /tmp/ccjQP8PK.s 			page 47
 
 
  721:../Core/Src/w25q_impl.c ****   if (HAL_OSPI_Command(&flash_spi, &cmd, HAL_OSPI_TIMEOUT_DEFAULT_VALUE) !=
@@ -2818,7 +2818,7 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  739:../Core/Src/w25q_impl.c ****   return err;
  1773              		.loc 1 739 3 view .LVU529
  1774              	.L112:
-ARM GAS  /tmp/ccsHQGUa.s 			page 48
+ARM GAS  /tmp/ccjQP8PK.s 			page 48
 
 
  740:../Core/Src/w25q_impl.c **** }...
@@ -2867,50 +2867,51 @@ ARM GAS  /tmp/ccsHQGUa.s 			page 1
  1815              		.file 8 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_ospi.h"
  1816              		.file 9 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h"
  1817              		.file 10 "../Core/Include/w25q.h"
- 1818              		.file 11 "../Core/Include/globals.h"
- 1819              		.file 12 "../Core/FreeRTOS-Kernel/include/task.h"
- 1820              		.file 13 "<built-in>"
-ARM GAS  /tmp/ccsHQGUa.s 			page 49
+ 1818              		.file 11 "../Core/Include/FreeRTOSConfig.h"
+ 1819              		.file 12 "../Core/Include/globals.h"
+ 1820              		.file 13 "../Core/FreeRTOS-Kernel/include/task.h"
+ 1821              		.file 14 "<built-in>"
+ARM GAS  /tmp/ccjQP8PK.s 			page 49
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 w25q_impl.c
-     /tmp/ccsHQGUa.s:17     .text.w25q_delay:0000000000000000 $t
-     /tmp/ccsHQGUa.s:25     .text.w25q_delay:0000000000000000 w25q_delay
-     /tmp/ccsHQGUa.s:48     .rodata.w25q_read_id.str1.4:0000000000000000 $d
-     /tmp/ccsHQGUa.s:61     .text.w25q_read_id:0000000000000000 $t
-     /tmp/ccsHQGUa.s:68     .text.w25q_read_id:0000000000000000 w25q_read_id
-     /tmp/ccsHQGUa.s:218    .text.w25q_read_id:00000000000000a4 $d
-     /tmp/ccsHQGUa.s:229    .text.w25q_write_enable:0000000000000000 $t
-     /tmp/ccsHQGUa.s:236    .text.w25q_write_enable:0000000000000000 w25q_write_enable
-     /tmp/ccsHQGUa.s:335    .text.w25q_write_enable:0000000000000054 $d
-     /tmp/ccsHQGUa.s:341    .text.w25q_enter_4_byte_mode:0000000000000000 $t
-     /tmp/ccsHQGUa.s:348    .text.w25q_enter_4_byte_mode:0000000000000000 w25q_enter_4_byte_mode
-     /tmp/ccsHQGUa.s:460    .text.w25q_enter_4_byte_mode:0000000000000060 $d
-     /tmp/ccsHQGUa.s:466    .text.w25q_read_status_reg:0000000000000000 $t
-     /tmp/ccsHQGUa.s:473    .text.w25q_read_status_reg:0000000000000000 w25q_read_status_reg
-     /tmp/ccsHQGUa.s:613    .text.w25q_read_status_reg:0000000000000080 $d
-     /tmp/ccsHQGUa.s:619    .text.w25q_write_status_reg:0000000000000000 $t
-     /tmp/ccsHQGUa.s:626    .text.w25q_write_status_reg:0000000000000000 w25q_write_status_reg
-     /tmp/ccsHQGUa.s:786    .text.w25q_write_status_reg:000000000000009c $d
-     /tmp/ccsHQGUa.s:792    .text.w25q_read_raw:0000000000000000 $t
-     /tmp/ccsHQGUa.s:799    .text.w25q_read_raw:0000000000000000 w25q_read_raw
-     /tmp/ccsHQGUa.s:949    .text.w25q_read_raw:000000000000008c $d
-     /tmp/ccsHQGUa.s:955    .text.w25q_write_raw:0000000000000000 $t
-     /tmp/ccsHQGUa.s:962    .text.w25q_write_raw:0000000000000000 w25q_write_raw
-     /tmp/ccsHQGUa.s:1124   .text.w25q_write_raw:0000000000000098 $d
-     /tmp/ccsHQGUa.s:1130   .text.w25q_erase_sector:0000000000000000 $t
-     /tmp/ccsHQGUa.s:1137   .text.w25q_erase_sector:0000000000000000 w25q_erase_sector
-     /tmp/ccsHQGUa.s:1284   .text.w25q_erase_sector:0000000000000084 $d
-     /tmp/ccsHQGUa.s:1290   .text.w25q_erase_block:0000000000000000 $t
-     /tmp/ccsHQGUa.s:1297   .text.w25q_erase_block:0000000000000000 w25q_erase_block
-     /tmp/ccsHQGUa.s:1509   .text.w25q_erase_block:00000000000000d0 $d
-     /tmp/ccsHQGUa.s:1515   .text.w25q_erase_chip:0000000000000000 $t
-     /tmp/ccsHQGUa.s:1522   .text.w25q_erase_chip:0000000000000000 w25q_erase_chip
-     /tmp/ccsHQGUa.s:1646   .text.w25q_erase_chip:0000000000000068 $d
-     /tmp/ccsHQGUa.s:1652   .text.w25q_reset:0000000000000000 $t
-     /tmp/ccsHQGUa.s:1659   .text.w25q_reset:0000000000000000 w25q_reset
-     /tmp/ccsHQGUa.s:1802   .text.w25q_reset:000000000000008c $d
+     /tmp/ccjQP8PK.s:17     .text.w25q_delay:0000000000000000 $t
+     /tmp/ccjQP8PK.s:25     .text.w25q_delay:0000000000000000 w25q_delay
+     /tmp/ccjQP8PK.s:48     .rodata.w25q_read_id.str1.4:0000000000000000 $d
+     /tmp/ccjQP8PK.s:61     .text.w25q_read_id:0000000000000000 $t
+     /tmp/ccjQP8PK.s:68     .text.w25q_read_id:0000000000000000 w25q_read_id
+     /tmp/ccjQP8PK.s:218    .text.w25q_read_id:00000000000000a4 $d
+     /tmp/ccjQP8PK.s:229    .text.w25q_write_enable:0000000000000000 $t
+     /tmp/ccjQP8PK.s:236    .text.w25q_write_enable:0000000000000000 w25q_write_enable
+     /tmp/ccjQP8PK.s:335    .text.w25q_write_enable:0000000000000054 $d
+     /tmp/ccjQP8PK.s:341    .text.w25q_enter_4_byte_mode:0000000000000000 $t
+     /tmp/ccjQP8PK.s:348    .text.w25q_enter_4_byte_mode:0000000000000000 w25q_enter_4_byte_mode
+     /tmp/ccjQP8PK.s:460    .text.w25q_enter_4_byte_mode:0000000000000060 $d
+     /tmp/ccjQP8PK.s:466    .text.w25q_read_status_reg:0000000000000000 $t
+     /tmp/ccjQP8PK.s:473    .text.w25q_read_status_reg:0000000000000000 w25q_read_status_reg
+     /tmp/ccjQP8PK.s:613    .text.w25q_read_status_reg:0000000000000080 $d
+     /tmp/ccjQP8PK.s:619    .text.w25q_write_status_reg:0000000000000000 $t
+     /tmp/ccjQP8PK.s:626    .text.w25q_write_status_reg:0000000000000000 w25q_write_status_reg
+     /tmp/ccjQP8PK.s:786    .text.w25q_write_status_reg:000000000000009c $d
+     /tmp/ccjQP8PK.s:792    .text.w25q_read_raw:0000000000000000 $t
+     /tmp/ccjQP8PK.s:799    .text.w25q_read_raw:0000000000000000 w25q_read_raw
+     /tmp/ccjQP8PK.s:949    .text.w25q_read_raw:000000000000008c $d
+     /tmp/ccjQP8PK.s:955    .text.w25q_write_raw:0000000000000000 $t
+     /tmp/ccjQP8PK.s:962    .text.w25q_write_raw:0000000000000000 w25q_write_raw
+     /tmp/ccjQP8PK.s:1124   .text.w25q_write_raw:0000000000000098 $d
+     /tmp/ccjQP8PK.s:1130   .text.w25q_erase_sector:0000000000000000 $t
+     /tmp/ccjQP8PK.s:1137   .text.w25q_erase_sector:0000000000000000 w25q_erase_sector
+     /tmp/ccjQP8PK.s:1284   .text.w25q_erase_sector:0000000000000084 $d
+     /tmp/ccjQP8PK.s:1290   .text.w25q_erase_block:0000000000000000 $t
+     /tmp/ccjQP8PK.s:1297   .text.w25q_erase_block:0000000000000000 w25q_erase_block
+     /tmp/ccjQP8PK.s:1509   .text.w25q_erase_block:00000000000000d0 $d
+     /tmp/ccjQP8PK.s:1515   .text.w25q_erase_chip:0000000000000000 $t
+     /tmp/ccjQP8PK.s:1522   .text.w25q_erase_chip:0000000000000000 w25q_erase_chip
+     /tmp/ccjQP8PK.s:1646   .text.w25q_erase_chip:0000000000000068 $d
+     /tmp/ccjQP8PK.s:1652   .text.w25q_reset:0000000000000000 $t
+     /tmp/ccjQP8PK.s:1659   .text.w25q_reset:0000000000000000 w25q_reset
+     /tmp/ccjQP8PK.s:1802   .text.w25q_reset:000000000000008c $d
 
 UNDEFINED SYMBOLS
 vTaskDelay

@@ -1005,6 +1005,9 @@ static size_t prvWriteMessageToBuffer( StreamBuffer_t * const pxStreamBuffer,
                                        size_t xRequiredSpace )
 {
     size_t xNextHead = pxStreamBuffer->xHead;
+    char buf[100];
+    sprintf(buf, "xNextHead: %d\r\n", xNextHead);
+    HAL_UART_Transmit(&huart2, (uint8_t *)buf, strlen(buf), 1000);
     configMESSAGE_BUFFER_LENGTH_TYPE xMessageLength;
 
     if( ( pxStreamBuffer->ucFlags & sbFLAGS_IS_MESSAGE_BUFFER ) != ( uint8_t ) 0 )
@@ -1473,6 +1476,9 @@ BaseType_t xStreamBufferReceiveCompletedFromISR( StreamBufferHandle_t xStreamBuf
     return xReturn;
 }
 /*-----------------------------------------------------------*/
+
+#include "stm32h7xx_hal.h"
+#include "string.h"
 
 static size_t prvWriteBytesToBuffer( StreamBuffer_t * const pxStreamBuffer,
                                      const uint8_t * pucData,

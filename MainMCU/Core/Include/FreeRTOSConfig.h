@@ -131,6 +131,12 @@ to all Cortex-M ports, and do not rely on any particular library functions. */
 See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY 	( configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY << (8 - configPRIO_BITS) )
 
+//error handler
+
+#include "stm32h7xx_hal.h"
+extern UART_HandleTypeDef huart2;
+#define configASSERT( x ) if ((x) == 0) {HAL_UART_Transmit(&huart2, "Error\r\n", 8, HAL_MAX_DELAY); for( ;; );}
+
 #define vPortSVCHandler    SVC_Handler
 #define xPortPendSVHandler PendSV_Handler
 #define xPortSysTickHandler SysTick_Handler

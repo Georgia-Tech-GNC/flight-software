@@ -24,6 +24,8 @@
         "stm32h7xx_hal_conf.h": "c",
         "stm32h7xx_hal_pwr.h": "c",
         "stm32h7xx_hal_ospi.h": "c",
-        "stm32h7xx_hal_qspi.h": "c"
+        "stm32h7xx_hal_qspi.h": "c",
+        "protocol.h": "c",
+        "stream_buffer.h": "c"
     }
 }

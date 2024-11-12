@@ -18,11 +18,11 @@
 int is_command_packet(uint8_t* packet, size_t packet_size) {
 	if (packet_size != 7) return -1; // Incorrect size
 	if (packet[1] != COMMAND_MSG_ID) return -1; // Incorrect command id
-	return packet[4];
+	return packet[3];
 }
 
 int get_command_uuid(uint8_t* packet) {
-	return packet[5];
+	return packet[4];
 }
 
 void reformat_as_command_ack_packet(uint8_t* packet) {

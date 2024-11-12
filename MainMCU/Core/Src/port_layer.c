@@ -24,7 +24,7 @@ SemaphoreHandle_t g_state_mutex_handle;
 StaticSemaphore_t state_mutex_buff;
 
 StreamBufferHandle_t g_telemetry_rx_sb_handle;
-uint8_t telemetry_rx_sb_storage[16 + 1];
+uint8_t telemetry_rx_sb_storage[128 + 1];
 StaticStreamBuffer_t telemetry_rx_sb_buff;
 
 MessageBufferHandle_t g_telemetry_tx_mb_handle;
@@ -51,7 +51,7 @@ int port_init(void) {
     }
 
     /* Create stream/message buffers */
-    g_telemetry_rx_sb_handle = xStreamBufferCreateStatic(16 + 1, 1, telemetry_rx_sb_storage, &telemetry_rx_sb_buff);
+    g_telemetry_rx_sb_handle = xStreamBufferCreateStatic(128 + 1, 1, telemetry_rx_sb_storage, &telemetry_rx_sb_buff);
     if (g_telemetry_rx_sb_handle == NULL) return 0;
 
     g_telemetry_tx_mb_handle = xMessageBufferCreateStatic(TX_MESSAGE_BUFFER_SIZE + 1, telemetry_tx_mb_storage, &telemetry_tx_mb_buff);
@@ -79,13 +79,9 @@ int port_init(void) {
     if (g_test_task_handle == NULL) return 0;
 
     /* Begin listening over uart */
-    
     if (HAL_UARTEx_ReceiveToIdle_IT(&telemetry_uart, telemetry_uart_rx_buf, MAX_PACKET_SIZE_TELEMETRY) != HAL_OK) {
         return 0;
-    } else {
-        HAL_UART_Transmit_DMA(&telemetry_uart, "Init ok\r\n", 9);
     }
-    
 
     if (HAL_UARTEx_ReceiveToIdle_IT(&state_uart, state_uart_rx_buf, MAX_PACKET_SIZE_STATE) != HAL_OK) {
         return 0;
@@ -98,32 +94,17 @@ void port_start(void) {
     vTaskStartScheduler();
 }
 
-uint16_t prev_size_uart_telemetry = 0;
-uint16_t prev_size_uart_state = 0;
-/*
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
     if (huart->Instance == telemetry_uart.Instance) {
-        if (size < prev_size_uart_telemetry) {
-            prev_size_uart_telemetry = 0;
-        }
-
-        xStreamBufferSendFromISR(g_telemetry_rx_sb_handle, telemetry_uart_rx_buf + prev_size_uart_telemetry, size - prev_size_uart_telemetry, NULL);
-        if (size == MAX_PACKET_SIZE_TELEMETRY) {
-            prev_size_uart_telemetry = 0;
-        } else {
-            prev_size_uart_telemetry = size;
-        }
+        xStreamBufferSendFromISR(g_telemetry_rx_sb_handle, telemetry_uart_rx_buf, size, &xHigherPriorityTaskWoken);
+        HAL_UARTEx_ReceiveToIdle_IT(&telemetry_uart, telemetry_uart_rx_buf, MAX_PACKET_SIZE_TELEMETRY);
     } else if (huart->Instance == state_uart.Instance) {
-        if (size < prev_size_uart_state) {
-            prev_size_uart_state = 0;
-        }
-
-        xStreamBufferSendFromISR(g_state_rx_sb_handle, state_uart_rx_buf + prev_size_uart_state, size - prev_size_uart_state, NULL);
-        if (size == MAX_PACKET_SIZE_STATE) {
-            prev_size_uart_state = 0;
-        } else {
-            prev_size_uart_state = size;
-        }
+        xStreamBufferSendFromISR(g_state_rx_sb_handle, state_uart_rx_buf, size, &xHigherPriorityTaskWoken);
+        HAL_UARTEx_ReceiveToIdle_IT(&state_uart, state_uart_rx_buf, MAX_PACKET_SIZE_STATE);
     }
+
+    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
-*/
+

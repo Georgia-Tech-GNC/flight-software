@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccjoFYLO.s 			page 1
+ARM GAS  /tmp/ccDbw0BS.s 			page 1
 
 
    1              		.cpu cortex-m7
@@ -26,7 +26,7 @@ ARM GAS  /tmp/ccjoFYLO.s 			page 1
   23              		.fpu fpv5-d16
   25              	vListInitialise:
   26              	.LVL0:
-  27              	.LFB4:
+  27              	.LFB148:
   28              		.file 1 "../Core/FreeRTOS-Kernel/list.c"
    1:../Core/FreeRTOS-Kernel/list.c **** /*
    2:../Core/FreeRTOS-Kernel/list.c ****  * FreeRTOS Kernel V11.1.0
@@ -58,7 +58,7 @@ ARM GAS  /tmp/ccjoFYLO.s 			page 1
   28:../Core/FreeRTOS-Kernel/list.c **** 
   29:../Core/FreeRTOS-Kernel/list.c **** 
   30:../Core/FreeRTOS-Kernel/list.c **** #include <stdlib.h>
-ARM GAS  /tmp/ccjoFYLO.s 			page 2
+ARM GAS  /tmp/ccDbw0BS.s 			page 2
 
 
   31:../Core/FreeRTOS-Kernel/list.c **** 
@@ -118,7 +118,7 @@ ARM GAS  /tmp/ccjoFYLO.s 			page 1
   47 000c C360     		str	r3, [r0, #12]
   67:../Core/FreeRTOS-Kernel/list.c ****     pxList->xListEnd.pxPrevious = ( ListItem_t * ) &( pxList->xListEnd );
   48              		.loc 1 67 5 is_stmt 1 view .LVU10
-ARM GAS  /tmp/ccjoFYLO.s 			page 3
+ARM GAS  /tmp/ccDbw0BS.s 			page 3
 
 
   49              		.loc 1 67 33 is_stmt 0 view .LVU11
@@ -152,7 +152,7 @@ ARM GAS  /tmp/ccjoFYLO.s 			page 1
   58              		.loc 1 86 1 is_stmt 0 view .LVU17
   59 0014 7047     		bx	lr
   60              		.cfi_endproc
-  61              	.LFE4:
+  61              	.LFE148:
   63              		.section	.text.vListInitialiseItem,"ax",%progbits
   64              		.align	1
   65              		.global	vListInitialiseItem
@@ -162,7 +162,7 @@ ARM GAS  /tmp/ccjoFYLO.s 			page 1
   69              		.fpu fpv5-d16
   71              	vListInitialiseItem:
   72              	.LVL1:
-  73              	.LFB5:
+  73              	.LFB149:
   87:../Core/FreeRTOS-Kernel/list.c **** /*-----------------------------------------------------------*/
   88:../Core/FreeRTOS-Kernel/list.c **** 
   89:../Core/FreeRTOS-Kernel/list.c **** void vListInitialiseItem( ListItem_t * const pxItem )
@@ -178,7 +178,7 @@ ARM GAS  /tmp/ccjoFYLO.s 			page 1
   93:../Core/FreeRTOS-Kernel/list.c ****     /* Make sure the list item is not recorded as being on a list. */
   94:../Core/FreeRTOS-Kernel/list.c ****     pxItem->pxContainer = NULL;
   80              		.loc 1 94 5 view .LVU20
-ARM GAS  /tmp/ccjoFYLO.s 			page 4
+ARM GAS  /tmp/ccDbw0BS.s 			page 4
 
 
   81              		.loc 1 94 25 is_stmt 0 view .LVU21
@@ -198,7 +198,7 @@ ARM GAS  /tmp/ccjoFYLO.s 			page 1
   87              		.loc 1 102 1 is_stmt 0 view .LVU25
   88 0004 7047     		bx	lr
   89              		.cfi_endproc
-  90              	.LFE5:
+  90              	.LFE149:
   92              		.section	.text.vListInsertEnd,"ax",%progbits
   93              		.align	1
   94              		.global	vListInsertEnd
@@ -208,7 +208,7 @@ ARM GAS  /tmp/ccjoFYLO.s 			page 1
   98              		.fpu fpv5-d16
  100              	vListInsertEnd:
  101              	.LVL2:
- 102              	.LFB6:
+ 102              	.LFB150:
  103:../Core/FreeRTOS-Kernel/list.c **** /*-----------------------------------------------------------*/
  104:../Core/FreeRTOS-Kernel/list.c **** 
  105:../Core/FreeRTOS-Kernel/list.c **** void vListInsertEnd( List_t * const pxList,
@@ -238,7 +238,7 @@ ARM GAS  /tmp/ccjoFYLO.s 			page 1
  117:../Core/FreeRTOS-Kernel/list.c **** 
  118:../Core/FreeRTOS-Kernel/list.c ****     /* Insert a new list item into pxList, but rather than sort the list,
  119:../Core/FreeRTOS-Kernel/list.c ****      * makes the new list item the last item to be removed by a call to
-ARM GAS  /tmp/ccjoFYLO.s 			page 5
+ARM GAS  /tmp/ccDbw0BS.s 			page 5
 
 
  120:../Core/FreeRTOS-Kernel/list.c ****      * listGET_OWNER_OF_NEXT_ENTRY(). */
@@ -288,7 +288,7 @@ ARM GAS  /tmp/ccjoFYLO.s 			page 1
  142              		.loc 1 136 1 is_stmt 0 view .LVU49
  143 0014 7047     		bx	lr
  144              		.cfi_endproc
- 145              	.LFE6:
+ 145              	.LFE150:
  147              		.section	.text.vListInsert,"ax",%progbits
  148              		.align	1
  149              		.global	vListInsert
@@ -298,10 +298,10 @@ ARM GAS  /tmp/ccjoFYLO.s 			page 1
  153              		.fpu fpv5-d16
  155              	vListInsert:
  156              	.LVL5:
-ARM GAS  /tmp/ccjoFYLO.s 			page 6
+ARM GAS  /tmp/ccDbw0BS.s 			page 6
 
 
- 157              	.LFB7:
+ 157              	.LFB151:
  137:../Core/FreeRTOS-Kernel/list.c **** /*-----------------------------------------------------------*/
  138:../Core/FreeRTOS-Kernel/list.c **** 
  139:../Core/FreeRTOS-Kernel/list.c **** void vListInsert( List_t * const pxList,
@@ -358,7 +358,7 @@ ARM GAS  /tmp/ccjoFYLO.s 			page 1
  167:../Core/FreeRTOS-Kernel/list.c ****         /* *** NOTE ***********************************************************
  168:../Core/FreeRTOS-Kernel/list.c ****         *  If you find your application is crashing here then likely causes are
  169:../Core/FreeRTOS-Kernel/list.c ****         *  listed below.  In addition see https://www.FreeRTOS.org/FAQHelp.html for
-ARM GAS  /tmp/ccjoFYLO.s 			page 7
+ARM GAS  /tmp/ccDbw0BS.s 			page 7
 
 
  170:../Core/FreeRTOS-Kernel/list.c ****         *  more tips, and ensure configASSERT() is defined!
@@ -418,7 +418,7 @@ ARM GAS  /tmp/ccjoFYLO.s 			page 1
  204 001c 9960     		str	r1, [r3, #8]
  201:../Core/FreeRTOS-Kernel/list.c ****     pxNewListItem->pxPrevious = pxIterator;
  205              		.loc 1 201 5 is_stmt 1 view .LVU71
-ARM GAS  /tmp/ccjoFYLO.s 			page 8
+ARM GAS  /tmp/ccDbw0BS.s 			page 8
 
 
  206              		.loc 1 201 31 is_stmt 0 view .LVU72
@@ -471,20 +471,20 @@ ARM GAS  /tmp/ccjoFYLO.s 			page 1
  240              		.loc 1 163 20 view .LVU86
  241 0030 F2E7     		b	.L6
  242              		.cfi_endproc
- 243              	.LFE7:
+ 243              	.LFE151:
  245              		.section	.text.uxListRemove,"ax",%progbits
  246              		.align	1
  247              		.global	uxListRemove
  248              		.syntax unified
  249              		.thumb
  250              		.thumb_func
-ARM GAS  /tmp/ccjoFYLO.s 			page 9
+ARM GAS  /tmp/ccDbw0BS.s 			page 9
 
 
  251              		.fpu fpv5-d16
  253              	uxListRemove:
  254              	.LVL12:
- 255              	.LFB8:
+ 255              	.LFB152:
  212:../Core/FreeRTOS-Kernel/list.c **** /*-----------------------------------------------------------*/
  213:../Core/FreeRTOS-Kernel/list.c **** 
  214:../Core/FreeRTOS-Kernel/list.c **** 
@@ -538,7 +538,7 @@ ARM GAS  /tmp/ccjoFYLO.s 			page 1
  232:../Core/FreeRTOS-Kernel/list.c ****         pxList->pxIndex = pxItemToRemove->pxPrevious;
  233:../Core/FreeRTOS-Kernel/list.c ****     }
  234:../Core/FreeRTOS-Kernel/list.c ****     else
-ARM GAS  /tmp/ccjoFYLO.s 			page 10
+ARM GAS  /tmp/ccDbw0BS.s 			page 10
 
 
  235:../Core/FreeRTOS-Kernel/list.c ****     {
@@ -581,26 +581,26 @@ ARM GAS  /tmp/ccjoFYLO.s 			page 1
  309 0020 5A60     		str	r2, [r3, #4]
  310 0022 F6E7     		b	.L11
  311              		.cfi_endproc
- 312              	.LFE8:
+ 312              	.LFE152:
  314              		.text
  315              	.Letext0:
  316              		.file 2 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stdint.h"
  317              		.file 3 "Core/Inc/portmacro.h"
  318              		.file 4 "../Core/FreeRTOS-Kernel/include/list.h"
-ARM GAS  /tmp/ccjoFYLO.s 			page 11
+ARM GAS  /tmp/ccDbw0BS.s 			page 11
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 list.c
-     /tmp/ccjoFYLO.s:17     .text.vListInitialise:0000000000000000 $t
-     /tmp/ccjoFYLO.s:25     .text.vListInitialise:0000000000000000 vListInitialise
-     /tmp/ccjoFYLO.s:64     .text.vListInitialiseItem:0000000000000000 $t
-     /tmp/ccjoFYLO.s:71     .text.vListInitialiseItem:0000000000000000 vListInitialiseItem
-     /tmp/ccjoFYLO.s:93     .text.vListInsertEnd:0000000000000000 $t
-     /tmp/ccjoFYLO.s:100    .text.vListInsertEnd:0000000000000000 vListInsertEnd
-     /tmp/ccjoFYLO.s:148    .text.vListInsert:0000000000000000 $t
-     /tmp/ccjoFYLO.s:155    .text.vListInsert:0000000000000000 vListInsert
-     /tmp/ccjoFYLO.s:246    .text.uxListRemove:0000000000000000 $t
-     /tmp/ccjoFYLO.s:253    .text.uxListRemove:0000000000000000 uxListRemove
+     /tmp/ccDbw0BS.s:17     .text.vListInitialise:0000000000000000 $t
+     /tmp/ccDbw0BS.s:25     .text.vListInitialise:0000000000000000 vListInitialise
+     /tmp/ccDbw0BS.s:64     .text.vListInitialiseItem:0000000000000000 $t
+     /tmp/ccDbw0BS.s:71     .text.vListInitialiseItem:0000000000000000 vListInitialiseItem
+     /tmp/ccDbw0BS.s:93     .text.vListInsertEnd:0000000000000000 $t
+     /tmp/ccDbw0BS.s:100    .text.vListInsertEnd:0000000000000000 vListInsertEnd
+     /tmp/ccDbw0BS.s:148    .text.vListInsert:0000000000000000 $t
+     /tmp/ccDbw0BS.s:155    .text.vListInsert:0000000000000000 vListInsert
+     /tmp/ccDbw0BS.s:246    .text.uxListRemove:0000000000000000 $t
+     /tmp/ccDbw0BS.s:253    .text.uxListRemove:0000000000000000 uxListRemove
 
 NO UNDEFINED SYMBOLS

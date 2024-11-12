@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccE8xnRX.s 			page 1
+ARM GAS  /tmp/cc8ky6Wn.s 			page 1
 
 
    1              		.cpu cortex-m7
@@ -16,16 +16,17 @@ ARM GAS  /tmp/ccE8xnRX.s 			page 1
   13              		.text
   14              	.Ltext0:
   15              		.cfi_sections	.debug_frame
-  16              		.section	.text.prvTaskExitError,"ax",%progbits
+  16              		.section	.text.SVC_Handler,"ax",%progbits
   17              		.align	1
-  18              		.arch armv7e-m
-  19              		.syntax unified
-  20              		.thumb
-  21              		.thumb_func
-  22              		.fpu fpv5-d16
-  24              	prvTaskExitError:
-  25              	.LFB5:
-  26              		.file 1 "Core/Src/port.c"
+  18              		.global	SVC_Handler
+  19              		.arch armv7e-m
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  23              		.fpu fpv5-d16
+  25              	SVC_Handler:
+  26              	.LFB150:
+  27              		.file 1 "Core/Src/port.c"
    1:Core/Src/port.c **** /*
    2:Core/Src/port.c ****  * FreeRTOS Kernel V11.1.0
    3:Core/Src/port.c ****  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -57,10 +58,10 @@ ARM GAS  /tmp/ccE8xnRX.s 			page 1
   29:Core/Src/port.c **** /*-----------------------------------------------------------
   30:Core/Src/port.c **** * Implementation of functions defined in portable.h for the ARM CM7 port.
   31:Core/Src/port.c **** *----------------------------------------------------------*/
+ARM GAS  /tmp/cc8ky6Wn.s 			page 2
+
+
   32:Core/Src/port.c **** 
-ARM GAS  /tmp/ccE8xnRX.s 			page 2
-
-
   33:Core/Src/port.c **** /* Scheduler includes. */
   34:Core/Src/port.c **** #include "FreeRTOS.h"
   35:Core/Src/port.c **** #include "task.h"
@@ -117,10 +118,10 @@ ARM GAS  /tmp/ccE8xnRX.s 			page 1
   86:Core/Src/port.c **** #define portINITIAL_XPSR                      ( 0x01000000 )
   87:Core/Src/port.c **** #define portINITIAL_EXC_RETURN                ( 0xfffffffd )
   88:Core/Src/port.c **** 
+ARM GAS  /tmp/cc8ky6Wn.s 			page 3
+
+
   89:Core/Src/port.c **** /* The systick is a 24-bit counter. */
-ARM GAS  /tmp/ccE8xnRX.s 			page 3
-
-
   90:Core/Src/port.c **** #define portMAX_24_BIT_NUMBER                 ( 0xffffffUL )
   91:Core/Src/port.c **** 
   92:Core/Src/port.c **** /* For strict compliance with the Cortex-M spec the task start address should
@@ -177,10 +178,10 @@ ARM GAS  /tmp/ccE8xnRX.s 			page 1
  143:Core/Src/port.c ****  */
  144:Core/Src/port.c **** static void vPortEnableVFP( void ) __attribute__( ( naked ) );
  145:Core/Src/port.c **** 
+ARM GAS  /tmp/cc8ky6Wn.s 			page 4
+
+
  146:Core/Src/port.c **** /*
-ARM GAS  /tmp/ccE8xnRX.s 			page 4
-
-
  147:Core/Src/port.c ****  * Used to catch tasks that attempt to return from their implementing function.
  148:Core/Src/port.c ****  */
  149:Core/Src/port.c **** static void prvTaskExitError( void );
@@ -237,10 +238,10 @@ ARM GAS  /tmp/ccE8xnRX.s 			page 1
  200:Core/Src/port.c ****     /* Simulate the stack frame as it would be created by a context switch
  201:Core/Src/port.c ****      * interrupt. */
  202:Core/Src/port.c **** 
+ARM GAS  /tmp/cc8ky6Wn.s 			page 5
+
+
  203:Core/Src/port.c ****     /* Offset added to account for the way the MCU uses the stack on entry/exit
-ARM GAS  /tmp/ccE8xnRX.s 			page 5
-
-
  204:Core/Src/port.c ****      * of interrupts, and to ensure alignment. */
  205:Core/Src/port.c ****     pxTopOfStack--;
  206:Core/Src/port.c **** 
@@ -267,19 +268,7 @@ ARM GAS  /tmp/ccE8xnRX.s 			page 1
  227:Core/Src/port.c **** 
  228:Core/Src/port.c **** static void prvTaskExitError( void )
  229:Core/Src/port.c **** {
-  27              		.loc 1 229 1 view -0
-  28              		.cfi_startproc
-  29              		@ args = 0, pretend = 0, frame = 8
-  30              		@ frame_needed = 0, uses_anonymous_args = 0
-  31              		@ link register save eliminated.
-  32 0000 82B0     		sub	sp, sp, #8
-  33              	.LCFI0:
-  34              		.cfi_def_cfa_offset 8
  230:Core/Src/port.c ****     volatile uint32_t ulDummy = 0;
-  35              		.loc 1 230 5 view .LVU1
-  36              		.loc 1 230 23 is_stmt 0 view .LVU2
-  37 0002 0023     		movs	r3, #0
-  38 0004 0193     		str	r3, [sp, #4]
  231:Core/Src/port.c **** 
  232:Core/Src/port.c ****     /* A function that implements a task must not exit or attempt to return to
  233:Core/Src/port.c ****      * its caller as there is nothing to return to.  If a task wants to exit it
@@ -288,262 +277,7 @@ ARM GAS  /tmp/ccE8xnRX.s 			page 1
  236:Core/Src/port.c ****      * Artificially force an assert() to be triggered if configASSERT() is
  237:Core/Src/port.c ****      * defined, then stop here so application writers can catch the error. */
  238:Core/Src/port.c ****     configASSERT( uxCriticalNesting == ~0UL );
-  39              		.loc 1 238 46 is_stmt 1 view .LVU3
  239:Core/Src/port.c ****     portDISABLE_INTERRUPTS();
-  40              		.loc 1 239 5 view .LVU4
-  41              	.LBB12:
-  42              	.LBI12:
-  43              		.file 2 "Core/Inc/portmacro.h"
-   1:Core/Inc/portmacro.h **** /*
-   2:Core/Inc/portmacro.h ****  * FreeRTOS Kernel V11.1.0
-   3:Core/Inc/portmacro.h ****  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-   4:Core/Inc/portmacro.h ****  *
-ARM GAS  /tmp/ccE8xnRX.s 			page 6
-
-
-   5:Core/Inc/portmacro.h ****  * SPDX-License-Identifier: MIT
-   6:Core/Inc/portmacro.h ****  *
-   7:Core/Inc/portmacro.h ****  * Permission is hereby granted, free of charge, to any person obtaining a copy of
-   8:Core/Inc/portmacro.h ****  * this software and associated documentation files (the "Software"), to deal in
-   9:Core/Inc/portmacro.h ****  * the Software without restriction, including without limitation the rights to
-  10:Core/Inc/portmacro.h ****  * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-  11:Core/Inc/portmacro.h ****  * the Software, and to permit persons to whom the Software is furnished to do so,
-  12:Core/Inc/portmacro.h ****  * subject to the following conditions:
-  13:Core/Inc/portmacro.h ****  *
-  14:Core/Inc/portmacro.h ****  * The above copyright notice and this permission notice shall be included in all
-  15:Core/Inc/portmacro.h ****  * copies or substantial portions of the Software.
-  16:Core/Inc/portmacro.h ****  *
-  17:Core/Inc/portmacro.h ****  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-  18:Core/Inc/portmacro.h ****  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-  19:Core/Inc/portmacro.h ****  * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-  20:Core/Inc/portmacro.h ****  * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-  21:Core/Inc/portmacro.h ****  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-  22:Core/Inc/portmacro.h ****  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-  23:Core/Inc/portmacro.h ****  *
-  24:Core/Inc/portmacro.h ****  * https://www.FreeRTOS.org
-  25:Core/Inc/portmacro.h ****  * https://github.com/FreeRTOS
-  26:Core/Inc/portmacro.h ****  *
-  27:Core/Inc/portmacro.h ****  */
-  28:Core/Inc/portmacro.h **** 
-  29:Core/Inc/portmacro.h **** 
-  30:Core/Inc/portmacro.h **** #ifndef PORTMACRO_H
-  31:Core/Inc/portmacro.h **** #define PORTMACRO_H
-  32:Core/Inc/portmacro.h **** 
-  33:Core/Inc/portmacro.h **** /* *INDENT-OFF* */
-  34:Core/Inc/portmacro.h **** #ifdef __cplusplus
-  35:Core/Inc/portmacro.h ****     extern "C" {
-  36:Core/Inc/portmacro.h **** #endif
-  37:Core/Inc/portmacro.h **** /* *INDENT-ON* */
-  38:Core/Inc/portmacro.h **** 
-  39:Core/Inc/portmacro.h **** /*-----------------------------------------------------------
-  40:Core/Inc/portmacro.h ****  * Port specific definitions.
-  41:Core/Inc/portmacro.h ****  *
-  42:Core/Inc/portmacro.h ****  * The settings in this file configure FreeRTOS correctly for the
-  43:Core/Inc/portmacro.h ****  * given hardware and compiler.
-  44:Core/Inc/portmacro.h ****  *
-  45:Core/Inc/portmacro.h ****  * These settings should not be altered.
-  46:Core/Inc/portmacro.h ****  *-----------------------------------------------------------
-  47:Core/Inc/portmacro.h ****  */
-  48:Core/Inc/portmacro.h **** 
-  49:Core/Inc/portmacro.h **** /* Type definitions. */
-  50:Core/Inc/portmacro.h **** #define portCHAR          char
-  51:Core/Inc/portmacro.h **** #define portFLOAT         float
-  52:Core/Inc/portmacro.h **** #define portDOUBLE        double
-  53:Core/Inc/portmacro.h **** #define portLONG          long
-  54:Core/Inc/portmacro.h **** #define portSHORT         short
-  55:Core/Inc/portmacro.h **** #define portSTACK_TYPE    uint32_t
-  56:Core/Inc/portmacro.h **** #define portBASE_TYPE     long
-  57:Core/Inc/portmacro.h **** 
-  58:Core/Inc/portmacro.h **** typedef portSTACK_TYPE   StackType_t;
-  59:Core/Inc/portmacro.h **** typedef long             BaseType_t;
-  60:Core/Inc/portmacro.h **** typedef unsigned long    UBaseType_t;
-  61:Core/Inc/portmacro.h **** 
-ARM GAS  /tmp/ccE8xnRX.s 			page 7
-
-
-  62:Core/Inc/portmacro.h **** #if ( configTICK_TYPE_WIDTH_IN_BITS == TICK_TYPE_WIDTH_16_BITS )
-  63:Core/Inc/portmacro.h ****     typedef uint16_t     TickType_t;
-  64:Core/Inc/portmacro.h ****     #define portMAX_DELAY              ( TickType_t ) 0xffff
-  65:Core/Inc/portmacro.h **** #elif ( configTICK_TYPE_WIDTH_IN_BITS == TICK_TYPE_WIDTH_32_BITS )
-  66:Core/Inc/portmacro.h ****     typedef uint32_t     TickType_t;
-  67:Core/Inc/portmacro.h ****     #define portMAX_DELAY              ( TickType_t ) 0xffffffffUL
-  68:Core/Inc/portmacro.h **** 
-  69:Core/Inc/portmacro.h **** /* 32-bit tick type on a 32-bit architecture, so reads of the tick count do
-  70:Core/Inc/portmacro.h ****  * not need to be guarded with a critical section. */
-  71:Core/Inc/portmacro.h ****     #define portTICK_TYPE_IS_ATOMIC    1
-  72:Core/Inc/portmacro.h **** #else
-  73:Core/Inc/portmacro.h ****     #error configTICK_TYPE_WIDTH_IN_BITS set to unsupported tick type width.
-  74:Core/Inc/portmacro.h **** #endif
-  75:Core/Inc/portmacro.h **** /*-----------------------------------------------------------*/
-  76:Core/Inc/portmacro.h **** 
-  77:Core/Inc/portmacro.h **** /* Architecture specifics. */
-  78:Core/Inc/portmacro.h **** #define portSTACK_GROWTH      ( -1 )
-  79:Core/Inc/portmacro.h **** #define portTICK_PERIOD_MS    ( ( TickType_t ) 1000 / configTICK_RATE_HZ )
-  80:Core/Inc/portmacro.h **** #define portBYTE_ALIGNMENT    8
-  81:Core/Inc/portmacro.h **** #define portDONT_DISCARD      __attribute__( ( used ) )
-  82:Core/Inc/portmacro.h **** /*-----------------------------------------------------------*/
-  83:Core/Inc/portmacro.h **** 
-  84:Core/Inc/portmacro.h **** /* Scheduler utilities. */
-  85:Core/Inc/portmacro.h **** #define portYIELD()                                     \
-  86:Core/Inc/portmacro.h ****     {                                                   \
-  87:Core/Inc/portmacro.h ****         /* Set a PendSV to request a context switch. */ \
-  88:Core/Inc/portmacro.h ****         portNVIC_INT_CTRL_REG = portNVIC_PENDSVSET_BIT; \
-  89:Core/Inc/portmacro.h ****                                                         \
-  90:Core/Inc/portmacro.h ****         /* Barriers are normally not required but do ensure the code is completely \
-  91:Core/Inc/portmacro.h ****          * within the specified behaviour for the architecture. */ \
-  92:Core/Inc/portmacro.h ****         __asm volatile ( "dsb" ::: "memory" );                     \
-  93:Core/Inc/portmacro.h ****         __asm volatile ( "isb" );                                  \
-  94:Core/Inc/portmacro.h ****     }
-  95:Core/Inc/portmacro.h **** 
-  96:Core/Inc/portmacro.h **** #define portNVIC_INT_CTRL_REG     ( *( ( volatile uint32_t * ) 0xe000ed04 ) )
-  97:Core/Inc/portmacro.h **** #define portNVIC_PENDSVSET_BIT    ( 1UL << 28UL )
-  98:Core/Inc/portmacro.h **** #define portEND_SWITCHING_ISR( xSwitchRequired ) \
-  99:Core/Inc/portmacro.h ****     do                                           \
- 100:Core/Inc/portmacro.h ****     {                                            \
- 101:Core/Inc/portmacro.h ****         if( xSwitchRequired != pdFALSE )         \
- 102:Core/Inc/portmacro.h ****         {                                        \
- 103:Core/Inc/portmacro.h ****             traceISR_EXIT_TO_SCHEDULER();        \
- 104:Core/Inc/portmacro.h ****             portYIELD();                         \
- 105:Core/Inc/portmacro.h ****         }                                        \
- 106:Core/Inc/portmacro.h ****         else                                     \
- 107:Core/Inc/portmacro.h ****         {                                        \
- 108:Core/Inc/portmacro.h ****             traceISR_EXIT();                     \
- 109:Core/Inc/portmacro.h ****         }                                        \
- 110:Core/Inc/portmacro.h ****     } while( 0 )
- 111:Core/Inc/portmacro.h **** #define portYIELD_FROM_ISR( x )    portEND_SWITCHING_ISR( x )
- 112:Core/Inc/portmacro.h **** /*-----------------------------------------------------------*/
- 113:Core/Inc/portmacro.h **** 
- 114:Core/Inc/portmacro.h **** /* Critical section management. */
- 115:Core/Inc/portmacro.h **** extern void vPortEnterCritical( void );
- 116:Core/Inc/portmacro.h **** extern void vPortExitCritical( void );
- 117:Core/Inc/portmacro.h **** #define portSET_INTERRUPT_MASK_FROM_ISR()         ulPortRaiseBASEPRI()
- 118:Core/Inc/portmacro.h **** #define portCLEAR_INTERRUPT_MASK_FROM_ISR( x )    vPortSetBASEPRI( x )
-ARM GAS  /tmp/ccE8xnRX.s 			page 8
-
-
- 119:Core/Inc/portmacro.h **** #define portDISABLE_INTERRUPTS()                  vPortRaiseBASEPRI()
- 120:Core/Inc/portmacro.h **** #define portENABLE_INTERRUPTS()                   vPortSetBASEPRI( 0 )
- 121:Core/Inc/portmacro.h **** #define portENTER_CRITICAL()                      vPortEnterCritical()
- 122:Core/Inc/portmacro.h **** #define portEXIT_CRITICAL()                       vPortExitCritical()
- 123:Core/Inc/portmacro.h **** 
- 124:Core/Inc/portmacro.h **** /*-----------------------------------------------------------*/
- 125:Core/Inc/portmacro.h **** 
- 126:Core/Inc/portmacro.h **** /* Task function macros as described on the FreeRTOS.org WEB site.  These are
- 127:Core/Inc/portmacro.h ****  * not necessary for to use this port.  They are defined so the common demo files
- 128:Core/Inc/portmacro.h ****  * (which build with all the ports) will build. */
- 129:Core/Inc/portmacro.h **** #define portTASK_FUNCTION_PROTO( vFunction, pvParameters )    void vFunction( void * pvParameters )
- 130:Core/Inc/portmacro.h **** #define portTASK_FUNCTION( vFunction, pvParameters )          void vFunction( void * pvParameters )
- 131:Core/Inc/portmacro.h **** /*-----------------------------------------------------------*/
- 132:Core/Inc/portmacro.h **** 
- 133:Core/Inc/portmacro.h **** /* Tickless idle/low power functionality. */
- 134:Core/Inc/portmacro.h **** #ifndef portSUPPRESS_TICKS_AND_SLEEP
- 135:Core/Inc/portmacro.h ****     extern void vPortSuppressTicksAndSleep( TickType_t xExpectedIdleTime );
- 136:Core/Inc/portmacro.h ****     #define portSUPPRESS_TICKS_AND_SLEEP( xExpectedIdleTime )    vPortSuppressTicksAndSleep( xExpec
- 137:Core/Inc/portmacro.h **** #endif
- 138:Core/Inc/portmacro.h **** /*-----------------------------------------------------------*/
- 139:Core/Inc/portmacro.h **** 
- 140:Core/Inc/portmacro.h **** /* Architecture specific optimisations. */
- 141:Core/Inc/portmacro.h **** #ifndef configUSE_PORT_OPTIMISED_TASK_SELECTION
- 142:Core/Inc/portmacro.h ****     #define configUSE_PORT_OPTIMISED_TASK_SELECTION    1
- 143:Core/Inc/portmacro.h **** #endif
- 144:Core/Inc/portmacro.h **** 
- 145:Core/Inc/portmacro.h **** #if configUSE_PORT_OPTIMISED_TASK_SELECTION == 1
- 146:Core/Inc/portmacro.h **** 
- 147:Core/Inc/portmacro.h **** /* Generic helper function. */
- 148:Core/Inc/portmacro.h ****     __attribute__( ( always_inline ) ) static inline uint8_t ucPortCountLeadingZeros( uint32_t ulBi
- 149:Core/Inc/portmacro.h ****     {
- 150:Core/Inc/portmacro.h ****         uint8_t ucReturn;
- 151:Core/Inc/portmacro.h **** 
- 152:Core/Inc/portmacro.h ****         __asm volatile ( "clz %0, %1" : "=r" ( ucReturn ) : "r" ( ulBitmap ) : "memory" );
- 153:Core/Inc/portmacro.h **** 
- 154:Core/Inc/portmacro.h ****         return ucReturn;
- 155:Core/Inc/portmacro.h ****     }
- 156:Core/Inc/portmacro.h **** 
- 157:Core/Inc/portmacro.h **** /* Check the configuration. */
- 158:Core/Inc/portmacro.h ****     #if ( configMAX_PRIORITIES > 32 )
- 159:Core/Inc/portmacro.h ****         #error configUSE_PORT_OPTIMISED_TASK_SELECTION can only be set to 1 when configMAX_PRIORITI
- 160:Core/Inc/portmacro.h ****     #endif
- 161:Core/Inc/portmacro.h **** 
- 162:Core/Inc/portmacro.h **** /* Store/clear the ready priorities in a bit map. */
- 163:Core/Inc/portmacro.h ****     #define portRECORD_READY_PRIORITY( uxPriority, uxReadyPriorities )    ( uxReadyPriorities ) |= 
- 164:Core/Inc/portmacro.h ****     #define portRESET_READY_PRIORITY( uxPriority, uxReadyPriorities )     ( uxReadyPriorities ) &= 
- 165:Core/Inc/portmacro.h **** 
- 166:Core/Inc/portmacro.h **** /*-----------------------------------------------------------*/
- 167:Core/Inc/portmacro.h **** 
- 168:Core/Inc/portmacro.h ****     #define portGET_HIGHEST_PRIORITY( uxTopPriority, uxReadyPriorities )    uxTopPriority = ( 31UL 
- 169:Core/Inc/portmacro.h **** 
- 170:Core/Inc/portmacro.h **** #endif /* configUSE_PORT_OPTIMISED_TASK_SELECTION */
- 171:Core/Inc/portmacro.h **** 
- 172:Core/Inc/portmacro.h **** /*-----------------------------------------------------------*/
- 173:Core/Inc/portmacro.h **** 
- 174:Core/Inc/portmacro.h **** #ifdef configASSERT
- 175:Core/Inc/portmacro.h ****     void vPortValidateInterruptPriority( void );
-ARM GAS  /tmp/ccE8xnRX.s 			page 9
-
-
- 176:Core/Inc/portmacro.h ****     #define portASSERT_IF_INTERRUPT_PRIORITY_INVALID()    vPortValidateInterruptPriority()
- 177:Core/Inc/portmacro.h **** #endif
- 178:Core/Inc/portmacro.h **** 
- 179:Core/Inc/portmacro.h **** /* portNOP() is not required by this port. */
- 180:Core/Inc/portmacro.h **** #define portNOP()
- 181:Core/Inc/portmacro.h **** 
- 182:Core/Inc/portmacro.h **** #define portINLINE              __inline
- 183:Core/Inc/portmacro.h **** 
- 184:Core/Inc/portmacro.h **** #ifndef portFORCE_INLINE
- 185:Core/Inc/portmacro.h ****     #define portFORCE_INLINE    inline __attribute__( ( always_inline ) )
- 186:Core/Inc/portmacro.h **** #endif
- 187:Core/Inc/portmacro.h **** 
- 188:Core/Inc/portmacro.h **** portFORCE_INLINE static BaseType_t xPortIsInsideInterrupt( void )
- 189:Core/Inc/portmacro.h **** {
- 190:Core/Inc/portmacro.h ****     uint32_t ulCurrentInterrupt;
- 191:Core/Inc/portmacro.h ****     BaseType_t xReturn;
- 192:Core/Inc/portmacro.h **** 
- 193:Core/Inc/portmacro.h ****     /* Obtain the number of the currently executing interrupt. */
- 194:Core/Inc/portmacro.h ****     __asm volatile ( "mrs %0, ipsr" : "=r" ( ulCurrentInterrupt )::"memory" );
- 195:Core/Inc/portmacro.h **** 
- 196:Core/Inc/portmacro.h ****     if( ulCurrentInterrupt == 0 )
- 197:Core/Inc/portmacro.h ****     {
- 198:Core/Inc/portmacro.h ****         xReturn = pdFALSE;
- 199:Core/Inc/portmacro.h ****     }
- 200:Core/Inc/portmacro.h ****     else
- 201:Core/Inc/portmacro.h ****     {
- 202:Core/Inc/portmacro.h ****         xReturn = pdTRUE;
- 203:Core/Inc/portmacro.h ****     }
- 204:Core/Inc/portmacro.h **** 
- 205:Core/Inc/portmacro.h ****     return xReturn;
- 206:Core/Inc/portmacro.h **** }
- 207:Core/Inc/portmacro.h **** 
- 208:Core/Inc/portmacro.h **** /*-----------------------------------------------------------*/
- 209:Core/Inc/portmacro.h **** 
- 210:Core/Inc/portmacro.h **** portFORCE_INLINE static void vPortRaiseBASEPRI( void )
-  44              		.loc 2 210 30 view .LVU5
-  45              	.LBB13:
- 211:Core/Inc/portmacro.h **** {
- 212:Core/Inc/portmacro.h ****     uint32_t ulNewBASEPRI;
-  46              		.loc 2 212 5 view .LVU6
- 213:Core/Inc/portmacro.h **** 
- 214:Core/Inc/portmacro.h ****     __asm volatile
-  47              		.loc 2 214 5 view .LVU7
-  48              		.syntax unified
-  49              	@ 214 "Core/Inc/portmacro.h" 1
-  50 0006 4FF05003 		   mov r3, #80                                              
-  51 000a 72B6     	   cpsid i                                                 
-  52 000c 83F31188 	   msr basepri, r3                                         
-  53 0010 BFF36F8F 	   isb                                                     
-  54 0014 BFF34F8F 	   dsb                                                     
-  55 0018 62B6     	   cpsie i                                                 
-  56              	
-  57              	@ 0 "" 2
-  58              	.LVL0:
-  59              		.thumb
-  60              		.syntax unified
-  61              	.L2:
-ARM GAS  /tmp/ccE8xnRX.s 			page 10
-
-
-  62              		.loc 2 214 5 is_stmt 0 view .LVU8
-  63              	.LBE13:
-  64              	.LBE12:
  240:Core/Src/port.c **** 
  241:Core/Src/port.c ****     while( ulDummy == 0 )
  242:Core/Src/port.c ****     {
@@ -555,38 +289,37 @@ ARM GAS  /tmp/ccE8xnRX.s 			page 1
  248:Core/Src/port.c ****          * therefore not output an 'unreachable code' warning for code that appears
  249:Core/Src/port.c ****          * after it. */
  250:Core/Src/port.c ****     }
-  65              		.loc 1 250 5 is_stmt 1 discriminator 1 view .LVU9
- 241:Core/Src/port.c ****     {
-  66              		.loc 1 241 10 discriminator 1 view .LVU10
- 241:Core/Src/port.c ****     {
-  67              		.loc 1 241 20 is_stmt 0 discriminator 1 view .LVU11
-  68 001a 019B     		ldr	r3, [sp, #4]
- 241:Core/Src/port.c ****     {
-  69              		.loc 1 241 10 discriminator 1 view .LVU12
-  70 001c 002B     		cmp	r3, #0
-  71 001e FCD0     		beq	.L2
  251:Core/Src/port.c **** }
-  72              		.loc 1 251 1 view .LVU13
-  73 0020 02B0     		add	sp, sp, #8
-  74              	.LCFI1:
-  75              		.cfi_def_cfa_offset 0
-  76              		@ sp needed
-  77 0022 7047     		bx	lr
-  78              		.cfi_endproc
-  79              	.LFE5:
-  81              		.section	.text.prvPortStartFirstTask,"ax",%progbits
-  82              		.align	1
-  83              		.syntax unified
-  84              		.thumb
-  85              		.thumb_func
-  86              		.fpu fpv5-d16
-  88              	prvPortStartFirstTask:
-  89              	.LFB7:
  252:Core/Src/port.c **** /*-----------------------------------------------------------*/
  253:Core/Src/port.c **** 
  254:Core/Src/port.c **** void vPortSVCHandler( void )
  255:Core/Src/port.c **** {
+  28              		.loc 1 255 1 view -0
+  29              		.cfi_startproc
+  30              		@ Naked Function: prologue and epilogue provided by programmer.
+  31              		@ args = 0, pretend = 0, frame = 0
+ARM GAS  /tmp/cc8ky6Wn.s 			page 6
+
+
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
  256:Core/Src/port.c ****     __asm volatile (
+  33              		.loc 1 256 5 view .LVU1
+  34              		.syntax unified
+  35              	@ 256 "Core/Src/port.c" 1
+  36 0000 074B     		   ldr r3, pxCurrentTCBConst2      
+  37 0002 1968     	   ldr r1, [r3]                    
+  38 0004 0868     	   ldr r0, [r1]                    
+  39 0006 B0E8F04F 	   ldmia r0!, {r4-r11, r14}        
+  40 000a 80F30988 	   msr psp, r0                     
+  41 000e BFF36F8F 	   isb                             
+  42 0012 4FF00000 	   mov r0, #0                      
+  43 0016 80F31188 	   msr basepri, r0                 
+  44 001a 7047     	   bx r14                          
+  45              	                                   
+  46 001c AFF30080 	   .align 4                        
+  47 0020 00000000 	pxCurrentTCBConst2: .word pxCurrentTCB             
+  48              	
+  49              	@ 0 "" 2
  257:Core/Src/port.c ****         "   ldr r3, pxCurrentTCBConst2      \n" /* Restore the context. */
  258:Core/Src/port.c ****         "   ldr r1, [r3]                    \n" /* Use pxCurrentTCBConst to get the pxCurrentTCB ad
  259:Core/Src/port.c ****         "   ldr r0, [r1]                    \n" /* The first item in pxCurrentTCB is the task top o
@@ -598,45 +331,58 @@ ARM GAS  /tmp/ccE8xnRX.s 			page 1
  265:Core/Src/port.c ****         "   bx r14                          \n"
  266:Core/Src/port.c ****         "                                   \n"
  267:Core/Src/port.c ****         "   .align 4                        \n"
-ARM GAS  /tmp/ccE8xnRX.s 			page 11
-
-
  268:Core/Src/port.c ****         "pxCurrentTCBConst2: .word pxCurrentTCB             \n"
  269:Core/Src/port.c ****         );
  270:Core/Src/port.c **** }
+  50              		.loc 1 270 1 is_stmt 0 view .LVU2
+  51              		.thumb
+  52              		.syntax unified
+  53              		.cfi_endproc
+  54              	.LFE150:
+  56              		.section	.text.prvPortStartFirstTask,"ax",%progbits
+  57              		.align	1
+  58              		.syntax unified
+  59              		.thumb
+  60              		.thumb_func
+  61              		.fpu fpv5-d16
+  63              	prvPortStartFirstTask:
+  64              	.LFB151:
  271:Core/Src/port.c **** /*-----------------------------------------------------------*/
  272:Core/Src/port.c **** 
  273:Core/Src/port.c **** static void prvPortStartFirstTask( void )
  274:Core/Src/port.c **** {
-  90              		.loc 1 274 1 is_stmt 1 view -0
-  91              		.cfi_startproc
-  92              		@ Naked Function: prologue and epilogue provided by programmer.
-  93              		@ args = 0, pretend = 0, frame = 0
-  94              		@ frame_needed = 0, uses_anonymous_args = 0
+  65              		.loc 1 274 1 is_stmt 1 view -0
+  66              		.cfi_startproc
+  67              		@ Naked Function: prologue and epilogue provided by programmer.
+  68              		@ args = 0, pretend = 0, frame = 0
+  69              		@ frame_needed = 0, uses_anonymous_args = 0
  275:Core/Src/port.c ****     /* Start the first task.  This also clears the bit that indicates the FPU is
  276:Core/Src/port.c ****      * in use in case the FPU was used before the scheduler was started - which
+ARM GAS  /tmp/cc8ky6Wn.s 			page 7
+
+
  277:Core/Src/port.c ****      * would otherwise result in the unnecessary leaving of space in the SVC stack
  278:Core/Src/port.c ****      * for lazy saving of FPU registers. */
  279:Core/Src/port.c ****     __asm volatile (
-  95              		.loc 1 279 5 view .LVU15
-  96              		.syntax unified
-  97              	@ 279 "Core/Src/port.c" 1
-  98 0000 0848     		 ldr r0, =0xE000ED08   
-  99 0002 0068     	 ldr r0, [r0]          
- 100 0004 0068     	 ldr r0, [r0]          
- 101 0006 80F30888 	 msr msp, r0           
- 102 000a 4FF00000 	 mov r0, #0            
- 103 000e 80F31488 	 msr control, r0       
- 104 0012 62B6     	 cpsie i               
- 105 0014 61B6     	 cpsie f               
- 106 0016 BFF34F8F 	 dsb                   
- 107 001a BFF36F8F 	 isb                   
- 108 001e 00DF     	 svc 0                 
- 109 0020 00BF     	 nop                   
- 110 0022 000008ED 	 .ltorg                
- 110      00E0
- 111              	
- 112              	@ 0 "" 2
+  70              		.loc 1 279 5 view .LVU4
+  71              		.syntax unified
+  72              	@ 279 "Core/Src/port.c" 1
+  73 0000 0848     		 ldr r0, =0xE000ED08   
+  74 0002 0068     	 ldr r0, [r0]          
+  75 0004 0068     	 ldr r0, [r0]          
+  76 0006 80F30888 	 msr msp, r0           
+  77 000a 4FF00000 	 mov r0, #0            
+  78 000e 80F31488 	 msr control, r0       
+  79 0012 62B6     	 cpsie i               
+  80 0014 61B6     	 cpsie f               
+  81 0016 BFF34F8F 	 dsb                   
+  82 001a BFF36F8F 	 isb                   
+  83 001e 00DF     	 svc 0                 
+  84 0020 00BF     	 nop                   
+  85 0022 000008ED 	 .ltorg                
+  85      00E0
+  86              	
+  87              	@ 0 "" 2
  280:Core/Src/port.c ****         " ldr r0, =0xE000ED08   \n" /* Use the NVIC offset register to locate the stack. */
  281:Core/Src/port.c ****         " ldr r0, [r0]          \n"
  282:Core/Src/port.c ****         " ldr r0, [r0]          \n"
@@ -652,28 +398,29 @@ ARM GAS  /tmp/ccE8xnRX.s 			page 1
  292:Core/Src/port.c ****         " .ltorg                \n"
  293:Core/Src/port.c ****         );
  294:Core/Src/port.c **** }
- 113              		.loc 1 294 1 is_stmt 0 view .LVU16
- 114              		.thumb
- 115              		.syntax unified
- 116              		.cfi_endproc
- 117              	.LFE7:
- 119              		.section	.text.vPortEnableVFP,"ax",%progbits
-ARM GAS  /tmp/ccE8xnRX.s 			page 12
-
-
- 120              		.align	1
- 121              		.syntax unified
- 122              		.thumb
- 123              		.thumb_func
- 124              		.fpu fpv5-d16
- 126              	vPortEnableVFP:
- 127              	.LFB15:
+  88              		.loc 1 294 1 is_stmt 0 view .LVU5
+  89              		.thumb
+  90              		.syntax unified
+  91              		.cfi_endproc
+  92              	.LFE151:
+  94              		.section	.text.PendSV_Handler,"ax",%progbits
+  95              		.align	1
+  96              		.global	PendSV_Handler
+  97              		.syntax unified
+  98              		.thumb
+  99              		.thumb_func
+ 100              		.fpu fpv5-d16
+ 102              	PendSV_Handler:
+ 103              	.LFB156:
  295:Core/Src/port.c **** /*-----------------------------------------------------------*/
  296:Core/Src/port.c **** 
  297:Core/Src/port.c **** /*
  298:Core/Src/port.c ****  * See header file for description.
  299:Core/Src/port.c ****  */
  300:Core/Src/port.c **** BaseType_t xPortStartScheduler( void )
+ARM GAS  /tmp/cc8ky6Wn.s 			page 8
+
+
  301:Core/Src/port.c **** {
  302:Core/Src/port.c ****     /* An application can install FreeRTOS interrupt handlers in one of the
  303:Core/Src/port.c ****      * following ways:
@@ -718,9 +465,6 @@ ARM GAS  /tmp/ccE8xnRX.s 			page 1
  342:Core/Src/port.c **** 
  343:Core/Src/port.c ****         /* Determine the maximum priority from which ISR safe FreeRTOS API
  344:Core/Src/port.c ****          * functions can be called.  ISR safe functions are those that end in
-ARM GAS  /tmp/ccE8xnRX.s 			page 13
-
-
  345:Core/Src/port.c ****          * "FromISR".  FreeRTOS maintains separate thread and ISR API functions to
  346:Core/Src/port.c ****          * ensure interrupt entry is as fast and simple as possible.
  347:Core/Src/port.c ****          *
@@ -734,6 +478,9 @@ ARM GAS  /tmp/ccE8xnRX.s 			page 1
  355:Core/Src/port.c ****         /* Read the value back to see how many bits stuck. */
  356:Core/Src/port.c ****         ucMaxPriorityValue = *pucFirstUserPriorityRegister;
  357:Core/Src/port.c **** 
+ARM GAS  /tmp/cc8ky6Wn.s 			page 9
+
+
  358:Core/Src/port.c ****         /* Use the same mask on the maximum system call priority. */
  359:Core/Src/port.c ****         ucMaxSysCallPriority = configMAX_SYSCALL_INTERRUPT_PRIORITY & ucMaxPriorityValue;
  360:Core/Src/port.c **** 
@@ -778,9 +525,6 @@ ARM GAS  /tmp/ccE8xnRX.s 			page 1
  399:Core/Src/port.c ****              * configMAX_SYSCALL_INTERRUPT_PRIORITY is clear to avoid the above mentioned
  400:Core/Src/port.c ****              * confusion. */
  401:Core/Src/port.c ****             configASSERT( ( configMAX_SYSCALL_INTERRUPT_PRIORITY & 0x1U ) == 0U );
-ARM GAS  /tmp/ccE8xnRX.s 			page 14
-
-
  402:Core/Src/port.c ****             ulMaxPRIGROUPValue = 0;
  403:Core/Src/port.c ****         }
  404:Core/Src/port.c ****         else
@@ -794,6 +538,9 @@ ARM GAS  /tmp/ccE8xnRX.s 			page 1
  412:Core/Src/port.c ****         ulMaxPRIGROUPValue &= portPRIORITY_GROUP_MASK;
  413:Core/Src/port.c **** 
  414:Core/Src/port.c ****         /* Restore the clobbered interrupt priority register to its original
+ARM GAS  /tmp/cc8ky6Wn.s 			page 10
+
+
  415:Core/Src/port.c ****          * value. */
  416:Core/Src/port.c ****         *pucFirstUserPriorityRegister = ucOriginalPriority;
  417:Core/Src/port.c ****     }
@@ -838,9 +585,6 @@ ARM GAS  /tmp/ccE8xnRX.s 			page 1
  456:Core/Src/port.c **** void vPortEndScheduler( void )
  457:Core/Src/port.c **** {
  458:Core/Src/port.c ****     /* Not implemented in ports where there is nothing to return to.
-ARM GAS  /tmp/ccE8xnRX.s 			page 15
-
-
  459:Core/Src/port.c ****      * Artificially force an assert. */
  460:Core/Src/port.c ****     configASSERT( uxCriticalNesting == 1000UL );
  461:Core/Src/port.c **** }
@@ -854,6 +598,9 @@ ARM GAS  /tmp/ccE8xnRX.s 			page 1
  469:Core/Src/port.c ****     /* This is not the interrupt safe version of the enter critical function so
  470:Core/Src/port.c ****      * assert() if it is being called from an interrupt context.  Only API
  471:Core/Src/port.c ****      * functions that end in "FromISR" can be used in an interrupt.  Only assert if
+ARM GAS  /tmp/cc8ky6Wn.s 			page 11
+
+
  472:Core/Src/port.c ****      * the critical nesting count is 1 to protect against recursive calls if the
  473:Core/Src/port.c ****      * assert function also uses a critical section. */
  474:Core/Src/port.c ****     if( uxCriticalNesting == 1 )
@@ -877,9 +624,64 @@ ARM GAS  /tmp/ccE8xnRX.s 			page 1
  492:Core/Src/port.c **** 
  493:Core/Src/port.c **** void xPortPendSVHandler( void )
  494:Core/Src/port.c **** {
+ 104              		.loc 1 494 1 is_stmt 1 view -0
+ 105              		.cfi_startproc
+ 106              		@ Naked Function: prologue and epilogue provided by programmer.
+ 107              		@ args = 0, pretend = 0, frame = 0
+ 108              		@ frame_needed = 0, uses_anonymous_args = 0
  495:Core/Src/port.c ****     /* This is a naked function. */
  496:Core/Src/port.c **** 
  497:Core/Src/port.c ****     __asm volatile
+ 109              		.loc 1 497 5 view .LVU7
+ 110              		.syntax unified
+ 111              	@ 497 "Core/Src/port.c" 1
+ 112 0000 EFF30980 		   mrs r0, psp                         
+ 113 0004 BFF36F8F 	   isb                                 
+ 114              	                                       
+ 115 0008 154B     	   ldr r3, pxCurrentTCBConst           
+ 116 000a 1A68     	   ldr r2, [r3]                        
+ 117              	                                       
+ 118 000c 1EF0100F 	   tst r14, #0x10                      
+ 119 0010 08BF     	   it eq                               
+ 120 0012 20ED108A 	   vstmdbeq r0!, {s16-s31}             
+ 121              	                                       
+ 122 0016 20E9F04F 	   stmdb r0!, {r4-r11, r14}            
+ 123 001a 1060     	   str r0, [r2]                        
+ 124              	                                       
+ 125 001c 2DE90900 	   stmdb sp!, {r0, r3}                 
+ 126 0020 4FF05000 	   mov r0, #80                          
+ 127 0024 72B6     	   cpsid i                             
+ 128 0026 80F31188 	   msr basepri, r0                     
+ 129 002a BFF34F8F 	   dsb                                 
+ 130 002e BFF36F8F 	   isb                                 
+ 131 0032 62B6     	   cpsie i                             
+ 132 0034 FFF7FEFF 	   bl vTaskSwitchContext               
+ 133 0038 4FF00000 	   mov r0, #0                          
+ 134 003c 80F31188 	   msr basepri, r0                     
+ARM GAS  /tmp/cc8ky6Wn.s 			page 12
+
+
+ 135 0040 09BC     	   ldmia sp!, {r0, r3}                 
+ 136              	                                       
+ 137 0042 1968     	   ldr r1, [r3]                        
+ 138 0044 0868     	   ldr r0, [r1]                        
+ 139              	                                       
+ 140 0046 B0E8F04F 	   ldmia r0!, {r4-r11, r14}            
+ 141              	                                       
+ 142 004a 1EF0100F 	   tst r14, #0x10                      
+ 143 004e 08BF     	   it eq                               
+ 144 0050 B0EC108A 	   vldmiaeq r0!, {s16-s31}             
+ 145              	                                       
+ 146 0054 80F30988 	   msr psp, r0                         
+ 147 0058 BFF36F8F 	   isb                                 
+ 148              	                                       
+ 149              	                                       
+ 150 005c 7047     	   bx r14                              
+ 151              	                                       
+ 152 005e 00BF     	   .align 4                            
+ 153 0060 00000000 	pxCurrentTCBConst: .word pxCurrentTCB  
+ 154              	
+ 155              	@ 0 "" 2
  498:Core/Src/port.c ****     (
  499:Core/Src/port.c ****         "   mrs r0, psp                         \n"
  500:Core/Src/port.c ****         "   isb                                 \n"
@@ -898,9 +700,6 @@ ARM GAS  /tmp/ccE8xnRX.s 			page 1
  513:Core/Src/port.c ****         "   mov r0, %0                          \n"
  514:Core/Src/port.c ****         "   cpsid i                             \n" /* ARM Cortex-M7 r0p1 Errata 837070 workaround.
  515:Core/Src/port.c ****         "   msr basepri, r0                     \n"
-ARM GAS  /tmp/ccE8xnRX.s 			page 16
-
-
  516:Core/Src/port.c ****         "   dsb                                 \n"
  517:Core/Src/port.c ****         "   isb                                 \n"
  518:Core/Src/port.c ****         "   cpsie i                             \n" /* ARM Cortex-M7 r0p1 Errata 837070 workaround.
@@ -919,6 +718,9 @@ ARM GAS  /tmp/ccE8xnRX.s 			page 1
  531:Core/Src/port.c ****         "   vldmiaeq r0!, {s16-s31}             \n"
  532:Core/Src/port.c ****         "                                       \n"
  533:Core/Src/port.c ****         "   msr psp, r0                         \n"
+ARM GAS  /tmp/cc8ky6Wn.s 			page 13
+
+
  534:Core/Src/port.c ****         "   isb                                 \n"
  535:Core/Src/port.c ****         "                                       \n"
  536:Core/Src/port.c ****         #ifdef WORKAROUND_PMU_CM001 /* XMC4000 specific errata workaround. */
@@ -935,6 +737,19 @@ ARM GAS  /tmp/ccE8xnRX.s 			page 1
  547:Core/Src/port.c ****         ::"i" ( configMAX_SYSCALL_INTERRUPT_PRIORITY )
  548:Core/Src/port.c ****     );
  549:Core/Src/port.c **** }
+ 156              		.loc 1 549 1 is_stmt 0 view .LVU8
+ 157              		.thumb
+ 158              		.syntax unified
+ 159              		.cfi_endproc
+ 160              	.LFE156:
+ 162              		.section	.text.vPortEnableVFP,"ax",%progbits
+ 163              		.align	1
+ 164              		.syntax unified
+ 165              		.thumb
+ 166              		.thumb_func
+ 167              		.fpu fpv5-d16
+ 169              	vPortEnableVFP:
+ 170              	.LFB159:
  550:Core/Src/port.c **** /*-----------------------------------------------------------*/
  551:Core/Src/port.c **** 
  552:Core/Src/port.c **** void xPortSysTickHandler( void )
@@ -958,14 +773,14 @@ ARM GAS  /tmp/ccE8xnRX.s 			page 1
  570:Core/Src/port.c ****         else
  571:Core/Src/port.c ****         {
  572:Core/Src/port.c ****             traceISR_EXIT();
-ARM GAS  /tmp/ccE8xnRX.s 			page 17
-
-
  573:Core/Src/port.c ****         }
  574:Core/Src/port.c ****     }
  575:Core/Src/port.c ****     portENABLE_INTERRUPTS();
  576:Core/Src/port.c **** }
  577:Core/Src/port.c **** /*-----------------------------------------------------------*/
+ARM GAS  /tmp/cc8ky6Wn.s 			page 14
+
+
  578:Core/Src/port.c **** 
  579:Core/Src/port.c **** #if ( configUSE_TICKLESS_IDLE == 1 )
  580:Core/Src/port.c **** 
@@ -1018,14 +833,14 @@ ARM GAS  /tmp/ccE8xnRX.s 			page 1
  627:Core/Src/port.c ****              * tick periods.  -1 is used because this code normally executes part
  628:Core/Src/port.c ****              * way through the first tick period.  But if the SysTick IRQ is now
  629:Core/Src/port.c ****              * pending, then clear the IRQ, suppressing the first tick, and correct
-ARM GAS  /tmp/ccE8xnRX.s 			page 18
-
-
  630:Core/Src/port.c ****              * the reload value to reflect that the second tick period is already
  631:Core/Src/port.c ****              * underway.  The expected idle time is always at least two ticks. */
  632:Core/Src/port.c ****             ulReloadValue = ulSysTickDecrementsLeft + ( ulTimerCountsForOneTick * ( xExpectedIdleTi
  633:Core/Src/port.c **** 
  634:Core/Src/port.c ****             if( ( portNVIC_INT_CTRL_REG & portNVIC_PEND_SYSTICK_SET_BIT ) != 0 )
+ARM GAS  /tmp/cc8ky6Wn.s 			page 15
+
+
  635:Core/Src/port.c ****             {
  636:Core/Src/port.c ****                 portNVIC_INT_CTRL_REG = portNVIC_PEND_SYSTICK_CLEAR_BIT;
  637:Core/Src/port.c ****                 ulReloadValue -= ulTimerCountsForOneTick;
@@ -1078,14 +893,14 @@ ARM GAS  /tmp/ccE8xnRX.s 			page 1
  684:Core/Src/port.c ****             __asm volatile ( "dsb" );
  685:Core/Src/port.c ****             __asm volatile ( "isb" );
  686:Core/Src/port.c **** 
-ARM GAS  /tmp/ccE8xnRX.s 			page 19
-
-
  687:Core/Src/port.c ****             /* Disable the SysTick clock without reading the
  688:Core/Src/port.c ****              * portNVIC_SYSTICK_CTRL_REG register to ensure the
  689:Core/Src/port.c ****              * portNVIC_SYSTICK_COUNT_FLAG_BIT is not cleared if it is set.  Again,
  690:Core/Src/port.c ****              * the time the SysTick is stopped for is accounted for as best it can
  691:Core/Src/port.c ****              * be, but using the tickless mode will inevitably result in some tiny
+ARM GAS  /tmp/cc8ky6Wn.s 			page 16
+
+
  692:Core/Src/port.c ****              * drift of the time maintained by the kernel with respect to calendar
  693:Core/Src/port.c ****              * time*/
  694:Core/Src/port.c ****             portNVIC_SYSTICK_CTRL_REG = ( portNVIC_SYSTICK_CLK_BIT_CONFIG | portNVIC_SYSTICK_INT_BI
@@ -1138,14 +953,14 @@ ARM GAS  /tmp/ccE8xnRX.s 			page 1
  741:Core/Src/port.c ****                 }
  742:Core/Src/port.c ****                 #endif /* portNVIC_SYSTICK_CLK_BIT_CONFIG */
  743:Core/Src/port.c **** 
-ARM GAS  /tmp/ccE8xnRX.s 			page 20
-
-
  744:Core/Src/port.c ****                 /* Work out how long the sleep lasted rounded to complete tick
  745:Core/Src/port.c ****                  * periods (not the ulReload value which accounted for part
  746:Core/Src/port.c ****                  * ticks). */
  747:Core/Src/port.c ****                 ulCompletedSysTickDecrements = ( xExpectedIdleTime * ulTimerCountsForOneTick ) - ul
  748:Core/Src/port.c **** 
+ARM GAS  /tmp/cc8ky6Wn.s 			page 17
+
+
  749:Core/Src/port.c ****                 /* How many complete tick periods passed while the processor
  750:Core/Src/port.c ****                  * was waiting? */
  751:Core/Src/port.c ****                 ulCompleteTickPeriods = ulCompletedSysTickDecrements / ulTimerCountsForOneTick;
@@ -1198,14 +1013,14 @@ ARM GAS  /tmp/ccE8xnRX.s 			page 1
  798:Core/Src/port.c **** /*-----------------------------------------------------------*/
  799:Core/Src/port.c **** 
  800:Core/Src/port.c **** /*
-ARM GAS  /tmp/ccE8xnRX.s 			page 21
-
-
  801:Core/Src/port.c ****  * Setup the systick timer to generate the tick interrupts at the required
  802:Core/Src/port.c ****  * frequency.
  803:Core/Src/port.c ****  */
  804:Core/Src/port.c **** __attribute__( ( weak ) ) void vPortSetupTimerInterrupt( void )
  805:Core/Src/port.c **** {
+ARM GAS  /tmp/cc8ky6Wn.s 			page 18
+
+
  806:Core/Src/port.c ****     /* Calculate the constants required to configure the tick interrupt. */
  807:Core/Src/port.c ****     #if ( configUSE_TICKLESS_IDLE == 1 )
  808:Core/Src/port.c ****     {
@@ -1228,25 +1043,25 @@ ARM GAS  /tmp/ccE8xnRX.s 			page 1
  825:Core/Src/port.c **** /* This is a naked function. */
  826:Core/Src/port.c **** static void vPortEnableVFP( void )
  827:Core/Src/port.c **** {
- 128              		.loc 1 827 1 is_stmt 1 view -0
- 129              		.cfi_startproc
- 130              		@ Naked Function: prologue and epilogue provided by programmer.
- 131              		@ args = 0, pretend = 0, frame = 0
- 132              		@ frame_needed = 0, uses_anonymous_args = 0
+ 171              		.loc 1 827 1 is_stmt 1 view -0
+ 172              		.cfi_startproc
+ 173              		@ Naked Function: prologue and epilogue provided by programmer.
+ 174              		@ args = 0, pretend = 0, frame = 0
+ 175              		@ frame_needed = 0, uses_anonymous_args = 0
  828:Core/Src/port.c ****     __asm volatile
- 133              		.loc 1 828 5 view .LVU18
- 134              		.syntax unified
- 135              	@ 828 "Core/Src/port.c" 1
- 136 0000 DFF80C00 		   ldr.w r0, =0xE000ED88       
- 137 0004 0168     	   ldr r1, [r0]                
- 138              	                               
- 139 0006 41F47001 	   orr r1, r1, #( 0xf << 20 )  
- 140 000a 0160     	   str r1, [r0]                
- 141 000c 7047     	   bx r14                      
- 142 000e 000088ED 	   .ltorg                      
- 142      00E0
- 143              	
- 144              	@ 0 "" 2
+ 176              		.loc 1 828 5 view .LVU10
+ 177              		.syntax unified
+ 178              	@ 828 "Core/Src/port.c" 1
+ 179 0000 DFF80C00 		   ldr.w r0, =0xE000ED88       
+ 180 0004 0168     	   ldr r1, [r0]                
+ 181              	                               
+ 182 0006 41F47001 	   orr r1, r1, #( 0xf << 20 )  
+ 183 000a 0160     	   str r1, [r0]                
+ 184 000c 7047     	   bx r14                      
+ 185 000e 000088ED 	   .ltorg                      
+ 185      00E0
+ 186              	
+ 187              	@ 0 "" 2
  829:Core/Src/port.c ****     (
  830:Core/Src/port.c ****         "   ldr.w r0, =0xE000ED88       \n" /* The FPU enable bits are in the CPACR. */
  831:Core/Src/port.c ****         "   ldr r1, [r0]                \n"
@@ -1257,264 +1072,639 @@ ARM GAS  /tmp/ccE8xnRX.s 			page 1
  836:Core/Src/port.c ****         "   .ltorg                      \n"
  837:Core/Src/port.c ****     );
  838:Core/Src/port.c **** }
- 145              		.loc 1 838 1 is_stmt 0 view .LVU19
-ARM GAS  /tmp/ccE8xnRX.s 			page 22
+ 188              		.loc 1 838 1 is_stmt 0 view .LVU11
+ 189              		.thumb
+ 190              		.syntax unified
+ 191              		.cfi_endproc
+ 192              	.LFE159:
+ 194              		.section	.rodata.prvTaskExitError.str1.4,"aMS",%progbits,1
+ARM GAS  /tmp/cc8ky6Wn.s 			page 19
 
 
- 146              		.thumb
- 147              		.syntax unified
- 148              		.cfi_endproc
- 149              	.LFE15:
- 151              		.section	.text.pxPortInitialiseStack,"ax",%progbits
- 152              		.align	1
- 153              		.global	pxPortInitialiseStack
- 154              		.syntax unified
- 155              		.thumb
- 156              		.thumb_func
- 157              		.fpu fpv5-d16
- 159              	pxPortInitialiseStack:
- 160              	.LVL1:
- 161              	.LFB4:
- 199:Core/Src/port.c ****     /* Simulate the stack frame as it would be created by a context switch
- 162              		.loc 1 199 1 is_stmt 1 view -0
- 163              		.cfi_startproc
- 164              		@ args = 0, pretend = 0, frame = 0
- 165              		@ frame_needed = 0, uses_anonymous_args = 0
- 166              		@ link register save eliminated.
- 205:Core/Src/port.c **** 
- 167              		.loc 1 205 5 view .LVU21
- 207:Core/Src/port.c ****     pxTopOfStack--;
- 168              		.loc 1 207 5 view .LVU22
- 207:Core/Src/port.c ****     pxTopOfStack--;
- 169              		.loc 1 207 19 is_stmt 0 view .LVU23
- 170 0000 4FF08073 		mov	r3, #16777216
- 171 0004 40F8043C 		str	r3, [r0, #-4]
- 208:Core/Src/port.c ****     *pxTopOfStack = ( ( StackType_t ) pxCode ) & portSTART_ADDRESS_MASK; /* PC */
- 172              		.loc 1 208 5 is_stmt 1 view .LVU24
- 173              	.LVL2:
- 209:Core/Src/port.c ****     pxTopOfStack--;
- 174              		.loc 1 209 5 view .LVU25
- 209:Core/Src/port.c ****     pxTopOfStack--;
- 175              		.loc 1 209 48 is_stmt 0 view .LVU26
- 176 0008 21F00101 		bic	r1, r1, #1
- 177              	.LVL3:
- 209:Core/Src/port.c ****     pxTopOfStack--;
- 178              		.loc 1 209 19 view .LVU27
- 179 000c 40F8081C 		str	r1, [r0, #-8]
- 210:Core/Src/port.c ****     *pxTopOfStack = ( StackType_t ) portTASK_RETURN_ADDRESS;             /* LR */
- 180              		.loc 1 210 5 is_stmt 1 view .LVU28
- 181              	.LVL4:
- 211:Core/Src/port.c **** 
- 182              		.loc 1 211 5 view .LVU29
- 211:Core/Src/port.c **** 
- 183              		.loc 1 211 21 is_stmt 0 view .LVU30
- 184 0010 054B     		ldr	r3, .L7
- 211:Core/Src/port.c **** 
- 185              		.loc 1 211 19 view .LVU31
- 186 0012 40F80C3C 		str	r3, [r0, #-12]
- 214:Core/Src/port.c ****     *pxTopOfStack = ( StackType_t ) pvParameters; /* R0 */
- 187              		.loc 1 214 5 is_stmt 1 view .LVU32
- 188              	.LVL5:
- 215:Core/Src/port.c **** 
- 189              		.loc 1 215 5 view .LVU33
- 215:Core/Src/port.c **** 
-ARM GAS  /tmp/ccE8xnRX.s 			page 23
+ 195              		.align	2
+ 196              	.LC0:
+ 197 0000 4572726F 		.ascii	"Error\015\012\000"
+ 197      720D0A00 
+ 198              		.section	.text.prvTaskExitError,"ax",%progbits
+ 199              		.align	1
+ 200              		.syntax unified
+ 201              		.thumb
+ 202              		.thumb_func
+ 203              		.fpu fpv5-d16
+ 205              	prvTaskExitError:
+ 206              	.LFB149:
+ 229:Core/Src/port.c ****     volatile uint32_t ulDummy = 0;
+ 207              		.loc 1 229 1 is_stmt 1 view -0
+ 208              		.cfi_startproc
+ 209              		@ args = 0, pretend = 0, frame = 8
+ 210              		@ frame_needed = 0, uses_anonymous_args = 0
+ 211 0000 00B5     		push	{lr}
+ 212              	.LCFI0:
+ 213              		.cfi_def_cfa_offset 4
+ 214              		.cfi_offset 14, -4
+ 215 0002 83B0     		sub	sp, sp, #12
+ 216              	.LCFI1:
+ 217              		.cfi_def_cfa_offset 16
+ 230:Core/Src/port.c **** 
+ 218              		.loc 1 230 5 view .LVU13
+ 230:Core/Src/port.c **** 
+ 219              		.loc 1 230 23 is_stmt 0 view .LVU14
+ 220 0004 0023     		movs	r3, #0
+ 221 0006 0193     		str	r3, [sp, #4]
+ 238:Core/Src/port.c ****     portDISABLE_INTERRUPTS();
+ 222              		.loc 1 238 5 is_stmt 1 view .LVU15
+ 223 0008 0E4B     		ldr	r3, .L11
+ 224 000a 1B68     		ldr	r3, [r3]
+ 225 000c B3F1FF3F 		cmp	r3, #-1
+ 226 0010 0FD1     		bne	.L10
+ 238:Core/Src/port.c ****     portDISABLE_INTERRUPTS();
+ 227              		.loc 1 238 46 view .LVU16
+ 239:Core/Src/port.c **** 
+ 228              		.loc 1 239 5 view .LVU17
+ 229              	.LBB12:
+ 230              	.LBI12:
+ 231              		.file 2 "Core/Inc/portmacro.h"
+   1:Core/Inc/portmacro.h **** /*
+   2:Core/Inc/portmacro.h ****  * FreeRTOS Kernel V11.1.0
+   3:Core/Inc/portmacro.h ****  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+   4:Core/Inc/portmacro.h ****  *
+   5:Core/Inc/portmacro.h ****  * SPDX-License-Identifier: MIT
+   6:Core/Inc/portmacro.h ****  *
+   7:Core/Inc/portmacro.h ****  * Permission is hereby granted, free of charge, to any person obtaining a copy of
+   8:Core/Inc/portmacro.h ****  * this software and associated documentation files (the "Software"), to deal in
+   9:Core/Inc/portmacro.h ****  * the Software without restriction, including without limitation the rights to
+  10:Core/Inc/portmacro.h ****  * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+  11:Core/Inc/portmacro.h ****  * the Software, and to permit persons to whom the Software is furnished to do so,
+  12:Core/Inc/portmacro.h ****  * subject to the following conditions:
+  13:Core/Inc/portmacro.h ****  *
+  14:Core/Inc/portmacro.h ****  * The above copyright notice and this permission notice shall be included in all
+ARM GAS  /tmp/cc8ky6Wn.s 			page 20
 
 
- 190              		.loc 1 215 19 is_stmt 0 view .LVU34
- 191 0016 40F8202C 		str	r2, [r0, #-32]
- 219:Core/Src/port.c ****     *pxTopOfStack = portINITIAL_EXC_RETURN;
- 192              		.loc 1 219 5 is_stmt 1 view .LVU35
- 193              	.LVL6:
- 220:Core/Src/port.c **** 
- 194              		.loc 1 220 5 view .LVU36
- 220:Core/Src/port.c **** 
- 195              		.loc 1 220 19 is_stmt 0 view .LVU37
- 196 001a 6FF00203 		mvn	r3, #2
- 197 001e 40F8243C 		str	r3, [r0, #-36]
- 222:Core/Src/port.c **** 
- 198              		.loc 1 222 5 is_stmt 1 view .LVU38
- 199              	.LVL7:
- 224:Core/Src/port.c **** }
- 200              		.loc 1 224 5 view .LVU39
- 225:Core/Src/port.c **** /*-----------------------------------------------------------*/
- 201              		.loc 1 225 1 is_stmt 0 view .LVU40
- 202 0022 4438     		subs	r0, r0, #68
- 203              	.LVL8:
- 225:Core/Src/port.c **** /*-----------------------------------------------------------*/
- 204              		.loc 1 225 1 view .LVU41
- 205 0024 7047     		bx	lr
- 206              	.L8:
- 207 0026 00BF     		.align	2
- 208              	.L7:
- 209 0028 00000000 		.word	prvTaskExitError
- 210              		.cfi_endproc
- 211              	.LFE4:
- 213              		.section	.text.SVC_Handler,"ax",%progbits
- 214              		.align	1
- 215              		.global	SVC_Handler
- 216              		.syntax unified
- 217              		.thumb
- 218              		.thumb_func
- 219              		.fpu fpv5-d16
- 221              	SVC_Handler:
- 222              	.LFB6:
- 255:Core/Src/port.c ****     __asm volatile (
- 223              		.loc 1 255 1 is_stmt 1 view -0
- 224              		.cfi_startproc
- 225              		@ Naked Function: prologue and epilogue provided by programmer.
- 226              		@ args = 0, pretend = 0, frame = 0
- 227              		@ frame_needed = 0, uses_anonymous_args = 0
- 256:Core/Src/port.c ****         "   ldr r3, pxCurrentTCBConst2      \n" /* Restore the context. */
- 228              		.loc 1 256 5 view .LVU43
- 229              		.syntax unified
- 230              	@ 256 "Core/Src/port.c" 1
- 231 0000 074B     		   ldr r3, pxCurrentTCBConst2      
- 232 0002 1968     	   ldr r1, [r3]                    
- 233 0004 0868     	   ldr r0, [r1]                    
- 234 0006 B0E8F04F 	   ldmia r0!, {r4-r11, r14}        
- 235 000a 80F30988 	   msr psp, r0                     
- 236 000e BFF36F8F 	   isb                             
- 237 0012 4FF00000 	   mov r0, #0                      
- 238 0016 80F31188 	   msr basepri, r0                 
- 239 001a 7047     	   bx r14                          
-ARM GAS  /tmp/ccE8xnRX.s 			page 24
+  15:Core/Inc/portmacro.h ****  * copies or substantial portions of the Software.
+  16:Core/Inc/portmacro.h ****  *
+  17:Core/Inc/portmacro.h ****  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  18:Core/Inc/portmacro.h ****  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+  19:Core/Inc/portmacro.h ****  * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+  20:Core/Inc/portmacro.h ****  * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+  21:Core/Inc/portmacro.h ****  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  22:Core/Inc/portmacro.h ****  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  23:Core/Inc/portmacro.h ****  *
+  24:Core/Inc/portmacro.h ****  * https://www.FreeRTOS.org
+  25:Core/Inc/portmacro.h ****  * https://github.com/FreeRTOS
+  26:Core/Inc/portmacro.h ****  *
+  27:Core/Inc/portmacro.h ****  */
+  28:Core/Inc/portmacro.h **** 
+  29:Core/Inc/portmacro.h **** 
+  30:Core/Inc/portmacro.h **** #ifndef PORTMACRO_H
+  31:Core/Inc/portmacro.h **** #define PORTMACRO_H
+  32:Core/Inc/portmacro.h **** 
+  33:Core/Inc/portmacro.h **** /* *INDENT-OFF* */
+  34:Core/Inc/portmacro.h **** #ifdef __cplusplus
+  35:Core/Inc/portmacro.h ****     extern "C" {
+  36:Core/Inc/portmacro.h **** #endif
+  37:Core/Inc/portmacro.h **** /* *INDENT-ON* */
+  38:Core/Inc/portmacro.h **** 
+  39:Core/Inc/portmacro.h **** /*-----------------------------------------------------------
+  40:Core/Inc/portmacro.h ****  * Port specific definitions.
+  41:Core/Inc/portmacro.h ****  *
+  42:Core/Inc/portmacro.h ****  * The settings in this file configure FreeRTOS correctly for the
+  43:Core/Inc/portmacro.h ****  * given hardware and compiler.
+  44:Core/Inc/portmacro.h ****  *
+  45:Core/Inc/portmacro.h ****  * These settings should not be altered.
+  46:Core/Inc/portmacro.h ****  *-----------------------------------------------------------
+  47:Core/Inc/portmacro.h ****  */
+  48:Core/Inc/portmacro.h **** 
+  49:Core/Inc/portmacro.h **** /* Type definitions. */
+  50:Core/Inc/portmacro.h **** #define portCHAR          char
+  51:Core/Inc/portmacro.h **** #define portFLOAT         float
+  52:Core/Inc/portmacro.h **** #define portDOUBLE        double
+  53:Core/Inc/portmacro.h **** #define portLONG          long
+  54:Core/Inc/portmacro.h **** #define portSHORT         short
+  55:Core/Inc/portmacro.h **** #define portSTACK_TYPE    uint32_t
+  56:Core/Inc/portmacro.h **** #define portBASE_TYPE     long
+  57:Core/Inc/portmacro.h **** 
+  58:Core/Inc/portmacro.h **** typedef portSTACK_TYPE   StackType_t;
+  59:Core/Inc/portmacro.h **** typedef long             BaseType_t;
+  60:Core/Inc/portmacro.h **** typedef unsigned long    UBaseType_t;
+  61:Core/Inc/portmacro.h **** 
+  62:Core/Inc/portmacro.h **** #if ( configTICK_TYPE_WIDTH_IN_BITS == TICK_TYPE_WIDTH_16_BITS )
+  63:Core/Inc/portmacro.h ****     typedef uint16_t     TickType_t;
+  64:Core/Inc/portmacro.h ****     #define portMAX_DELAY              ( TickType_t ) 0xffff
+  65:Core/Inc/portmacro.h **** #elif ( configTICK_TYPE_WIDTH_IN_BITS == TICK_TYPE_WIDTH_32_BITS )
+  66:Core/Inc/portmacro.h ****     typedef uint32_t     TickType_t;
+  67:Core/Inc/portmacro.h ****     #define portMAX_DELAY              ( TickType_t ) 0xffffffffUL
+  68:Core/Inc/portmacro.h **** 
+  69:Core/Inc/portmacro.h **** /* 32-bit tick type on a 32-bit architecture, so reads of the tick count do
+  70:Core/Inc/portmacro.h ****  * not need to be guarded with a critical section. */
+  71:Core/Inc/portmacro.h ****     #define portTICK_TYPE_IS_ATOMIC    1
+ARM GAS  /tmp/cc8ky6Wn.s 			page 21
 
 
- 240              	                                   
- 241 001c AFF30080 	   .align 4                        
- 242 0020 00000000 	pxCurrentTCBConst2: .word pxCurrentTCB             
- 243              	
- 244              	@ 0 "" 2
- 270:Core/Src/port.c **** /*-----------------------------------------------------------*/
- 245              		.loc 1 270 1 is_stmt 0 view .LVU44
- 246              		.thumb
- 247              		.syntax unified
- 248              		.cfi_endproc
- 249              	.LFE6:
- 251              		.section	.text.vPortEndScheduler,"ax",%progbits
- 252              		.align	1
- 253              		.global	vPortEndScheduler
- 254              		.syntax unified
- 255              		.thumb
- 256              		.thumb_func
- 257              		.fpu fpv5-d16
- 259              	vPortEndScheduler:
- 260              	.LFB9:
- 457:Core/Src/port.c ****     /* Not implemented in ports where there is nothing to return to.
- 261              		.loc 1 457 1 is_stmt 1 view -0
- 262              		.cfi_startproc
- 263              		@ args = 0, pretend = 0, frame = 0
- 264              		@ frame_needed = 0, uses_anonymous_args = 0
- 265              		@ link register save eliminated.
- 460:Core/Src/port.c **** }
- 266              		.loc 1 460 48 view .LVU46
- 461:Core/Src/port.c **** /*-----------------------------------------------------------*/
- 267              		.loc 1 461 1 is_stmt 0 view .LVU47
- 268 0000 7047     		bx	lr
- 269              		.cfi_endproc
- 270              	.LFE9:
- 272              		.section	.text.vPortEnterCritical,"ax",%progbits
- 273              		.align	1
- 274              		.global	vPortEnterCritical
- 275              		.syntax unified
- 276              		.thumb
- 277              		.thumb_func
- 278              		.fpu fpv5-d16
- 280              	vPortEnterCritical:
- 281              	.LFB10:
- 465:Core/Src/port.c ****     portDISABLE_INTERRUPTS();
- 282              		.loc 1 465 1 is_stmt 1 view -0
- 283              		.cfi_startproc
- 284              		@ args = 0, pretend = 0, frame = 0
- 285              		@ frame_needed = 0, uses_anonymous_args = 0
- 286              		@ link register save eliminated.
- 466:Core/Src/port.c ****     uxCriticalNesting++;
- 287              		.loc 1 466 5 view .LVU49
- 288              	.LBB14:
- 289              	.LBI14:
- 210:Core/Inc/portmacro.h **** {
- 290              		.loc 2 210 30 view .LVU50
- 291              	.LBB15:
- 212:Core/Inc/portmacro.h **** 
- 292              		.loc 2 212 5 view .LVU51
-ARM GAS  /tmp/ccE8xnRX.s 			page 25
+  72:Core/Inc/portmacro.h **** #else
+  73:Core/Inc/portmacro.h ****     #error configTICK_TYPE_WIDTH_IN_BITS set to unsupported tick type width.
+  74:Core/Inc/portmacro.h **** #endif
+  75:Core/Inc/portmacro.h **** /*-----------------------------------------------------------*/
+  76:Core/Inc/portmacro.h **** 
+  77:Core/Inc/portmacro.h **** /* Architecture specifics. */
+  78:Core/Inc/portmacro.h **** #define portSTACK_GROWTH      ( -1 )
+  79:Core/Inc/portmacro.h **** #define portTICK_PERIOD_MS    ( ( TickType_t ) 1000 / configTICK_RATE_HZ )
+  80:Core/Inc/portmacro.h **** #define portBYTE_ALIGNMENT    8
+  81:Core/Inc/portmacro.h **** #define portDONT_DISCARD      __attribute__( ( used ) )
+  82:Core/Inc/portmacro.h **** /*-----------------------------------------------------------*/
+  83:Core/Inc/portmacro.h **** 
+  84:Core/Inc/portmacro.h **** /* Scheduler utilities. */
+  85:Core/Inc/portmacro.h **** #define portYIELD()                                     \
+  86:Core/Inc/portmacro.h ****     {                                                   \
+  87:Core/Inc/portmacro.h ****         /* Set a PendSV to request a context switch. */ \
+  88:Core/Inc/portmacro.h ****         portNVIC_INT_CTRL_REG = portNVIC_PENDSVSET_BIT; \
+  89:Core/Inc/portmacro.h ****                                                         \
+  90:Core/Inc/portmacro.h ****         /* Barriers are normally not required but do ensure the code is completely \
+  91:Core/Inc/portmacro.h ****          * within the specified behaviour for the architecture. */ \
+  92:Core/Inc/portmacro.h ****         __asm volatile ( "dsb" ::: "memory" );                     \
+  93:Core/Inc/portmacro.h ****         __asm volatile ( "isb" );                                  \
+  94:Core/Inc/portmacro.h ****     }
+  95:Core/Inc/portmacro.h **** 
+  96:Core/Inc/portmacro.h **** #define portNVIC_INT_CTRL_REG     ( *( ( volatile uint32_t * ) 0xe000ed04 ) )
+  97:Core/Inc/portmacro.h **** #define portNVIC_PENDSVSET_BIT    ( 1UL << 28UL )
+  98:Core/Inc/portmacro.h **** #define portEND_SWITCHING_ISR( xSwitchRequired ) \
+  99:Core/Inc/portmacro.h ****     do                                           \
+ 100:Core/Inc/portmacro.h ****     {                                            \
+ 101:Core/Inc/portmacro.h ****         if( xSwitchRequired != pdFALSE )         \
+ 102:Core/Inc/portmacro.h ****         {                                        \
+ 103:Core/Inc/portmacro.h ****             traceISR_EXIT_TO_SCHEDULER();        \
+ 104:Core/Inc/portmacro.h ****             portYIELD();                         \
+ 105:Core/Inc/portmacro.h ****         }                                        \
+ 106:Core/Inc/portmacro.h ****         else                                     \
+ 107:Core/Inc/portmacro.h ****         {                                        \
+ 108:Core/Inc/portmacro.h ****             traceISR_EXIT();                     \
+ 109:Core/Inc/portmacro.h ****         }                                        \
+ 110:Core/Inc/portmacro.h ****     } while( 0 )
+ 111:Core/Inc/portmacro.h **** #define portYIELD_FROM_ISR( x )    portEND_SWITCHING_ISR( x )
+ 112:Core/Inc/portmacro.h **** /*-----------------------------------------------------------*/
+ 113:Core/Inc/portmacro.h **** 
+ 114:Core/Inc/portmacro.h **** /* Critical section management. */
+ 115:Core/Inc/portmacro.h **** extern void vPortEnterCritical( void );
+ 116:Core/Inc/portmacro.h **** extern void vPortExitCritical( void );
+ 117:Core/Inc/portmacro.h **** #define portSET_INTERRUPT_MASK_FROM_ISR()         ulPortRaiseBASEPRI()
+ 118:Core/Inc/portmacro.h **** #define portCLEAR_INTERRUPT_MASK_FROM_ISR( x )    vPortSetBASEPRI( x )
+ 119:Core/Inc/portmacro.h **** #define portDISABLE_INTERRUPTS()                  vPortRaiseBASEPRI()
+ 120:Core/Inc/portmacro.h **** #define portENABLE_INTERRUPTS()                   vPortSetBASEPRI( 0 )
+ 121:Core/Inc/portmacro.h **** #define portENTER_CRITICAL()                      vPortEnterCritical()
+ 122:Core/Inc/portmacro.h **** #define portEXIT_CRITICAL()                       vPortExitCritical()
+ 123:Core/Inc/portmacro.h **** 
+ 124:Core/Inc/portmacro.h **** /*-----------------------------------------------------------*/
+ 125:Core/Inc/portmacro.h **** 
+ 126:Core/Inc/portmacro.h **** /* Task function macros as described on the FreeRTOS.org WEB site.  These are
+ 127:Core/Inc/portmacro.h ****  * not necessary for to use this port.  They are defined so the common demo files
+ 128:Core/Inc/portmacro.h ****  * (which build with all the ports) will build. */
+ARM GAS  /tmp/cc8ky6Wn.s 			page 22
 
 
- 293              		.loc 2 214 5 view .LVU52
+ 129:Core/Inc/portmacro.h **** #define portTASK_FUNCTION_PROTO( vFunction, pvParameters )    void vFunction( void * pvParameters )
+ 130:Core/Inc/portmacro.h **** #define portTASK_FUNCTION( vFunction, pvParameters )          void vFunction( void * pvParameters )
+ 131:Core/Inc/portmacro.h **** /*-----------------------------------------------------------*/
+ 132:Core/Inc/portmacro.h **** 
+ 133:Core/Inc/portmacro.h **** /* Tickless idle/low power functionality. */
+ 134:Core/Inc/portmacro.h **** #ifndef portSUPPRESS_TICKS_AND_SLEEP
+ 135:Core/Inc/portmacro.h ****     extern void vPortSuppressTicksAndSleep( TickType_t xExpectedIdleTime );
+ 136:Core/Inc/portmacro.h ****     #define portSUPPRESS_TICKS_AND_SLEEP( xExpectedIdleTime )    vPortSuppressTicksAndSleep( xExpec
+ 137:Core/Inc/portmacro.h **** #endif
+ 138:Core/Inc/portmacro.h **** /*-----------------------------------------------------------*/
+ 139:Core/Inc/portmacro.h **** 
+ 140:Core/Inc/portmacro.h **** /* Architecture specific optimisations. */
+ 141:Core/Inc/portmacro.h **** #ifndef configUSE_PORT_OPTIMISED_TASK_SELECTION
+ 142:Core/Inc/portmacro.h ****     #define configUSE_PORT_OPTIMISED_TASK_SELECTION    1
+ 143:Core/Inc/portmacro.h **** #endif
+ 144:Core/Inc/portmacro.h **** 
+ 145:Core/Inc/portmacro.h **** #if configUSE_PORT_OPTIMISED_TASK_SELECTION == 1
+ 146:Core/Inc/portmacro.h **** 
+ 147:Core/Inc/portmacro.h **** /* Generic helper function. */
+ 148:Core/Inc/portmacro.h ****     __attribute__( ( always_inline ) ) static inline uint8_t ucPortCountLeadingZeros( uint32_t ulBi
+ 149:Core/Inc/portmacro.h ****     {
+ 150:Core/Inc/portmacro.h ****         uint8_t ucReturn;
+ 151:Core/Inc/portmacro.h **** 
+ 152:Core/Inc/portmacro.h ****         __asm volatile ( "clz %0, %1" : "=r" ( ucReturn ) : "r" ( ulBitmap ) : "memory" );
+ 153:Core/Inc/portmacro.h **** 
+ 154:Core/Inc/portmacro.h ****         return ucReturn;
+ 155:Core/Inc/portmacro.h ****     }
+ 156:Core/Inc/portmacro.h **** 
+ 157:Core/Inc/portmacro.h **** /* Check the configuration. */
+ 158:Core/Inc/portmacro.h ****     #if ( configMAX_PRIORITIES > 32 )
+ 159:Core/Inc/portmacro.h ****         #error configUSE_PORT_OPTIMISED_TASK_SELECTION can only be set to 1 when configMAX_PRIORITI
+ 160:Core/Inc/portmacro.h ****     #endif
+ 161:Core/Inc/portmacro.h **** 
+ 162:Core/Inc/portmacro.h **** /* Store/clear the ready priorities in a bit map. */
+ 163:Core/Inc/portmacro.h ****     #define portRECORD_READY_PRIORITY( uxPriority, uxReadyPriorities )    ( uxReadyPriorities ) |= 
+ 164:Core/Inc/portmacro.h ****     #define portRESET_READY_PRIORITY( uxPriority, uxReadyPriorities )     ( uxReadyPriorities ) &= 
+ 165:Core/Inc/portmacro.h **** 
+ 166:Core/Inc/portmacro.h **** /*-----------------------------------------------------------*/
+ 167:Core/Inc/portmacro.h **** 
+ 168:Core/Inc/portmacro.h ****     #define portGET_HIGHEST_PRIORITY( uxTopPriority, uxReadyPriorities )    uxTopPriority = ( 31UL 
+ 169:Core/Inc/portmacro.h **** 
+ 170:Core/Inc/portmacro.h **** #endif /* configUSE_PORT_OPTIMISED_TASK_SELECTION */
+ 171:Core/Inc/portmacro.h **** 
+ 172:Core/Inc/portmacro.h **** /*-----------------------------------------------------------*/
+ 173:Core/Inc/portmacro.h **** 
+ 174:Core/Inc/portmacro.h **** #ifdef configASSERT
+ 175:Core/Inc/portmacro.h ****     void vPortValidateInterruptPriority( void );
+ 176:Core/Inc/portmacro.h ****     #define portASSERT_IF_INTERRUPT_PRIORITY_INVALID()    vPortValidateInterruptPriority()
+ 177:Core/Inc/portmacro.h **** #endif
+ 178:Core/Inc/portmacro.h **** 
+ 179:Core/Inc/portmacro.h **** /* portNOP() is not required by this port. */
+ 180:Core/Inc/portmacro.h **** #define portNOP()
+ 181:Core/Inc/portmacro.h **** 
+ 182:Core/Inc/portmacro.h **** #define portINLINE              __inline
+ 183:Core/Inc/portmacro.h **** 
+ 184:Core/Inc/portmacro.h **** #ifndef portFORCE_INLINE
+ 185:Core/Inc/portmacro.h ****     #define portFORCE_INLINE    inline __attribute__( ( always_inline ) )
+ARM GAS  /tmp/cc8ky6Wn.s 			page 23
+
+
+ 186:Core/Inc/portmacro.h **** #endif
+ 187:Core/Inc/portmacro.h **** 
+ 188:Core/Inc/portmacro.h **** portFORCE_INLINE static BaseType_t xPortIsInsideInterrupt( void )
+ 189:Core/Inc/portmacro.h **** {
+ 190:Core/Inc/portmacro.h ****     uint32_t ulCurrentInterrupt;
+ 191:Core/Inc/portmacro.h ****     BaseType_t xReturn;
+ 192:Core/Inc/portmacro.h **** 
+ 193:Core/Inc/portmacro.h ****     /* Obtain the number of the currently executing interrupt. */
+ 194:Core/Inc/portmacro.h ****     __asm volatile ( "mrs %0, ipsr" : "=r" ( ulCurrentInterrupt )::"memory" );
+ 195:Core/Inc/portmacro.h **** 
+ 196:Core/Inc/portmacro.h ****     if( ulCurrentInterrupt == 0 )
+ 197:Core/Inc/portmacro.h ****     {
+ 198:Core/Inc/portmacro.h ****         xReturn = pdFALSE;
+ 199:Core/Inc/portmacro.h ****     }
+ 200:Core/Inc/portmacro.h ****     else
+ 201:Core/Inc/portmacro.h ****     {
+ 202:Core/Inc/portmacro.h ****         xReturn = pdTRUE;
+ 203:Core/Inc/portmacro.h ****     }
+ 204:Core/Inc/portmacro.h **** 
+ 205:Core/Inc/portmacro.h ****     return xReturn;
+ 206:Core/Inc/portmacro.h **** }
+ 207:Core/Inc/portmacro.h **** 
+ 208:Core/Inc/portmacro.h **** /*-----------------------------------------------------------*/
+ 209:Core/Inc/portmacro.h **** 
+ 210:Core/Inc/portmacro.h **** portFORCE_INLINE static void vPortRaiseBASEPRI( void )
+ 232              		.loc 2 210 30 view .LVU18
+ 233              	.LBB13:
+ 211:Core/Inc/portmacro.h **** {
+ 212:Core/Inc/portmacro.h ****     uint32_t ulNewBASEPRI;
+ 234              		.loc 2 212 5 view .LVU19
+ 213:Core/Inc/portmacro.h **** 
+ 214:Core/Inc/portmacro.h ****     __asm volatile
+ 235              		.loc 2 214 5 view .LVU20
+ 236              		.syntax unified
+ 237              	@ 214 "Core/Inc/portmacro.h" 1
+ 238 0012 4FF05003 		   mov r3, #80                                              
+ 239 0016 72B6     	   cpsid i                                                 
+ 240 0018 83F31188 	   msr basepri, r3                                         
+ 241 001c BFF36F8F 	   isb                                                     
+ 242 0020 BFF34F8F 	   dsb                                                     
+ 243 0024 62B6     	   cpsie i                                                 
+ 244              	
+ 245              	@ 0 "" 2
+ 246              	.LVL0:
+ 247              		.thumb
+ 248              		.syntax unified
+ 249              	.L8:
+ 250              		.loc 2 214 5 is_stmt 0 view .LVU21
+ 251              	.LBE13:
+ 252              	.LBE12:
+ 250:Core/Src/port.c **** }
+ 253              		.loc 1 250 5 is_stmt 1 discriminator 1 view .LVU22
+ 241:Core/Src/port.c ****     {
+ 254              		.loc 1 241 10 discriminator 1 view .LVU23
+ 241:Core/Src/port.c ****     {
+ 255              		.loc 1 241 20 is_stmt 0 discriminator 1 view .LVU24
+ 256 0026 019B     		ldr	r3, [sp, #4]
+ARM GAS  /tmp/cc8ky6Wn.s 			page 24
+
+
+ 241:Core/Src/port.c ****     {
+ 257              		.loc 1 241 10 discriminator 1 view .LVU25
+ 258 0028 002B     		cmp	r3, #0
+ 259 002a FCD0     		beq	.L8
+ 251:Core/Src/port.c **** /*-----------------------------------------------------------*/
+ 260              		.loc 1 251 1 view .LVU26
+ 261 002c 03B0     		add	sp, sp, #12
+ 262              	.LCFI2:
+ 263              		.cfi_remember_state
+ 264              		.cfi_def_cfa_offset 4
+ 265              		@ sp needed
+ 266 002e 5DF804FB 		ldr	pc, [sp], #4
+ 267              	.L10:
+ 268              	.LCFI3:
+ 269              		.cfi_restore_state
+ 238:Core/Src/port.c ****     portDISABLE_INTERRUPTS();
+ 270              		.loc 1 238 5 is_stmt 1 discriminator 1 view .LVU27
+ 271 0032 4FF0FF33 		mov	r3, #-1
+ 272 0036 0822     		movs	r2, #8
+ 273 0038 0349     		ldr	r1, .L11+4
+ 274 003a 0448     		ldr	r0, .L11+8
+ 275 003c FFF7FEFF 		bl	HAL_UART_Transmit
+ 276              	.LVL1:
+ 277              	.L7:
+ 238:Core/Src/port.c ****     portDISABLE_INTERRUPTS();
+ 278              		.loc 1 238 5 discriminator 1 view .LVU28
+ 238:Core/Src/port.c ****     portDISABLE_INTERRUPTS();
+ 279              		.loc 1 238 5 discriminator 1 view .LVU29
+ 238:Core/Src/port.c ****     portDISABLE_INTERRUPTS();
+ 280              		.loc 1 238 5 discriminator 1 view .LVU30
+ 281 0040 FEE7     		b	.L7
+ 282              	.L12:
+ 283 0042 00BF     		.align	2
+ 284              	.L11:
+ 285 0044 00000000 		.word	.LANCHOR0
+ 286 0048 00000000 		.word	.LC0
+ 287 004c 00000000 		.word	huart2
+ 288              		.cfi_endproc
+ 289              	.LFE149:
+ 291              		.section	.text.pxPortInitialiseStack,"ax",%progbits
+ 292              		.align	1
+ 293              		.global	pxPortInitialiseStack
  294              		.syntax unified
- 295              	@ 214 "Core/Inc/portmacro.h" 1
- 296 0000 4FF05003 		   mov r3, #80                                              
- 297 0004 72B6     	   cpsid i                                                 
- 298 0006 83F31188 	   msr basepri, r3                                         
- 299 000a BFF36F8F 	   isb                                                     
- 300 000e BFF34F8F 	   dsb                                                     
- 301 0012 62B6     	   cpsie i                                                 
- 302              	
- 303              	@ 0 "" 2
- 304              		.thumb
- 305              		.syntax unified
- 306              	.LBE15:
- 307              	.LBE14:
+ 295              		.thumb
+ 296              		.thumb_func
+ 297              		.fpu fpv5-d16
+ 299              	pxPortInitialiseStack:
+ 300              	.LVL2:
+ 301              	.LFB148:
+ 199:Core/Src/port.c ****     /* Simulate the stack frame as it would be created by a context switch
+ 302              		.loc 1 199 1 view -0
+ 303              		.cfi_startproc
+ 304              		@ args = 0, pretend = 0, frame = 0
+ 305              		@ frame_needed = 0, uses_anonymous_args = 0
+ 306              		@ link register save eliminated.
+ 205:Core/Src/port.c **** 
+ 307              		.loc 1 205 5 view .LVU32
+ARM GAS  /tmp/cc8ky6Wn.s 			page 25
+
+
+ 207:Core/Src/port.c ****     pxTopOfStack--;
+ 308              		.loc 1 207 5 view .LVU33
+ 207:Core/Src/port.c ****     pxTopOfStack--;
+ 309              		.loc 1 207 19 is_stmt 0 view .LVU34
+ 310 0000 4FF08073 		mov	r3, #16777216
+ 311 0004 40F8043C 		str	r3, [r0, #-4]
+ 208:Core/Src/port.c ****     *pxTopOfStack = ( ( StackType_t ) pxCode ) & portSTART_ADDRESS_MASK; /* PC */
+ 312              		.loc 1 208 5 is_stmt 1 view .LVU35
+ 313              	.LVL3:
+ 209:Core/Src/port.c ****     pxTopOfStack--;
+ 314              		.loc 1 209 5 view .LVU36
+ 209:Core/Src/port.c ****     pxTopOfStack--;
+ 315              		.loc 1 209 48 is_stmt 0 view .LVU37
+ 316 0008 21F00101 		bic	r1, r1, #1
+ 317              	.LVL4:
+ 209:Core/Src/port.c ****     pxTopOfStack--;
+ 318              		.loc 1 209 19 view .LVU38
+ 319 000c 40F8081C 		str	r1, [r0, #-8]
+ 210:Core/Src/port.c ****     *pxTopOfStack = ( StackType_t ) portTASK_RETURN_ADDRESS;             /* LR */
+ 320              		.loc 1 210 5 is_stmt 1 view .LVU39
+ 321              	.LVL5:
+ 211:Core/Src/port.c **** 
+ 322              		.loc 1 211 5 view .LVU40
+ 211:Core/Src/port.c **** 
+ 323              		.loc 1 211 21 is_stmt 0 view .LVU41
+ 324 0010 054B     		ldr	r3, .L14
+ 211:Core/Src/port.c **** 
+ 325              		.loc 1 211 19 view .LVU42
+ 326 0012 40F80C3C 		str	r3, [r0, #-12]
+ 214:Core/Src/port.c ****     *pxTopOfStack = ( StackType_t ) pvParameters; /* R0 */
+ 327              		.loc 1 214 5 is_stmt 1 view .LVU43
+ 328              	.LVL6:
+ 215:Core/Src/port.c **** 
+ 329              		.loc 1 215 5 view .LVU44
+ 215:Core/Src/port.c **** 
+ 330              		.loc 1 215 19 is_stmt 0 view .LVU45
+ 331 0016 40F8202C 		str	r2, [r0, #-32]
+ 219:Core/Src/port.c ****     *pxTopOfStack = portINITIAL_EXC_RETURN;
+ 332              		.loc 1 219 5 is_stmt 1 view .LVU46
+ 333              	.LVL7:
+ 220:Core/Src/port.c **** 
+ 334              		.loc 1 220 5 view .LVU47
+ 220:Core/Src/port.c **** 
+ 335              		.loc 1 220 19 is_stmt 0 view .LVU48
+ 336 001a 6FF00203 		mvn	r3, #2
+ 337 001e 40F8243C 		str	r3, [r0, #-36]
+ 222:Core/Src/port.c **** 
+ 338              		.loc 1 222 5 is_stmt 1 view .LVU49
+ 339              	.LVL8:
+ 224:Core/Src/port.c **** }
+ 340              		.loc 1 224 5 view .LVU50
+ 225:Core/Src/port.c **** /*-----------------------------------------------------------*/
+ 341              		.loc 1 225 1 is_stmt 0 view .LVU51
+ 342 0022 4438     		subs	r0, r0, #68
+ 343              	.LVL9:
+ 225:Core/Src/port.c **** /*-----------------------------------------------------------*/
+ 344              		.loc 1 225 1 view .LVU52
+ARM GAS  /tmp/cc8ky6Wn.s 			page 26
+
+
+ 345 0024 7047     		bx	lr
+ 346              	.L15:
+ 347 0026 00BF     		.align	2
+ 348              	.L14:
+ 349 0028 00000000 		.word	prvTaskExitError
+ 350              		.cfi_endproc
+ 351              	.LFE148:
+ 353              		.section	.text.vPortEndScheduler,"ax",%progbits
+ 354              		.align	1
+ 355              		.global	vPortEndScheduler
+ 356              		.syntax unified
+ 357              		.thumb
+ 358              		.thumb_func
+ 359              		.fpu fpv5-d16
+ 361              	vPortEndScheduler:
+ 362              	.LFB153:
+ 457:Core/Src/port.c ****     /* Not implemented in ports where there is nothing to return to.
+ 363              		.loc 1 457 1 is_stmt 1 view -0
+ 364              		.cfi_startproc
+ 365              		@ args = 0, pretend = 0, frame = 0
+ 366              		@ frame_needed = 0, uses_anonymous_args = 0
+ 367 0000 08B5     		push	{r3, lr}
+ 368              	.LCFI4:
+ 369              		.cfi_def_cfa_offset 8
+ 370              		.cfi_offset 3, -8
+ 371              		.cfi_offset 14, -4
+ 460:Core/Src/port.c **** }
+ 372              		.loc 1 460 5 view .LVU54
+ 373 0002 074B     		ldr	r3, .L21
+ 374 0004 1B68     		ldr	r3, [r3]
+ 375 0006 B3F57A7F 		cmp	r3, #1000
+ 376 000a 00D1     		bne	.L20
+ 461:Core/Src/port.c **** /*-----------------------------------------------------------*/
+ 377              		.loc 1 461 1 is_stmt 0 view .LVU55
+ 378 000c 08BD     		pop	{r3, pc}
+ 379              	.L20:
+ 460:Core/Src/port.c **** }
+ 380              		.loc 1 460 5 is_stmt 1 discriminator 1 view .LVU56
+ 381 000e 4FF0FF33 		mov	r3, #-1
+ 382 0012 0822     		movs	r2, #8
+ 383 0014 0349     		ldr	r1, .L21+4
+ 384 0016 0448     		ldr	r0, .L21+8
+ 385 0018 FFF7FEFF 		bl	HAL_UART_Transmit
+ 386              	.LVL10:
+ 387              	.L18:
+ 460:Core/Src/port.c **** }
+ 388              		.loc 1 460 5 discriminator 1 view .LVU57
+ 460:Core/Src/port.c **** }
+ 389              		.loc 1 460 5 discriminator 1 view .LVU58
+ 460:Core/Src/port.c **** }
+ 390              		.loc 1 460 5 discriminator 1 view .LVU59
+ 391 001c FEE7     		b	.L18
+ 392              	.L22:
+ 393 001e 00BF     		.align	2
+ 394              	.L21:
+ 395 0020 00000000 		.word	.LANCHOR0
+ 396 0024 00000000 		.word	.LC0
+ARM GAS  /tmp/cc8ky6Wn.s 			page 27
+
+
+ 397 0028 00000000 		.word	huart2
+ 398              		.cfi_endproc
+ 399              	.LFE153:
+ 401              		.section	.text.vPortEnterCritical,"ax",%progbits
+ 402              		.align	1
+ 403              		.global	vPortEnterCritical
+ 404              		.syntax unified
+ 405              		.thumb
+ 406              		.thumb_func
+ 407              		.fpu fpv5-d16
+ 409              	vPortEnterCritical:
+ 410              	.LFB154:
+ 465:Core/Src/port.c ****     portDISABLE_INTERRUPTS();
+ 411              		.loc 1 465 1 view -0
+ 412              		.cfi_startproc
+ 413              		@ args = 0, pretend = 0, frame = 0
+ 414              		@ frame_needed = 0, uses_anonymous_args = 0
+ 415 0000 08B5     		push	{r3, lr}
+ 416              	.LCFI5:
+ 417              		.cfi_def_cfa_offset 8
+ 418              		.cfi_offset 3, -8
+ 419              		.cfi_offset 14, -4
+ 466:Core/Src/port.c ****     uxCriticalNesting++;
+ 420              		.loc 1 466 5 view .LVU61
+ 421              	.LBB14:
+ 422              	.LBI14:
+ 210:Core/Inc/portmacro.h **** {
+ 423              		.loc 2 210 30 view .LVU62
+ 424              	.LBB15:
+ 212:Core/Inc/portmacro.h **** 
+ 425              		.loc 2 212 5 view .LVU63
+ 426              		.loc 2 214 5 view .LVU64
+ 427              		.syntax unified
+ 428              	@ 214 "Core/Inc/portmacro.h" 1
+ 429 0002 4FF05003 		   mov r3, #80                                              
+ 430 0006 72B6     	   cpsid i                                                 
+ 431 0008 83F31188 	   msr basepri, r3                                         
+ 432 000c BFF36F8F 	   isb                                                     
+ 433 0010 BFF34F8F 	   dsb                                                     
+ 434 0014 62B6     	   cpsie i                                                 
+ 435              	
+ 436              	@ 0 "" 2
+ 437              		.thumb
+ 438              		.syntax unified
+ 439              	.LBE15:
+ 440              	.LBE14:
  467:Core/Src/port.c **** 
- 308              		.loc 1 467 5 view .LVU53
+ 441              		.loc 1 467 5 view .LVU65
  467:Core/Src/port.c **** 
- 309              		.loc 1 467 22 is_stmt 0 view .LVU54
- 310 0014 024A     		ldr	r2, .L12
- 311 0016 1368     		ldr	r3, [r2]
- 312 0018 0133     		adds	r3, r3, #1
- 313 001a 1360     		str	r3, [r2]
+ 442              		.loc 1 467 22 is_stmt 0 view .LVU66
+ 443 0016 0B4A     		ldr	r2, .L28
+ 444 0018 1368     		ldr	r3, [r2]
+ 445 001a 0133     		adds	r3, r3, #1
+ 446 001c 1360     		str	r3, [r2]
  474:Core/Src/port.c ****     {
- 314              		.loc 1 474 5 is_stmt 1 view .LVU55
- 476:Core/Src/port.c ****     }
- 315              		.loc 1 476 77 view .LVU56
+ 447              		.loc 1 474 5 is_stmt 1 view .LVU67
+ 474:Core/Src/port.c ****     {
+ARM GAS  /tmp/cc8ky6Wn.s 			page 28
+
+
+ 448              		.loc 1 474 7 is_stmt 0 view .LVU68
+ 449 001e 012B     		cmp	r3, #1
+ 450 0020 00D0     		beq	.L27
+ 451              	.L23:
  478:Core/Src/port.c **** /*-----------------------------------------------------------*/
- 316              		.loc 1 478 1 is_stmt 0 view .LVU57
- 317 001c 7047     		bx	lr
- 318              	.L13:
- 319 001e 00BF     		.align	2
- 320              	.L12:
- 321 0020 00000000 		.word	.LANCHOR0
- 322              		.cfi_endproc
- 323              	.LFE10:
- 325              		.section	.text.vPortExitCritical,"ax",%progbits
- 326              		.align	1
- 327              		.global	vPortExitCritical
- 328              		.syntax unified
- 329              		.thumb
- 330              		.thumb_func
- 331              		.fpu fpv5-d16
- 333              	vPortExitCritical:
- 334              	.LFB11:
+ 452              		.loc 1 478 1 view .LVU69
+ 453 0022 08BD     		pop	{r3, pc}
+ 454              	.L27:
+ 476:Core/Src/port.c ****     }
+ 455              		.loc 1 476 9 is_stmt 1 view .LVU70
+ 456 0024 4FF0E023 		mov	r3, #-536813568
+ 457 0028 D3F8043D 		ldr	r3, [r3, #3332]
+ 458 002c 13F0FF0F 		tst	r3, #255
+ 459 0030 F7D0     		beq	.L23
+ 476:Core/Src/port.c ****     }
+ 460              		.loc 1 476 9 discriminator 1 view .LVU71
+ 461 0032 4FF0FF33 		mov	r3, #-1
+ 462 0036 0822     		movs	r2, #8
+ 463 0038 0349     		ldr	r1, .L28+4
+ 464 003a 0448     		ldr	r0, .L28+8
+ 465 003c FFF7FEFF 		bl	HAL_UART_Transmit
+ 466              	.LVL11:
+ 467              	.L25:
+ 476:Core/Src/port.c ****     }
+ 468              		.loc 1 476 9 discriminator 1 view .LVU72
+ 476:Core/Src/port.c ****     }
+ 469              		.loc 1 476 9 discriminator 1 view .LVU73
+ 476:Core/Src/port.c ****     }
+ 470              		.loc 1 476 9 discriminator 1 view .LVU74
+ 471 0040 FEE7     		b	.L25
+ 472              	.L29:
+ 473 0042 00BF     		.align	2
+ 474              	.L28:
+ 475 0044 00000000 		.word	.LANCHOR0
+ 476 0048 00000000 		.word	.LC0
+ 477 004c 00000000 		.word	huart2
+ 478              		.cfi_endproc
+ 479              	.LFE154:
+ 481              		.section	.text.vPortExitCritical,"ax",%progbits
+ 482              		.align	1
+ 483              		.global	vPortExitCritical
+ 484              		.syntax unified
+ 485              		.thumb
+ 486              		.thumb_func
+ 487              		.fpu fpv5-d16
+ 489              	vPortExitCritical:
+ 490              	.LFB155:
  482:Core/Src/port.c ****     configASSERT( uxCriticalNesting );
- 335              		.loc 1 482 1 is_stmt 1 view -0
- 336              		.cfi_startproc
- 337              		@ args = 0, pretend = 0, frame = 0
- 338              		@ frame_needed = 0, uses_anonymous_args = 0
- 339              		@ link register save eliminated.
+ 491              		.loc 1 482 1 view -0
+ 492              		.cfi_startproc
+ 493              		@ args = 0, pretend = 0, frame = 0
+ 494              		@ frame_needed = 0, uses_anonymous_args = 0
+ 495 0000 08B5     		push	{r3, lr}
+ 496              	.LCFI6:
+ 497              		.cfi_def_cfa_offset 8
+ 498              		.cfi_offset 3, -8
+ 499              		.cfi_offset 14, -4
+ARM GAS  /tmp/cc8ky6Wn.s 			page 29
+
+
  483:Core/Src/port.c ****     uxCriticalNesting--;
- 340              		.loc 1 483 38 view .LVU59
+ 500              		.loc 1 483 5 view .LVU76
+ 501 0002 094B     		ldr	r3, .L36
+ 502 0004 1B68     		ldr	r3, [r3]
+ 503 0006 33B1     		cbz	r3, .L35
+ 483:Core/Src/port.c ****     uxCriticalNesting--;
+ 504              		.loc 1 483 38 discriminator 2 view .LVU77
  484:Core/Src/port.c **** 
- 341              		.loc 1 484 5 view .LVU60
+ 505              		.loc 1 484 5 discriminator 2 view .LVU78
  484:Core/Src/port.c **** 
- 342              		.loc 1 484 22 is_stmt 0 view .LVU61
-ARM GAS  /tmp/ccE8xnRX.s 			page 26
-
-
- 343 0000 034A     		ldr	r2, .L16
- 344 0002 1368     		ldr	r3, [r2]
- 345 0004 013B     		subs	r3, r3, #1
- 346 0006 1360     		str	r3, [r2]
+ 506              		.loc 1 484 22 is_stmt 0 discriminator 2 view .LVU79
+ 507 0008 013B     		subs	r3, r3, #1
+ 508 000a 074A     		ldr	r2, .L36
+ 509 000c 1360     		str	r3, [r2]
  486:Core/Src/port.c ****     {
- 347              		.loc 1 486 5 is_stmt 1 view .LVU62
+ 510              		.loc 1 486 5 is_stmt 1 discriminator 2 view .LVU80
  486:Core/Src/port.c ****     {
- 348              		.loc 1 486 7 is_stmt 0 view .LVU63
- 349 0008 0BB9     		cbnz	r3, .L14
+ 511              		.loc 1 486 7 is_stmt 0 discriminator 2 view .LVU81
+ 512 000e 0BB9     		cbnz	r3, .L30
  488:Core/Src/port.c ****     }
- 350              		.loc 1 488 9 is_stmt 1 view .LVU64
- 351              	.LVL9:
- 352              	.LBB16:
- 353              	.LBI16:
+ 513              		.loc 1 488 9 is_stmt 1 view .LVU82
+ 514              	.LVL12:
+ 515              	.LBB16:
+ 516              	.LBI16:
  215:Core/Inc/portmacro.h ****     (
  216:Core/Inc/portmacro.h ****         "   mov %0, %1                                              \n" \
  217:Core/Inc/portmacro.h ****         "   cpsid i                                                 \n" \
@@ -1548,426 +1738,841 @@ ARM GAS  /tmp/ccE8xnRX.s 			page 1
  245:Core/Inc/portmacro.h ****      * warnings. */
  246:Core/Inc/portmacro.h ****     return ulOriginalBASEPRI;
  247:Core/Inc/portmacro.h **** }
+ARM GAS  /tmp/cc8ky6Wn.s 			page 30
+
+
  248:Core/Inc/portmacro.h **** /*-----------------------------------------------------------*/
  249:Core/Inc/portmacro.h **** 
  250:Core/Inc/portmacro.h **** portFORCE_INLINE static void vPortSetBASEPRI( uint32_t ulNewMaskValue )
- 354              		.loc 2 250 30 view .LVU65
- 355              	.LBB17:
+ 517              		.loc 2 250 30 view .LVU83
+ 518              	.LBB17:
  251:Core/Inc/portmacro.h **** {
  252:Core/Inc/portmacro.h ****     __asm volatile
- 356              		.loc 2 252 5 view .LVU66
- 357              		.syntax unified
- 358              	@ 252 "Core/Inc/portmacro.h" 1
-ARM GAS  /tmp/ccE8xnRX.s 			page 27
-
-
- 359 000a 83F31188 		   msr basepri, r3 
- 360              	@ 0 "" 2
- 361              	.LVL10:
- 362              		.thumb
- 363              		.syntax unified
- 364              	.L14:
- 365              		.loc 2 252 5 is_stmt 0 view .LVU67
- 366              	.LBE17:
- 367              	.LBE16:
- 490:Core/Src/port.c **** /*-----------------------------------------------------------*/
- 368              		.loc 1 490 1 view .LVU68
- 369 000e 7047     		bx	lr
- 370              	.L17:
- 371              		.align	2
- 372              	.L16:
- 373 0010 00000000 		.word	.LANCHOR0
- 374              		.cfi_endproc
- 375              	.LFE11:
- 377              		.section	.text.PendSV_Handler,"ax",%progbits
- 378              		.align	1
- 379              		.global	PendSV_Handler
- 380              		.syntax unified
- 381              		.thumb
- 382              		.thumb_func
- 383              		.fpu fpv5-d16
- 385              	PendSV_Handler:
- 386              	.LFB12:
- 494:Core/Src/port.c ****     /* This is a naked function. */
- 387              		.loc 1 494 1 is_stmt 1 view -0
- 388              		.cfi_startproc
- 389              		@ Naked Function: prologue and epilogue provided by programmer.
- 390              		@ args = 0, pretend = 0, frame = 0
- 391              		@ frame_needed = 0, uses_anonymous_args = 0
- 497:Core/Src/port.c ****     (
- 392              		.loc 1 497 5 view .LVU70
- 393              		.syntax unified
- 394              	@ 497 "Core/Src/port.c" 1
- 395 0000 EFF30980 		   mrs r0, psp                         
- 396 0004 BFF36F8F 	   isb                                 
- 397              	                                       
- 398 0008 154B     	   ldr r3, pxCurrentTCBConst           
- 399 000a 1A68     	   ldr r2, [r3]                        
- 400              	                                       
- 401 000c 1EF0100F 	   tst r14, #0x10                      
- 402 0010 08BF     	   it eq                               
- 403 0012 20ED108A 	   vstmdbeq r0!, {s16-s31}             
- 404              	                                       
- 405 0016 20E9F04F 	   stmdb r0!, {r4-r11, r14}            
- 406 001a 1060     	   str r0, [r2]                        
- 407              	                                       
- 408 001c 2DE90900 	   stmdb sp!, {r0, r3}                 
- 409 0020 4FF05000 	   mov r0, #80                          
- 410 0024 72B6     	   cpsid i                             
- 411 0026 80F31188 	   msr basepri, r0                     
- 412 002a BFF34F8F 	   dsb                                 
- 413 002e BFF36F8F 	   isb                                 
- 414 0032 62B6     	   cpsie i                             
-ARM GAS  /tmp/ccE8xnRX.s 			page 28
-
-
- 415 0034 FFF7FEFF 	   bl vTaskSwitchContext               
- 416 0038 4FF00000 	   mov r0, #0                          
- 417 003c 80F31188 	   msr basepri, r0                     
- 418 0040 09BC     	   ldmia sp!, {r0, r3}                 
- 419              	                                       
- 420 0042 1968     	   ldr r1, [r3]                        
- 421 0044 0868     	   ldr r0, [r1]                        
- 422              	                                       
- 423 0046 B0E8F04F 	   ldmia r0!, {r4-r11, r14}            
- 424              	                                       
- 425 004a 1EF0100F 	   tst r14, #0x10                      
- 426 004e 08BF     	   it eq                               
- 427 0050 B0EC108A 	   vldmiaeq r0!, {s16-s31}             
- 428              	                                       
- 429 0054 80F30988 	   msr psp, r0                         
- 430 0058 BFF36F8F 	   isb                                 
- 431              	                                       
- 432              	                                       
- 433 005c 7047     	   bx r14                              
- 434              	                                       
- 435 005e 00BF     	   .align 4                            
- 436 0060 00000000 	pxCurrentTCBConst: .word pxCurrentTCB  
- 437              	
- 438              	@ 0 "" 2
- 549:Core/Src/port.c **** /*-----------------------------------------------------------*/
- 439              		.loc 1 549 1 is_stmt 0 view .LVU71
- 440              		.thumb
- 441              		.syntax unified
- 442              		.cfi_endproc
- 443              	.LFE12:
- 445              		.section	.text.SysTick_Handler,"ax",%progbits
- 446              		.align	1
- 447              		.global	SysTick_Handler
- 448              		.syntax unified
- 449              		.thumb
- 450              		.thumb_func
- 451              		.fpu fpv5-d16
- 453              	SysTick_Handler:
- 454              	.LFB13:
- 553:Core/Src/port.c ****     /* The SysTick runs at the lowest interrupt priority, so when this interrupt
- 455              		.loc 1 553 1 is_stmt 1 view -0
- 456              		.cfi_startproc
- 457              		@ args = 0, pretend = 0, frame = 0
- 458              		@ frame_needed = 0, uses_anonymous_args = 0
- 459 0000 08B5     		push	{r3, lr}
- 460              	.LCFI2:
- 461              		.cfi_def_cfa_offset 8
- 462              		.cfi_offset 3, -8
- 463              		.cfi_offset 14, -4
- 558:Core/Src/port.c ****     traceISR_ENTER();
- 464              		.loc 1 558 5 view .LVU73
- 465              	.LBB18:
- 466              	.LBI18:
- 210:Core/Inc/portmacro.h **** {
- 467              		.loc 2 210 30 view .LVU74
- 468              	.LBB19:
- 212:Core/Inc/portmacro.h **** 
-ARM GAS  /tmp/ccE8xnRX.s 			page 29
-
-
- 469              		.loc 2 212 5 view .LVU75
- 214:Core/Inc/portmacro.h ****     (
- 470              		.loc 2 214 5 view .LVU76
- 471              		.syntax unified
- 472              	@ 214 "Core/Inc/portmacro.h" 1
- 473 0002 4FF05003 		   mov r3, #80                                              
- 474 0006 72B6     	   cpsid i                                                 
- 475 0008 83F31188 	   msr basepri, r3                                         
- 476 000c BFF36F8F 	   isb                                                     
- 477 0010 BFF34F8F 	   dsb                                                     
- 478 0014 62B6     	   cpsie i                                                 
- 479              	
- 480              	@ 0 "" 2
- 481              		.thumb
- 482              		.syntax unified
- 483              	.LBE19:
- 484              	.LBE18:
- 559:Core/Src/port.c ****     {
- 485              		.loc 1 559 21 view .LVU77
- 562:Core/Src/port.c ****         {
- 486              		.loc 1 562 9 view .LVU78
- 562:Core/Src/port.c ****         {
- 487              		.loc 1 562 13 is_stmt 0 view .LVU79
- 488 0016 FFF7FEFF 		bl	xTaskIncrementTick
- 489              	.LVL11:
- 562:Core/Src/port.c ****         {
- 490              		.loc 1 562 11 view .LVU80
- 491 001a 28B1     		cbz	r0, .L20
- 564:Core/Src/port.c **** 
- 492              		.loc 1 564 41 is_stmt 1 view .LVU81
- 568:Core/Src/port.c ****         }
- 493              		.loc 1 568 13 view .LVU82
- 568:Core/Src/port.c ****         }
- 494              		.loc 1 568 35 is_stmt 0 view .LVU83
- 495 001c 4FF0E023 		mov	r3, #-536813568
- 496 0020 4FF08052 		mov	r2, #268435456
- 497 0024 C3F8042D 		str	r2, [r3, #3332]
- 498              	.L20:
- 572:Core/Src/port.c ****         }
- 499              		.loc 1 572 28 is_stmt 1 view .LVU84
- 575:Core/Src/port.c **** }
- 500              		.loc 1 575 5 view .LVU85
- 501              	.LVL12:
- 502              	.LBB20:
- 503              	.LBI20:
- 250:Core/Inc/portmacro.h **** {
- 504              		.loc 2 250 30 view .LVU86
- 505              	.LBB21:
- 506              		.loc 2 252 5 view .LVU87
- 507 0028 0023     		movs	r3, #0
- 508              		.syntax unified
- 509              	@ 252 "Core/Inc/portmacro.h" 1
- 510 002a 83F31188 		   msr basepri, r3 
- 511              	@ 0 "" 2
- 512              	.LVL13:
- 513              		.loc 2 252 5 is_stmt 0 view .LVU88
- 514              		.thumb
-ARM GAS  /tmp/ccE8xnRX.s 			page 30
-
-
- 515              		.syntax unified
- 516              	.LBE21:
- 517              	.LBE20:
- 576:Core/Src/port.c **** /*-----------------------------------------------------------*/
- 518              		.loc 1 576 1 view .LVU89
- 519 002e 08BD     		pop	{r3, pc}
- 520              		.cfi_endproc
- 521              	.LFE13:
- 523              		.section	.text.vPortSetupTimerInterrupt,"ax",%progbits
- 524              		.align	1
- 525              		.weak	vPortSetupTimerInterrupt
+ 519              		.loc 2 252 5 view .LVU84
+ 520              		.syntax unified
+ 521              	@ 252 "Core/Inc/portmacro.h" 1
+ 522 0010 83F31188 		   msr basepri, r3 
+ 523              	@ 0 "" 2
+ 524              	.LVL13:
+ 525              		.thumb
  526              		.syntax unified
- 527              		.thumb
- 528              		.thumb_func
- 529              		.fpu fpv5-d16
- 531              	vPortSetupTimerInterrupt:
- 532              	.LFB14:
+ 527              	.L30:
+ 528              		.loc 2 252 5 is_stmt 0 view .LVU85
+ 529              	.LBE17:
+ 530              	.LBE16:
+ 490:Core/Src/port.c **** /*-----------------------------------------------------------*/
+ 531              		.loc 1 490 1 view .LVU86
+ 532 0014 08BD     		pop	{r3, pc}
+ 533              	.L35:
+ 483:Core/Src/port.c ****     uxCriticalNesting--;
+ 534              		.loc 1 483 5 is_stmt 1 discriminator 1 view .LVU87
+ 535 0016 4FF0FF33 		mov	r3, #-1
+ 536 001a 0822     		movs	r2, #8
+ 537 001c 0349     		ldr	r1, .L36+4
+ 538 001e 0448     		ldr	r0, .L36+8
+ 539 0020 FFF7FEFF 		bl	HAL_UART_Transmit
+ 540              	.LVL14:
+ 541              	.L32:
+ 483:Core/Src/port.c ****     uxCriticalNesting--;
+ 542              		.loc 1 483 5 discriminator 1 view .LVU88
+ 483:Core/Src/port.c ****     uxCriticalNesting--;
+ 543              		.loc 1 483 5 discriminator 1 view .LVU89
+ 483:Core/Src/port.c ****     uxCriticalNesting--;
+ 544              		.loc 1 483 5 discriminator 1 view .LVU90
+ 545 0024 FEE7     		b	.L32
+ 546              	.L37:
+ 547 0026 00BF     		.align	2
+ 548              	.L36:
+ 549 0028 00000000 		.word	.LANCHOR0
+ 550 002c 00000000 		.word	.LC0
+ 551 0030 00000000 		.word	huart2
+ 552              		.cfi_endproc
+ 553              	.LFE155:
+ 555              		.section	.text.SysTick_Handler,"ax",%progbits
+ 556              		.align	1
+ 557              		.global	SysTick_Handler
+ 558              		.syntax unified
+ 559              		.thumb
+ 560              		.thumb_func
+ 561              		.fpu fpv5-d16
+ 563              	SysTick_Handler:
+ 564              	.LFB157:
+ 553:Core/Src/port.c ****     /* The SysTick runs at the lowest interrupt priority, so when this interrupt
+ARM GAS  /tmp/cc8ky6Wn.s 			page 31
+
+
+ 565              		.loc 1 553 1 view -0
+ 566              		.cfi_startproc
+ 567              		@ args = 0, pretend = 0, frame = 0
+ 568              		@ frame_needed = 0, uses_anonymous_args = 0
+ 569 0000 08B5     		push	{r3, lr}
+ 570              	.LCFI7:
+ 571              		.cfi_def_cfa_offset 8
+ 572              		.cfi_offset 3, -8
+ 573              		.cfi_offset 14, -4
+ 558:Core/Src/port.c ****     traceISR_ENTER();
+ 574              		.loc 1 558 5 view .LVU92
+ 575              	.LBB18:
+ 576              	.LBI18:
+ 210:Core/Inc/portmacro.h **** {
+ 577              		.loc 2 210 30 view .LVU93
+ 578              	.LBB19:
+ 212:Core/Inc/portmacro.h **** 
+ 579              		.loc 2 212 5 view .LVU94
+ 214:Core/Inc/portmacro.h ****     (
+ 580              		.loc 2 214 5 view .LVU95
+ 581              		.syntax unified
+ 582              	@ 214 "Core/Inc/portmacro.h" 1
+ 583 0002 4FF05003 		   mov r3, #80                                              
+ 584 0006 72B6     	   cpsid i                                                 
+ 585 0008 83F31188 	   msr basepri, r3                                         
+ 586 000c BFF36F8F 	   isb                                                     
+ 587 0010 BFF34F8F 	   dsb                                                     
+ 588 0014 62B6     	   cpsie i                                                 
+ 589              	
+ 590              	@ 0 "" 2
+ 591              		.thumb
+ 592              		.syntax unified
+ 593              	.LBE19:
+ 594              	.LBE18:
+ 559:Core/Src/port.c ****     {
+ 595              		.loc 1 559 21 view .LVU96
+ 562:Core/Src/port.c ****         {
+ 596              		.loc 1 562 9 view .LVU97
+ 562:Core/Src/port.c ****         {
+ 597              		.loc 1 562 13 is_stmt 0 view .LVU98
+ 598 0016 FFF7FEFF 		bl	xTaskIncrementTick
+ 599              	.LVL15:
+ 562:Core/Src/port.c ****         {
+ 600              		.loc 1 562 11 view .LVU99
+ 601 001a 28B1     		cbz	r0, .L39
+ 564:Core/Src/port.c **** 
+ 602              		.loc 1 564 41 is_stmt 1 view .LVU100
+ 568:Core/Src/port.c ****         }
+ 603              		.loc 1 568 13 view .LVU101
+ 568:Core/Src/port.c ****         }
+ 604              		.loc 1 568 35 is_stmt 0 view .LVU102
+ 605 001c 4FF0E023 		mov	r3, #-536813568
+ 606 0020 4FF08052 		mov	r2, #268435456
+ 607 0024 C3F8042D 		str	r2, [r3, #3332]
+ 608              	.L39:
+ 572:Core/Src/port.c ****         }
+ 609              		.loc 1 572 28 is_stmt 1 view .LVU103
+ARM GAS  /tmp/cc8ky6Wn.s 			page 32
+
+
+ 575:Core/Src/port.c **** }
+ 610              		.loc 1 575 5 view .LVU104
+ 611              	.LVL16:
+ 612              	.LBB20:
+ 613              	.LBI20:
+ 250:Core/Inc/portmacro.h **** {
+ 614              		.loc 2 250 30 view .LVU105
+ 615              	.LBB21:
+ 616              		.loc 2 252 5 view .LVU106
+ 617 0028 0023     		movs	r3, #0
+ 618              		.syntax unified
+ 619              	@ 252 "Core/Inc/portmacro.h" 1
+ 620 002a 83F31188 		   msr basepri, r3 
+ 621              	@ 0 "" 2
+ 622              	.LVL17:
+ 623              		.loc 2 252 5 is_stmt 0 view .LVU107
+ 624              		.thumb
+ 625              		.syntax unified
+ 626              	.LBE21:
+ 627              	.LBE20:
+ 576:Core/Src/port.c **** /*-----------------------------------------------------------*/
+ 628              		.loc 1 576 1 view .LVU108
+ 629 002e 08BD     		pop	{r3, pc}
+ 630              		.cfi_endproc
+ 631              	.LFE157:
+ 633              		.section	.text.vPortSetupTimerInterrupt,"ax",%progbits
+ 634              		.align	1
+ 635              		.weak	vPortSetupTimerInterrupt
+ 636              		.syntax unified
+ 637              		.thumb
+ 638              		.thumb_func
+ 639              		.fpu fpv5-d16
+ 641              	vPortSetupTimerInterrupt:
+ 642              	.LFB158:
  805:Core/Src/port.c ****     /* Calculate the constants required to configure the tick interrupt. */
- 533              		.loc 1 805 1 is_stmt 1 view -0
- 534              		.cfi_startproc
- 535              		@ args = 0, pretend = 0, frame = 0
- 536              		@ frame_needed = 0, uses_anonymous_args = 0
- 537              		@ link register save eliminated.
+ 643              		.loc 1 805 1 is_stmt 1 view -0
+ 644              		.cfi_startproc
+ 645              		@ args = 0, pretend = 0, frame = 0
+ 646              		@ frame_needed = 0, uses_anonymous_args = 0
+ 647              		@ link register save eliminated.
  816:Core/Src/port.c ****     portNVIC_SYSTICK_CURRENT_VALUE_REG = 0UL;
- 538              		.loc 1 816 5 view .LVU91
+ 648              		.loc 1 816 5 view .LVU110
  816:Core/Src/port.c ****     portNVIC_SYSTICK_CURRENT_VALUE_REG = 0UL;
- 539              		.loc 1 816 31 is_stmt 0 view .LVU92
- 540 0000 4FF0E022 		mov	r2, #-536813568
- 541 0004 0023     		movs	r3, #0
- 542 0006 1361     		str	r3, [r2, #16]
+ 649              		.loc 1 816 31 is_stmt 0 view .LVU111
+ 650 0000 4FF0E022 		mov	r2, #-536813568
+ 651 0004 0023     		movs	r3, #0
+ 652 0006 1361     		str	r3, [r2, #16]
  817:Core/Src/port.c **** 
- 543              		.loc 1 817 5 is_stmt 1 view .LVU93
+ 653              		.loc 1 817 5 is_stmt 1 view .LVU112
  817:Core/Src/port.c **** 
- 544              		.loc 1 817 40 is_stmt 0 view .LVU94
- 545 0008 9361     		str	r3, [r2, #24]
+ 654              		.loc 1 817 40 is_stmt 0 view .LVU113
+ 655 0008 9361     		str	r3, [r2, #24]
  820:Core/Src/port.c ****     portNVIC_SYSTICK_CTRL_REG = ( portNVIC_SYSTICK_CLK_BIT_CONFIG | portNVIC_SYSTICK_INT_BIT | port
- 546              		.loc 1 820 5 is_stmt 1 view .LVU95
+ 656              		.loc 1 820 5 is_stmt 1 view .LVU114
  820:Core/Src/port.c ****     portNVIC_SYSTICK_CTRL_REG = ( portNVIC_SYSTICK_CLK_BIT_CONFIG | portNVIC_SYSTICK_INT_BIT | port
- 547              		.loc 1 820 58 is_stmt 0 view .LVU96
- 548 000a 054B     		ldr	r3, .L23
- 549 000c 1B68     		ldr	r3, [r3]
- 550 000e 0549     		ldr	r1, .L23+4
- 551 0010 A1FB0313 		umull	r1, r3, r1, r3
- 552 0014 9B09     		lsrs	r3, r3, #6
+ 657              		.loc 1 820 58 is_stmt 0 view .LVU115
+ 658 000a 054B     		ldr	r3, .L42
+ARM GAS  /tmp/cc8ky6Wn.s 			page 33
+
+
+ 659 000c 1B68     		ldr	r3, [r3]
+ 660 000e 0549     		ldr	r1, .L42+4
+ 661 0010 A1FB0313 		umull	r1, r3, r1, r3
+ 662 0014 9B09     		lsrs	r3, r3, #6
  820:Core/Src/port.c ****     portNVIC_SYSTICK_CTRL_REG = ( portNVIC_SYSTICK_CLK_BIT_CONFIG | portNVIC_SYSTICK_INT_BIT | port
- 553              		.loc 1 820 81 view .LVU97
- 554 0016 013B     		subs	r3, r3, #1
+ 663              		.loc 1 820 81 view .LVU116
+ 664 0016 013B     		subs	r3, r3, #1
  820:Core/Src/port.c ****     portNVIC_SYSTICK_CTRL_REG = ( portNVIC_SYSTICK_CLK_BIT_CONFIG | portNVIC_SYSTICK_INT_BIT | port
- 555              		.loc 1 820 31 view .LVU98
- 556 0018 5361     		str	r3, [r2, #20]
+ 665              		.loc 1 820 31 view .LVU117
+ 666 0018 5361     		str	r3, [r2, #20]
  821:Core/Src/port.c **** }
- 557              		.loc 1 821 5 is_stmt 1 view .LVU99
+ 667              		.loc 1 821 5 is_stmt 1 view .LVU118
  821:Core/Src/port.c **** }
- 558              		.loc 1 821 31 is_stmt 0 view .LVU100
- 559 001a 0723     		movs	r3, #7
- 560 001c 1361     		str	r3, [r2, #16]
+ 668              		.loc 1 821 31 is_stmt 0 view .LVU119
+ 669 001a 0723     		movs	r3, #7
+ 670 001c 1361     		str	r3, [r2, #16]
  822:Core/Src/port.c **** /*-----------------------------------------------------------*/
-ARM GAS  /tmp/ccE8xnRX.s 			page 31
-
-
- 561              		.loc 1 822 1 view .LVU101
- 562 001e 7047     		bx	lr
- 563              	.L24:
- 564              		.align	2
- 565              	.L23:
- 566 0020 00000000 		.word	SystemCoreClock
- 567 0024 D34D6210 		.word	274877907
- 568              		.cfi_endproc
- 569              	.LFE14:
- 571              		.section	.text.xPortStartScheduler,"ax",%progbits
- 572              		.align	1
- 573              		.global	xPortStartScheduler
- 574              		.syntax unified
- 575              		.thumb
- 576              		.thumb_func
- 577              		.fpu fpv5-d16
- 579              	xPortStartScheduler:
- 580              	.LFB8:
+ 671              		.loc 1 822 1 view .LVU120
+ 672 001e 7047     		bx	lr
+ 673              	.L43:
+ 674              		.align	2
+ 675              	.L42:
+ 676 0020 00000000 		.word	SystemCoreClock
+ 677 0024 D34D6210 		.word	274877907
+ 678              		.cfi_endproc
+ 679              	.LFE158:
+ 681              		.section	.text.xPortStartScheduler,"ax",%progbits
+ 682              		.align	1
+ 683              		.global	xPortStartScheduler
+ 684              		.syntax unified
+ 685              		.thumb
+ 686              		.thumb_func
+ 687              		.fpu fpv5-d16
+ 689              	xPortStartScheduler:
+ 690              	.LFB152:
  301:Core/Src/port.c ****     /* An application can install FreeRTOS interrupt handlers in one of the
- 581              		.loc 1 301 1 is_stmt 1 view -0
- 582              		.cfi_startproc
- 583              		@ args = 0, pretend = 0, frame = 0
- 584              		@ frame_needed = 0, uses_anonymous_args = 0
- 585 0000 38B5     		push	{r3, r4, r5, lr}
- 586              	.LCFI3:
- 587              		.cfi_def_cfa_offset 16
- 588              		.cfi_offset 3, -16
- 589              		.cfi_offset 4, -12
- 590              		.cfi_offset 5, -8
- 591              		.cfi_offset 14, -4
+ 691              		.loc 1 301 1 is_stmt 1 view -0
+ 692              		.cfi_startproc
+ 693              		@ args = 0, pretend = 0, frame = 8
+ 694              		@ frame_needed = 0, uses_anonymous_args = 0
+ 695 0000 30B5     		push	{r4, r5, lr}
+ 696              	.LCFI8:
+ 697              		.cfi_def_cfa_offset 12
+ 698              		.cfi_offset 4, -12
+ 699              		.cfi_offset 5, -8
+ 700              		.cfi_offset 14, -4
+ 701 0002 83B0     		sub	sp, sp, #12
+ 702              	.LCFI9:
+ 703              		.cfi_def_cfa_offset 24
+ 704              	.LBB22:
  316:Core/Src/port.c **** 
- 592              		.loc 1 316 9 view .LVU103
- 593              	.LVL14:
+ 705              		.loc 1 316 9 view .LVU122
+ 316:Core/Src/port.c **** 
+ 706              		.loc 1 316 33 is_stmt 0 view .LVU123
+ 707 0004 4FF0E023 		mov	r3, #-536813568
+ 708 0008 D3F8083D 		ldr	r3, [r3, #3336]
+ 709              	.LVL18:
+ARM GAS  /tmp/cc8ky6Wn.s 			page 34
+
+
  331:Core/Src/port.c ****         configASSERT( pxVectorTable[ portVECTOR_INDEX_PENDSV ] == xPortPendSVHandler );
- 594              		.loc 1 331 81 view .LVU104
+ 710              		.loc 1 331 9 is_stmt 1 view .LVU124
+ 711 000c D96A     		ldr	r1, [r3, #44]
+ 712 000e 464A     		ldr	r2, .L59
+ 713 0010 9142     		cmp	r1, r2
+ 714 0012 07D0     		beq	.L45
+ 331:Core/Src/port.c ****         configASSERT( pxVectorTable[ portVECTOR_INDEX_PENDSV ] == xPortPendSVHandler );
+ 715              		.loc 1 331 9 discriminator 1 view .LVU125
+ 716 0014 4FF0FF33 		mov	r3, #-1
+ 717              	.LVL19:
+ 331:Core/Src/port.c ****         configASSERT( pxVectorTable[ portVECTOR_INDEX_PENDSV ] == xPortPendSVHandler );
+ 718              		.loc 1 331 9 is_stmt 0 discriminator 1 view .LVU126
+ 719 0018 0822     		movs	r2, #8
+ 720 001a 4449     		ldr	r1, .L59+4
+ 721 001c 4448     		ldr	r0, .L59+8
+ 722 001e FFF7FEFF 		bl	HAL_UART_Transmit
+ 723              	.LVL20:
+ 724              	.L46:
+ 331:Core/Src/port.c ****         configASSERT( pxVectorTable[ portVECTOR_INDEX_PENDSV ] == xPortPendSVHandler );
+ 725              		.loc 1 331 9 is_stmt 1 discriminator 1 view .LVU127
+ 331:Core/Src/port.c ****         configASSERT( pxVectorTable[ portVECTOR_INDEX_PENDSV ] == xPortPendSVHandler );
+ 726              		.loc 1 331 9 discriminator 1 view .LVU128
+ 331:Core/Src/port.c ****         configASSERT( pxVectorTable[ portVECTOR_INDEX_PENDSV ] == xPortPendSVHandler );
+ 727              		.loc 1 331 9 discriminator 1 view .LVU129
+ 728 0022 FEE7     		b	.L46
+ 729              	.LVL21:
+ 730              	.L45:
+ 331:Core/Src/port.c ****         configASSERT( pxVectorTable[ portVECTOR_INDEX_PENDSV ] == xPortPendSVHandler );
+ 731              		.loc 1 331 81 discriminator 2 view .LVU130
  332:Core/Src/port.c ****     }
- 595              		.loc 1 332 87 view .LVU105
- 422:Core/Src/port.c ****     portNVIC_SHPR3_REG |= portNVIC_SYSTICK_PRI;
- 596              		.loc 1 422 5 view .LVU106
- 422:Core/Src/port.c ****     portNVIC_SHPR3_REG |= portNVIC_SYSTICK_PRI;
- 597              		.loc 1 422 24 is_stmt 0 view .LVU107
- 598 0002 4FF0E024 		mov	r4, #-536813568
- 599 0006 D4F8203D 		ldr	r3, [r4, #3360]
- 600 000a 43F47F03 		orr	r3, r3, #16711680
- 601 000e C4F8203D 		str	r3, [r4, #3360]
- 423:Core/Src/port.c ****     portNVIC_SHPR2_REG = 0;
- 602              		.loc 1 423 5 is_stmt 1 view .LVU108
- 423:Core/Src/port.c ****     portNVIC_SHPR2_REG = 0;
- 603              		.loc 1 423 24 is_stmt 0 view .LVU109
- 604 0012 D4F8203D 		ldr	r3, [r4, #3360]
- 605 0016 43F07F43 		orr	r3, r3, #-16777216
- 606 001a C4F8203D 		str	r3, [r4, #3360]
- 424:Core/Src/port.c **** 
- 607              		.loc 1 424 5 is_stmt 1 view .LVU110
- 424:Core/Src/port.c **** 
- 608              		.loc 1 424 24 is_stmt 0 view .LVU111
- 609 001e 0025     		movs	r5, #0
-ARM GAS  /tmp/ccE8xnRX.s 			page 32
+ 732              		.loc 1 332 9 discriminator 2 view .LVU131
+ 733 0024 9A6B     		ldr	r2, [r3, #56]
+ 734 0026 434B     		ldr	r3, .L59+12
+ 735              	.LVL22:
+ 332:Core/Src/port.c ****     }
+ 736              		.loc 1 332 9 is_stmt 0 discriminator 2 view .LVU132
+ 737 0028 9A42     		cmp	r2, r3
+ 738 002a 07D0     		beq	.L47
+ 332:Core/Src/port.c ****     }
+ 739              		.loc 1 332 9 is_stmt 1 discriminator 1 view .LVU133
+ 740 002c 4FF0FF33 		mov	r3, #-1
+ 741 0030 0822     		movs	r2, #8
+ 742 0032 3E49     		ldr	r1, .L59+4
+ 743 0034 3E48     		ldr	r0, .L59+8
+ 744 0036 FFF7FEFF 		bl	HAL_UART_Transmit
+ 745              	.LVL23:
+ 746              	.L48:
+ 332:Core/Src/port.c ****     }
+ 747              		.loc 1 332 9 discriminator 2 view .LVU134
+ 332:Core/Src/port.c ****     }
+ 748              		.loc 1 332 9 discriminator 2 view .LVU135
+ 332:Core/Src/port.c ****     }
+ 749              		.loc 1 332 9 discriminator 2 view .LVU136
+ 750 003a FEE7     		b	.L48
+ 751              	.LVL24:
+ 752              	.L47:
+ 332:Core/Src/port.c ****     }
+ARM GAS  /tmp/cc8ky6Wn.s 			page 35
 
 
- 610 0020 C4F81C5D 		str	r5, [r4, #3356]
+ 753              		.loc 1 332 87 discriminator 2 view .LVU137
+ 754              	.LBE22:
+ 755              	.LBB23:
+ 338:Core/Src/port.c ****         volatile uint32_t ulImplementedPrioBits = 0;
+ 756              		.loc 1 338 9 discriminator 2 view .LVU138
+ 339:Core/Src/port.c ****         volatile uint8_t * const pucFirstUserPriorityRegister = ( volatile uint8_t * const ) ( port
+ 757              		.loc 1 339 9 discriminator 2 view .LVU139
+ 339:Core/Src/port.c ****         volatile uint8_t * const pucFirstUserPriorityRegister = ( volatile uint8_t * const ) ( port
+ 758              		.loc 1 339 27 is_stmt 0 discriminator 2 view .LVU140
+ 759 003c 0023     		movs	r3, #0
+ 760 003e 0193     		str	r3, [sp, #4]
+ 761              	.LVL25:
+ 340:Core/Src/port.c ****         volatile uint8_t ucMaxPriorityValue;
+ 762              		.loc 1 340 9 is_stmt 1 discriminator 2 view .LVU141
+ 341:Core/Src/port.c **** 
+ 763              		.loc 1 341 9 discriminator 2 view .LVU142
+ 349:Core/Src/port.c **** 
+ 764              		.loc 1 349 9 discriminator 2 view .LVU143
+ 349:Core/Src/port.c **** 
+ 765              		.loc 1 349 30 is_stmt 0 discriminator 2 view .LVU144
+ 766 0040 3D4B     		ldr	r3, .L59+16
+ 767 0042 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+ 768 0044 D2B2     		uxtb	r2, r2
+ 349:Core/Src/port.c **** 
+ 769              		.loc 1 349 28 discriminator 2 view .LVU145
+ 770 0046 8DF80220 		strb	r2, [sp, #2]
+ 353:Core/Src/port.c **** 
+ 771              		.loc 1 353 9 is_stmt 1 discriminator 2 view .LVU146
+ 353:Core/Src/port.c **** 
+ 772              		.loc 1 353 39 is_stmt 0 discriminator 2 view .LVU147
+ 773 004a FF22     		movs	r2, #255
+ 774 004c 1A70     		strb	r2, [r3]
+ 356:Core/Src/port.c **** 
+ 775              		.loc 1 356 9 is_stmt 1 discriminator 2 view .LVU148
+ 356:Core/Src/port.c **** 
+ 776              		.loc 1 356 30 is_stmt 0 discriminator 2 view .LVU149
+ 777 004e 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 778 0050 DBB2     		uxtb	r3, r3
+ 356:Core/Src/port.c **** 
+ 779              		.loc 1 356 28 discriminator 2 view .LVU150
+ 780 0052 8DF80330 		strb	r3, [sp, #3]
+ 359:Core/Src/port.c **** 
+ 781              		.loc 1 359 9 is_stmt 1 discriminator 2 view .LVU151
+ 359:Core/Src/port.c **** 
+ 782              		.loc 1 359 69 is_stmt 0 discriminator 2 view .LVU152
+ 783 0056 9DF80330 		ldrb	r3, [sp, #3]	@ zero_extendqisi2
+ 784 005a 03F05003 		and	r3, r3, #80
+ 359:Core/Src/port.c **** 
+ 785              		.loc 1 359 30 discriminator 2 view .LVU153
+ 786 005e 374A     		ldr	r2, .L59+20
+ 787 0060 1370     		strb	r3, [r2]
+ 367:Core/Src/port.c **** 
+ 788              		.loc 1 367 9 is_stmt 1 discriminator 2 view .LVU154
+ 789 0062 6BB1     		cbz	r3, .L57
+ 367:Core/Src/port.c **** 
+ 790              		.loc 1 367 45 discriminator 2 view .LVU155
+ 371:Core/Src/port.c **** 
+ARM GAS  /tmp/cc8ky6Wn.s 			page 36
+
+
+ 791              		.loc 1 371 9 discriminator 2 view .LVU156
+ 792 0064 9DF80330 		ldrb	r3, [sp, #3]	@ zero_extendqisi2
+ 793 0068 DB43     		mvns	r3, r3
+ 794 006a 13F0500F 		tst	r3, #80
+ 795 006e 18D0     		beq	.L51
+ 371:Core/Src/port.c **** 
+ 796              		.loc 1 371 9 discriminator 1 view .LVU157
+ 797 0070 4FF0FF33 		mov	r3, #-1
+ 798 0074 0822     		movs	r2, #8
+ 799 0076 2D49     		ldr	r1, .L59+4
+ 800 0078 2D48     		ldr	r0, .L59+8
+ 801 007a FFF7FEFF 		bl	HAL_UART_Transmit
+ 802              	.LVL26:
+ 803              	.L52:
+ 371:Core/Src/port.c **** 
+ 804              		.loc 1 371 9 discriminator 4 view .LVU158
+ 371:Core/Src/port.c **** 
+ 805              		.loc 1 371 9 discriminator 4 view .LVU159
+ 371:Core/Src/port.c **** 
+ 806              		.loc 1 371 9 discriminator 4 view .LVU160
+ 807 007e FEE7     		b	.L52
+ 808              	.L57:
+ 367:Core/Src/port.c **** 
+ 809              		.loc 1 367 9 discriminator 1 view .LVU161
+ 810 0080 4FF0FF33 		mov	r3, #-1
+ 811 0084 0822     		movs	r2, #8
+ 812 0086 2949     		ldr	r1, .L59+4
+ 813 0088 2948     		ldr	r0, .L59+8
+ 814 008a FFF7FEFF 		bl	HAL_UART_Transmit
+ 815              	.LVL27:
+ 816              	.L50:
+ 367:Core/Src/port.c **** 
+ 817              		.loc 1 367 9 discriminator 3 view .LVU162
+ 367:Core/Src/port.c **** 
+ 818              		.loc 1 367 9 discriminator 3 view .LVU163
+ 367:Core/Src/port.c **** 
+ 819              		.loc 1 367 9 discriminator 3 view .LVU164
+ 820 008e FEE7     		b	.L50
+ 821              	.L53:
+ 378:Core/Src/port.c ****             ucMaxPriorityValue <<= ( uint8_t ) 0x01;
+ 822              		.loc 1 378 13 view .LVU165
+ 378:Core/Src/port.c ****             ucMaxPriorityValue <<= ( uint8_t ) 0x01;
+ 823              		.loc 1 378 34 is_stmt 0 view .LVU166
+ 824 0090 019B     		ldr	r3, [sp, #4]
+ 825 0092 0133     		adds	r3, r3, #1
+ 826 0094 0193     		str	r3, [sp, #4]
+ 379:Core/Src/port.c ****         }
+ 827              		.loc 1 379 13 is_stmt 1 view .LVU167
+ 379:Core/Src/port.c ****         }
+ 828              		.loc 1 379 32 is_stmt 0 view .LVU168
+ 829 0096 9DF80330 		ldrb	r3, [sp, #3]	@ zero_extendqisi2
+ 830 009a 5B00     		lsls	r3, r3, #1
+ 831 009c DBB2     		uxtb	r3, r3
+ 832 009e 8DF80330 		strb	r3, [sp, #3]
+ 833              	.L51:
+ 376:Core/Src/port.c ****         {
+ 834              		.loc 1 376 14 is_stmt 1 view .LVU169
+ARM GAS  /tmp/cc8ky6Wn.s 			page 37
+
+
+ 376:Core/Src/port.c ****         {
+ 835              		.loc 1 376 37 is_stmt 0 view .LVU170
+ 836 00a2 9DF80330 		ldrb	r3, [sp, #3]	@ zero_extendqisi2
+ 376:Core/Src/port.c ****         {
+ 837              		.loc 1 376 14 view .LVU171
+ 838 00a6 13F0800F 		tst	r3, #128
+ 839 00aa F1D1     		bne	.L53
+ 382:Core/Src/port.c ****         {
+ 840              		.loc 1 382 9 is_stmt 1 view .LVU172
+ 382:Core/Src/port.c ****         {
+ 841              		.loc 1 382 35 is_stmt 0 view .LVU173
+ 842 00ac 019B     		ldr	r3, [sp, #4]
+ 382:Core/Src/port.c ****         {
+ 843              		.loc 1 382 11 view .LVU174
+ 844 00ae 082B     		cmp	r3, #8
+ 845 00b0 36D0     		beq	.L58
+ 406:Core/Src/port.c ****         }
+ 846              		.loc 1 406 13 is_stmt 1 view .LVU175
+ 406:Core/Src/port.c ****         }
+ 847              		.loc 1 406 56 is_stmt 0 view .LVU176
+ 848 00b2 019B     		ldr	r3, [sp, #4]
+ 849 00b4 C3F10703 		rsb	r3, r3, #7
+ 406:Core/Src/port.c ****         }
+ 850              		.loc 1 406 32 view .LVU177
+ 851 00b8 214A     		ldr	r2, .L59+24
+ 852 00ba 1360     		str	r3, [r2]
+ 853              	.L55:
+ 411:Core/Src/port.c ****         ulMaxPRIGROUPValue &= portPRIORITY_GROUP_MASK;
+ 854              		.loc 1 411 9 is_stmt 1 view .LVU178
+ 411:Core/Src/port.c ****         ulMaxPRIGROUPValue &= portPRIORITY_GROUP_MASK;
+ 855              		.loc 1 411 28 is_stmt 0 view .LVU179
+ 856 00bc 204A     		ldr	r2, .L59+24
+ 857 00be 1368     		ldr	r3, [r2]
+ 858 00c0 1B02     		lsls	r3, r3, #8
+ 859 00c2 1360     		str	r3, [r2]
+ 412:Core/Src/port.c **** 
+ 860              		.loc 1 412 9 is_stmt 1 view .LVU180
+ 412:Core/Src/port.c **** 
+ 861              		.loc 1 412 28 is_stmt 0 view .LVU181
+ 862 00c4 03F4E063 		and	r3, r3, #1792
+ 863 00c8 1360     		str	r3, [r2]
+ 416:Core/Src/port.c ****     }
+ 864              		.loc 1 416 9 is_stmt 1 view .LVU182
+ 416:Core/Src/port.c ****     }
+ 865              		.loc 1 416 39 is_stmt 0 view .LVU183
+ 866 00ca 9DF80230 		ldrb	r3, [sp, #2]	@ zero_extendqisi2
+ 867 00ce DBB2     		uxtb	r3, r3
+ 868 00d0 194A     		ldr	r2, .L59+16
+ 869 00d2 1370     		strb	r3, [r2]
+ 870              	.LBE23:
+ 422:Core/Src/port.c ****     portNVIC_SHPR3_REG |= portNVIC_SYSTICK_PRI;
+ 871              		.loc 1 422 5 is_stmt 1 view .LVU184
+ 422:Core/Src/port.c ****     portNVIC_SHPR3_REG |= portNVIC_SYSTICK_PRI;
+ 872              		.loc 1 422 24 is_stmt 0 view .LVU185
+ 873 00d4 4FF0E024 		mov	r4, #-536813568
+ 874 00d8 D4F8203D 		ldr	r3, [r4, #3360]
+ 875 00dc 43F47F03 		orr	r3, r3, #16711680
+ARM GAS  /tmp/cc8ky6Wn.s 			page 38
+
+
+ 876 00e0 C4F8203D 		str	r3, [r4, #3360]
+ 423:Core/Src/port.c ****     portNVIC_SHPR2_REG = 0;
+ 877              		.loc 1 423 5 is_stmt 1 view .LVU186
+ 423:Core/Src/port.c ****     portNVIC_SHPR2_REG = 0;
+ 878              		.loc 1 423 24 is_stmt 0 view .LVU187
+ 879 00e4 D4F8203D 		ldr	r3, [r4, #3360]
+ 880 00e8 43F07F43 		orr	r3, r3, #-16777216
+ 881 00ec C4F8203D 		str	r3, [r4, #3360]
+ 424:Core/Src/port.c **** 
+ 882              		.loc 1 424 5 is_stmt 1 view .LVU188
+ 424:Core/Src/port.c **** 
+ 883              		.loc 1 424 24 is_stmt 0 view .LVU189
+ 884 00f0 0025     		movs	r5, #0
+ 885 00f2 C4F81C5D 		str	r5, [r4, #3356]
  428:Core/Src/port.c **** 
- 611              		.loc 1 428 5 is_stmt 1 view .LVU112
- 612 0024 FFF7FEFF 		bl	vPortSetupTimerInterrupt
- 613              	.LVL15:
+ 886              		.loc 1 428 5 is_stmt 1 view .LVU190
+ 887 00f6 FFF7FEFF 		bl	vPortSetupTimerInterrupt
+ 888              	.LVL28:
  431:Core/Src/port.c **** 
- 614              		.loc 1 431 5 view .LVU113
+ 889              		.loc 1 431 5 view .LVU191
  431:Core/Src/port.c **** 
- 615              		.loc 1 431 23 is_stmt 0 view .LVU114
- 616 0028 084B     		ldr	r3, .L27
- 617 002a 1D60     		str	r5, [r3]
+ 890              		.loc 1 431 23 is_stmt 0 view .LVU192
+ 891 00fa 124B     		ldr	r3, .L59+28
+ 892 00fc 1D60     		str	r5, [r3]
  434:Core/Src/port.c **** 
- 618              		.loc 1 434 5 is_stmt 1 view .LVU115
- 619 002c FFF7FEFF 		bl	vPortEnableVFP
- 620              	.LVL16:
+ 893              		.loc 1 434 5 is_stmt 1 view .LVU193
+ 894 00fe FFF7FEFF 		bl	vPortEnableVFP
+ 895              	.LVL29:
  437:Core/Src/port.c **** 
- 621              		.loc 1 437 5 view .LVU116
+ 896              		.loc 1 437 5 view .LVU194
  437:Core/Src/port.c **** 
- 622              		.loc 1 437 20 is_stmt 0 view .LVU117
- 623 0030 D4F8343F 		ldr	r3, [r4, #3892]
- 624 0034 43F04043 		orr	r3, r3, #-1073741824
- 625 0038 C4F8343F 		str	r3, [r4, #3892]
+ 897              		.loc 1 437 20 is_stmt 0 view .LVU195
+ 898 0102 D4F8343F 		ldr	r3, [r4, #3892]
+ 899 0106 43F04043 		orr	r3, r3, #-1073741824
+ 900 010a C4F8343F 		str	r3, [r4, #3892]
  440:Core/Src/port.c **** 
- 626              		.loc 1 440 5 is_stmt 1 view .LVU118
- 627 003c FFF7FEFF 		bl	prvPortStartFirstTask
- 628              	.LVL17:
+ 901              		.loc 1 440 5 is_stmt 1 view .LVU196
+ 902 010e FFF7FEFF 		bl	prvPortStartFirstTask
+ 903              	.LVL30:
  448:Core/Src/port.c ****     prvTaskExitError();
- 629              		.loc 1 448 5 view .LVU119
- 630 0040 FFF7FEFF 		bl	vTaskSwitchContext
- 631              	.LVL18:
+ 904              		.loc 1 448 5 view .LVU197
+ 905 0112 FFF7FEFF 		bl	vTaskSwitchContext
+ 906              	.LVL31:
  449:Core/Src/port.c **** 
- 632              		.loc 1 449 5 view .LVU120
- 633 0044 FFF7FEFF 		bl	prvTaskExitError
- 634              	.LVL19:
+ 907              		.loc 1 449 5 view .LVU198
+ 908 0116 FFF7FEFF 		bl	prvTaskExitError
+ 909              	.LVL32:
  452:Core/Src/port.c **** }
- 635              		.loc 1 452 5 view .LVU121
+ 910              		.loc 1 452 5 view .LVU199
  453:Core/Src/port.c **** /*-----------------------------------------------------------*/
- 636              		.loc 1 453 1 is_stmt 0 view .LVU122
- 637 0048 2846     		mov	r0, r5
- 638 004a 38BD     		pop	{r3, r4, r5, pc}
- 639              	.L28:
- 640              		.align	2
- 641              	.L27:
- 642 004c 00000000 		.word	.LANCHOR0
- 643              		.cfi_endproc
- 644              	.LFE8:
- 646              		.section	.data.uxCriticalNesting,"aw"
- 647              		.align	2
- 648              		.set	.LANCHOR0,. + 0
- 651              	uxCriticalNesting:
- 652 0000 AAAAAAAA 		.word	-1431655766
- 653              		.text
- 654              	.Letext0:
- 655              		.file 3 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stdint.h"
- 656              		.file 4 "../Core/FreeRTOS-Kernel/include/projdefs.h"
- 657              		.file 5 "../Core/FreeRTOS-Kernel/include/task.h"
- 658              		.file 6 "../Core/Include/FreeRTOSConfig.h"
-ARM GAS  /tmp/ccE8xnRX.s 			page 33
+ 911              		.loc 1 453 1 is_stmt 0 view .LVU200
+ 912 011a 2846     		mov	r0, r5
+ 913 011c 03B0     		add	sp, sp, #12
+ 914              	.LCFI10:
+ 915              		.cfi_remember_state
+ 916              		.cfi_def_cfa_offset 12
+ 917              		@ sp needed
+ARM GAS  /tmp/cc8ky6Wn.s 			page 39
 
 
-ARM GAS  /tmp/ccE8xnRX.s 			page 34
+ 918 011e 30BD     		pop	{r4, r5, pc}
+ 919              	.L58:
+ 920              	.LCFI11:
+ 921              		.cfi_restore_state
+ 922              	.LBB24:
+ 401:Core/Src/port.c ****             ulMaxPRIGROUPValue = 0;
+ 923              		.loc 1 401 13 is_stmt 1 discriminator 2 view .LVU201
+ 401:Core/Src/port.c ****             ulMaxPRIGROUPValue = 0;
+ 924              		.loc 1 401 82 discriminator 2 view .LVU202
+ 402:Core/Src/port.c ****         }
+ 925              		.loc 1 402 13 discriminator 2 view .LVU203
+ 402:Core/Src/port.c ****         }
+ 926              		.loc 1 402 32 is_stmt 0 discriminator 2 view .LVU204
+ 927 0120 074B     		ldr	r3, .L59+24
+ 928 0122 0022     		movs	r2, #0
+ 929 0124 1A60     		str	r2, [r3]
+ 930 0126 C9E7     		b	.L55
+ 931              	.L60:
+ 932              		.align	2
+ 933              	.L59:
+ 934 0128 00000000 		.word	SVC_Handler
+ 935 012c 00000000 		.word	.LC0
+ 936 0130 00000000 		.word	huart2
+ 937 0134 00000000 		.word	PendSV_Handler
+ 938 0138 00E400E0 		.word	-536812544
+ 939 013c 00000000 		.word	.LANCHOR1
+ 940 0140 00000000 		.word	.LANCHOR2
+ 941 0144 00000000 		.word	.LANCHOR0
+ 942              	.LBE24:
+ 943              		.cfi_endproc
+ 944              	.LFE152:
+ 946              		.section	.text.vPortValidateInterruptPriority,"ax",%progbits
+ 947              		.align	1
+ 948              		.global	vPortValidateInterruptPriority
+ 949              		.syntax unified
+ 950              		.thumb
+ 951              		.thumb_func
+ 952              		.fpu fpv5-d16
+ 954              	vPortValidateInterruptPriority:
+ 955              	.LFB160:
+ 839:Core/Src/port.c **** /*-----------------------------------------------------------*/
+ 840:Core/Src/port.c **** 
+ 841:Core/Src/port.c **** #if ( configASSERT_DEFINED == 1 )
+ 842:Core/Src/port.c **** 
+ 843:Core/Src/port.c ****     void vPortValidateInterruptPriority( void )
+ 844:Core/Src/port.c ****     {
+ 956              		.loc 1 844 5 is_stmt 1 view -0
+ 957              		.cfi_startproc
+ 958              		@ args = 0, pretend = 0, frame = 0
+ 959              		@ frame_needed = 0, uses_anonymous_args = 0
+ 960 0000 08B5     		push	{r3, lr}
+ 961              	.LCFI12:
+ 962              		.cfi_def_cfa_offset 8
+ 963              		.cfi_offset 3, -8
+ 964              		.cfi_offset 14, -4
+ 845:Core/Src/port.c ****         uint32_t ulCurrentInterrupt;
+ 965              		.loc 1 845 9 view .LVU206
+ARM GAS  /tmp/cc8ky6Wn.s 			page 40
+
+
+ 846:Core/Src/port.c ****         uint8_t ucCurrentPriority;
+ 966              		.loc 1 846 9 view .LVU207
+ 847:Core/Src/port.c **** 
+ 848:Core/Src/port.c ****         /* Obtain the number of the currently executing interrupt. */
+ 849:Core/Src/port.c ****         __asm volatile ( "mrs %0, ipsr" : "=r" ( ulCurrentInterrupt )::"memory" );
+ 967              		.loc 1 849 9 view .LVU208
+ 968              		.syntax unified
+ 969              	@ 849 "Core/Src/port.c" 1
+ 970 0002 EFF30583 		mrs r3, ipsr
+ 971              	@ 0 "" 2
+ 972              	.LVL33:
+ 850:Core/Src/port.c **** 
+ 851:Core/Src/port.c ****         /* Is the interrupt number a user defined interrupt? */
+ 852:Core/Src/port.c ****         if( ulCurrentInterrupt >= portFIRST_USER_INTERRUPT_NUMBER )
+ 973              		.loc 1 852 9 view .LVU209
+ 974              		.loc 1 852 11 is_stmt 0 view .LVU210
+ 975              		.thumb
+ 976              		.syntax unified
+ 977 0006 0F2B     		cmp	r3, #15
+ 978 0008 06D9     		bls	.L62
+ 853:Core/Src/port.c ****         {
+ 854:Core/Src/port.c ****             /* Look up the interrupt's priority. */
+ 855:Core/Src/port.c ****             ucCurrentPriority = pcInterruptPriorityRegisters[ ulCurrentInterrupt ];
+ 979              		.loc 1 855 13 is_stmt 1 view .LVU211
+ 980              		.loc 1 855 61 is_stmt 0 view .LVU212
+ 981 000a 114A     		ldr	r2, .L69
+ 982              		.loc 1 855 31 view .LVU213
+ 983 000c 9B5C     		ldrb	r3, [r3, r2]	@ zero_extendqisi2
+ 984              	.LVL34:
+ 985              		.loc 1 855 31 view .LVU214
+ 986 000e DBB2     		uxtb	r3, r3
+ 987              	.LVL35:
+ 856:Core/Src/port.c **** 
+ 857:Core/Src/port.c ****             /* The following assertion will fail if a service routine (ISR) for
+ 858:Core/Src/port.c ****              * an interrupt that has been assigned a priority above
+ 859:Core/Src/port.c ****              * configMAX_SYSCALL_INTERRUPT_PRIORITY calls an ISR safe FreeRTOS API
+ 860:Core/Src/port.c ****              * function.  ISR safe FreeRTOS API functions must *only* be called
+ 861:Core/Src/port.c ****              * from interrupts that have been assigned a priority at or below
+ 862:Core/Src/port.c ****              * configMAX_SYSCALL_INTERRUPT_PRIORITY.
+ 863:Core/Src/port.c ****              *
+ 864:Core/Src/port.c ****              * Numerically low interrupt priority numbers represent logically high
+ 865:Core/Src/port.c ****              * interrupt priorities, therefore the priority of the interrupt must
+ 866:Core/Src/port.c ****              * be set to a value equal to or numerically *higher* than
+ 867:Core/Src/port.c ****              * configMAX_SYSCALL_INTERRUPT_PRIORITY.
+ 868:Core/Src/port.c ****              *
+ 869:Core/Src/port.c ****              * Interrupts that  use the FreeRTOS API must not be left at their
+ 870:Core/Src/port.c ****              * default priority of  zero as that is the highest possible priority,
+ 871:Core/Src/port.c ****              * which is guaranteed to be above configMAX_SYSCALL_INTERRUPT_PRIORITY,
+ 872:Core/Src/port.c ****              * and  therefore also guaranteed to be invalid.
+ 873:Core/Src/port.c ****              *
+ 874:Core/Src/port.c ****              * FreeRTOS maintains separate thread and ISR API functions to ensure
+ 875:Core/Src/port.c ****              * interrupt entry is as fast and simple as possible.
+ 876:Core/Src/port.c ****              *
+ 877:Core/Src/port.c ****              * The following links provide detailed information:
+ 878:Core/Src/port.c ****              * https://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html
+ 879:Core/Src/port.c ****              * https://www.FreeRTOS.org/FAQHelp.html */
+ 880:Core/Src/port.c ****             configASSERT( ucCurrentPriority >= ucMaxSysCallPriority );
+ARM GAS  /tmp/cc8ky6Wn.s 			page 41
+
+
+ 988              		.loc 1 880 13 is_stmt 1 view .LVU215
+ 989 0010 104A     		ldr	r2, .L69+4
+ 990 0012 1278     		ldrb	r2, [r2]	@ zero_extendqisi2
+ 991 0014 9A42     		cmp	r2, r3
+ 992 0016 0AD8     		bhi	.L67
+ 993              	.LVL36:
+ 994              	.L62:
+ 995              		.loc 1 880 70 discriminator 2 view .LVU216
+ 881:Core/Src/port.c ****         }
+ 882:Core/Src/port.c **** 
+ 883:Core/Src/port.c ****         /* Priority grouping:  The interrupt controller (NVIC) allows the bits
+ 884:Core/Src/port.c ****          * that define each interrupt's priority to be split between bits that
+ 885:Core/Src/port.c ****          * define the interrupt's pre-emption priority bits and bits that define
+ 886:Core/Src/port.c ****          * the interrupt's sub-priority.  For simplicity all bits must be defined
+ 887:Core/Src/port.c ****          * to be pre-emption priority bits.  The following assertion will fail if
+ 888:Core/Src/port.c ****          * this is not the case (if some bits represent a sub-priority).
+ 889:Core/Src/port.c ****          *
+ 890:Core/Src/port.c ****          * If the application only uses CMSIS libraries for interrupt
+ 891:Core/Src/port.c ****          * configuration then the correct setting can be achieved on all Cortex-M
+ 892:Core/Src/port.c ****          * devices by calling NVIC_SetPriorityGrouping( 0 ); before starting the
+ 893:Core/Src/port.c ****          * scheduler.  Note however that some vendor specific peripheral libraries
+ 894:Core/Src/port.c ****          * assume a non-zero priority group setting, in which cases using a value
+ 895:Core/Src/port.c ****          * of zero will result in unpredictable behaviour. */
+ 896:Core/Src/port.c ****         configASSERT( ( portAIRCR_REG & portPRIORITY_GROUP_MASK ) <= ulMaxPRIGROUPValue );
+ 996              		.loc 1 896 9 discriminator 2 view .LVU217
+ 997 0018 4FF0E023 		mov	r3, #-536813568
+ 998 001c D3F80C3D 		ldr	r3, [r3, #3340]
+ 999 0020 03F4E063 		and	r3, r3, #1792
+ 1000 0024 0C4A     		ldr	r2, .L69+8
+ 1001 0026 1268     		ldr	r2, [r2]
+ 1002 0028 9342     		cmp	r3, r2
+ 1003 002a 08D8     		bhi	.L68
+ 897:Core/Src/port.c ****     }
+ 1004              		.loc 1 897 5 is_stmt 0 view .LVU218
+ 1005 002c 08BD     		pop	{r3, pc}
+ 1006              	.LVL37:
+ 1007              	.L67:
+ 880:Core/Src/port.c ****         }
+ 1008              		.loc 1 880 13 is_stmt 1 discriminator 1 view .LVU219
+ 1009 002e 4FF0FF33 		mov	r3, #-1
+ 1010              	.LVL38:
+ 880:Core/Src/port.c ****         }
+ 1011              		.loc 1 880 13 is_stmt 0 discriminator 1 view .LVU220
+ 1012 0032 0822     		movs	r2, #8
+ 1013 0034 0949     		ldr	r1, .L69+12
+ 1014 0036 0A48     		ldr	r0, .L69+16
+ 1015 0038 FFF7FEFF 		bl	HAL_UART_Transmit
+ 1016              	.LVL39:
+ 1017              	.L63:
+ 880:Core/Src/port.c ****         }
+ 1018              		.loc 1 880 13 is_stmt 1 discriminator 1 view .LVU221
+ 880:Core/Src/port.c ****         }
+ 1019              		.loc 1 880 13 discriminator 1 view .LVU222
+ 880:Core/Src/port.c ****         }
+ 1020              		.loc 1 880 13 discriminator 1 view .LVU223
+ 1021 003c FEE7     		b	.L63
+ 1022              	.L68:
+ARM GAS  /tmp/cc8ky6Wn.s 			page 42
+
+
+ 896:Core/Src/port.c ****     }
+ 1023              		.loc 1 896 9 discriminator 1 view .LVU224
+ 1024 003e 4FF0FF33 		mov	r3, #-1
+ 1025 0042 0822     		movs	r2, #8
+ 1026 0044 0549     		ldr	r1, .L69+12
+ 1027 0046 0648     		ldr	r0, .L69+16
+ 1028 0048 FFF7FEFF 		bl	HAL_UART_Transmit
+ 1029              	.LVL40:
+ 1030              	.L65:
+ 896:Core/Src/port.c ****     }
+ 1031              		.loc 1 896 9 discriminator 2 view .LVU225
+ 896:Core/Src/port.c ****     }
+ 1032              		.loc 1 896 9 discriminator 2 view .LVU226
+ 896:Core/Src/port.c ****     }
+ 1033              		.loc 1 896 9 discriminator 2 view .LVU227
+ 1034 004c FEE7     		b	.L65
+ 1035              	.L70:
+ 1036 004e 00BF     		.align	2
+ 1037              	.L69:
+ 1038 0050 F0E300E0 		.word	-536812560
+ 1039 0054 00000000 		.word	.LANCHOR1
+ 1040 0058 00000000 		.word	.LANCHOR2
+ 1041 005c 00000000 		.word	.LC0
+ 1042 0060 00000000 		.word	huart2
+ 1043              		.cfi_endproc
+ 1044              	.LFE160:
+ 1046              		.section	.bss.ucMaxSysCallPriority,"aw",%nobits
+ 1047              		.set	.LANCHOR1,. + 0
+ 1050              	ucMaxSysCallPriority:
+ 1051 0000 00       		.space	1
+ 1052              		.section	.bss.ulMaxPRIGROUPValue,"aw",%nobits
+ 1053              		.align	2
+ 1054              		.set	.LANCHOR2,. + 0
+ 1057              	ulMaxPRIGROUPValue:
+ 1058 0000 00000000 		.space	4
+ 1059              		.section	.data.uxCriticalNesting,"aw"
+ 1060              		.align	2
+ 1061              		.set	.LANCHOR0,. + 0
+ 1064              	uxCriticalNesting:
+ 1065 0000 AAAAAAAA 		.word	-1431655766
+ 1066              		.text
+ 1067              	.Letext0:
+ 1068              		.file 3 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stdint.h"
+ 1069              		.file 4 "Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h725xx.h"
+ 1070              		.file 5 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_def.h"
+ 1071              		.file 6 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dma.h"
+ 1072              		.file 7 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h"
+ 1073              		.file 8 "../Core/Include/FreeRTOSConfig.h"
+ 1074              		.file 9 "../Core/FreeRTOS-Kernel/include/projdefs.h"
+ 1075              		.file 10 "../Core/FreeRTOS-Kernel/include/task.h"
+ARM GAS  /tmp/cc8ky6Wn.s 			page 43
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 port.c
-     /tmp/ccE8xnRX.s:17     .text.prvTaskExitError:0000000000000000 $t
-     /tmp/ccE8xnRX.s:24     .text.prvTaskExitError:0000000000000000 prvTaskExitError
-     /tmp/ccE8xnRX.s:82     .text.prvPortStartFirstTask:0000000000000000 $t
-     /tmp/ccE8xnRX.s:88     .text.prvPortStartFirstTask:0000000000000000 prvPortStartFirstTask
-     /tmp/ccE8xnRX.s:110    .text.prvPortStartFirstTask:0000000000000022 $d
-     /tmp/ccE8xnRX.s:110    .text.prvPortStartFirstTask:0000000000000024 $d
-     /tmp/ccE8xnRX.s:120    .text.vPortEnableVFP:0000000000000000 $t
-     /tmp/ccE8xnRX.s:126    .text.vPortEnableVFP:0000000000000000 vPortEnableVFP
-     /tmp/ccE8xnRX.s:142    .text.vPortEnableVFP:000000000000000e $d
-     /tmp/ccE8xnRX.s:142    .text.vPortEnableVFP:0000000000000010 $d
-     /tmp/ccE8xnRX.s:152    .text.pxPortInitialiseStack:0000000000000000 $t
-     /tmp/ccE8xnRX.s:159    .text.pxPortInitialiseStack:0000000000000000 pxPortInitialiseStack
-     /tmp/ccE8xnRX.s:209    .text.pxPortInitialiseStack:0000000000000028 $d
-     /tmp/ccE8xnRX.s:214    .text.SVC_Handler:0000000000000000 $t
-     /tmp/ccE8xnRX.s:221    .text.SVC_Handler:0000000000000000 SVC_Handler
-     /tmp/ccE8xnRX.s:242    .text.SVC_Handler:0000000000000020 pxCurrentTCBConst2
-     /tmp/ccE8xnRX.s:242    .text.SVC_Handler:0000000000000020 $d
-     /tmp/ccE8xnRX.s:252    .text.vPortEndScheduler:0000000000000000 $t
-     /tmp/ccE8xnRX.s:259    .text.vPortEndScheduler:0000000000000000 vPortEndScheduler
-     /tmp/ccE8xnRX.s:273    .text.vPortEnterCritical:0000000000000000 $t
-     /tmp/ccE8xnRX.s:280    .text.vPortEnterCritical:0000000000000000 vPortEnterCritical
-     /tmp/ccE8xnRX.s:321    .text.vPortEnterCritical:0000000000000020 $d
-     /tmp/ccE8xnRX.s:326    .text.vPortExitCritical:0000000000000000 $t
-     /tmp/ccE8xnRX.s:333    .text.vPortExitCritical:0000000000000000 vPortExitCritical
-     /tmp/ccE8xnRX.s:373    .text.vPortExitCritical:0000000000000010 $d
-     /tmp/ccE8xnRX.s:378    .text.PendSV_Handler:0000000000000000 $t
-     /tmp/ccE8xnRX.s:385    .text.PendSV_Handler:0000000000000000 PendSV_Handler
-     /tmp/ccE8xnRX.s:436    .text.PendSV_Handler:0000000000000060 pxCurrentTCBConst
-     /tmp/ccE8xnRX.s:436    .text.PendSV_Handler:0000000000000060 $d
-     /tmp/ccE8xnRX.s:446    .text.SysTick_Handler:0000000000000000 $t
-     /tmp/ccE8xnRX.s:453    .text.SysTick_Handler:0000000000000000 SysTick_Handler
-     /tmp/ccE8xnRX.s:524    .text.vPortSetupTimerInterrupt:0000000000000000 $t
-     /tmp/ccE8xnRX.s:531    .text.vPortSetupTimerInterrupt:0000000000000000 vPortSetupTimerInterrupt
-     /tmp/ccE8xnRX.s:566    .text.vPortSetupTimerInterrupt:0000000000000020 $d
-     /tmp/ccE8xnRX.s:572    .text.xPortStartScheduler:0000000000000000 $t
-     /tmp/ccE8xnRX.s:579    .text.xPortStartScheduler:0000000000000000 xPortStartScheduler
-     /tmp/ccE8xnRX.s:642    .text.xPortStartScheduler:000000000000004c $d
-     /tmp/ccE8xnRX.s:647    .data.uxCriticalNesting:0000000000000000 $d
-     /tmp/ccE8xnRX.s:651    .data.uxCriticalNesting:0000000000000000 uxCriticalNesting
+     /tmp/cc8ky6Wn.s:17     .text.SVC_Handler:0000000000000000 $t
+     /tmp/cc8ky6Wn.s:25     .text.SVC_Handler:0000000000000000 SVC_Handler
+     /tmp/cc8ky6Wn.s:47     .text.SVC_Handler:0000000000000020 pxCurrentTCBConst2
+     /tmp/cc8ky6Wn.s:47     .text.SVC_Handler:0000000000000020 $d
+     /tmp/cc8ky6Wn.s:57     .text.prvPortStartFirstTask:0000000000000000 $t
+     /tmp/cc8ky6Wn.s:63     .text.prvPortStartFirstTask:0000000000000000 prvPortStartFirstTask
+     /tmp/cc8ky6Wn.s:85     .text.prvPortStartFirstTask:0000000000000022 $d
+     /tmp/cc8ky6Wn.s:85     .text.prvPortStartFirstTask:0000000000000024 $d
+     /tmp/cc8ky6Wn.s:95     .text.PendSV_Handler:0000000000000000 $t
+     /tmp/cc8ky6Wn.s:102    .text.PendSV_Handler:0000000000000000 PendSV_Handler
+     /tmp/cc8ky6Wn.s:153    .text.PendSV_Handler:0000000000000060 pxCurrentTCBConst
+     /tmp/cc8ky6Wn.s:153    .text.PendSV_Handler:0000000000000060 $d
+     /tmp/cc8ky6Wn.s:163    .text.vPortEnableVFP:0000000000000000 $t
+     /tmp/cc8ky6Wn.s:169    .text.vPortEnableVFP:0000000000000000 vPortEnableVFP
+     /tmp/cc8ky6Wn.s:185    .text.vPortEnableVFP:000000000000000e $d
+     /tmp/cc8ky6Wn.s:185    .text.vPortEnableVFP:0000000000000010 $d
+     /tmp/cc8ky6Wn.s:195    .rodata.prvTaskExitError.str1.4:0000000000000000 $d
+     /tmp/cc8ky6Wn.s:199    .text.prvTaskExitError:0000000000000000 $t
+     /tmp/cc8ky6Wn.s:205    .text.prvTaskExitError:0000000000000000 prvTaskExitError
+     /tmp/cc8ky6Wn.s:285    .text.prvTaskExitError:0000000000000044 $d
+     /tmp/cc8ky6Wn.s:292    .text.pxPortInitialiseStack:0000000000000000 $t
+     /tmp/cc8ky6Wn.s:299    .text.pxPortInitialiseStack:0000000000000000 pxPortInitialiseStack
+     /tmp/cc8ky6Wn.s:349    .text.pxPortInitialiseStack:0000000000000028 $d
+     /tmp/cc8ky6Wn.s:354    .text.vPortEndScheduler:0000000000000000 $t
+     /tmp/cc8ky6Wn.s:361    .text.vPortEndScheduler:0000000000000000 vPortEndScheduler
+     /tmp/cc8ky6Wn.s:395    .text.vPortEndScheduler:0000000000000020 $d
+     /tmp/cc8ky6Wn.s:402    .text.vPortEnterCritical:0000000000000000 $t
+     /tmp/cc8ky6Wn.s:409    .text.vPortEnterCritical:0000000000000000 vPortEnterCritical
+     /tmp/cc8ky6Wn.s:475    .text.vPortEnterCritical:0000000000000044 $d
+     /tmp/cc8ky6Wn.s:482    .text.vPortExitCritical:0000000000000000 $t
+     /tmp/cc8ky6Wn.s:489    .text.vPortExitCritical:0000000000000000 vPortExitCritical
+     /tmp/cc8ky6Wn.s:549    .text.vPortExitCritical:0000000000000028 $d
+     /tmp/cc8ky6Wn.s:556    .text.SysTick_Handler:0000000000000000 $t
+     /tmp/cc8ky6Wn.s:563    .text.SysTick_Handler:0000000000000000 SysTick_Handler
+     /tmp/cc8ky6Wn.s:634    .text.vPortSetupTimerInterrupt:0000000000000000 $t
+     /tmp/cc8ky6Wn.s:641    .text.vPortSetupTimerInterrupt:0000000000000000 vPortSetupTimerInterrupt
+     /tmp/cc8ky6Wn.s:676    .text.vPortSetupTimerInterrupt:0000000000000020 $d
+     /tmp/cc8ky6Wn.s:682    .text.xPortStartScheduler:0000000000000000 $t
+     /tmp/cc8ky6Wn.s:689    .text.xPortStartScheduler:0000000000000000 xPortStartScheduler
+     /tmp/cc8ky6Wn.s:934    .text.xPortStartScheduler:0000000000000128 $d
+     /tmp/cc8ky6Wn.s:947    .text.vPortValidateInterruptPriority:0000000000000000 $t
+     /tmp/cc8ky6Wn.s:954    .text.vPortValidateInterruptPriority:0000000000000000 vPortValidateInterruptPriority
+     /tmp/cc8ky6Wn.s:1038   .text.vPortValidateInterruptPriority:0000000000000050 $d
+     /tmp/cc8ky6Wn.s:1050   .bss.ucMaxSysCallPriority:0000000000000000 ucMaxSysCallPriority
+     /tmp/cc8ky6Wn.s:1051   .bss.ucMaxSysCallPriority:0000000000000000 $d
+     /tmp/cc8ky6Wn.s:1053   .bss.ulMaxPRIGROUPValue:0000000000000000 $d
+     /tmp/cc8ky6Wn.s:1057   .bss.ulMaxPRIGROUPValue:0000000000000000 ulMaxPRIGROUPValue
+     /tmp/cc8ky6Wn.s:1060   .data.uxCriticalNesting:0000000000000000 $d
+     /tmp/cc8ky6Wn.s:1064   .data.uxCriticalNesting:0000000000000000 uxCriticalNesting
 
 UNDEFINED SYMBOLS
 pxCurrentTCB
 vTaskSwitchContext
+HAL_UART_Transmit
+huart2
+ARM GAS  /tmp/cc8ky6Wn.s 			page 44
+
+
 xTaskIncrementTick
 SystemCoreClock

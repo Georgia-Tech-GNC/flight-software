@@ -1,4 +1,4 @@
-ARM GAS  /tmp/ccl2sswo.s 			page 1
+ARM GAS  /tmp/cci8TkZQ.s 			page 1
 
 
    1              		.cpu cortex-m7
@@ -25,8 +25,9 @@ ARM GAS  /tmp/ccl2sswo.s 			page 1
   22              		.thumb_func
   23              		.fpu fpv5-d16
   25              	telemetry_test_task:
-  26              	.LFB148:
-  27              		.file 1 "../Core/Tests/Src/telemetry_test.c"
+  26              	.LVL0:
+  27              	.LFB148:
+  28              		.file 1 "../Core/Tests/Src/telemetry_test.c"
    1:../Core/Tests/Src/telemetry_test.c **** #include "telemetry_test.h"
    2:../Core/Tests/Src/telemetry_test.c **** #include "telemetry.h"
    3:../Core/Tests/Src/telemetry_test.c **** #include "stdint.h"
@@ -39,55 +40,75 @@ ARM GAS  /tmp/ccl2sswo.s 			page 1
   10:../Core/Tests/Src/telemetry_test.c **** #include "port_config.h"
   11:../Core/Tests/Src/telemetry_test.c **** 
   12:../Core/Tests/Src/telemetry_test.c **** void telemetry_test_task(void *args) {
-  28              		.loc 1 12 38 view -0
-  29              		.cfi_startproc
-  30              		@ Volatile: function does not return.
-  31              		@ args = 0, pretend = 0, frame = 0
-  32              		@ frame_needed = 0, uses_anonymous_args = 0
-  33              	.LVL0:
+  29              		.loc 1 12 38 view -0
+  30              		.cfi_startproc
+  31              		@ Volatile: function does not return.
+  32              		@ args = 0, pretend = 0, frame = 8
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
   34              		.loc 1 12 38 is_stmt 0 view .LVU1
-  35 0000 08B5     		push	{r3, lr}
+  35 0000 00B5     		push	{lr}
   36              	.LCFI0:
-  37              		.cfi_def_cfa_offset 8
-  38              		.cfi_offset 3, -8
-  39              		.cfi_offset 14, -4
-  40              	.LVL1:
-  41              	.L2:
+  37              		.cfi_def_cfa_offset 4
+  38              		.cfi_offset 14, -4
+  39 0002 83B0     		sub	sp, sp, #12
+  40              	.LCFI1:
+  41              		.cfi_def_cfa_offset 16
   13:../Core/Tests/Src/telemetry_test.c **** 
   14:../Core/Tests/Src/telemetry_test.c ****     uint8_t rx[2];
-  42              		.loc 1 14 5 is_stmt 1 discriminator 1 view .LVU2
+  42              		.loc 1 14 5 is_stmt 1 view .LVU2
   15:../Core/Tests/Src/telemetry_test.c **** 
-  16:../Core/Tests/Src/telemetry_test.c ****     while (1) {
-ARM GAS  /tmp/ccl2sswo.s 			page 2
+  16:../Core/Tests/Src/telemetry_test.c ****     uint8_t dummy_data[7] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06};
+ARM GAS  /tmp/cci8TkZQ.s 			page 2
 
 
-  43              		.loc 1 16 5 discriminator 1 view .LVU3
-  44              	.LBB2:
-  17:../Core/Tests/Src/telemetry_test.c ****         char s[19];
-  45              		.loc 1 17 9 discriminator 1 view .LVU4
+  43              		.loc 1 16 5 view .LVU3
+  44              		.loc 1 16 13 is_stmt 0 view .LVU4
+  45 0004 064B     		ldr	r3, .L4
+  46 0006 93E80300 		ldm	r3, {r0, r1}
+  47              	.LVL1:
+  48              		.loc 1 16 13 view .LVU5
+  49 000a 0090     		str	r0, [sp]
+  50 000c ADF80410 		strh	r1, [sp, #4]	@ movhi
+  51 0010 090C     		lsrs	r1, r1, #16
+  52 0012 8DF80610 		strb	r1, [sp, #6]
+  53              	.L2:
+  17:../Core/Tests/Src/telemetry_test.c **** 
+  18:../Core/Tests/Src/telemetry_test.c ****     while (1) {
+  54              		.loc 1 18 5 is_stmt 1 discriminator 1 view .LVU6
+  19:../Core/Tests/Src/telemetry_test.c **** 
+  20:../Core/Tests/Src/telemetry_test.c ****         vTaskDelay(1000);
+  55              		.loc 1 20 9 discriminator 1 view .LVU7
+  56 0016 4FF47A70 		mov	r0, #1000
+  57 001a FFF7FEFF 		bl	vTaskDelay
+  58              	.LVL2:
   18:../Core/Tests/Src/telemetry_test.c **** 
-  19:../Core/Tests/Src/telemetry_test.c ****         vTaskDelay(1000);
-  46              		.loc 1 19 9 discriminator 1 view .LVU5
-  47 0002 4FF47A70 		mov	r0, #1000
-  48 0006 FFF7FEFF 		bl	vTaskDelay
-  49              	.LVL2:
-  50              	.LBE2:
-  16:../Core/Tests/Src/telemetry_test.c ****         char s[19];
-  51              		.loc 1 16 11 discriminator 1 view .LVU6
-  52 000a FAE7     		b	.L2
-  53              		.cfi_endproc
-  54              	.LFE148:
-  56              		.text
-  57              	.Letext0:
-  58              		.file 2 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stdint.h"
-  59              		.file 3 "../Core/FreeRTOS-Kernel/include/task.h"
-ARM GAS  /tmp/ccl2sswo.s 			page 3
+  59              		.loc 1 18 11 discriminator 1 view .LVU8
+  60 001e FAE7     		b	.L2
+  61              	.L5:
+  62              		.align	2
+  63              	.L4:
+  64 0020 00000000 		.word	.LANCHOR0
+  65              		.cfi_endproc
+  66              	.LFE148:
+  68              		.section	.rodata
+  69              		.align	2
+  70              		.set	.LANCHOR0,. + 0
+  71              	.LC0:
+  72 0000 00010203 		.ascii	"\000\001\002\003\004\005\006"
+  72      040506
+  73              		.text
+  74              	.Letext0:
+  75              		.file 2 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stdint.h"
+  76              		.file 3 "../Core/FreeRTOS-Kernel/include/task.h"
+ARM GAS  /tmp/cci8TkZQ.s 			page 3
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 telemetry_test.c
-     /tmp/ccl2sswo.s:17     .text.telemetry_test_task:0000000000000000 $t
-     /tmp/ccl2sswo.s:25     .text.telemetry_test_task:0000000000000000 telemetry_test_task
+     /tmp/cci8TkZQ.s:17     .text.telemetry_test_task:0000000000000000 $t
+     /tmp/cci8TkZQ.s:25     .text.telemetry_test_task:0000000000000000 telemetry_test_task
+     /tmp/cci8TkZQ.s:64     .text.telemetry_test_task:0000000000000020 $d
+     /tmp/cci8TkZQ.s:69     .rodata:0000000000000000 $d
 
 UNDEFINED SYMBOLS
 vTaskDelay

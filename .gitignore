@@ -53,3 +53,12 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# Directories
+.vscode/
+MainMCU/Core/.vscode/
+MainMCU/MCU-h725zgt6/build/
+MainMCU/Nucleo-F429ZI/.vscode/
+MainMCU/Nucleo-F429ZI/build/
+MainMCU/Nucleo-H723ZG/.vscode/
+MainMCU/Nucleo-H723ZG/build/

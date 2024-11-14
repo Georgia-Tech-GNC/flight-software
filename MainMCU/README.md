@@ -14,11 +14,12 @@
 
 ### USART
 
-1. Enable three USARTx/UARTx modules as asynchronous (one as communication with the H723 and one as communication with the XBee)
-2. Set baud rate on all three modules to 115200
-3. Enable DMA for TX/RX on two modules (one as communication with H723 and one as communication with XBee)
-4. Set DMA mode for RX to circular on the two modules
-5. Enable USARTx global interrupt on all three modules with preemption priority 5
+1. Enable three USARTx/UARTx modules as asynchronous (one as communication with the H723, one as communication with the XBee, and one as debug output)
+2. Set baud rate on the XBee UART modeule to 38400
+3. Set baud rate on the other modules to 115200
+4. Enable DMA for TX/RX on two modules (one as communication with H723 and one as communication with XBee)
+5. Set DMA mode for RX to circular on the two modules
+6. Enable USARTx global interrupt on all three modules with preemption priority 5
 
 ### SPI
 
@@ -39,11 +40,10 @@
 
 1. Write port_config.h. You may use the config file in the Nucleo-F429ZI folder as a template
 
-## Interrupts
+## Fix Autogen
 
-1. Locate the stm32xxxx_it.c and .h file in Core/Src
-2. Delete SVC_Handler, PendSV_Handler, and SysTick_Handler definitions in stm32xxxx_it.c and .h files.
-3. _This is the only step in post-generation configuration that will have to be done every time CubeMX generates._
+1. In the project root directory, run "python tools/fix_autogen.py" and select the MCU/Nucleo you just generated
+2. _This will have to be run every time you regenerate from CubeMX_
 
 ## FreeRTOS
 
@@ -51,7 +51,7 @@
 
 ## FATFS
 
-1. Replace code in user_dskio.c. Again, you may just copy the file in the Nucleo-F429ZI.
+1. Replace code in FATFS/Target/user_dskio.c with what is in the Nucleo-F429ZI folder.
 
 ## main.c file
 

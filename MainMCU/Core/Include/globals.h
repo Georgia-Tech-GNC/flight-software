@@ -7,6 +7,7 @@
 #include "stream_buffer.h"
 #include "semphr.h"
 #include "message_buffer.h"
+#include "state.h"
 
 extern TaskHandle_t g_test_task_handle;
 extern TaskHandle_t g_sdio_task_handle;
@@ -25,10 +26,14 @@ extern UART_HandleTypeDef debug_uart;
 
 extern SPI_HandleTypeDef sd_spi;
 
+extern ADC_HandleTypeDef hadc1;
+extern ADC_HandleTypeDef hadc2;
+extern ADC_HandleTypeDef hadc3;
+
 #ifdef MCU_H725ZGT6
 extern OSPI_HandleTypeDef flash_spi;
 #endif
 
-extern uint8_t *g_current_state;
+extern RocketState g_current_state;
 
 #endif

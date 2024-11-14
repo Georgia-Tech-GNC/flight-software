@@ -2,6 +2,7 @@
 #define PORT_CONFIG_H
 
 #include "stm32h7xx_hal.h"
+#include "adc.h"
 
 /* Change these to the values for your board */
 #define MCU_H725ZGT6
@@ -26,5 +27,34 @@
 #define sd_spi              hspi1
 
 #define flash_spi           hospi1
+
+#define ADC1_N_CHANNELS     3
+#define ADC2_N_CHANNELS     7
+#define ADC3_N_CHANNELS     6
+
+static const ADC_Channel ADC1_SEQUENCE[ADC1_N_CHANNELS] = {
+    ADC_SERVO_2,
+    ADC_I_SENSE_0,
+    ADC_I_SENSE_3
+};
+
+static const ADC_Channel ADC2_SEQUENCE[ADC2_N_CHANNELS] = {
+    ADC_I_SENSE_4,
+    ADC_SERVO_1,
+    ADC_SERVO_3,
+    ADC_SERVO_0,
+    ADC_PYRO_I_2,
+    ADC_I_SENSE_1,
+    ADC_I_SENSE_2
+};
+
+static const ADC_Channel ADC3_SEQUENCE[ADC3_N_CHANNELS] = {
+    ADC_SERVO_4,
+    ADC_PYRO_I_0,
+    ADC_VCC_V,
+    ADC_PYRO_I_1,
+    ADC_BUCK_V,
+    ADC_VCC_I,
+};
 
 #endif

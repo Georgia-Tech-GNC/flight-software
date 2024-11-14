@@ -13,7 +13,13 @@
 
 void rx_process_byte(uint8_t byte, uint8_t *packet_buffer, uint8_t *packet_buffer_size);
 int uart_transmit_message(Message *message, uint8_t *packet_buf);
-void process_command(int command_it);
+
+void process_command(int command_id);
+
+void command_idle_to_ground();
+void command_fire_pyro();
+void command_flash_sd_card();
+void command_run_vane_activation_test();
 
 void telemetry_tx_task(void *args) {
     /* Buffer to store the generated packet */
@@ -87,8 +93,6 @@ void telemetry_rx_task(void *args) {
         /* Wait for new bytes to read */
         int bytes_read = xStreamBufferReceive(g_telemetry_rx_sb_handle, bytes_to_process, 16, portMAX_DELAY);
         
-        HAL_UART_Transmit(&debug_uart, "Received bytes\r\n", 16, HAL_MAX_DELAY);
-
         /* Process them */
         for (int i = 0; i < bytes_read; i ++) {
             rx_process_byte(bytes_to_process[i], packet_buffer, &packet_buffer_size);
@@ -135,7 +139,34 @@ void rx_process_byte(uint8_t byte, uint8_t *packet_buffer, uint8_t *packet_buffe
  * @param command_id The id of the command to be processed
  */
 void process_command(int command_id) {
-    char buff[32];
-    sprintf(buff, "Received command id: %d.\r\n", command_id);
-    HAL_UART_Transmit(&debug_uart, buff, strlen(buff), HAL_MAX_DELAY);
+    switch (command_id) {
+        case ROCKET_IDLE_TO_GROUND_COMMAND_ID:
+            command_idle_to_ground();
+            break;
+        case ROCKET_FIRE_PYRO_COMMAND_ID:
+            command_fire_pyro();
+            break;
+        case ROCKET_FLASH_SD_CARD_COMMAND_ID:
+            command_flash_sd_card();
+            break;
+        case ROCKET_RUN_VANE_ACTIVATION_TEST_COMMAND_ID:
+            command_run_vane_activation_test();
+            break;
+    }
+}
+
+void command_idle_to_ground() {
+    HAL_UART_Transmit_IT(&state_uart, (uint8_t *) "GO", 2);
+}
+
+void command_fire_pyro() {
+    /* Unimplemented */
+}
+
+void command_flash_sd_card() {
+    /* Unimplemented */
+}
+
+void command_run_vane_activation_test() {
+    /* Unimplemented */
 }

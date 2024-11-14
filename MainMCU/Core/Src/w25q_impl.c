@@ -2,7 +2,7 @@
 #include "port_config.h"
 #include "globals.h"
 
-void w25q_delay(uint32_t ms) { vTaskDelay(ms); }
+void w25q_delay(uint32_t ms) { vTaskDelay(pdMS_TO_TICKS(ms)); }
 
 enum w25q_err w25q_read_id(struct w25q_device *device, uint8_t *buf) {
   OSPI_RegularCmdTypeDef cmd = {0};
@@ -29,26 +29,19 @@ enum w25q_err w25q_read_id(struct w25q_device *device, uint8_t *buf) {
   cmd.DQSMode = HAL_OSPI_DQS_DISABLE;
   cmd.SIOOMode = HAL_OSPI_SIOO_INST_EVERY_CMD;
 
-    HAL_UART_Transmit(&debug_uart, "Reading ID\r\n", 12, HAL_MAX_DELAY);
-
   HAL_GPIO_WritePin(FLASH_CS_GPIO_PORT, FLASH_CS_PIN, GPIO_PIN_RESET);
 
   if (HAL_OSPI_Command(&flash_spi, &cmd, HAL_OSPI_TIMEOUT_DEFAULT_VALUE) !=
       HAL_OK) {
-        HAL_UART_Transmit(&debug_uart, "Command failed\r\n", 16, HAL_MAX_DELAY);
     return W25Q_ERR_SPI;
   }
 
   if (HAL_OSPI_Receive(&flash_spi, buf, HAL_OSPI_TIMEOUT_DEFAULT_VALUE) !=
       HAL_OK) {
-        HAL_UART_Transmit(&debug_uart, "Receive failed\r\n", 16, HAL_MAX_DELAY);
     return W25Q_ERR_SPI;
   }
 
   HAL_GPIO_WritePin(FLASH_CS_GPIO_PORT, FLASH_CS_PIN, GPIO_PIN_SET);
-
-    HAL_UART_Transmit(&debug_uart, "ID read\r\n", 9, HAL_MAX_DELAY);
-
 
   return W25Q_ERR_OK;
 }

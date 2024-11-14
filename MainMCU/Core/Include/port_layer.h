@@ -11,8 +11,10 @@
 #include "port_config.h"
 
 #include "sdio.h"
-#include "state_rx.h"
+#include "state_est_rx.h"
+#include "state_tx.h"
 #include "telemetry.h"
+#include "adc.h"
 
 #include "globals.h"
 

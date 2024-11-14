@@ -12,10 +12,6 @@ enum w25q_err w25q_init(struct w25q_device *device) {
     return err;
   }
 
-  char buf[100];
-  sprintf(buf, "ID: %02X\r\n", id);
-  HAL_UART_Transmit(&huart2, (uint8_t *)buf, strlen(buf), HAL_MAX_DELAY);
-
   if (id != 0x15) {
     return W25Q_ERR_INVALID_ID;
   }
@@ -24,8 +20,6 @@ enum w25q_err w25q_init(struct w25q_device *device) {
   if (err != W25Q_ERR_OK) {
     return err;
   }
-
-  HAL_UART_Transmit(&huart2, "Updated status\r\n", 16, HAL_MAX_DELAY);
 
 #if W25Q_MEM_FLASH_SIZE > 128
 
@@ -53,13 +47,11 @@ enum w25q_err w25q_init(struct w25q_device *device) {
 
   if (!device->status.QE) {
     uint8_t reg;
-      HAL_UART_Transmit(&huart2, "Something1 \r\n", 15, HAL_MAX_DELAY);
 
     err = w25q_read_status_reg(device, &reg, 2);
     if (err != W25Q_ERR_OK) {
       return err;
     }
-      HAL_UART_Transmit(&huart2, "Something2 \r\n", 15, HAL_MAX_DELAY);
 
     reg |= 0x02;
     err = w25q_write_status_reg(device, reg, 2);
@@ -67,11 +59,7 @@ enum w25q_err w25q_init(struct w25q_device *device) {
       return err;
     }
 
-          HAL_UART_Transmit(&huart2, "Something3 \r\n", 15, HAL_MAX_DELAY);
-
   }
-
-  HAL_UART_Transmit(&huart2, "Something \r\n", 14, HAL_MAX_DELAY);
 
   err = w25q_update_status_struct(device);
 

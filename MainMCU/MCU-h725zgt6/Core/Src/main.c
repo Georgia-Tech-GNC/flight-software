@@ -22,11 +22,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "packet_encode.h"
-#include "protocol.h"
 #include "port_layer.h"
-#include "string.h"
-#include "stdio.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -36,7 +32,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define MESSAGE_MAX_SIZE 32
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -59,15 +55,7 @@ UART_HandleTypeDef huart2;
 DMA_HandleTypeDef hdma_uart4_tx;
 
 /* USER CODE BEGIN PV */
-uint8_t messages_recieved = 0;
-uint8_t message_buffer[MESSAGE_MAX_SIZE];
-uint16_t message_buffer_size = 0;
-uint8_t rx_buffer[MESSAGE_MAX_SIZE];
-uint8_t ack_packet_buffer[MESSAGE_MAX_SIZE];
-uint16_t ack_packet_size = 0;
-uint16_t prev_size = 0;
-uint16_t n_bytes_received = 0;
-uint16_t n_times_recieved = 0;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -135,37 +123,8 @@ int main(void)
   MX_ADC2_Init();
   MX_ADC3_Init();
   /* USER CODE BEGIN 2 */
-  if (port_init()) {
-    HAL_UART_Transmit(&debug_uart, "Port init success\r\n", 19, HAL_MAX_DELAY);
-  } else {
-    HAL_UART_Transmit(&debug_uart, "Port init failed\r\n", 18, HAL_MAX_DELAY);
-  }
+  port_init();
   port_start();
-  //HAL_UARTEx_ReceiveToIdle_IT(&huart4, rx_buffer, MESSAGE_MAX_SIZE);
-
-  /*
-  struct RocketStateVector state = {
-    .velocity_x = 1.0,
-    .velocity_y = 2.0,
-    .velocity_z = 3.0,
-    .attitude_w = 4.0,
-    .attitude_x = 5.0,
-    .attitude_y = 6.0,
-    .attitude_z = 7.0,
-    .position_x = 8.0,
-    .position_y = 9.0,
-    .position_z = 10.0,
-    .timestamp = 12345
-  };
-
-  uint8_t encoded[48];
-  RocketStateVector_encode(&state, encoded);
-
-  uint8_t packetized[48+5];
-  generate_packet(encoded, 48, packetized, ROCKETSTATEVECTOR_MSG_ID);
-
-  HAL_UART_Transmit_IT(&huart4, packetized, 48+5);
-  */
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -175,17 +134,6 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    
-    char buf[40];
-    sprintf(buf, "Received: %d %d %d\r\n", n_bytes_received, n_times_recieved, messages_recieved);
-    HAL_UART_Transmit(&debug_uart, buf, strlen(buf), HAL_MAX_DELAY);
-    HAL_Delay(100);
-
-    if (ack_packet_size != 0) {
-      HAL_UART_Transmit_IT(&huart4, ack_packet_buffer, ack_packet_size);
-      ack_packet_size = 0;
-    }
-    
   }
   /* USER CODE END 3 */
 }
@@ -301,7 +249,7 @@ static void MX_ADC1_Init(void)
   hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;
   hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
   hadc1.Init.LowPowerAutoWait = DISABLE;
-  hadc1.Init.ContinuousConvMode = DISABLE;
+  hadc1.Init.ContinuousConvMode = ENABLE;
   hadc1.Init.NbrOfConversion = 1;
   hadc1.Init.DiscontinuousConvMode = DISABLE;
   hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
@@ -369,7 +317,7 @@ static void MX_ADC2_Init(void)
   hadc2.Init.ScanConvMode = ADC_SCAN_DISABLE;
   hadc2.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
   hadc2.Init.LowPowerAutoWait = DISABLE;
-  hadc2.Init.ContinuousConvMode = DISABLE;
+  hadc2.Init.ContinuousConvMode = ENABLE;
   hadc2.Init.NbrOfConversion = 1;
   hadc2.Init.DiscontinuousConvMode = DISABLE;
   hadc2.Init.ExternalTrigConv = ADC_SOFTWARE_START;
@@ -430,7 +378,7 @@ static void MX_ADC3_Init(void)
   hadc3.Init.ScanConvMode = ADC_SCAN_DISABLE;
   hadc3.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
   hadc3.Init.LowPowerAutoWait = DISABLE;
-  hadc3.Init.ContinuousConvMode = DISABLE;
+  hadc3.Init.ContinuousConvMode = ENABLE;
   hadc3.Init.NbrOfConversion = 1;
   hadc3.Init.DiscontinuousConvMode = DISABLE;
   hadc3.Init.ExternalTrigConv = ADC_SOFTWARE_START;
@@ -760,56 +708,6 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-  //HAL_UART_Transmit(&debug_uart, "Received bytes\r\n", 16, HAL_MAX_DELAY);
-}
-
-/*
-void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
-  //char buf2[100];
-  //sprintf(buf2, "Current size: %d, Prev size: %d\r\n", size, prev_size);
-
-  //HAL_UART_Transmit(&debug_uart, buf2, strlen(buf2), HAL_MAX_DELAY);
-
-  n_times_recieved ++;
-  n_bytes_received += size;
-  
-  for (int i = 0; i < size; i ++) {
-    char msg[100];
-
-    int16_t next_buffer_size = process_incoming_byte(rx_buffer[i], message_buffer, message_buffer_size);
-
-    sprintf(msg, "Next buf size: %d, Cur buf size: %d\r\n", next_buffer_size, message_buffer_size);
-    HAL_UART_Transmit(&debug_uart, msg, strlen(msg), HAL_MAX_DELAY);
-
-    if (next_buffer_size < 0) {
-
-      message_buffer_size = 0;
-
-      if (verify_packet(message_buffer, -next_buffer_size)) {
-        uint8_t command_id = is_command_packet(message_buffer, -next_buffer_size);
-
-        uint8_t rawData[2];
-        rawData[0] = command_id; // command id
-        rawData[1] = get_command_uuid(message_buffer); // command uuid
-        generate_packet(rawData, 2, ack_packet_buffer, COMMAND_ACK_MSG_ID);
-        // reformat_as_command_ack_packet(message_buffer);
-        // memcpy(ack_packet_buffer, message_buffer, -next_buffer_size);
-        ack_packet_size = -next_buffer_size;
-
-        messages_recieved ++;
-      }
-    } else if (next_buffer_size < MESSAGE_MAX_SIZE) {
-      //avoid buffer overflow
-      message_buffer_size = next_buffer_size;
-    } else {
-      message_buffer_size = 0;
-    }
-  }
-
-  HAL_UARTEx_ReceiveToIdle_IT(&huart4, rx_buffer, MESSAGE_MAX_SIZE);
-}
-*/
 
 /* USER CODE END 4 */
 

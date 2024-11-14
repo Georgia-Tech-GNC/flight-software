@@ -1,6 +1,0 @@
-{
-    "files.associations": {
-        "sdio.h": "c",
-        "freertos.h": "c"
-    }
-}

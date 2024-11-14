@@ -177,10 +177,7 @@ SECTIONS
     . = ALIGN(8);
   } >DTCMRAM
 
-  .buffer(NOLOAD) :
-  {
-    . = ALIGN (1);
-  } >RAM_D2
+  
 
   /* Remove information from the standard libraries */
   /DISCARD/ :

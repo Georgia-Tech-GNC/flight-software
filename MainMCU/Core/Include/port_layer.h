@@ -10,7 +10,7 @@
 
 #include "port_config.h"
 
-#include "sdio.h"
+#include "periph_io.h"
 #include "state_est_rx.h"
 #include "state_tx.h"
 #include "telemetry.h"

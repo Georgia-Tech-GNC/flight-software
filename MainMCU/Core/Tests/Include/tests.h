@@ -5,6 +5,6 @@
 #include "uart_test.h"
 #include "flash_test.h"
 
-#define test_task flash_test_task
+#define test_task uart_test_task
 
 #endif

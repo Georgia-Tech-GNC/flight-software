@@ -6,7 +6,7 @@
 #include "port_config.h"
 
 #include "main.h"
-#include "sdio.h"
+#include "periph_io.h"
 
 #include "globals.h"
 

@@ -75,7 +75,7 @@ Core/Src/port.c \\\
 ../Core/Src/packet_encode.c \\\
 ../Core/Src/port_layer.c \\\
 ../Core/Src/protocol.c \\\
-../Core/Src/sdio.c \\\
+../Core/Src/periph_io.c \\\
 ../Core/Src/state_rx.c \\\
 ../Core/Src/telemetry.c \\\
 ../Core/Src/transmission_manager.c \\\

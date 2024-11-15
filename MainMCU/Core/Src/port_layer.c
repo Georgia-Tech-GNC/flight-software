@@ -4,9 +4,9 @@ TaskHandle_t g_test_task_handle;
 StackType_t test_task_stack[8192];
 StaticTask_t test_task_buff;
 
-TaskHandle_t g_sdio_task_handle;
-StackType_t sdio_task_stack[4096];
-StaticTask_t sdio_task_buff;
+TaskHandle_t g_periph_io_task_handle;
+StackType_t periph_io_task_stack[4096];
+StaticTask_t periph_io_task_buff;
 
 TaskHandle_t g_telemetry_tx_task_handle;
 StackType_t telemetry_tx_task_stack[4096];
@@ -39,16 +39,18 @@ StreamBufferHandle_t g_state_rx_sb_handle;
 uint8_t state_rx_sb_storage[STATE_ESTIMATION_BYTES * 2 + 1];
 StaticMessageBuffer_t state_rx_sb_buff;
 
-MessageBufferHandle_t g_sdio_mb_handle;
-uint8_t sdio_mb_storage[256];
-StaticMessageBuffer_t sdio_mb_buff;
+MessageBufferHandle_t g_periph_io_mb_handle;
+uint8_t periph_io_mb_storage[256];
+StaticMessageBuffer_t periph_io_mb_buff;
 
 uint8_t telemetry_uart_rx_buf[MAX_PACKET_SIZE_TELEMETRY];
 uint8_t state_uart_rx_buf[MAX_PACKET_SIZE_STATE];
 
+#ifdef MCU_H725ZGT6
 uint8_t adc1_conv_ptr = 0;
 uint8_t adc2_conv_ptr = 0;
 uint8_t adc3_conv_ptr = 0;
+#endif
 
 RocketState g_current_state = {0};
 
@@ -70,12 +72,12 @@ int port_init(void) {
     g_state_rx_sb_handle = xStreamBufferCreateStatic(STATE_ESTIMATION_BYTES * 2 + 1, 1, state_rx_sb_storage, &state_rx_sb_buff);
     if (g_state_rx_sb_handle == NULL) return 0;
 
-    g_sdio_mb_handle = xMessageBufferCreateStatic(SD_MB_SIZE + 1, sdio_mb_storage, &sdio_mb_buff);
+    g_periph_io_mb_handle = xMessageBufferCreateStatic(SD_MB_SIZE + 1, periph_io_mb_storage, &periph_io_mb_buff);
     
     /* Create tasks */
     
-    g_sdio_task_handle = xTaskCreateStatic(sdio_task, "flash_task", 4096, NULL, tskIDLE_PRIORITY, sdio_task_stack, &sdio_task_buff);
-    if (g_sdio_task_handle == NULL) return 0;
+    g_periph_io_task_handle = xTaskCreateStatic(periph_io_task, "flash_task", 4096, NULL, tskIDLE_PRIORITY, periph_io_task_stack, &periph_io_task_buff);
+    if (g_periph_io_task_handle == NULL) return 0;
     
     g_telemetry_tx_task_handle = xTaskCreateStatic(telemetry_tx_task, "telemetry_tx_task", 4096, NULL, tskIDLE_PRIORITY, telemetry_tx_task_stack, &telemetry_tx_task_buff);
     if (g_telemetry_tx_task_handle == NULL) return 0;
@@ -102,6 +104,7 @@ int port_init(void) {
     }
 
     /* Begin ADC Conversions */
+#ifdef MCU_H725ZGT6
     if (HAL_ADC_Start_IT(&hadc1) != HAL_OK) {
         return 0;
     }
@@ -113,6 +116,7 @@ int port_init(void) {
     if (HAL_ADC_Start_IT(&hadc3) != HAL_OK) {
         return 0;
     }
+#endif
     
     return 1;
 }
@@ -140,7 +144,7 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
-/*
+#ifdef MCU_H725ZGT6
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
@@ -198,4 +202,4 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
 
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
-*/
+#endif

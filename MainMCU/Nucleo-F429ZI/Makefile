@@ -84,12 +84,12 @@ Core/Src/port.c \
 ../Core/Src/packet_encode.c \
 ../Core/Src/port_layer.c \
 ../Core/Src/protocol.c \
-../Core/Src/sdio.c \
-../Core/Src/state_rx.c \
+../Core/Src/periph_io.c \
+../Core/Src/state_est_rx.c \
+../Core/Src/state_tx.c \
 ../Core/Src/telemetry.c \
-../Core/Src/transmission_manager.c \
-../Core/Tests/Src/sd_test.c \
 ../Core/Tests/Src/uart_test.c \
+../Core/Tests/Src/sd_test.c \
 
 # ASM sources
 ASM_SOURCES =  \

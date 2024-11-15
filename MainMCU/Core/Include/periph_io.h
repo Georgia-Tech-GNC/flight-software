@@ -1,5 +1,5 @@
-#ifndef SDIO_H
-#define SDIO_H
+#ifndef periph_io_H
+#define periph_io_H
 
 #include "stdint.h"
 #include "FreeRTOS.h"
@@ -37,6 +37,6 @@ int sd_write_channel(SDChannel *channel, uint8_t *data, size_t len);
 int sd_save_channel(SDChannel *channel);
 int sd_load_channel(SDChannel *channel, size_t offset, size_t bytes_to_read);
 int sd_read_channel(SDChannel *channel, uint8_t *data, size_t len);
-void sdio_task(void *args);
+void periph_io_task(void *args);
 
 #endif

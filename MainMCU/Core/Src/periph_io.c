@@ -1,4 +1,4 @@
-#include "sdio.h"
+#include "periph_io.h"
 
 #include "FreeRTOS.h"
 #include "stream_buffer.h"
@@ -112,7 +112,7 @@ int sd_save_channel(SDChannel *channel) {
         .n_bytes = 0, /* Unused */
     };
 
-    size_t bytes_written = xMessageBufferSend(g_sdio_mb_handle, &operation, sizeof(SDOperation), 0);
+    size_t bytes_written = xMessageBufferSend(g_periph_io_mb_handle, &operation, sizeof(SDOperation), 0);
 
     if (bytes_written != sizeof(SDOperation)) {
         return 0;
@@ -141,7 +141,7 @@ int sd_load_channel(SDChannel *channel, size_t offset, size_t bytes_to_read) {
         .n_bytes = bytes_to_read,
     };
 
-    size_t bytes_written = xMessageBufferSend(g_sdio_mb_handle, &operation, sizeof(SDOperation), 0);
+    size_t bytes_written = xMessageBufferSend(g_periph_io_mb_handle, &operation, sizeof(SDOperation), 0);
 
     if (bytes_written != sizeof(SDOperation)) {
         return 0;
@@ -169,7 +169,7 @@ int sd_read_channel(SDChannel *channel, uint8_t *data, size_t len) {
  * Task to handle SD card operations
  * @param args Unused
  */
-void sdio_task(void *args) {
+void periph_io_task(void *args) {
     uint8_t sd_mounted = 0;
     FATFS fs;
 
@@ -186,7 +186,7 @@ void sdio_task(void *args) {
 
     for (;;) {
         /* Wait for an operation to be sent to us */
-        xMessageBufferReceive(g_sdio_mb_handle, operation_buffer, sizeof(SDOperation), portMAX_DELAY);
+        xMessageBufferReceive(g_periph_io_mb_handle, operation_buffer, sizeof(SDOperation), portMAX_DELAY);
 
         /* Re-attempt to mount SD card if not already */
         if (!sd_mounted && f_mount(&fs, "/", 1) == FR_OK) {

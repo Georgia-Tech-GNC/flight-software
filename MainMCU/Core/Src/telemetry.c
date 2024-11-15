@@ -67,7 +67,7 @@ int send_message(uint8_t *payload, uint8_t payload_size, uint8_t message_id) {
  */
 int uart_transmit_message(Message *message, uint8_t *packet_buf) {
     int packet_size = generate_packet(message->payload, message->payload_size, packet_buf, message->message_id);    
-
+ 
     if (HAL_UART_Transmit_IT(&telemetry_uart, packet_buf, packet_size) != HAL_OK) {
         return 0;
     }

@@ -50,7 +50,7 @@ uint8_t adc1_conv_ptr = 0;
 uint8_t adc2_conv_ptr = 0;
 uint8_t adc3_conv_ptr = 0;
 
-RocketState g_current_state;
+RocketState g_current_state = {0};
 
 int port_init(void) {
     /* Create mutexes */
@@ -64,15 +64,16 @@ int port_init(void) {
     g_telemetry_rx_sb_handle = xStreamBufferCreateStatic(128 + 1, 1, telemetry_rx_sb_storage, &telemetry_rx_sb_buff);
     if (g_telemetry_rx_sb_handle == NULL) return 0;
 
-    g_telemetry_tx_mb_handle = xMessageBufferCreateStatic(TX_MESSAGE_BUFFER_SIZE + 1, telemetry_tx_mb_storage, &telemetry_tx_mb_buff);
+    g_telemetry_tx_mb_handle = xMessageBufferCreateStatic(TX_MESSAGE_BUFFER_SIZE, telemetry_tx_mb_storage, &telemetry_tx_mb_buff);
     if (g_telemetry_tx_mb_handle == NULL) return 0;
 
     g_state_rx_sb_handle = xStreamBufferCreateStatic(STATE_ESTIMATION_BYTES * 2 + 1, 1, state_rx_sb_storage, &state_rx_sb_buff);
     if (g_state_rx_sb_handle == NULL) return 0;
 
     g_sdio_mb_handle = xMessageBufferCreateStatic(SD_MB_SIZE + 1, sdio_mb_storage, &sdio_mb_buff);
-
+    
     /* Create tasks */
+    
     g_sdio_task_handle = xTaskCreateStatic(sdio_task, "flash_task", 4096, NULL, tskIDLE_PRIORITY, sdio_task_stack, &sdio_task_buff);
     if (g_sdio_task_handle == NULL) return 0;
     
@@ -120,6 +121,11 @@ void port_start(void) {
     vTaskStartScheduler();
 }
 
+void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName) {
+    HAL_UART_Transmit(&debug_uart, (uint8_t *) "Stack overflow\r\n", 16, HAL_MAX_DELAY);
+    while(1);
+}
+
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
@@ -134,6 +140,7 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
+/*
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
@@ -191,3 +198,4 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
 
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
+*/

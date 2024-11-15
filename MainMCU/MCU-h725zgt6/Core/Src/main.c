@@ -125,6 +125,14 @@ int main(void)
   /* USER CODE BEGIN 2 */
   port_init();
   port_start();
+
+  /*
+  HAL_UART_Transmit(&huart4, "+++", 3, HAL_MAX_DELAY);
+  HAL_Delay(1000);
+  HAL_UART_Transmit(&huart4, "ATBD 6\r\n", 8, HAL_MAX_DELAY); 
+  HAL_Delay(1000);
+  HAL_UART_Transmit(&huart4, "ATWR\r\n", 6, HAL_MAX_DELAY);
+  */
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -528,7 +536,7 @@ static void MX_UART4_Init(void)
 
   /* USER CODE END UART4_Init 1 */
   huart4.Instance = UART4;
-  huart4.Init.BaudRate = 38400;
+  huart4.Init.BaudRate = 57600;
   huart4.Init.WordLength = UART_WORDLENGTH_8B;
   huart4.Init.StopBits = UART_STOPBITS_1;
   huart4.Init.Parity = UART_PARITY_NONE;

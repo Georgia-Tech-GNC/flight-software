@@ -42,8 +42,6 @@ void state_tx_task(void *args) {
         vTaskDelay(pdMS_TO_TICKS((ROCKETSENSORDATA_SIZE + 5) * MULT));
         send_analog_feedback_data(&rocket_state, analog_feedback_data_payload_buf);
         vTaskDelay(pdMS_TO_TICKS((ROCKETANALOGFEEDBACKDATA_SIZE + 5) * MULT));
-
-        HAL_UART_Transmit(&debug_uart, (uint8_t *) "Sent state\r\n", 12, HAL_MAX_DELAY);
     }
 }
 

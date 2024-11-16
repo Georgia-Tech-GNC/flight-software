@@ -28,13 +28,6 @@ void state_est_rx_task(void *args) {
         if (xSemaphoreTake(g_state_mutex_handle, portMAX_DELAY) == pdTRUE) {
             /* TODO: Do something here */
 
-            g_current_state.analog_feedback_data.current_fb_33 = timestamp % 100;
-            g_current_state.analog_feedback_data.pyro_0_cont = (float) timestamp / 4129.0;
-            g_current_state.analog_feedback_data.pyro_1_cont = (float) timestamp / 29.0;
-            g_current_state.analog_feedback_data.pyro_2_cont = (float) timestamp / 3.0;
-            g_current_state.analog_feedback_data.pyro_channel_deploy = timestamp % 2;
-            g_current_state.analog_feedback_data.timestamp = timestamp;
-
             g_current_state.ground_ekf.pn_matrix_d1 = (float) timestamp / 100.0;
             g_current_state.ground_ekf.pn_matrix_d2 = (float) timestamp / 200.0;
             g_current_state.ground_ekf.pn_matrix_d3 = (float) timestamp / 300.0;

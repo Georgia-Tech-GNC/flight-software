@@ -30,6 +30,10 @@ TaskHandle_t g_state_flash_task_handle;
 StackType_t state_flash_task_stack[4096];
 StaticTask_t state_flash_task_buff;
 
+TaskHandle_t g_adc_convert_task_handle;
+StackType_t adc_convert_task_stack[4096];
+StaticTask_t adc_convert_task_buff;
+
 SemaphoreHandle_t g_state_mutex_handle;
 StaticSemaphore_t state_mutex_buff;
 
@@ -52,11 +56,9 @@ StaticMessageBuffer_t periph_io_mb_buff;
 uint8_t telemetry_uart_rx_buf[MAX_PACKET_SIZE_TELEMETRY];
 uint8_t state_uart_rx_buf[MAX_PACKET_SIZE_STATE];
 
-#ifdef MCU_H725ZGT6
 uint8_t adc1_conv_ptr = 0;
 uint8_t adc2_conv_ptr = 0;
 uint8_t adc3_conv_ptr = 0;
-#endif
 
 RocketState g_current_state = {0};
 
@@ -100,6 +102,9 @@ int port_init(void) {
     g_state_flash_task_handle = xTaskCreateStatic(state_flash_task, "state_flash_task", 4096, NULL, tskIDLE_PRIORITY, state_flash_task_stack, &state_flash_task_buff);
     if (g_state_flash_task_handle == NULL) return 0;
 
+    g_adc_convert_task_handle = xTaskCreateStatic(adc_convert_task, "adc_convert_task", 4096, NULL, tskIDLE_PRIORITY, adc_convert_task_stack, &adc_convert_task_buff);
+    if (g_adc_convert_task_handle == NULL) return 0;
+
 #ifdef USE_TESTS
     g_test_task_handle = xTaskCreateStatic(test_task, "test_task", 4096, NULL, tskIDLE_PRIORITY, test_task_stack, &test_task_buff);
     if (g_test_task_handle == NULL) return 0;
@@ -113,21 +118,6 @@ int port_init(void) {
     if (HAL_UARTEx_ReceiveToIdle_IT(&state_uart, state_uart_rx_buf, MAX_PACKET_SIZE_STATE) != HAL_OK) {
         return 0;
     }
-
-    /* Begin ADC Conversions */
-#ifdef MCU_H725ZGT6
-    if (HAL_ADC_Start_IT(&hadc1) != HAL_OK) {
-        return 0;
-    }
-
-    if (HAL_ADC_Start_IT(&hadc2) != HAL_OK) {
-        return 0;
-    }
-
-    if (HAL_ADC_Start_IT(&hadc3) != HAL_OK) {
-        return 0;
-    }
-#endif
     
     return 1;
 }
@@ -155,62 +145,77 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
-#ifdef MCU_H725ZGT6
+
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-
-    uint16_t adc_val = 0;
+    
+    uint16_t adc_val = HAL_ADC_GetValue(hadc);
     ADC_Channel channel;
 
+    ADC_HandleTypeDef *to_start = NULL;
+    
+#ifdef USE_ADC1
     if (hadc->Instance == hadc1.Instance) {
         channel = ADC1_SEQUENCE[adc1_conv_ptr];
-        adc_val = HAL_ADC_GetValue(&hadc1);
         adc1_conv_ptr = (adc1_conv_ptr + 1) % ADC1_N_CHANNELS;
-    } else if (hadc->Instance == hadc2.Instance) {
+
+        if (adc1_conv_ptr == 0) {
+            to_start = ADC1_NEXT;
+        } else {
+            to_start = &hadc1;
+        }
+    }
+#endif
+
+#ifdef USE_ADC2
+    if (hadc->Instance == hadc2.Instance) {
         channel = ADC2_SEQUENCE[adc2_conv_ptr];
-        adc_val = HAL_ADC_GetValue(&hadc2);
         adc2_conv_ptr = (adc2_conv_ptr + 1) % ADC2_N_CHANNELS;
-    } else if (hadc->Instance == hadc3.Instance) {
+        
+        if (adc2_conv_ptr == 0) {
+            to_start = ADC2_NEXT;
+        } else {
+            to_start = &hadc2;
+        }
+    }
+#endif
+
+#ifdef USE_ADC3
+    if (hadc->Instance == hadc3.Instance) {
         channel = ADC3_SEQUENCE[adc3_conv_ptr];
-        adc_val = HAL_ADC_GetValue(&hadc3);
         adc3_conv_ptr = (adc3_conv_ptr + 1) % ADC3_N_CHANNELS;
+
+        if (adc3_conv_ptr != 0) {
+            to_start = &hadc3;
+        } else {
+            to_start = ADC3_NEXT;
+        }
+    }
+#endif
+
+    if (xSemaphoreTakeFromISR(g_state_mutex_handle, &xHigherPriorityTaskWoken) == pdTRUE) {
+        switch (channel) {
+            case ADC_PYRO_I_0:
+                g_current_state.analog_feedback_data.pyro_0_cont = adc_val;
+                break;
+            case ADC_PYRO_I_1:
+                g_current_state.analog_feedback_data.pyro_1_cont = adc_val;
+                break;
+            case ADC_PYRO_I_2:
+                g_current_state.analog_feedback_data.pyro_2_cont = adc_val;
+                break;
+            case ADC_VCC_I:
+                g_current_state.analog_feedback_data.current_fb_33 = adc_val;
+                break;
+        }
+
+        g_current_state.analog_feedback_data.timestamp = xTaskGetTickCount();
+        xSemaphoreGiveFromISR(g_state_mutex_handle, &xHigherPriorityTaskWoken);
     }
 
-    switch (channel) {
-        case ADC_I_SENSE_0:
-            break;
-        case ADC_I_SENSE_1:
-            break;
-        case ADC_I_SENSE_2:
-            break;
-        case ADC_I_SENSE_3:
-            break;
-        case ADC_I_SENSE_4:
-            break;
-        case ADC_SERVO_0:
-            break;
-        case ADC_SERVO_1:
-            break;
-        case ADC_SERVO_2:
-            break;
-        case ADC_SERVO_3:
-            break;
-        case ADC_SERVO_4:
-            break;
-        case ADC_PYRO_I_0:
-            break;
-        case ADC_PYRO_I_1:
-            break;
-        case ADC_PYRO_I_2:
-            break;
-        case ADC_VCC_I:
-            break;
-        case ADC_VCC_V:
-            break;
-        case ADC_BUCK_V:
-            break;
+    if (to_start != NULL) {
+        HAL_ADC_Start_IT(to_start);
     }
 
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
-#endif

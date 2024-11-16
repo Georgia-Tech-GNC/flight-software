@@ -17,7 +17,7 @@ int sd_save_operation(IOOperation *operation, uint8_t *data_buffer, size_t *byte
 int flash_load_operation(struct w25q_device w25q, IOOperation *operation, uint8_t *data_buffer, size_t *bytes_loaded, uint8_t w25q_initialized);
 int flash_save_operation(struct w25q_device w25q, IOOperation *operation, uint8_t *data_buffer, size_t *bytes_saved, size_t *w25q_write_ptr, uint8_t w25q_initialized);
 
-uint8_t _fake_flash_chip[10000];
+uint8_t _fake_flash_chip[15000];
 uint8_t *fake_flash_chip = _fake_flash_chip;
 
 /**
@@ -217,7 +217,10 @@ void periph_io_task(void *args) {
 
     /* Initial attempt to mount SD card */
     if (f_mount(&fs, "/", 1) == FR_OK) {
+        HAL_UART_Transmit(&debug_uart, (uint8_t *) "SD card mounted\r\n", 17, HAL_MAX_DELAY);
         sd_mounted = 1;
+    } else {
+        HAL_UART_Transmit(&debug_uart, (uint8_t *) "SD card not mounted\r\n", 21, HAL_MAX_DELAY);
     }
 
 #ifdef MCU_H725ZGT6

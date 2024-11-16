@@ -53,8 +53,6 @@ void state_flash_task(void *args) {
 }
 
 void write_to_flash(IOChannel *flash_write_channel, RocketState *rocket_state) {
-    HAL_UART_Transmit(&debug_uart, (uint8_t *) "Writing to flash...\r\n", 21, HAL_MAX_DELAY);
-
     uint8_t raw_bytes[sizeof(RocketState)];
     memcpy(raw_bytes, rocket_state, sizeof(RocketState));
 

@@ -4,6 +4,7 @@
 #include "stdint.h"
 #include "state_flash.h"
 #include "state_tx.h"
+#include "adc_convert.h"
 
 #define TELEMETRY_SEND_TIMEOUT 100
 #define TX_PACKET_BUFFER_SIZE 258

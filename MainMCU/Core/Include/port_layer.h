@@ -16,6 +16,7 @@
 #include "state_flash.h"
 #include "telemetry.h"
 #include "adc.h"
+#include "adc_convert.h"
 
 #include "globals.h"
 

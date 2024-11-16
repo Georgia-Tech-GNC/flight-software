@@ -18,6 +18,7 @@ extern TaskHandle_t g_telemetry_rx_task_handle;
 extern TaskHandle_t g_state_tx_task_handle;
 extern TaskHandle_t g_state_est_rx_task_handle;
 extern TaskHandle_t g_state_flash_task_handle;
+extern TaskHandle_t g_adc_convert_task_handle;
 
 extern SemaphoreHandle_t g_state_mutex_handle;
 extern MessageBufferHandle_t g_telemetry_tx_mb_handle;
@@ -31,11 +32,17 @@ extern UART_HandleTypeDef debug_uart;
 
 extern SPI_HandleTypeDef sd_spi;
 
-#ifdef MCU_H725ZGT6
+#ifdef USE_ADC1
 extern ADC_HandleTypeDef hadc1;
+#endif
+#ifdef USE_ADC2
 extern ADC_HandleTypeDef hadc2;
+#endif
+#ifdef USE_ADC3
 extern ADC_HandleTypeDef hadc3;
+#endif
 
+#ifdef MCU_H725ZGT6
 extern OSPI_HandleTypeDef flash_spi;
 #endif
 

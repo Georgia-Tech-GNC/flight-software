@@ -175,6 +175,7 @@ void command_idle_to_ground() {
 
     xTaskNotify(g_state_flash_task_handle, BEGIN_STATE_FLASH_NOTIFICATION_BIT, eSetBits);
     xTaskNotify(g_state_tx_task_handle, BEGIN_STATE_TX_NOTIFICATION_BIT, eSetBits);
+    xTaskNotify(g_adc_convert_task_handle, BEGIN_ADC_NOTIFICATION_BIT, eSetBits);
 }
 
 void command_fire_pyro() {

@@ -3,7 +3,7 @@
 
 #include "stdint.h"
 
-#define STATE_ESTIMATION_BYTES 8
+#define STATE_ESTIMATION_BYTES 1
 
 typedef struct {
     uint8_t _dummy;

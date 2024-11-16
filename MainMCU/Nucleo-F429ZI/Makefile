@@ -86,6 +86,7 @@ Core/Src/port.c \
 ../Core/Src/protocol.c \
 ../Core/Src/periph_io.c \
 ../Core/Src/state_est_rx.c \
+../Core/Src/state_flash.c \
 ../Core/Src/state_tx.c \
 ../Core/Src/telemetry.c \
 ../Core/Tests/Src/uart_test.c \
@@ -171,7 +172,6 @@ ifeq ($(DEBUG), 1)
 CFLAGS += -g -gdwarf-2
 endif
 
-
 # Generate dependency information
 CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"
 
@@ -186,6 +186,7 @@ LDSCRIPT = STM32F429ZITx_FLASH.ld
 LIBS = -lc -lm -lnosys 
 LIBDIR = 
 LDFLAGS = $(MCU) -specs=nano.specs -T$(LDSCRIPT) $(LIBDIR) $(LIBS) -Wl,-Map=$(BUILD_DIR)/$(TARGET).map,--cref -Wl,--gc-sections
+LDFLAGS += -u _printf_float
 
 # default action: build all
 all: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).hex $(BUILD_DIR)/$(TARGET).bin

@@ -90,6 +90,7 @@ Core/Src/port.c \
 ../Core/Src/protocol.c \
 ../Core/Src/periph_io.c \
 ../Core/Src/state_est_rx.c \
+../Core/Src/state_flash.c \
 ../Core/Src/state_tx.c \
 ../Core/Src/telemetry.c \
 ../Core/Src/w25q.c \

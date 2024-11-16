@@ -13,6 +13,7 @@
 #include "periph_io.h"
 #include "state_est_rx.h"
 #include "state_tx.h"
+#include "state_flash.h"
 #include "telemetry.h"
 #include "adc.h"
 

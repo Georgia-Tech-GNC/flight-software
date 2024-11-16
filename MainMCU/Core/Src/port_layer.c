@@ -1,8 +1,10 @@
 #include "port_layer.h"
 
+#ifdef USE_TESTS
 TaskHandle_t g_test_task_handle;
-StackType_t test_task_stack[8192];
+StackType_t test_task_stack[4096];
 StaticTask_t test_task_buff;
+#endif
 
 TaskHandle_t g_periph_io_task_handle;
 StackType_t periph_io_task_stack[4096];
@@ -24,6 +26,10 @@ TaskHandle_t g_state_tx_task_handle;
 StackType_t state_tx_task_stack[4096];
 StaticTask_t state_tx_task_buff;
 
+TaskHandle_t g_state_flash_task_handle;
+StackType_t state_flash_task_stack[4096];
+StaticTask_t state_flash_task_buff;
+
 SemaphoreHandle_t g_state_mutex_handle;
 StaticSemaphore_t state_mutex_buff;
 
@@ -40,7 +46,7 @@ uint8_t state_rx_sb_storage[STATE_ESTIMATION_BYTES * 2 + 1];
 StaticMessageBuffer_t state_rx_sb_buff;
 
 MessageBufferHandle_t g_periph_io_mb_handle;
-uint8_t periph_io_mb_storage[256];
+uint8_t periph_io_mb_storage[IO_MB_SIZE + 2];
 StaticMessageBuffer_t periph_io_mb_buff;
 
 uint8_t telemetry_uart_rx_buf[MAX_PACKET_SIZE_TELEMETRY];
@@ -72,10 +78,10 @@ int port_init(void) {
     g_state_rx_sb_handle = xStreamBufferCreateStatic(STATE_ESTIMATION_BYTES * 2 + 1, 1, state_rx_sb_storage, &state_rx_sb_buff);
     if (g_state_rx_sb_handle == NULL) return 0;
 
-    g_periph_io_mb_handle = xMessageBufferCreateStatic(SD_MB_SIZE + 1, periph_io_mb_storage, &periph_io_mb_buff);
+    g_periph_io_mb_handle = xMessageBufferCreateStatic(IO_MB_SIZE + 1, periph_io_mb_storage, &periph_io_mb_buff);
+    if (g_periph_io_mb_handle == NULL) return 0;
     
     /* Create tasks */
-    
     g_periph_io_task_handle = xTaskCreateStatic(periph_io_task, "flash_task", 4096, NULL, tskIDLE_PRIORITY, periph_io_task_stack, &periph_io_task_buff);
     if (g_periph_io_task_handle == NULL) return 0;
     
@@ -91,8 +97,13 @@ int port_init(void) {
     g_state_tx_task_handle = xTaskCreateStatic(state_tx_task, "state_tx_task", 4096, NULL, tskIDLE_PRIORITY, state_tx_task_stack, &state_tx_task_buff);
     if (g_state_tx_task_handle == NULL) return 0;
 
-    g_test_task_handle = xTaskCreateStatic(test_task, "test_task", 8192, NULL, tskIDLE_PRIORITY, test_task_stack, &test_task_buff);
+    g_state_flash_task_handle = xTaskCreateStatic(state_flash_task, "state_flash_task", 4096, NULL, tskIDLE_PRIORITY, state_flash_task_stack, &state_flash_task_buff);
+    if (g_state_flash_task_handle == NULL) return 0;
+
+#ifdef USE_TESTS
+    g_test_task_handle = xTaskCreateStatic(test_task, "test_task", 4096, NULL, tskIDLE_PRIORITY, test_task_stack, &test_task_buff);
     if (g_test_task_handle == NULL) return 0;
+#endif
 
     /* Begin listening over uart */
     if (HAL_UARTEx_ReceiveToIdle_IT(&telemetry_uart, telemetry_uart_rx_buf, MAX_PACKET_SIZE_TELEMETRY) != HAL_OK) {

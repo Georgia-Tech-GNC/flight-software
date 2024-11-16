@@ -9,11 +9,16 @@
 #include "message_buffer.h"
 #include "state.h"
 
+#ifdef USE_TESTS
 extern TaskHandle_t g_test_task_handle;
+#endif
 extern TaskHandle_t g_periph_io_task_handle;
 extern TaskHandle_t g_telemetry_tx_task_handle;
 extern TaskHandle_t g_telemetry_rx_task_handle;
-extern TaskHandle_t g_state_rx_task_handle;
+extern TaskHandle_t g_state_tx_task_handle;
+extern TaskHandle_t g_state_est_rx_task_handle;
+extern TaskHandle_t g_state_flash_task_handle;
+
 extern SemaphoreHandle_t g_state_mutex_handle;
 extern MessageBufferHandle_t g_telemetry_tx_mb_handle;
 extern StreamBufferHandle_t g_telemetry_rx_sb_handle;

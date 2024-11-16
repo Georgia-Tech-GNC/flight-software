@@ -11,7 +11,7 @@
 
 #include "globals.h"
 
-void rx_process_byte(uint8_t byte, uint8_t *packet_buffer, uint8_t *packet_buffer_size);
+void rx_process_byte(uint8_t byte, uint8_t *packet_buffer, uint8_t *extracted_buffer, uint8_t *packet_buffer_size);
 int uart_transmit_message(Message *message, uint8_t *packet_buf);
 
 void process_command(int command_id);
@@ -81,21 +81,23 @@ int uart_transmit_message(Message *message, uint8_t *packet_buf) {
  */
 void telemetry_rx_task(void *args) {
     /* Buffer to hold received bytes before they are processed */
-    uint8_t bytes_to_process[16];
+    uint8_t bytes_to_process[MAX_PACKET_SIZE_TELEMETRY];
 
     /* Buffer to hold the incoming packet before it is extracted */
-    uint8_t packet_buffer[9];
+    uint8_t packet_buffer[MAX_PACKET_SIZE_TELEMETRY];
+
+    uint8_t extracted_packet_buffer[MAX_PACKET_SIZE_TELEMETRY];
 
     /* Current size of incoming packet buffer */
     uint8_t packet_buffer_size = 0;
 
     while (1) {
         /* Wait for new bytes to read */
-        int bytes_read = xStreamBufferReceive(g_telemetry_rx_sb_handle, bytes_to_process, 16, portMAX_DELAY);
-        
+        int bytes_read = xStreamBufferReceive(g_telemetry_rx_sb_handle, bytes_to_process, MAX_PACKET_SIZE_TELEMETRY, portMAX_DELAY);
+
         /* Process them */
         for (int i = 0; i < bytes_read; i ++) {
-            rx_process_byte(bytes_to_process[i], packet_buffer, &packet_buffer_size);
+            rx_process_byte(bytes_to_process[i], packet_buffer, extracted_packet_buffer, &packet_buffer_size);
         }
     }
 }
@@ -107,22 +109,34 @@ void telemetry_rx_task(void *args) {
  * @param packet_buffer_size The current size of the incoming packet buffer
  * @param extracted_buffer The buffer to hold the extracted packet
  */
-void rx_process_byte(uint8_t byte, uint8_t *packet_buffer, uint8_t *packet_buffer_size) {
+void rx_process_byte(uint8_t byte, uint8_t *packet_buffer, uint8_t *extracted_buffer, uint8_t *packet_buffer_size) {
     int next_packet_buffer_size = process_incoming_byte(byte, packet_buffer, *packet_buffer_size);
+    char buf[100];
+    sprintf(buf, "%02x\r\n", byte);
+    HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
 
     if (next_packet_buffer_size < 0) {
         *packet_buffer_size = 0;
         next_packet_buffer_size *= -1;
 
         if (verify_packet(packet_buffer, next_packet_buffer_size)) {
-            int command_id = is_command_packet(packet_buffer, next_packet_buffer_size);
-            if (command_id == -1) {
+            uint8_t message_id = extract_packet(packet_buffer, next_packet_buffer_size, extracted_buffer);
+
+            if (message_id != COMMAND_MSG_ID) {
                 return;
             }
 
+            int command_id = extracted_buffer[0];
+            int command_uuid = extracted_buffer[1];
+
+            char buf2[100];
+            sprintf(buf2, "Command ID: %d, Command UUID: %d\r\n", command_id, command_uuid);
+            HAL_UART_Transmit(&debug_uart, (uint8_t *) buf2, strlen(buf2), HAL_MAX_DELAY);
+
             uint8_t payload[2];
             payload[0] = command_id; // command id
-            payload[1] = get_command_uuid(packet_buffer); // command uuid
+            payload[1] = command_uuid; // command uuid
+
             send_message(payload, 2, COMMAND_ACK_MSG_ID);
 
             process_command(command_id);
@@ -156,7 +170,11 @@ void process_command(int command_id) {
 }
 
 void command_idle_to_ground() {
+    HAL_UART_Transmit(&debug_uart, (uint8_t *) "Idle to ground\r\n", 17, HAL_MAX_DELAY);
     HAL_UART_Transmit_IT(&state_uart, (uint8_t *) "GO", 2);
+
+    xTaskNotify(g_state_flash_task_handle, BEGIN_STATE_FLASH_NOTIFICATION_BIT, eSetBits);
+    xTaskNotify(g_state_tx_task_handle, BEGIN_STATE_TX_NOTIFICATION_BIT, eSetBits);
 }
 
 void command_fire_pyro() {
@@ -164,7 +182,8 @@ void command_fire_pyro() {
 }
 
 void command_flash_sd_card() {
-    /* Unimplemented */
+    HAL_UART_Transmit(&debug_uart, (uint8_t *) "Flashing SD card\r\n", 18, HAL_MAX_DELAY);
+    xTaskNotifyIndexed(g_state_flash_task_handle, 1, FLASH_SD_CARD_NOTIFICATION_BIT, eSetBits);
 }
 
 void command_run_vane_activation_test() {

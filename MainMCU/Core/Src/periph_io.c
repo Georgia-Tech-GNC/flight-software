@@ -11,11 +11,14 @@
 
 void io_save_complete(IOChannel *channel, int status, size_t bytes_saved);
 void io_load_complete(IOChannel *channel, int status, size_t bytes_loaded);
+void io_reset_complete(IOChannel *channel, int status);
 
-int sd_load_operation(FATFS *fs, IOOperation *operation, uint8_t *data_buffer, size_t *bytes_loaded, uint8_t sd_mounted);
+int sd_load_operation(IOOperation *operation, uint8_t *data_buffer, size_t *bytes_loaded, uint8_t sd_mounted);
 int sd_save_operation(IOOperation *operation, uint8_t *data_buffer, size_t *bytes_saved, uint8_t sd_mounted);
+int sd_reset_operation(IOOperation *operation, uint8_t sd_mounted);
 int flash_load_operation(struct w25q_device w25q, IOOperation *operation, uint8_t *data_buffer, size_t *bytes_loaded, uint8_t w25q_initialized);
 int flash_save_operation(struct w25q_device w25q, IOOperation *operation, uint8_t *data_buffer, size_t *bytes_saved, size_t *w25q_write_ptr, uint8_t w25q_initialized);
+int flash_reset_operation(struct w25q_device w25q, IOOperation *operation, size_t *w25q_write_ptr, uint8_t w25q_initialized);
 
 uint8_t _fake_flash_chip[15000];
 uint8_t *fake_flash_chip = _fake_flash_chip;
@@ -182,6 +185,27 @@ int io_load_channel(IOChannel *channel, size_t offset, size_t bytes_to_read) {
     return 1;
 }
 
+int io_reset_channel(IOChannel *channel) {
+    if (channel == NULL) {
+        return 0;
+    }
+
+    IOOperation operation = {
+        .type = IO_OPERATION_RESET,
+        .channel = channel,
+        .offset = 0,
+        .n_bytes = 0,
+    };
+
+    size_t bytes_written = xMessageBufferSend(g_periph_io_mb_handle, &operation, sizeof(IOOperation), 0);
+
+    if (bytes_written != sizeof(IOOperation)) {
+        return 0;
+    }
+
+    return 1;
+}
+
 /**
  * Read data from a channel. The channel must be in read mode.
  * @param channel The channel to read from
@@ -265,12 +289,22 @@ void periph_io_task(void *args) {
             int status = 0;
 
             if (operation->channel->type == IO_CHANNEL_TYPE_SD) {
-                status = sd_load_operation(&fs, operation, data_buffer, &bytes_loaded, sd_mounted);
+                status = sd_load_operation(operation, data_buffer, &bytes_loaded, sd_mounted);
             } else if (operation->channel->type == IO_CHANNEL_TYPE_FLASH) {
                 status = flash_load_operation(w25q, operation, data_buffer, &bytes_loaded, w25q_initialized);
             }
 
             io_load_complete(operation->channel, status, bytes_loaded);
+        } else if (operation->type == IO_OPERATION_RESET) {
+            int status = 0;
+
+            if (operation->channel->type == IO_CHANNEL_TYPE_SD) {
+                status = sd_reset_operation(operation, sd_mounted);
+            } else if (operation->channel->type == IO_CHANNEL_TYPE_FLASH) {
+                status = flash_reset_operation(w25q, operation, &w25q_write_ptr, w25q_initialized);
+            }
+
+            io_reset_complete(operation->channel, status);
         }
     }
 }
@@ -332,6 +366,16 @@ int flash_save_operation(struct w25q_device w25q, IOOperation *operation, uint8_
     return 1;
 }
 
+int flash_reset_operation(struct w25q_device w25q, IOOperation *operation, size_t *w25q_write_ptr, uint8_t w25q_initialized) {
+    if (!w25q_initialized) {
+        return 0;
+    }
+
+    *w25q_write_ptr = 0;
+
+    return 1;
+}
+
 /**
  * Load data from the SD card into a channel.
  * @param operation The operation to perform
@@ -339,7 +383,7 @@ int flash_save_operation(struct w25q_device w25q, IOOperation *operation, uint8_
  * @param sd_mounted Whether the SD card is mounted
  * @return 1 if successful, 0 otherwise
  */
-int sd_load_operation(FATFS *fs, IOOperation *operation, uint8_t *data_buffer, size_t *bytes_loaded, uint8_t sd_mounted) {
+int sd_load_operation(IOOperation *operation, uint8_t *data_buffer, size_t *bytes_loaded, uint8_t sd_mounted) {
     *bytes_loaded = 0;
 
     if (!sd_mounted) {
@@ -418,6 +462,20 @@ int sd_save_operation(IOOperation *operation, uint8_t *data_buffer, size_t *byte
     return 1;
 }
 
+int sd_reset_operation(IOOperation *operation, uint8_t sd_mounted) {
+    if (!sd_mounted) {
+        return 0;
+    }
+
+    IOChannel *channel = operation->channel;
+
+    if (f_unlink(channel->file_path) != FR_OK) {
+        return 0;
+    }
+
+    return 1;
+}
+
 #include "sd_test.h"
 
 /**
@@ -432,15 +490,15 @@ void io_save_complete(IOChannel *channel, int status, size_t bytes_saved) {
         xTaskNotify(g_test_task_handle, SD_TASK_WRITE_COMPLETE_BIT, eSetBits);
     }
 #endif
-            char buf[100];
+    if (status == 0) {
+        return;
+    }
 
     switch (channel->id) {
         case FLASH_WRITE_CHANNEL_ID:
             xTaskNotify(g_state_flash_task_handle, FLASH_WRITE_COMPLETE_NOTIFICATION_BIT, eSetBits);
             break;
         case SD_WRITE_CHANNEL_ID:
-            sprintf(buf, "Wrote %d bytes to SD card status %d\r\n", bytes_saved, status);
-            HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
             xTaskNotify(g_state_flash_task_handle, SD_WRITE_COMPLETE_NOTIFICATION_BIT, eSetBits);
             break;
     }
@@ -458,10 +516,31 @@ void io_load_complete(IOChannel *channel, int status, size_t bytes_loaded) {
         xTaskNotify(g_test_task_handle, SD_TASK_READ_COMPLETE_BIT, eSetBits);
     }
 #endif
+    if (status == 0) {
+        return;
+    }
+
     switch (channel->id) {
         case FLASH_READ_CHANNEL_ID:
-            HAL_UART_Transmit(&debug_uart, (uint8_t *) "Read complete\r\n", 15, HAL_MAX_DELAY);
             xTaskNotify(g_state_flash_task_handle, FLASH_READ_COMPLETE_NOTIFICATION_BIT, eSetBits);
+            break;
+        case SD_READ_CHANNEL_ID:
+            xTaskNotify(g_state_flash_task_handle, SD_READ_COMPLETE_NOTIFICATION_BIT, eSetBits);
+            break;
+    }
+}
+
+void io_reset_complete(IOChannel *channel, int status) {
+    if (status == 0) {
+        return;
+    }
+
+    switch (channel->id) {
+        case FLASH_WRITE_CHANNEL_ID:
+            xTaskNotify(g_state_flash_task_handle, FLASH_RESET_COMPLETE_NOTIFICATION_BIT, eSetBits);
+            break;
+        case SD_WRITE_CHANNEL_ID:
+            xTaskNotify(g_state_flash_task_handle, SD_RESET_COMPLETE_NOTIFICATION_BIT, eSetBits);
             break;
     }
 }

@@ -18,6 +18,7 @@
 
 #define IO_OPERATION_LOAD 0
 #define IO_OPERATION_SAVE 1
+#define IO_OPERATION_RESET 2
 
 #define IO_CHANNEL_TYPE_SD 0
 #define IO_CHANNEL_TYPE_FLASH 1
@@ -44,6 +45,7 @@ size_t io_channel_get_free(IOChannel *channel);
 size_t io_channel_get_full(IOChannel *channel);
 int io_write_channel(IOChannel *channel, uint8_t *data, size_t len);
 int io_save_channel(IOChannel *channel);
+int io_reset_channel(IOChannel *channel);
 int io_load_channel(IOChannel *channel, size_t offset, size_t bytes_to_read);
 int io_read_channel(IOChannel *channel, uint8_t *data, size_t len);
 void periph_io_task(void *args);

@@ -1,10 +1,25 @@
 #include "state_flash.h"
 
+int flash_test(void);
+int sd_test(void);
+
 void write_to_flash(IOChannel *flash_write_channel, RocketState *rocket_state);
 void flash_sd_card(IOChannel *flash_read_channel, IOChannel *sd_write_channel, size_t n_states);
 size_t to_csv_line(RocketState *rocket_state, char *line);
 
 void state_flash_task(void *args) {
+    if (flash_test()) {
+        HAL_UART_Transmit(&debug_uart, (uint8_t *) "Flash test PASS\r\n", 17, HAL_MAX_DELAY);
+    } else {
+        HAL_UART_Transmit(&debug_uart, (uint8_t *) "Flash test FAIL\r\n", 19, HAL_MAX_DELAY);
+    }
+
+    if (sd_test()) {
+        HAL_UART_Transmit(&debug_uart, (uint8_t *) "SD test PASS\r\n", 14, HAL_MAX_DELAY);
+    } else {
+        HAL_UART_Transmit(&debug_uart, (uint8_t *) "SD test FAIL\r\n", 16, HAL_MAX_DELAY);
+    }
+
     RocketState rocket_state;
 
     IOChannel flash_write_channel;
@@ -50,6 +65,150 @@ void state_flash_task(void *args) {
 
         vTaskDelay(pdMS_TO_TICKS(1000 / FLASH_FREQ_HZ));
     }
+}
+
+int flash_test(void) {
+    StaticStreamBuffer_t flash_write_sb_buff;
+    uint8_t flash_write_sb_storage_area[FLASH_MAX_READ_WRITE_SIZE + 1];
+    StaticStreamBuffer_t flash_read_sb_buff;
+    uint8_t flash_read_sb_storage_area[FLASH_MAX_READ_WRITE_SIZE + 1];
+
+    IOChannel flash_write_channel;
+    IOChannel flash_read_channel;
+
+    flash_channel_init(&flash_write_channel, IO_MODE_WRITE, FLASH_WRITE_CHANNEL_ID, &flash_write_sb_buff, flash_write_sb_storage_area, FLASH_MAX_READ_WRITE_SIZE);
+    flash_channel_init(&flash_read_channel, IO_MODE_READ, FLASH_READ_CHANNEL_ID, &flash_read_sb_buff, flash_read_sb_storage_area, FLASH_MAX_READ_WRITE_SIZE);
+
+    uint8_t test_bytes[512];
+    for (size_t i = 0; i < 512; i ++) {
+        test_bytes[i] = i % 256;
+    }
+
+    io_write_channel(&flash_write_channel, test_bytes, 256);
+    io_save_channel(&flash_write_channel);
+
+    if (xTaskNotifyWait(0, FLASH_WRITE_COMPLETE_NOTIFICATION_BIT, NULL, 1000) != pdTRUE) {
+        return 0;
+    }
+
+    io_write_channel(&flash_write_channel, test_bytes + 256, 256);
+    io_save_channel(&flash_write_channel);
+
+    if (xTaskNotifyWait(0, FLASH_WRITE_COMPLETE_NOTIFICATION_BIT, NULL, 1000) != pdTRUE) {
+        return 0;
+    }
+
+    for (size_t i = 0; i < 512; i ++) {
+        test_bytes[i] = 0;
+    }
+
+    io_load_channel(&flash_read_channel, 0, 256);
+
+    if (xTaskNotifyWait(0, FLASH_READ_COMPLETE_NOTIFICATION_BIT, NULL, 1000) != pdTRUE) {
+        return 0;
+    }
+
+    io_read_channel(&flash_read_channel, test_bytes, 256);
+
+    for (size_t i = 0; i < 256; i ++) {
+        if (test_bytes[i] != i % 256) {
+            return 0;
+        }
+    }
+
+    io_load_channel(&flash_read_channel, 256, 256);
+
+    if (xTaskNotifyWait(0, FLASH_READ_COMPLETE_NOTIFICATION_BIT, NULL, 1000) != pdTRUE) {
+        return 0;
+    }
+    
+    io_read_channel(&flash_read_channel, test_bytes, 256);
+
+    for (size_t i = 0; i < 256; i ++) {
+        if (test_bytes[i] != i % 256) {
+            return 0;
+        }
+    }
+
+    io_reset_channel(&flash_write_channel);
+    
+    if (xTaskNotifyWait(0, FLASH_RESET_COMPLETE_NOTIFICATION_BIT, NULL, 1000) != pdTRUE) {
+        return 0;
+    }
+
+    return 1;
+}
+
+int sd_test(void) {
+    StaticStreamBuffer_t sd_write_sb_buff;
+    uint8_t sd_write_sb_storage_area[SD_MAX_READ_WRITE_SIZE + 1];
+    StaticStreamBuffer_t sd_read_sb_buff;
+    uint8_t sd_read_sb_storage_area[SD_MAX_READ_WRITE_SIZE + 1];
+
+    IOChannel sd_write_channel;
+    IOChannel sd_read_channel;
+
+    sd_channel_init(&sd_write_channel, "post.txt", IO_MODE_WRITE, SD_WRITE_CHANNEL_ID, &sd_write_sb_buff, sd_write_sb_storage_area, SD_MAX_READ_WRITE_SIZE);
+    sd_channel_init(&sd_read_channel, "post.txt", IO_MODE_READ, SD_READ_CHANNEL_ID, &sd_read_sb_buff, sd_read_sb_storage_area, SD_MAX_READ_WRITE_SIZE);
+
+    uint8_t test_bytes[1024];
+    for (size_t i = 0; i < 1024; i ++) {
+        test_bytes[i] = i % 256;
+    }
+
+    io_write_channel(&sd_write_channel, test_bytes, 512);
+    io_save_channel(&sd_write_channel);
+
+    if (xTaskNotifyWait(0, SD_WRITE_COMPLETE_NOTIFICATION_BIT, NULL, 1000) != pdTRUE) {
+        return 0;
+    }
+
+    io_write_channel(&sd_write_channel, test_bytes + 512, 512);
+    io_save_channel(&sd_write_channel);
+    
+    if (xTaskNotifyWait(0, SD_WRITE_COMPLETE_NOTIFICATION_BIT, NULL, 1000) != pdTRUE) {
+        return 0;
+    }
+
+    for (size_t i = 0; i < 1024; i ++) {
+        test_bytes[i] = 0;
+    }
+
+    io_load_channel(&sd_read_channel, 0, 512);
+
+    if (xTaskNotifyWait(0, SD_READ_COMPLETE_NOTIFICATION_BIT, NULL, 1000) != pdTRUE) {
+        return 0;
+    }
+
+    io_read_channel(&sd_read_channel, test_bytes, 512);
+
+    for (size_t i = 0; i < 512; i ++) {
+        if (test_bytes[i] != i % 256) {
+            return 0;
+        }
+    }
+
+    io_load_channel(&sd_read_channel, 512, 512);
+
+    if (xTaskNotifyWait(0, SD_READ_COMPLETE_NOTIFICATION_BIT, NULL, 1000) != pdTRUE) {
+        return 0;
+    }
+
+    io_read_channel(&sd_read_channel, test_bytes, 512);
+
+    for (size_t i = 0; i < 512; i ++) {
+        if (test_bytes[i] != i % 256) {
+            return 0;
+        }
+    }
+
+    io_reset_channel(&sd_write_channel);
+
+    if (xTaskNotifyWait(0, SD_RESET_COMPLETE_NOTIFICATION_BIT, NULL, 1000) != pdTRUE) {
+        return 0;
+    }
+
+    return 1;
 }
 
 void write_to_flash(IOChannel *flash_write_channel, RocketState *rocket_state) {

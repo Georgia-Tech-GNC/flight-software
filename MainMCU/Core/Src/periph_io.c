@@ -8,6 +8,7 @@
 #include "ff.h"
 
 #include "globals.h"
+#include "w25q.h"
 
 void io_save_complete(IOChannel *channel, int status, size_t bytes_saved);
 void io_load_complete(IOChannel *channel, int status, size_t bytes_loaded);
@@ -20,8 +21,10 @@ int flash_load_operation(struct w25q_device w25q, IOOperation *operation, uint8_
 int flash_save_operation(struct w25q_device w25q, IOOperation *operation, uint8_t *data_buffer, size_t *bytes_saved, size_t *w25q_write_ptr, uint8_t w25q_initialized);
 int flash_reset_operation(struct w25q_device w25q, IOOperation *operation, size_t *w25q_write_ptr, uint8_t w25q_initialized);
 
+#ifndef MCU_H725ZGT6
 uint8_t _fake_flash_chip[15000];
 uint8_t *fake_flash_chip = _fake_flash_chip;
+#endif
 
 /**
  * Initializes an IO channel

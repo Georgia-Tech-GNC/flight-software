@@ -55,8 +55,8 @@
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
+extern ADC_HandleTypeDef hadc3;
 extern OSPI_HandleTypeDef hospi1;
-extern DMA_HandleTypeDef hdma_uart4_tx;
 extern UART_HandleTypeDef huart4;
 extern UART_HandleTypeDef huart5;
 extern UART_HandleTypeDef huart2;
@@ -150,10 +150,10 @@ void UsageFault_Handler(void)
 //void SVC_Handler(void)
 //{
 //  /* USER CODE BEGIN SVCall_IRQn 0 */
-//////////////////////////////////////////
+////////////////////////////////////////////
 //  /* USER CODE END SVCall_IRQn 0 */
 //  /* USER CODE BEGIN SVCall_IRQn 1 */
-//////////////////////////////////////////
+////////////////////////////////////////////
 //  /* USER CODE END SVCall_IRQn 1 */
 //}
 //
@@ -176,10 +176,10 @@ void DebugMon_Handler(void)
 //void PendSV_Handler(void)
 //{
 //  /* USER CODE BEGIN PendSV_IRQn 0 */
-//////////////////////////////////////////
+////////////////////////////////////////////
 //  /* USER CODE END PendSV_IRQn 0 */
 //  /* USER CODE BEGIN PendSV_IRQn 1 */
-//////////////////////////////////////////
+////////////////////////////////////////////
 //  /* USER CODE END PendSV_IRQn 1 */
 //}
 //
@@ -189,11 +189,11 @@ void DebugMon_Handler(void)
 //void SysTick_Handler(void)
 //{
 //  /* USER CODE BEGIN SysTick_IRQn 0 */
-//////////////////////////////////////////
+////////////////////////////////////////////
 //  /* USER CODE END SysTick_IRQn 0 */
 //
 //  /* USER CODE BEGIN SysTick_IRQn 1 */
-//////////////////////////////////////////
+////////////////////////////////////////////
 //  /* USER CODE END SysTick_IRQn 1 */
 //}
 
@@ -203,20 +203,6 @@ void DebugMon_Handler(void)
 /* For the available peripheral interrupt handler names,                      */
 /* please refer to the startup file (startup_stm32h7xx.s).                    */
 /******************************************************************************/
-
-/**
-  * @brief This function handles DMA1 stream0 global interrupt.
-  */
-void DMA1_Stream0_IRQHandler(void)
-{
-  /* USER CODE BEGIN DMA1_Stream0_IRQn 0 */
-
-  /* USER CODE END DMA1_Stream0_IRQn 0 */
-  HAL_DMA_IRQHandler(&hdma_uart4_tx);
-  /* USER CODE BEGIN DMA1_Stream0_IRQn 1 */
-
-  /* USER CODE END DMA1_Stream0_IRQn 1 */
-}
 
 /**
   * @brief This function handles TIM1 update interrupt.
@@ -286,6 +272,20 @@ void OCTOSPI1_IRQHandler(void)
   /* USER CODE BEGIN OCTOSPI1_IRQn 1 */
 
   /* USER CODE END OCTOSPI1_IRQn 1 */
+}
+
+/**
+  * @brief This function handles ADC3 global interrupt.
+  */
+void ADC3_IRQHandler(void)
+{
+  /* USER CODE BEGIN ADC3_IRQn 0 */
+
+  /* USER CODE END ADC3_IRQn 0 */
+  HAL_ADC_IRQHandler(&hadc3);
+  /* USER CODE BEGIN ADC3_IRQn 1 */
+
+  /* USER CODE END ADC3_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */

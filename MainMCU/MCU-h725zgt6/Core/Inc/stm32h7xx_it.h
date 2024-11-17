@@ -55,12 +55,12 @@ void UsageFault_Handler(void);
 void DebugMon_Handler(void);
 //void PendSV_Handler(void);
 //void SysTick_Handler(void);
-void DMA1_Stream0_IRQHandler(void);
 void TIM1_UP_IRQHandler(void);
 void USART2_IRQHandler(void);
 void UART4_IRQHandler(void);
 void UART5_IRQHandler(void);
 void OCTOSPI1_IRQHandler(void);
+void ADC3_IRQHandler(void);
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */

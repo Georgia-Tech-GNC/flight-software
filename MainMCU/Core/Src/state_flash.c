@@ -56,10 +56,12 @@ void state_flash_task(void *args) {
         n_states ++;
 
         notification_value = 0;
-        if (xTaskNotifyWaitIndexed(1, 0, FLASH_SD_CARD_NOTIFICATION_BIT, &notification_value, 10) == pdTRUE) {
+        if (xTaskNotifyWaitIndexed(1, 0, FLASH_SD_CARD_NOTIFICATION_BIT, &notification_value, 0) == pdTRUE) {
             if (notification_value & FLASH_SD_CARD_NOTIFICATION_BIT) {
                 HAL_UART_Transmit(&debug_uart, (uint8_t *) "Flashing to SD card...\r\n", 24, HAL_MAX_DELAY);
                 flash_sd_card(&flash_read_channel, &sd_write_channel, n_states);
+
+                return;
             }
         }
 

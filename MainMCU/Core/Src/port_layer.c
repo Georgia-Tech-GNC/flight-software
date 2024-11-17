@@ -2,7 +2,7 @@
 
 #ifdef USE_TESTS
 TaskHandle_t g_test_task_handle;
-StackType_t test_task_stack[4096];
+StackType_t test_task_stack[2048];
 StaticTask_t test_task_buff;
 #endif
 
@@ -104,9 +104,9 @@ int port_init(void) {
 
     g_adc_convert_task_handle = xTaskCreateStatic(adc_convert_task, "adc_convert_task", 4096, NULL, tskIDLE_PRIORITY, adc_convert_task_stack, &adc_convert_task_buff);
     if (g_adc_convert_task_handle == NULL) return 0;
-
+    
 #ifdef USE_TESTS
-    g_test_task_handle = xTaskCreateStatic(test_task, "test_task", 4096, NULL, tskIDLE_PRIORITY, test_task_stack, &test_task_buff);
+    g_test_task_handle = xTaskCreateStatic(test_task, "test_task", 2048, NULL, tskIDLE_PRIORITY, test_task_stack, &test_task_buff);
     if (g_test_task_handle == NULL) return 0;
 #endif
 
@@ -148,7 +148,7 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    
+
     uint16_t adc_val = HAL_ADC_GetValue(hadc);
     ADC_Channel channel;
 
@@ -185,10 +185,10 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
         channel = ADC3_SEQUENCE[adc3_conv_ptr];
         adc3_conv_ptr = (adc3_conv_ptr + 1) % ADC3_N_CHANNELS;
 
-        if (adc3_conv_ptr != 0) {
-            to_start = &hadc3;
-        } else {
+        if (adc3_conv_ptr == 0) {
             to_start = ADC3_NEXT;
+        } else {
+            to_start = &hadc3;
         }
     }
 #endif
@@ -215,6 +215,8 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
 
     if (to_start != NULL) {
         HAL_ADC_Start_IT(to_start);
+    } else {
+        HAL_UART_Transmit(&debug_uart, (uint8_t *) "No next ADC\r\n", 14, HAL_MAX_DELAY);
     }
 
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);

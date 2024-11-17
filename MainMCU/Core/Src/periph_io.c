@@ -10,6 +10,8 @@
 #include "globals.h"
 #include "w25q.h"
 
+#define W25Q_WRITE_START 8192
+
 void io_save_complete(IOChannel *channel, int status, size_t bytes_saved);
 void io_load_complete(IOChannel *channel, int status, size_t bytes_loaded);
 void io_reset_complete(IOChannel *channel, int status);
@@ -233,7 +235,7 @@ void periph_io_task(void *args) {
     FATFS fs;
 
     uint8_t w25q_initialized = 0;
-    size_t w25q_write_ptr = 0;
+    size_t w25q_write_ptr = W25Q_WRITE_START;
     struct w25q_device w25q;
 
     /* Buffer to mediate between fatfs and freertos stream buffer */
@@ -322,7 +324,7 @@ int flash_load_operation(struct w25q_device w25q, IOOperation *operation, uint8_
     IOChannel *channel = operation->channel;
 
 #ifdef MCU_H725ZGT6
-    if (w25q_read_raw(&w25q, data_buffer, operation->n_bytes, operation->offset) != W25Q_ERR_OK) {
+    if (w25q_read_raw(&w25q, data_buffer, operation->n_bytes, operation->offset + W25Q_WRITE_START) != W25Q_ERR_OK) {
         return 0;
     }
 #else

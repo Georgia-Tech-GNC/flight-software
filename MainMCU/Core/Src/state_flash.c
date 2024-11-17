@@ -83,7 +83,7 @@ int flash_test(void) {
 
     uint8_t test_bytes[512];
     for (size_t i = 0; i < 512; i ++) {
-        test_bytes[i] = i % 256;
+        test_bytes[i] = (i + 2) % 256;
     }
 
     io_write_channel(&flash_write_channel, test_bytes, 256);
@@ -113,7 +113,7 @@ int flash_test(void) {
     io_read_channel(&flash_read_channel, test_bytes, 256);
 
     for (size_t i = 0; i < 256; i ++) {
-        if (test_bytes[i] != i % 256) {
+        if (test_bytes[i] != (i + 2) % 256) {
             return 0;
         }
     }

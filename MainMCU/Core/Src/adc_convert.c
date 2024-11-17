@@ -5,6 +5,7 @@ void adc_convert_task(void *args) {
     vTaskDelay(100);
 
     if (xSemaphoreTake(g_state_mutex_handle, portMAX_DELAY) == pdTRUE) {
+        HAL_UART_Transmit(&debug_uart, (uint8_t *) "ADC Convert Task\r\n", 18, HAL_MAX_DELAY);
         char buf[100];
         sprintf(buf, "Pyro Continuity: %f %f %f\r\n", g_current_state.analog_feedback_data.pyro_0_cont, g_current_state.analog_feedback_data.pyro_1_cont, g_current_state.analog_feedback_data.pyro_2_cont);
         HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);

@@ -465,7 +465,7 @@ enum w25q_err w25q_write_raw(struct w25q_device *device, uint8_t *buf,
     return W25Q_ERR_SPI;
   }
 
-    HAL_GPIO_WritePin(FLASH_CS_GPIO_PORT, FLASH_CS_PIN, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(FLASH_CS_GPIO_PORT, FLASH_CS_PIN, GPIO_PIN_SET);
 
   return W25Q_ERR_OK;
 }
@@ -525,6 +525,8 @@ enum w25q_err w25q_erase_sector(struct w25q_device *device,
   }
 
   HAL_GPIO_WritePin(FLASH_CS_GPIO_PORT, FLASH_CS_PIN, GPIO_PIN_SET);
+
+  w25q_delay(1000);
 
   while (w25q_is_busy(device) == W25Q_ERR_BUSY)
     ;
@@ -613,12 +615,10 @@ enum w25q_err w25q_erase_block(struct w25q_device *device, uint32_t block_addr,
     return W25Q_ERR_SPI;
   }
 
+  HAL_GPIO_WritePin(FLASH_CS_GPIO_PORT, FLASH_CS_PIN, GPIO_PIN_SET);
 
   while (w25q_is_busy(device) == W25Q_ERR_BUSY)
     ;
-
-  HAL_GPIO_WritePin(FLASH_CS_GPIO_PORT, FLASH_CS_PIN, GPIO_PIN_SET);
-
 
   return W25Q_ERR_OK;
 }
@@ -660,10 +660,10 @@ enum w25q_err w25q_erase_chip(struct w25q_device *device) {
     return W25Q_ERR_SPI;
   }
 
+  HAL_GPIO_WritePin(FLASH_CS_GPIO_PORT, FLASH_CS_PIN, GPIO_PIN_SET);
+
   while (w25q_is_busy(device) == W25Q_ERR_BUSY)
     ;
-
-  HAL_GPIO_WritePin(FLASH_CS_GPIO_PORT, FLASH_CS_PIN, GPIO_PIN_SET);
 
 
   return W25Q_ERR_OK;
@@ -725,7 +725,7 @@ enum w25q_err w25q_reset(struct w25q_device *device) {
     return W25Q_ERR_SPI;
   }
 
-    HAL_GPIO_WritePin(FLASH_CS_GPIO_PORT, FLASH_CS_PIN, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(FLASH_CS_GPIO_PORT, FLASH_CS_PIN, GPIO_PIN_SET);
 
   w25q_delay(5);
 

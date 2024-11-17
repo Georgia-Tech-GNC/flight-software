@@ -163,9 +163,6 @@ void process_command(int command_id) {
         case ROCKET_FLASH_SD_CARD_COMMAND_ID:
             command_flash_sd_card();
             break;
-        case ROCKET_RUN_VANE_ACTIVATION_TEST_COMMAND_ID:
-            command_run_vane_activation_test();
-            break;
     }
 }
 

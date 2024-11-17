@@ -44,7 +44,7 @@ struct CommandStruct {
 #define ROCKET_IDLE_TO_GROUND_COMMAND_ID 1
 #define ROCKET_FIRE_PYRO_COMMAND_ID 2
 #define ROCKET_FLASH_SD_CARD_COMMAND_ID 3
-#define ROCKET_RUN_VANE_ACTIVATION_TEST_COMMAND_ID 4
+#define PING_ROCKET_COMMAND_ID 4
 
 #define NUM_COMMAND_TYPES 4
 
@@ -66,10 +66,14 @@ int is_command_packet(uint8_t* packet, size_t packet_size);
 int get_command_uuid(uint8_t* packet);
 
 /**
- * Takes a command packet and modifies it inplace to be a command acknowledgement packet
- * @param packet the packet to convert (should be a valid command packet, see is_command_packet)
+ * Checks whether the given packet is a command packet, verifies it, and generates a return acknowledge packet.
+ *
+ * @param packet           original command packet
+ * @param packet_size      original command packet's packet size (must be seven)
+ * @param generated_packet ptr to store generated packet in. must be able to hold 7 bytes
+ * @return                 positive generated packet size if success, failure if zero or negative
  */
-void reformat_as_command_ack_packet(uint8_t* packet);
+int generate_ack_packet(uint8_t *packet, size_t packet_size, uint8_t *generated_packet);
 
 /**
  * Generates a command payload given a command id and a command counter (should be passed into generate packet as raw data)
@@ -104,11 +108,14 @@ struct RocketStateVector {
 	float position_x;
 	float position_y;
 	float position_z;
+	float world_x;
+	float world_y;
+	float world_z;
 	int64_t timestamp;
 };
 #define ROCKETSTATEVECTOR_MSG_ID 10
-#define ROCKETSTATEVECTOR_SIZE 48
-#define ROCKETSTATEVECTOR_NUM_VALUES 11
+#define ROCKETSTATEVECTOR_SIZE 60
+#define ROCKETSTATEVECTOR_NUM_VALUES 14
 #ifdef INCLUDE_PROTOCOL_SQL_MACROS
 	#define ROCKETSTATEVECTOR_SQL_TABLE_GEN "CREATE TABLE RocketStateVector ( " \
 	"velocity_x real, " \
@@ -121,10 +128,13 @@ struct RocketStateVector {
 	"position_x real, " \
 	"position_y real, " \
 	"position_z real, " \
+	"world_x real, " \
+	"world_y real, " \
+	"world_z real, " \
 	"time bigint PRIMARY KEY);"
-	#define ROCKETSTATEVECTOR_SQL_GET_MOST_RECENT "SELECT velocity_x, velocity_y, velocity_z, attitude_w, attitude_x, attitude_y, attitude_z, position_x, position_y, position_z, time FROM RocketStateVector ORDER BY time LIMIT 1"
+	#define ROCKETSTATEVECTOR_SQL_GET_MOST_RECENT "SELECT velocity_x, velocity_y, velocity_z, attitude_w, attitude_x, attitude_y, attitude_z, position_x, position_y, position_z, world_x, world_y, world_z, time FROM RocketStateVector ORDER BY time LIMIT 1"
 	#define ROCKETSTATEVECTOR_SQL_ADD_ENTRY(buffer, data) sprintf(buffer, \
-		"INSERT INTO ROCKETSTATEVECTOR VALUES ('%.10E', '%.10E', '%.10E', '%.10E', '%.10E', '%.10E', '%.10E', '%.10E', '%.10E', '%.10E', '%lld');", \
+		"INSERT INTO ROCKETSTATEVECTOR VALUES ('%.10E', '%.10E', '%.10E', '%.10E', '%.10E', '%.10E', '%.10E', '%.10E', '%.10E', '%.10E', '%.10E', '%.10E', '%.10E', '%ld');", \
 		(data)->velocity_x, \
 		(data)->velocity_y, \
 		(data)->velocity_z, \
@@ -135,9 +145,12 @@ struct RocketStateVector {
 		(data)->position_x, \
 		(data)->position_y, \
 		(data)->position_z, \
+		(data)->world_x, \
+		(data)->world_y, \
+		(data)->world_z, \
 		(data)->timestamp); 
 	#define ROCKETSTATEVECTOR_API_PATH "/api/data/RocketStateVector"
-	#define ROCKETSTATEVECTOR_SQL_SELECT_TO_JSON(sql_row_values) "{ %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\"}", \
+	#define ROCKETSTATEVECTOR_SQL_SELECT_TO_JSON(sql_row_values) "{ %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\"}", \
 		MG_ESC("velocity_x"), sql_row_values[0], \
 		MG_ESC("velocity_y"), sql_row_values[1], \
 		MG_ESC("velocity_z"), sql_row_values[2], \
@@ -148,18 +161,21 @@ struct RocketStateVector {
 		MG_ESC("position_x"), sql_row_values[7], \
 		MG_ESC("position_y"), sql_row_values[8], \
 		MG_ESC("position_z"), sql_row_values[9], \
-		MG_ESC("timestamp"), sql_row_values[10]
+		MG_ESC("world_x"), sql_row_values[10], \
+		MG_ESC("world_y"), sql_row_values[11], \
+		MG_ESC("world_z"), sql_row_values[12], \
+		MG_ESC("timestamp"), sql_row_values[13]
 #endif
 
 /**
  * Serializes the data.
- * Output must have a length of at least 48 bytes.
+ * Output must have a length of at least 60 bytes.
  */
 void RocketStateVector_encode(struct RocketStateVector *input, uint8_t *output);
 
 /**
  * Deserializes the data.
- * Input must have a length of at least 48 bytes.
+ * Input must have a length of at least 60 bytes.
  */
 void RocketStateVector_decode(uint8_t *input, struct RocketStateVector *output);
 
@@ -183,7 +199,7 @@ struct RocketServoDeflection {
 	"time bigint PRIMARY KEY);"
 	#define ROCKETSERVODEFLECTION_SQL_GET_MOST_RECENT "SELECT servo_deflection_1, servo_deflection_2, servo_deflection_3, servo_deflection_4, time FROM RocketServoDeflection ORDER BY time LIMIT 1"
 	#define ROCKETSERVODEFLECTION_SQL_ADD_ENTRY(buffer, data) sprintf(buffer, \
-		"INSERT INTO ROCKETSERVODEFLECTION VALUES ('%.10E', '%.10E', '%.10E', '%.10E', '%lld');", \
+		"INSERT INTO ROCKETSERVODEFLECTION VALUES ('%.10E', '%.10E', '%.10E', '%.10E', '%ld');", \
 		(data)->servo_deflection_1, \
 		(data)->servo_deflection_2, \
 		(data)->servo_deflection_3, \
@@ -230,7 +246,7 @@ struct RocketState {
 	"time bigint PRIMARY KEY);"
 	#define ROCKETSTATE_SQL_GET_MOST_RECENT "SELECT rocket_state, firing_channel_1, firing_channel_2, firing_channel_3, time FROM RocketState ORDER BY time LIMIT 1"
 	#define ROCKETSTATE_SQL_ADD_ENTRY(buffer, data) sprintf(buffer, \
-		"INSERT INTO ROCKETSTATE VALUES ('%d', '%d', '%d', '%d', '%lld');", \
+		"INSERT INTO ROCKETSTATE VALUES ('%d', '%d', '%d', '%d', '%ld');", \
 		(data)->rocket_state, \
 		(data)->firing_channel_1, \
 		(data)->firing_channel_2, \
@@ -281,7 +297,7 @@ struct RocketGroundEKF {
 	"time bigint PRIMARY KEY);"
 	#define ROCKETGROUNDEKF_SQL_GET_MOST_RECENT "SELECT pn_matrix_d1, pn_matrix_d2, pn_matrix_d3, pn_matrix_d4, pn_matrix_d5, pn_matrix_d6, time FROM RocketGroundEKF ORDER BY time LIMIT 1"
 	#define ROCKETGROUNDEKF_SQL_ADD_ENTRY(buffer, data) sprintf(buffer, \
-		"INSERT INTO ROCKETGROUNDEKF VALUES ('%.10E', '%.10E', '%.10E', '%.10E', '%.10E', '%.10E', '%lld');", \
+		"INSERT INTO ROCKETGROUNDEKF VALUES ('%.10E', '%.10E', '%.10E', '%.10E', '%.10E', '%.10E', '%ld');", \
 		(data)->pn_matrix_d1, \
 		(data)->pn_matrix_d2, \
 		(data)->pn_matrix_d3, \
@@ -323,12 +339,11 @@ struct RocketSensorData {
 	float gps_x;
 	float gps_y;
 	float gps_z;
-	float barometer;
 	int64_t timestamp;
 };
 #define ROCKETSENSORDATA_MSG_ID 14
-#define ROCKETSENSORDATA_SIZE 48
-#define ROCKETSENSORDATA_NUM_VALUES 11
+#define ROCKETSENSORDATA_SIZE 44
+#define ROCKETSENSORDATA_NUM_VALUES 10
 #ifdef INCLUDE_PROTOCOL_SQL_MACROS
 	#define ROCKETSENSORDATA_SQL_TABLE_GEN "CREATE TABLE RocketSensorData ( " \
 	"accelerometer_x real, " \
@@ -340,11 +355,10 @@ struct RocketSensorData {
 	"gps_x real, " \
 	"gps_y real, " \
 	"gps_z real, " \
-	"barometer real, " \
 	"time bigint PRIMARY KEY);"
-	#define ROCKETSENSORDATA_SQL_GET_MOST_RECENT "SELECT accelerometer_x, accelerometer_y, accelerometer_z, gyro_x, gyro_y, gyro_z, gps_x, gps_y, gps_z, barometer, time FROM RocketSensorData ORDER BY time LIMIT 1"
+	#define ROCKETSENSORDATA_SQL_GET_MOST_RECENT "SELECT accelerometer_x, accelerometer_y, accelerometer_z, gyro_x, gyro_y, gyro_z, gps_x, gps_y, gps_z, time FROM RocketSensorData ORDER BY time LIMIT 1"
 	#define ROCKETSENSORDATA_SQL_ADD_ENTRY(buffer, data) sprintf(buffer, \
-		"INSERT INTO ROCKETSENSORDATA VALUES ('%.10E', '%.10E', '%.10E', '%.10E', '%.10E', '%.10E', '%.10E', '%.10E', '%.10E', '%.10E', '%lld');", \
+		"INSERT INTO ROCKETSENSORDATA VALUES ('%.10E', '%.10E', '%.10E', '%.10E', '%.10E', '%.10E', '%.10E', '%.10E', '%.10E', '%ld');", \
 		(data)->accelerometer_x, \
 		(data)->accelerometer_y, \
 		(data)->accelerometer_z, \
@@ -354,10 +368,9 @@ struct RocketSensorData {
 		(data)->gps_x, \
 		(data)->gps_y, \
 		(data)->gps_z, \
-		(data)->barometer, \
 		(data)->timestamp); 
 	#define ROCKETSENSORDATA_API_PATH "/api/data/RocketSensorData"
-	#define ROCKETSENSORDATA_SQL_SELECT_TO_JSON(sql_row_values) "{ %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\"}", \
+	#define ROCKETSENSORDATA_SQL_SELECT_TO_JSON(sql_row_values) "{ %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\"}", \
 		MG_ESC("accelerometer_x"), sql_row_values[0], \
 		MG_ESC("accelerometer_y"), sql_row_values[1], \
 		MG_ESC("accelerometer_z"), sql_row_values[2], \
@@ -367,48 +380,44 @@ struct RocketSensorData {
 		MG_ESC("gps_x"), sql_row_values[6], \
 		MG_ESC("gps_y"), sql_row_values[7], \
 		MG_ESC("gps_z"), sql_row_values[8], \
-		MG_ESC("barometer"), sql_row_values[9], \
-		MG_ESC("timestamp"), sql_row_values[10]
+		MG_ESC("timestamp"), sql_row_values[9]
 #endif
 
 /**
  * Serializes the data.
- * Output must have a length of at least 48 bytes.
+ * Output must have a length of at least 44 bytes.
  */
 void RocketSensorData_encode(struct RocketSensorData *input, uint8_t *output);
 
 /**
  * Deserializes the data.
- * Input must have a length of at least 48 bytes.
+ * Input must have a length of at least 44 bytes.
  */
 void RocketSensorData_decode(uint8_t *input, struct RocketSensorData *output);
 
 
 struct RocketAnalogFeedbackData {
-	float voltage_fb_33;
-	float current_fb_33;
-	float pyro_0_cont;
-	float pyro_1_cont;
-	float pyro_2_cont;
+	uint16_t current_fb_33;
+	uint16_t pyro_0_cont;
+	uint16_t pyro_1_cont;
+	uint16_t pyro_2_cont;
 	uint8_t pyro_channel_deploy;
 	int64_t timestamp;
 };
 #define ROCKETANALOGFEEDBACKDATA_MSG_ID 15
-#define ROCKETANALOGFEEDBACKDATA_SIZE 29
-#define ROCKETANALOGFEEDBACKDATA_NUM_VALUES 7
+#define ROCKETANALOGFEEDBACKDATA_SIZE 17
+#define ROCKETANALOGFEEDBACKDATA_NUM_VALUES 6
 #ifdef INCLUDE_PROTOCOL_SQL_MACROS
 	#define ROCKETANALOGFEEDBACKDATA_SQL_TABLE_GEN "CREATE TABLE RocketAnalogFeedbackData ( " \
-	"voltage_fb_33 real, " \
-	"current_fb_33 real, " \
-	"pyro_0_cont real, " \
-	"pyro_1_cont real, " \
-	"pyro_2_cont real, " \
+	"current_fb_33 int, " \
+	"pyro_0_cont int, " \
+	"pyro_1_cont int, " \
+	"pyro_2_cont int, " \
 	"pyro_channel_deploy int, " \
 	"time bigint PRIMARY KEY);"
-	#define ROCKETANALOGFEEDBACKDATA_SQL_GET_MOST_RECENT "SELECT voltage_fb_33, current_fb_33, pyro_0_cont, pyro_1_cont, pyro_2_cont, pyro_channel_deploy, time FROM RocketAnalogFeedbackData ORDER BY time LIMIT 1"
+	#define ROCKETANALOGFEEDBACKDATA_SQL_GET_MOST_RECENT "SELECT current_fb_33, pyro_0_cont, pyro_1_cont, pyro_2_cont, pyro_channel_deploy, time FROM RocketAnalogFeedbackData ORDER BY time LIMIT 1"
 	#define ROCKETANALOGFEEDBACKDATA_SQL_ADD_ENTRY(buffer, data) sprintf(buffer, \
-		"INSERT INTO ROCKETANALOGFEEDBACKDATA VALUES ('%.10E', '%.10E', '%.10E', '%.10E', '%.10E', '%d', '%lld');", \
-		(data)->voltage_fb_33, \
+		"INSERT INTO ROCKETANALOGFEEDBACKDATA VALUES ('%d', '%d', '%d', '%d', '%d', '%ld');", \
 		(data)->current_fb_33, \
 		(data)->pyro_0_cont, \
 		(data)->pyro_1_cont, \
@@ -416,25 +425,24 @@ struct RocketAnalogFeedbackData {
 		(data)->pyro_channel_deploy, \
 		(data)->timestamp); 
 	#define ROCKETANALOGFEEDBACKDATA_API_PATH "/api/data/RocketAnalogFeedbackData"
-	#define ROCKETANALOGFEEDBACKDATA_SQL_SELECT_TO_JSON(sql_row_values) "{ %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\"}", \
-		MG_ESC("voltage_fb_33"), sql_row_values[0], \
-		MG_ESC("current_fb_33"), sql_row_values[1], \
-		MG_ESC("pyro_0_cont"), sql_row_values[2], \
-		MG_ESC("pyro_1_cont"), sql_row_values[3], \
-		MG_ESC("pyro_2_cont"), sql_row_values[4], \
-		MG_ESC("pyro_channel_deploy"), sql_row_values[5], \
-		MG_ESC("timestamp"), sql_row_values[6]
+	#define ROCKETANALOGFEEDBACKDATA_SQL_SELECT_TO_JSON(sql_row_values) "{ %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\"}", \
+		MG_ESC("current_fb_33"), sql_row_values[0], \
+		MG_ESC("pyro_0_cont"), sql_row_values[1], \
+		MG_ESC("pyro_1_cont"), sql_row_values[2], \
+		MG_ESC("pyro_2_cont"), sql_row_values[3], \
+		MG_ESC("pyro_channel_deploy"), sql_row_values[4], \
+		MG_ESC("timestamp"), sql_row_values[5]
 #endif
 
 /**
  * Serializes the data.
- * Output must have a length of at least 29 bytes.
+ * Output must have a length of at least 17 bytes.
  */
 void RocketAnalogFeedbackData_encode(struct RocketAnalogFeedbackData *input, uint8_t *output);
 
 /**
  * Deserializes the data.
- * Input must have a length of at least 29 bytes.
+ * Input must have a length of at least 17 bytes.
  */
 void RocketAnalogFeedbackData_decode(uint8_t *input, struct RocketAnalogFeedbackData *output);
 
@@ -451,7 +459,7 @@ int get_msg_size(int message_id);
 bool is_data_send_msg(int message_id);
 
 #ifdef INCLUDE_PROTOCOL_SQL_MACROS
-	#define MAX_SQL_WRITE_CMD_SIZE 273
+	#define MAX_SQL_WRITE_CMD_SIZE 333
 
 	#define ALL_SQL_TABLE_CREATE_COMMANDS ROCKETSTATEVECTOR_SQL_TABLE_GEN, ROCKETSERVODEFLECTION_SQL_TABLE_GEN, ROCKETSTATE_SQL_TABLE_GEN, ROCKETGROUNDEKF_SQL_TABLE_GEN, ROCKETSENSORDATA_SQL_TABLE_GEN, ROCKETANALOGFEEDBACKDATA_SQL_TABLE_GEN
 

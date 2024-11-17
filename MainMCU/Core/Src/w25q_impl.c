@@ -526,8 +526,6 @@ enum w25q_err w25q_erase_sector(struct w25q_device *device,
 
   HAL_GPIO_WritePin(FLASH_CS_GPIO_PORT, FLASH_CS_PIN, GPIO_PIN_SET);
 
-  w25q_delay(1000);
-
   while (w25q_is_busy(device) == W25Q_ERR_BUSY)
     ;
 

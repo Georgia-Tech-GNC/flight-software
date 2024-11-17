@@ -81,15 +81,18 @@ int flash_test(void) {
     flash_channel_init(&flash_write_channel, IO_MODE_WRITE, FLASH_WRITE_CHANNEL_ID, &flash_write_sb_buff, flash_write_sb_storage_area, FLASH_MAX_READ_WRITE_SIZE);
     flash_channel_init(&flash_read_channel, IO_MODE_READ, FLASH_READ_CHANNEL_ID, &flash_read_sb_buff, flash_read_sb_storage_area, FLASH_MAX_READ_WRITE_SIZE);
 
+    const uint8_t offset = 43;
+
     uint8_t test_bytes[512];
     for (size_t i = 0; i < 512; i ++) {
-        test_bytes[i] = (i + 2) % 256;
+        test_bytes[i] = (i + offset) % 256;
     }
 
     io_write_channel(&flash_write_channel, test_bytes, 256);
     io_save_channel(&flash_write_channel);
 
-    if (xTaskNotifyWait(0, FLASH_WRITE_COMPLETE_NOTIFICATION_BIT, NULL, 1000) != pdTRUE) {
+    if (xTaskNotifyWait(0, FLASH_WRITE_COMPLETE_NOTIFICATION_BIT, NULL, portMAX_DELAY) != pdTRUE) {
+        HAL_UART_Transmit(&debug_uart, (uint8_t *) "Write 1 failed\r\n", 16, HAL_MAX_DELAY);
         return 0;
     }
 
@@ -97,23 +100,28 @@ int flash_test(void) {
     io_save_channel(&flash_write_channel);
 
     if (xTaskNotifyWait(0, FLASH_WRITE_COMPLETE_NOTIFICATION_BIT, NULL, 1000) != pdTRUE) {
+        HAL_UART_Transmit(&debug_uart, (uint8_t *) "Write 2 failed\r\n", 17, HAL_MAX_DELAY);
         return 0;
     }
 
-    for (size_t i = 0; i < 512; i ++) {
+    for (size_t i = 0; i < 256; i ++) {
         test_bytes[i] = 0;
     }
 
     io_load_channel(&flash_read_channel, 0, 256);
 
     if (xTaskNotifyWait(0, FLASH_READ_COMPLETE_NOTIFICATION_BIT, NULL, 1000) != pdTRUE) {
+        HAL_UART_Transmit(&debug_uart, (uint8_t *) "Read failed\r\n", 13, HAL_MAX_DELAY);
         return 0;
     }
 
     io_read_channel(&flash_read_channel, test_bytes, 256);
 
     for (size_t i = 0; i < 256; i ++) {
-        if (test_bytes[i] != (i + 2) % 256) {
+        char buf[100];
+        sprintf(buf, "Byte: %d, expected: %d\r\n", test_bytes[i], (i + offset) % 256);
+        HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
+        if (test_bytes[i] != (i + offset) % 256) {
             return 0;
         }
     }
@@ -124,17 +132,24 @@ int flash_test(void) {
         return 0;
     }
     
+    for (size_t i = 0; i < 256; i ++) {
+        test_bytes[i] = 0;
+    }
+
     io_read_channel(&flash_read_channel, test_bytes, 256);
 
     for (size_t i = 0; i < 256; i ++) {
-        if (test_bytes[i] != i % 256) {
+        char buf[100];
+        sprintf(buf, "Byte: %d, expected: %d\r\n", test_bytes[i], (i + offset) % 256);
+        HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
+        if (test_bytes[i] != (i + offset) % 256) {
             return 0;
         }
     }
 
     io_reset_channel(&flash_write_channel);
     
-    if (xTaskNotifyWait(0, FLASH_RESET_COMPLETE_NOTIFICATION_BIT, NULL, 1000) != pdTRUE) {
+    if (xTaskNotifyWait(0, FLASH_RESET_COMPLETE_NOTIFICATION_BIT, NULL, portMAX_DELAY) != pdTRUE) {
         return 0;
     }
 
@@ -214,7 +229,7 @@ int sd_test(void) {
 }
 
 void write_to_flash(IOChannel *flash_write_channel, RocketState *rocket_state) {
-    uint8_t raw_bytes[sizeof(RocketState)];
+    uint8_t raw_bytes[256];
     memcpy(raw_bytes, rocket_state, sizeof(RocketState));
 
     io_write_channel(flash_write_channel, raw_bytes, sizeof(RocketState));
@@ -224,14 +239,14 @@ void write_to_flash(IOChannel *flash_write_channel, RocketState *rocket_state) {
 }
 
 void flash_sd_card(IOChannel *flash_read_channel, IOChannel *sd_write_channel, size_t n_states) {
-    RocketState *rocket_state;
+    RocketState rocket_state;
     uint8_t data_buffer[FLASH_MAX_READ_WRITE_SIZE];
     size_t offset = 0;
 
     char line_buf[2048];
 
     for (size_t i = 0; i < n_states; i ++) {
-        io_load_channel(flash_read_channel, offset, sizeof(RocketState));
+        io_load_channel(flash_read_channel, offset, 256);
         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Loading from flash...\r\n", 23, HAL_MAX_DELAY);
         xTaskNotifyWait(0, FLASH_READ_COMPLETE_NOTIFICATION_BIT, NULL, portMAX_DELAY);
         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Loaded from flash\r\n", 19, HAL_MAX_DELAY);
@@ -239,12 +254,12 @@ void flash_sd_card(IOChannel *flash_read_channel, IOChannel *sd_write_channel, s
         size_t n_bytes = io_channel_get_full(flash_read_channel);
         offset += n_bytes;
 
-        io_read_channel(flash_read_channel, data_buffer, n_bytes);
+        io_read_channel(flash_read_channel, data_buffer, 256);
 
-        rocket_state = (RocketState *) data_buffer;
+        memcpy(&rocket_state, data_buffer, sizeof(RocketState));
 
         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Converting to CSV line...\r\n", 26, HAL_MAX_DELAY);
-        size_t line_len = to_csv_line(rocket_state, line_buf);
+        size_t line_len = to_csv_line(&rocket_state, line_buf);
         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Converted to CSV line\r\n", 24, HAL_MAX_DELAY);
         size_t written = 0;
         size_t remaining = line_len;
@@ -270,7 +285,7 @@ void flash_sd_card(IOChannel *flash_read_channel, IOChannel *sd_write_channel, s
 size_t to_csv_line(RocketState *rocket_state, char *line) {
     size_t len = 0;
     
-    len += sprintf(line + len, "%ld,", rocket_state->state_vector.timestamp);
+    len += sprintf(line + len, "%ld,", (uint32_t) (rocket_state->state_vector.timestamp));
     len += sprintf(line + len, "%f,", rocket_state->state_vector.velocity_x);
     len += sprintf(line + len, "%f,", rocket_state->state_vector.velocity_y);
     len += sprintf(line + len, "%f,", rocket_state->state_vector.velocity_z);
@@ -281,20 +296,23 @@ size_t to_csv_line(RocketState *rocket_state, char *line) {
     len += sprintf(line + len, "%f,", rocket_state->state_vector.position_x);
     len += sprintf(line + len, "%f,", rocket_state->state_vector.position_y);
     len += sprintf(line + len, "%f,", rocket_state->state_vector.position_z);
+    len += sprintf(line + len, "%f,", rocket_state->state_vector.world_x);
+    len += sprintf(line + len, "%f,", rocket_state->state_vector.world_y);
+    len += sprintf(line + len, "%f,", rocket_state->state_vector.world_z);
 
-    len += sprintf(line + len, "%ld,", rocket_state->servo_deflection.timestamp);
+    len += sprintf(line + len, "%ld,", (uint32_t) (rocket_state->servo_deflection.timestamp));
     len += sprintf(line + len, "%f,", rocket_state->servo_deflection.servo_deflection_1);
     len += sprintf(line + len, "%f,", rocket_state->servo_deflection.servo_deflection_2);
     len += sprintf(line + len, "%f,", rocket_state->servo_deflection.servo_deflection_3);
     len += sprintf(line + len, "%f,", rocket_state->servo_deflection.servo_deflection_4);
 
-    len += sprintf(line + len, "%ld,", rocket_state->rocket_state.timestamp);
+    len += sprintf(line + len, "%ld,", (uint32_t) (rocket_state->rocket_state.timestamp));
     len += sprintf(line + len, "%d,", rocket_state->rocket_state.rocket_state);
     len += sprintf(line + len, "%d,", rocket_state->rocket_state.firing_channel_1);
     len += sprintf(line + len, "%d,", rocket_state->rocket_state.firing_channel_2);
     len += sprintf(line + len, "%d,", rocket_state->rocket_state.firing_channel_3);
 
-    len += sprintf(line + len, "%ld,", rocket_state->ground_ekf.timestamp);
+    len += sprintf(line + len, "%ld,", (uint32_t) (rocket_state->ground_ekf.timestamp));
     len += sprintf(line + len, "%f,", rocket_state->ground_ekf.pn_matrix_d1);
     len += sprintf(line + len, "%f,", rocket_state->ground_ekf.pn_matrix_d2);
     len += sprintf(line + len, "%f,", rocket_state->ground_ekf.pn_matrix_d3);
@@ -302,7 +320,7 @@ size_t to_csv_line(RocketState *rocket_state, char *line) {
     len += sprintf(line + len, "%f,", rocket_state->ground_ekf.pn_matrix_d5);
     len += sprintf(line + len, "%f,", rocket_state->ground_ekf.pn_matrix_d6);
 
-    len += sprintf(line + len, "%ld,", rocket_state->sensor_data.timestamp);
+    len += sprintf(line + len, "%ld,", (uint32_t) (rocket_state->sensor_data.timestamp));
     len += sprintf(line + len, "%f,", rocket_state->sensor_data.accelerometer_x);
     len += sprintf(line + len, "%f,", rocket_state->sensor_data.accelerometer_y);
     len += sprintf(line + len, "%f,", rocket_state->sensor_data.accelerometer_z);
@@ -312,14 +330,12 @@ size_t to_csv_line(RocketState *rocket_state, char *line) {
     len += sprintf(line + len, "%f,", rocket_state->sensor_data.gps_x);
     len += sprintf(line + len, "%f,", rocket_state->sensor_data.gps_y);
     len += sprintf(line + len, "%f,", rocket_state->sensor_data.gps_z);
-    len += sprintf(line + len, "%f,", rocket_state->sensor_data.barometer);
 
-    len += sprintf(line + len, "%ld,", rocket_state->analog_feedback_data.timestamp);
-    len += sprintf(line + len, "%f,", rocket_state->analog_feedback_data.voltage_fb_33);
-    len += sprintf(line + len, "%f,", rocket_state->analog_feedback_data.current_fb_33);
-    len += sprintf(line + len, "%f,", rocket_state->analog_feedback_data.pyro_0_cont);
-    len += sprintf(line + len, "%f,", rocket_state->analog_feedback_data.pyro_1_cont);
-    len += sprintf(line + len, "%f,", rocket_state->analog_feedback_data.pyro_2_cont);
+    len += sprintf(line + len, "%ld,", (uint32_t) (rocket_state->analog_feedback_data.timestamp));
+    len += sprintf(line + len, "%d,", rocket_state->analog_feedback_data.current_fb_33);
+    len += sprintf(line + len, "%d,", rocket_state->analog_feedback_data.pyro_0_cont);
+    len += sprintf(line + len, "%d,", rocket_state->analog_feedback_data.pyro_1_cont);
+    len += sprintf(line + len, "%d,", rocket_state->analog_feedback_data.pyro_2_cont);
     len += sprintf(line + len, "%d", rocket_state->analog_feedback_data.pyro_channel_deploy);
     
     line[len++] = '\n';

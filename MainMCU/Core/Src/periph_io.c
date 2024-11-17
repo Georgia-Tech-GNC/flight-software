@@ -10,7 +10,8 @@
 #include "globals.h"
 #include "w25q.h"
 
-#define W25Q_WRITE_START 8192
+#define W25Q_WRITE_START 0
+#define N_SECTORS 64
 
 void io_save_complete(IOChannel *channel, int status, size_t bytes_saved);
 void io_load_complete(IOChannel *channel, int status, size_t bytes_loaded);
@@ -253,8 +254,15 @@ void periph_io_task(void *args) {
     }
 
 #ifdef MCU_H725ZGT6
-    if (w25q_init(&w25q) == W25Q_ERR_OK) {
+    if (w25q_init(&w25q) == W25Q_ERR_OK && w25q_erase_sector(&w25q, 0) == W25Q_ERR_OK) {
         w25q_initialized = 1;
+        HAL_UART_Transmit(&debug_uart, (uint8_t *) "W25Q initialized\r\n", 18, HAL_MAX_DELAY);
+    }
+
+    for (size_t i = 0; i < N_SECTORS; i++) {
+        if (w25q_erase_sector(&w25q, i) != W25Q_ERR_OK) {
+            w25q_initialized = 0;
+        }
     }
 #else
     w25q_initialized = 1;
@@ -360,6 +368,10 @@ int flash_save_operation(struct w25q_device w25q, IOOperation *operation, uint8_
 #ifdef MCU_H725ZGT6
     if (w25q_write_raw(&w25q, data_buffer, available, *w25q_write_ptr) != W25Q_ERR_OK) {
         return 0;
+    } else {
+        char buf[100];
+        sprintf(buf, "Wrote %d bytes to flash at %d\r\n", available, *w25q_write_ptr);
+        HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
     }
 #else
     memcpy(fake_flash_chip + *w25q_write_ptr, data_buffer, available);
@@ -376,7 +388,13 @@ int flash_reset_operation(struct w25q_device w25q, IOOperation *operation, size_
         return 0;
     }
 
-    *w25q_write_ptr = 0;
+    *w25q_write_ptr = W25Q_WRITE_START;
+
+    for (size_t i = 0; i < N_SECTORS; i++) {
+        if (w25q_erase_sector(&w25q, i) != W25Q_ERR_OK) {
+            return 0;
+        }
+    }
 
     return 1;
 }

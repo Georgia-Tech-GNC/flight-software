@@ -1,3 +1,4 @@
+#include "packet_encode.h"
 #include "protocol.h"
 #include <time.h>
 #include <stdbool.h>
@@ -25,8 +26,26 @@ int get_command_uuid(uint8_t* packet) {
 	return packet[4];
 }
 
-void reformat_as_command_ack_packet(uint8_t* packet) {
-	packet[1] = COMMAND_ACK_MSG_ID;
+int generate_ack_packet(uint8_t *packet, size_t packet_size, uint8_t *generated_packet) {
+  if (packet_size != 7) {
+    return -1;
+  }
+  if (!verify_packet(packet, packet_size)) {
+    return -2;
+  }
+
+  int command_id = is_command_packet(packet, packet_size);
+  if (command_id < 0 || command_id > 255) {
+    return -3;
+  }
+  uint8_t payload[2];
+  payload[0] = command_id; // command id
+  payload[1] = get_command_uuid(packet); // command uuid
+  int written = generate_packet(payload, 2, generated_packet, COMMAND_ACK_MSG_ID);
+  if (written != 7) {
+    return -4;
+  }
+  return 7;
 }
 
 size_t generate_command_payload(uint8_t *buffer, uint8_t command_id, uint8_t command_counter) {
@@ -146,7 +165,10 @@ void RocketStateVector_encode(struct RocketStateVector *input, uint8_t *output) 
 		memcpy(output + 28, &input->position_x, 4);
 		memcpy(output + 32, &input->position_y, 4);
 		memcpy(output + 36, &input->position_z, 4);
-		memcpy(output + 40, &input->timestamp, 8);
+		memcpy(output + 40, &input->world_x, 4);
+		memcpy(output + 44, &input->world_y, 4);
+		memcpy(output + 48, &input->world_z, 4);
+		memcpy(output + 52, &input->timestamp, 8);
 
 }
 
@@ -161,7 +183,10 @@ void RocketStateVector_decode(uint8_t *input, struct RocketStateVector *output) 
 		memcpy(&output->position_x, input + 28, 4);
 		memcpy(&output->position_y, input + 32, 4);
 		memcpy(&output->position_z, input + 36, 4);
-		memcpy(&output->timestamp, input + 40, 8);
+		memcpy(&output->world_x, input + 40, 4);
+		memcpy(&output->world_y, input + 44, 4);
+		memcpy(&output->world_z, input + 48, 4);
+		memcpy(&output->timestamp, input + 52, 8);
 
 }
 
@@ -237,8 +262,7 @@ void RocketSensorData_encode(struct RocketSensorData *input, uint8_t *output) {
 		memcpy(output + 24, &input->gps_x, 4);
 		memcpy(output + 28, &input->gps_y, 4);
 		memcpy(output + 32, &input->gps_z, 4);
-		memcpy(output + 36, &input->barometer, 4);
-		memcpy(output + 40, &input->timestamp, 8);
+		memcpy(output + 36, &input->timestamp, 8);
 
 }
 
@@ -252,30 +276,27 @@ void RocketSensorData_decode(uint8_t *input, struct RocketSensorData *output) {
 		memcpy(&output->gps_x, input + 24, 4);
 		memcpy(&output->gps_y, input + 28, 4);
 		memcpy(&output->gps_z, input + 32, 4);
-		memcpy(&output->barometer, input + 36, 4);
-		memcpy(&output->timestamp, input + 40, 8);
+		memcpy(&output->timestamp, input + 36, 8);
 
 }
 
 
 void RocketAnalogFeedbackData_encode(struct RocketAnalogFeedbackData *input, uint8_t *output) {
-		memcpy(output + 0, &input->voltage_fb_33, 4);
-		memcpy(output + 4, &input->current_fb_33, 4);
-		memcpy(output + 8, &input->pyro_0_cont, 4);
-		memcpy(output + 12, &input->pyro_1_cont, 4);
-		memcpy(output + 16, &input->pyro_2_cont, 4);
-		memcpy(output + 20, &input->pyro_channel_deploy, 1);
-		memcpy(output + 21, &input->timestamp, 8);
+		memcpy(output + 0, &input->current_fb_33, 2);
+		memcpy(output + 2, &input->pyro_0_cont, 2);
+		memcpy(output + 4, &input->pyro_1_cont, 2);
+		memcpy(output + 6, &input->pyro_2_cont, 2);
+		memcpy(output + 8, &input->pyro_channel_deploy, 1);
+		memcpy(output + 9, &input->timestamp, 8);
 
 }
 
 void RocketAnalogFeedbackData_decode(uint8_t *input, struct RocketAnalogFeedbackData *output) {
-		memcpy(&output->voltage_fb_33, input + 0, 4);
-		memcpy(&output->current_fb_33, input + 4, 4);
-		memcpy(&output->pyro_0_cont, input + 8, 4);
-		memcpy(&output->pyro_1_cont, input + 12, 4);
-		memcpy(&output->pyro_2_cont, input + 16, 4);
-		memcpy(&output->pyro_channel_deploy, input + 20, 1);
-		memcpy(&output->timestamp, input + 21, 8);
+		memcpy(&output->current_fb_33, input + 0, 2);
+		memcpy(&output->pyro_0_cont, input + 2, 2);
+		memcpy(&output->pyro_1_cont, input + 4, 2);
+		memcpy(&output->pyro_2_cont, input + 6, 2);
+		memcpy(&output->pyro_channel_deploy, input + 8, 1);
+		memcpy(&output->timestamp, input + 9, 8);
 
 }

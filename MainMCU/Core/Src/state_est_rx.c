@@ -1,5 +1,7 @@
 #include "state_est_rx.h"
 
+#include "string.h"
+
 #include "FreeRTOS.h"
 #include "message_buffer.h"
 #include "semphr.h"
@@ -45,7 +47,6 @@ void state_est_rx_task(void *args) {
             g_current_state.sensor_data.accelerometer_x = (float) timestamp / 1000.0;
             g_current_state.sensor_data.accelerometer_y = (float) timestamp / 2000.0;
             g_current_state.sensor_data.accelerometer_z = (float) timestamp / 3000.0;
-            g_current_state.sensor_data.barometer = (float) timestamp / 4000.0;
             g_current_state.sensor_data.gps_x = (float) timestamp / 5000.0;
             g_current_state.sensor_data.gps_y = (float) timestamp / 6000.0;
             g_current_state.sensor_data.gps_z = (float) timestamp / 7000.0;
@@ -70,6 +71,9 @@ void state_est_rx_task(void *args) {
             g_current_state.state_vector.position_x = (float) timestamp / 110.0 + 90;
             g_current_state.state_vector.position_y = (float) timestamp / 120.0 + 100;
             g_current_state.state_vector.position_z = (float) timestamp / 130.0 + 110;
+            g_current_state.state_vector.world_x = timestamp % 2;
+            g_current_state.state_vector.world_y = timestamp % 3;
+            g_current_state.state_vector.world_z = timestamp % 4;
             g_current_state.state_vector.timestamp = timestamp;
 
             char buf[100];

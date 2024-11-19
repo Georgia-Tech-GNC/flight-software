@@ -9,6 +9,7 @@
 */
 
 #include "controls.h"
+#include "reference_data.h"
 #include <math.h>
 #include <stdio.h>
 

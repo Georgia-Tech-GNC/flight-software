@@ -7,7 +7,10 @@
   * @attention
   *
   * Copyright (c) 2024 STMicroelectronics.
-  * All rights reserved.
+  * All rights reserved.  .buffer(NOLOAD) :
+  {
+    . = ALIGN (1);
+  } > RAM_D2
   *
   * This software is licensed under terms that can be found in the LICENSE file
   * in the root directory of this software component.
@@ -17,24 +20,35 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+#include "main.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <stdio.h>
 #include <string.h>
+#include <stdio.h>
+#include <stdarg.h>
 
-#include "../Inc/main.h"
-
+#include "States/Idle.h"
+#include "States/Ground.h"
+#include "States/FastAscent.h"
+#include "States/SlowAscent.h"
+#include "States/FreeFall.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+static uint32_t total_bytes_received = 0;
+static uint32_t last_bytes_received = 0;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+SerialData serial_data;
+Sensors sensors;
+GroundExtKalmanFilter gekf;
+ExtKalmanFilter fekf;
+rocket_attitude rocket_atd;
+uint8_t signal_received[2];
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -44,17 +58,6 @@
 
 /* Private variables ---------------------------------------------------------*/
 
-I2C_HandleTypeDef hi2c4;
-
-SPI_HandleTypeDef hspi2;
-SPI_HandleTypeDef hspi3;
-SPI_HandleTypeDef hspi4;
-SPI_HandleTypeDef hspi6;
-
-UART_HandleTypeDef huart2;
-
-PCD_HandleTypeDef hpcd_USB_OTG_HS;
-
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -62,39 +65,21 @@ PCD_HandleTypeDef hpcd_USB_OTG_HS;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
 static void MX_I2C4_Init(void);
 static void MX_SPI2_Init(void);
-static void MX_SPI3_Init(void);
 static void MX_SPI4_Init(void);
 static void MX_SPI6_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_USB_OTG_HS_PCD_Init(void);
+static void MX_USART3_UART_Init(void);
+static void MX_UART4_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
-// Global variables
-int STATE_MACHINE = GROUND;
-uint32_t GlobalTime;
-float GlobalTimeSeconds;
-uint32_t prevGlobalTime;
-int first_iter;
-// Initialize drivers
-adis_init(*adis_imu);
-ADIS16500_Data *imu_data;
-
-struct lis3mdl_device *lis_mag;
-int status = lis3mdl_initialize(lis_mag);
-
-// struct promData promData_baro;
-// struct MS5607UncompensatedValues uncomp_vals_baro;
-// struct MS5607Readings readings_baro;
-int status = MS5607_Init(*hspi6, *GPIOH, GPIO_PIN_3);
-
-
 
 /* USER CODE END 0 */
 
@@ -104,6 +89,7 @@ int status = MS5607_Init(*hspi6, *GPIOH, GPIO_PIN_3);
   */
 int main(void)
 {
+
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
@@ -126,106 +112,138 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_I2C4_Init();
   MX_SPI2_Init();
-  MX_SPI3_Init();
   MX_SPI4_Init();
   MX_SPI6_Init();
   MX_USART2_UART_Init();
   MX_USB_OTG_HS_PCD_Init();
+  MX_USART3_UART_Init();
+  MX_UART4_Init();
   /* USER CODE BEGIN 2 */
-
-  SerialData *serial_data;
-  Sensors *sensors;
-  ExtKalmanFilter* gekf;
-  ExtKalmanFilter *fekf;
-  rocket_attitude *rocket_atd;
-  int has_run_fast_ascent = 0;
-  int first_time = 0;
-
-  uint32_t start = HAL_GetTick(); //number of milliseconds since start
-
+  DWT_Init();
+  sensors_init(&sensors);
+  state_machine_init();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  char uart_buffer[128];
+  uint8_t tmp;
+  int len;
+  // Print initial message
+  const char *start_msg = "\r\nStarting Data Ready Pin Check...\r\n";
+  HAL_UART_Transmit(&huart3, (uint8_t*)start_msg, strlen(start_msg), HAL_MAX_DELAY);
+  while(HAL_TIMEOUT != HAL_UART_Receive(&huart2, &tmp, 1, 10));
+  HAL_UART_Receive_IT(&huart2, signal_received, 2);
+  HAL_Delay(500);
+  
   while (1)
   {
-    if (first_time == 0){
-      prevGlobalTime = start;
-      first_time = 1;
-    }
-    //TODO: Implement com_to_imu() function in state_est_helpers to take into account Coriolis effects on accelerometer measurements
-    // State machine manager
-    switch (STATE_MACHINE) {
-        case IDLE: {
-          run_idle();
-          break;
-        }
-        case GROUND: {
-            run_ground(gekf, sensors, serial_data);
-            break;
-        }
-        case FASTASCENT: {
-            if (has_run_fast_ascent == 0){
-              initialize_ekf(fekf); //Initialize in-flight EKF
-              initialize_rocket_attitude(rocket_atd, 0.7071, 0, 0.7071, 0); //Initialize in-flight attitude estimation
-              has_run_fast_ascent = 1;
-            }
-            read_sensors(sensors);
-            run_fast_ascent(fekf,rocket_atd, sensors, serial_data); 
-            break;
-        }
-        case SLOWASCENT: {
-            read_sensors(sensors);
-            run_slow_ascent(fekf,rocket_atd, sensors, serial_data);
-            break;
-        }
-        case FREEFALL: {
-            read_sensors(sensors);
-            run_freefall(fekf,rocket_atd, sensors, serial_data); 
-            break;
-        }
-        case LANDED: {
-            serial_data->state = 5; //Landed is 5
-            serial_data->pos_x = 0.0;
-            serial_data->pos_y = 0.0;
-            serial_data->pos_z = 0.0;
-            serial_data->vel_x = 0.0;
-            serial_data->vel_y = 0.0;
-            serial_data->vel_z = 0.0;
-            serial_data->q0 = 1.0;
-            serial_data->q1 = 0.0;
-            serial_data->q2 = 0.0;
-            serial_data->q3 = 0.0;
-            serial_data->wx = 0.0;
-            serial_data->wy = 0.0;
-            serial_data->wz = 0.0;
-            break;
-        }
-        default: {
-            printf('Invalid state reached');
-            break;
-        }
-    }
-    //TODO: Make state_vec a part of serial data, and update the state in the state machine that serial data possesses
-    // Transmit to controls MCU
-    send_serial_data(serial_data);
-
-    // Log data to flash
-    log_data(serial_data, sensors);
-
-    //Update time step(s)
-    GlobalTime = HAL_GetTick();
-    GlobalTimeSeconds = (float)GlobalTime/1000.0;
-    uint32_t global_time_step = ((float32_t)(GlobalTime - prevGlobalTime))/1000.0;
-    gekf->time_step = global_time_step;
-    fekf->time_step = global_time_step;
-    rocket_atd->time_step = global_time_step;
-
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    update_sensors(&sensors, &huart3);
+    /* State Machine */
+    if (first_time) {
+      prev_global_time = start;
+      first_time = 0;
+    }
+    switch (state_machine) {
+        case IDLE: {
+            if (!ready_message_printed) {
+                HAL_UART_Transmit(&huart3, "Ready to run EKF. Type 'GO' to start.\r\n", 
+                                  sizeof("Ready to run EKF. Type 'GO' to start.\r\n"), HAL_MAX_DELAY);
+                ready_message_printed = 1;
+            }
+            char debug[128];
+            int debug_len = sprintf(debug, "GPS: lat=%f, lon=%f, height=%f\r\n", 
+                              sensors.gps_x, sensors.gps_y, sensors.gps_z);
+            HAL_UART_Transmit(&huart3, (uint8_t*)debug, debug_len, HAL_MAX_DELAY);
+            float32_t x_flat, y_flat, z_flat, xr, yr, zr;
+            GPS2FlatGround(&sensors, &gekf, 1);
+            debug_len = sprintf(debug, "FLAT: x=%f, y=%f, z=%f\r\n",
+            gekf.gps_flat[0], gekf.gps_flat[1], gekf.gps_flat[2]);
+            HAL_UART_Transmit(&huart3, (uint8_t*)debug, debug_len, HAL_MAX_DELAY);
+            debug_len = sprintf(debug, "ACCEL: x=%f, y=%f, z=%f\r\n",
+            sensors.accel_x, sensors.accel_y, sensors.accel_z);
+            HAL_UART_Transmit(&huart3, (uint8_t*)debug, debug_len, HAL_MAX_DELAY);
+            debug_len = sprintf(debug, "GYRO: x=%f, y=%f, z=%f\r\n",
+                              sensors.gyro_x, sensors.gyro_y, sensors.gyro_z);
+            HAL_UART_Transmit(&huart3, (uint8_t*)debug, debug_len, HAL_MAX_DELAY);
+            uint8_t start_byte = 'S';
+            uint8_t buffer[39];
+            buffer[0] = start_byte;
+            memcpy(&buffer[1], &sensors.accel_x, 4);
+            memcpy(&buffer[5], &sensors.accel_y, 4);
+            memcpy(&buffer[9], &sensors.accel_z, 4);
+            
+            memcpy(&buffer[13], &sensors.gyro_x, 4);
+            memcpy(&buffer[17], &sensors.gyro_y, 4);
+            memcpy(&buffer[21], &sensors.gyro_z, 4);
+            
+            memcpy(&buffer[25], &sensors.gps_x, 4);
+            memcpy(&buffer[29], &sensors.gps_y, 4);
+            memcpy(&buffer[33], &sensors.gps_z, 4);
+            memcpy(&buffer[37], &state_machine, 2);
+            HAL_UART_Transmit(&huart2, buffer, sizeof(buffer), HAL_MAX_DELAY);
+            run_idle(&huart3);
+            break;
+        }
+        case GROUND: {
+          if (gekf_initialize) {
+            initialize_ekf_ground(&gekf, &huart3, &sensors, 6);
+            gekf_initialize = 0;
+          }
+          update_ekf_ground(&gekf, &sensors);
+          run_ground(&gekf, &sensors, &serial_data, &huart3);
+          iterations++;
+          break;
+        }
+        case ARMED: {
+          char debug_buffer[256];
+          int len;
+          if (fekf_initialize) {
+            initialize_ekf(&fekf, &huart3, &sensors, 3);
+            initialize_rocket_attitude(&rocket_atd, 1, 0, 0, 0); 
+            fekf_initialize = 0;
+          }
+          GPS2Flat(&sensors, &fekf, 0);
+          if (sensors.accel_z - sensors.accel_bias_z > 1.0) {
+              len = snprintf(debug_buffer, sizeof(debug_buffer), "Transitioning to FASTASCENT\r\n");
+              state_machine = FASTASCENT;
+              HAL_UART_Transmit(&huart3, (uint8_t*)debug_buffer, len, HAL_MAX_DELAY);
+          }
+          break;
+        }
+        case FASTASCENT: {
+          run_fast_ascent(&fekf, &rocket_atd, &sensors, &serial_data, &huart3); 
+          print_rocket_attitude(&rocket_atd, &huart3); 
+          break;
+        }
+        case SLOWASCENT: {
+          run_slow_ascent(&fekf, &rocket_atd, &sensors, &serial_data, &huart3);
+          break;
+        }
+        case FREEFALL: {
+          run_freefall(&fekf, &rocket_atd, &sensors, &serial_data, &huart3); 
+          break;
+        }
+        case LANDED: {
+          break;
+        }
+    }
+    log_data(&serial_data, &sensors, &huart2);
+    global_time = HAL_GetTick();
+    global_time_seconds = (float32_t) global_time / 1000.0f;
+    global_time_step = (float32_t)(global_time - prev_global_time) / 1000.0f;
+    update_ekf(&fekf, &sensors);
+    gekf.time_step = global_time_step;
+    fekf.time_step = global_time_step / 10.0;
+    rocket_atd.time_step = global_time_step;
+    prev_global_time = global_time;
+    HAL_Delay(100);
   }
   /* USER CODE END 3 */
 }
@@ -256,12 +274,12 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-  RCC_OscInitStruct.PLL.PLLM = 5;
-  RCC_OscInitStruct.PLL.PLLN = 72;
-  RCC_OscInitStruct.PLL.PLLP = 5;
-  RCC_OscInitStruct.PLL.PLLQ = 8;
+  RCC_OscInitStruct.PLL.PLLM = 1;
+  RCC_OscInitStruct.PLL.PLLN = 27;
+  RCC_OscInitStruct.PLL.PLLP = 3;
+  RCC_OscInitStruct.PLL.PLLQ = 5;
   RCC_OscInitStruct.PLL.PLLR = 2;
-  RCC_OscInitStruct.PLL.PLLRGE = RCC_PLL1VCIRANGE_2;
+  RCC_OscInitStruct.PLL.PLLRGE = RCC_PLL1VCIRANGE_3;
   RCC_OscInitStruct.PLL.PLLVCOSEL = RCC_PLL1VCOWIDE;
   RCC_OscInitStruct.PLL.PLLFRACN = 0;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
@@ -277,9 +295,9 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.SYSCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_HCLK_DIV1;
-  RCC_ClkInitStruct.APB3CLKDivider = RCC_APB3_DIV1;
+  RCC_ClkInitStruct.APB3CLKDivider = RCC_APB3_DIV2;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_APB1_DIV2;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_APB2_DIV1;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_APB2_DIV2;
   RCC_ClkInitStruct.APB4CLKDivider = RCC_APB4_DIV2;
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
@@ -385,54 +403,6 @@ static void MX_SPI2_Init(void)
 }
 
 /**
-  * @brief SPI3 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_SPI3_Init(void)
-{
-
-  /* USER CODE BEGIN SPI3_Init 0 */
-
-  /* USER CODE END SPI3_Init 0 */
-
-  /* USER CODE BEGIN SPI3_Init 1 */
-
-  /* USER CODE END SPI3_Init 1 */
-  /* SPI3 parameter configuration*/
-  hspi3.Instance = SPI3;
-  hspi3.Init.Mode = SPI_MODE_MASTER;
-  hspi3.Init.Direction = SPI_DIRECTION_2LINES;
-  hspi3.Init.DataSize = SPI_DATASIZE_4BIT;
-  hspi3.Init.CLKPolarity = SPI_POLARITY_LOW;
-  hspi3.Init.CLKPhase = SPI_PHASE_1EDGE;
-  hspi3.Init.NSS = SPI_NSS_HARD_OUTPUT;
-  hspi3.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
-  hspi3.Init.FirstBit = SPI_FIRSTBIT_MSB;
-  hspi3.Init.TIMode = SPI_TIMODE_DISABLE;
-  hspi3.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
-  hspi3.Init.CRCPolynomial = 0x0;
-  hspi3.Init.NSSPMode = SPI_NSS_PULSE_ENABLE;
-  hspi3.Init.NSSPolarity = SPI_NSS_POLARITY_LOW;
-  hspi3.Init.FifoThreshold = SPI_FIFO_THRESHOLD_01DATA;
-  hspi3.Init.TxCRCInitializationPattern = SPI_CRC_INITIALIZATION_ALL_ZERO_PATTERN;
-  hspi3.Init.RxCRCInitializationPattern = SPI_CRC_INITIALIZATION_ALL_ZERO_PATTERN;
-  hspi3.Init.MasterSSIdleness = SPI_MASTER_SS_IDLENESS_00CYCLE;
-  hspi3.Init.MasterInterDataIdleness = SPI_MASTER_INTERDATA_IDLENESS_00CYCLE;
-  hspi3.Init.MasterReceiverAutoSusp = SPI_MASTER_RX_AUTOSUSP_DISABLE;
-  hspi3.Init.MasterKeepIOState = SPI_MASTER_KEEP_IO_STATE_DISABLE;
-  hspi3.Init.IOSwap = SPI_IO_SWAP_DISABLE;
-  if (HAL_SPI_Init(&hspi3) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN SPI3_Init 2 */
-
-  /* USER CODE END SPI3_Init 2 */
-
-}
-
-/**
   * @brief SPI4 Initialization Function
   * @param None
   * @retval None
@@ -451,16 +421,16 @@ static void MX_SPI4_Init(void)
   hspi4.Instance = SPI4;
   hspi4.Init.Mode = SPI_MODE_MASTER;
   hspi4.Init.Direction = SPI_DIRECTION_2LINES;
-  hspi4.Init.DataSize = SPI_DATASIZE_4BIT;
-  hspi4.Init.CLKPolarity = SPI_POLARITY_LOW;
-  hspi4.Init.CLKPhase = SPI_PHASE_1EDGE;
-  hspi4.Init.NSS = SPI_NSS_HARD_OUTPUT;
-  hspi4.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+  hspi4.Init.DataSize = SPI_DATASIZE_16BIT;
+  hspi4.Init.CLKPolarity = SPI_POLARITY_HIGH;
+  hspi4.Init.CLKPhase = SPI_PHASE_2EDGE;
+  hspi4.Init.NSS = SPI_NSS_SOFT;
+  hspi4.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
   hspi4.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi4.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi4.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
   hspi4.Init.CRCPolynomial = 0x0;
-  hspi4.Init.NSSPMode = SPI_NSS_PULSE_ENABLE;
+  hspi4.Init.NSSPMode = SPI_NSS_PULSE_DISABLE;
   hspi4.Init.NSSPolarity = SPI_NSS_POLARITY_LOW;
   hspi4.Init.FifoThreshold = SPI_FIFO_THRESHOLD_01DATA;
   hspi4.Init.TxCRCInitializationPattern = SPI_CRC_INITIALIZATION_ALL_ZERO_PATTERN;
@@ -529,6 +499,54 @@ static void MX_SPI6_Init(void)
 }
 
 /**
+  * @brief UART4 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_UART4_Init(void)
+{
+
+  /* USER CODE BEGIN UART4_Init 0 */
+
+  /* USER CODE END UART4_Init 0 */
+
+  /* USER CODE BEGIN UART4_Init 1 */
+
+  /* USER CODE END UART4_Init 1 */
+  huart4.Instance = UART4;
+  huart4.Init.BaudRate = 38400;
+  huart4.Init.WordLength = UART_WORDLENGTH_8B;
+  huart4.Init.StopBits = UART_STOPBITS_1;
+  huart4.Init.Parity = UART_PARITY_NONE;
+  huart4.Init.Mode = UART_MODE_TX_RX;
+  huart4.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart4.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart4.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart4.Init.ClockPrescaler = UART_PRESCALER_DIV1;
+  huart4.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  if (HAL_UART_Init(&huart4) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_UARTEx_SetTxFifoThreshold(&huart4, UART_TXFIFO_THRESHOLD_1_8) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_UARTEx_SetRxFifoThreshold(&huart4, UART_RXFIFO_THRESHOLD_1_8) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_UARTEx_DisableFifoMode(&huart4) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN UART4_Init 2 */
+
+  /* USER CODE END UART4_Init 2 */
+
+}
+
+/**
   * @brief USART2 Initialization Function
   * @param None
   * @retval None
@@ -537,7 +555,7 @@ static void MX_USART2_UART_Init(void)
 {
 
   /* USER CODE BEGIN USART2_Init 0 */
-
+  __HAL_RCC_USART2_CLK_ENABLE();
   /* USER CODE END USART2_Init 0 */
 
   /* USER CODE BEGIN USART2_Init 1 */
@@ -573,6 +591,54 @@ static void MX_USART2_UART_Init(void)
   /* USER CODE BEGIN USART2_Init 2 */
 
   /* USER CODE END USART2_Init 2 */
+
+}
+
+/**
+  * @brief USART3 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART3_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART3_Init 0 */
+
+  /* USER CODE END USART3_Init 0 */
+
+  /* USER CODE BEGIN USART3_Init 1 */
+
+  /* USER CODE END USART3_Init 1 */
+  huart3.Instance = USART3;
+  huart3.Init.BaudRate = 115200;
+  huart3.Init.WordLength = UART_WORDLENGTH_8B;
+  huart3.Init.StopBits = UART_STOPBITS_1;
+  huart3.Init.Parity = UART_PARITY_NONE;
+  huart3.Init.Mode = UART_MODE_TX_RX;
+  huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart3.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart3.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart3.Init.ClockPrescaler = UART_PRESCALER_DIV1;
+  huart3.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  if (HAL_UART_Init(&huart3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_UARTEx_SetTxFifoThreshold(&huart3, UART_TXFIFO_THRESHOLD_1_8) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_UARTEx_SetRxFifoThreshold(&huart3, UART_RXFIFO_THRESHOLD_1_8) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_UARTEx_DisableFifoMode(&huart3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART3_Init 2 */
+
+  /* USER CODE END USART3_Init 2 */
 
 }
 
@@ -613,12 +679,29 @@ static void MX_USB_OTG_HS_PCD_Init(void)
 }
 
 /**
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void)
+{
+
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA1_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA1_Stream2_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Stream2_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Stream2_IRQn);
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
   */
 static void MX_GPIO_Init(void)
 {
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
 /* USER CODE BEGIN MX_GPIO_Init_1 */
 /* USER CODE END MX_GPIO_Init_1 */
 
@@ -630,12 +713,107 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : PE4 */
+  GPIO_InitStruct.Pin = GPIO_PIN_4;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PE9 */
+  GPIO_InitStruct.Pin = GPIO_PIN_9;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */
+void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
+    char debug[128];
+    int len;
+    
+    if (huart->Instance == UART4) {
+        len = sprintf(debug, "UART Interrupt: Size=%d, Data: ", Size);
+        //HAL_UART_Transmit(&huart3, (uint8_t*)debug, len, HAL_MAX_DELAY);
+        for(int i = 0; i < Size && i < 8; i++) {
+            len = sprintf(debug, "%02X ", uart4_rx_dma_buffer[i]);
+            //HAL_UART_Transmit(&huart3, (uint8_t*)debug, len, HAL_MAX_DELAY);
+        }
+        if (Size >= 4 && uart4_rx_dma_buffer[0] == 0xB5 && uart4_rx_dma_buffer[1] == 0x62) {
+            len = sprintf(debug, "\r\nUBX Message - Class: 0x%02X, ID: 0x%02X\r\n", 
+                         uart4_rx_dma_buffer[2], uart4_rx_dma_buffer[3]);
+            //HAL_UART_Transmit(&huart3, (uint8_t*)debug, len, HAL_MAX_DELAY);
+        } else {
+            len = sprintf(debug, "\r\nNot a UBX message\r\n");
+            //HAL_UART_Transmit(&huart3, (uint8_t*)debug, len, HAL_MAX_DELAY);
+        }
+        ring_buffer_write(&uart4_rx_rb, uart4_rx_dma_buffer, Size);
+        memset(uart4_rx_dma_buffer, 0, sizeof(uart4_rx_dma_buffer));
+        if(HAL_UARTEx_ReceiveToIdle_IT(&huart4, uart4_rx_dma_buffer, sizeof(uart4_rx_dma_buffer)) != HAL_OK) {
+            len = sprintf(debug, "Failed to restart UART\r\n");
+            HAL_UART_Transmit(&huart3, (uint8_t*)debug, len, HAL_MAX_DELAY);
+            HAL_UART_DeInit(&huart4);
+            HAL_UART_Init(&huart4);
+            HAL_UARTEx_ReceiveToIdle_IT(&huart4, uart4_rx_dma_buffer, sizeof(uart4_rx_dma_buffer));
+        }
+    }
+      
 
+}
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
+  if (huart->Instance == USART2) {
+    char buffer[6];
+    sprintf(buffer, "%02X\r\n", signal_received[0]);
+    HAL_UART_Transmit(&huart3, buffer, strlen(buffer), HAL_MAX_DELAY);
+    if (strncmp(signal_received, "GO", 2) == 0) {
+        HAL_UART_Transmit(&huart3, "\r\nStarting EKF...\r\n", sizeof("\r\nStarting EKF...\r\n") - 1, HAL_MAX_DELAY);
+        state_machine = GROUND;
+        ready_message_printed = 0; 
+    }
+  }
+}
+
+
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
+    char debug[128];
+    int len;
+    
+    if (huart->Instance == UART4) {
+        len = sprintf(debug, "UART4 Error 0x%lX\r\n", huart->ErrorCode);
+        HAL_UART_Transmit(&huart3, (uint8_t*)debug, len, HAL_MAX_DELAY);
+        HAL_UART_AbortReceive(&huart4);
+        HAL_UARTEx_ReceiveToIdle_IT(&huart4, uart4_rx_dma_buffer, sizeof(uart4_rx_dma_buffer));
+    }
+}
+
+void print_rocket_attitude(rocket_attitude *rocket_atd, UART_HandleTypeDef *huart) {
+    char buf[200];
+    
+    // Print quaternion
+    snprintf(buf, sizeof(buf), "Quaternion (s,x,y,z): %.3f, %.3f, %.3f, %.3f\r\n", 
+             rocket_atd->q_current_s,
+             rocket_atd->q_current_x,
+             rocket_atd->q_current_y,
+             rocket_atd->q_current_z);
+    HAL_UART_Transmit(huart, (uint8_t*)buf, strlen(buf), HAL_MAX_DELAY);
+    snprintf(buf, sizeof(buf), "Euler (phi,theta,psi): %.2f, %.2f, %.2f\r\n",
+             rocket_atd->phi, 
+             rocket_atd->theta,
+             rocket_atd->psi);
+    HAL_UART_Transmit(huart, (uint8_t*)buf, strlen(buf), HAL_MAX_DELAY);
+    snprintf(buf, sizeof(buf), "Gyro (x,y,z): %.2f, %.2f, %.2f\r\n",
+             rocket_atd->gyro_x,
+             rocket_atd->gyro_y,
+             rocket_atd->gyro_z);
+    HAL_UART_Transmit(huart, (uint8_t*)buf, strlen(buf), HAL_MAX_DELAY);
+}
 /* USER CODE END 4 */
 
 /**

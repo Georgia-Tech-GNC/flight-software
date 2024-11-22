@@ -117,7 +117,15 @@ int main(void)
   MX_ADC2_Init();
   MX_ADC3_Init();
   /* USER CODE BEGIN 2 */
-  port_init();
+  uint8_t tmp;
+  while(HAL_TIMEOUT != HAL_UART_Receive(&state_uart, &tmp, 1, 10));
+
+  if (port_init()) {
+    HAL_UART_Transmit(&debug_uart, "Port initialized\r\n", 18, HAL_MAX_DELAY);
+  } else {
+    HAL_UART_Transmit(&debug_uart, "Port not initialized\r\n", 22, HAL_MAX_DELAY);
+  }
+
   port_start();
 
   /*

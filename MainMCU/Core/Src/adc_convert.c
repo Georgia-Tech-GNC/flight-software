@@ -2,9 +2,9 @@
 #include "string.h"
 
 void adc_convert_task(void *args) {
+    vTaskDelay(100);
     HAL_ADC_Start_IT(FIRST_ADC);
     vTaskDelay(100);
-
     if (xSemaphoreTake(g_state_mutex_handle, portMAX_DELAY) == pdTRUE) {
         HAL_UART_Transmit(&debug_uart, (uint8_t *) "ADC Convert Task\r\n", 18, HAL_MAX_DELAY);
         char buf[100];

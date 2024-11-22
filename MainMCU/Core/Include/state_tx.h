@@ -11,7 +11,7 @@
 
 #include "telemetry.h"
 
-#define TX_FREQ_HZ 30
+#define TX_FREQ_HZ 5
 #define BEGIN_STATE_TX_NOTIFICATION_BIT 0x01
 
 void state_tx_task(void *args);

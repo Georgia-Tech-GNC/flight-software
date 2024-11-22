@@ -11,7 +11,7 @@
 #include "w25q.h"
 
 #define W25Q_WRITE_START 0
-#define N_SECTORS 64
+#define N_SECTORS 256
 
 void io_save_complete(IOChannel *channel, int status, size_t bytes_saved);
 void io_load_complete(IOChannel *channel, int status, size_t bytes_loaded);
@@ -259,11 +259,18 @@ void periph_io_task(void *args) {
         HAL_UART_Transmit(&debug_uart, (uint8_t *) "W25Q initialized\r\n", 18, HAL_MAX_DELAY);
     }
 
+    HAL_UART_Transmit(&debug_uart, (uint8_t *) "Erasing W25Q sectors\r\n", 22, HAL_MAX_DELAY);
+
     for (size_t i = 0; i < N_SECTORS; i++) {
+        char erase_progress[100];
+        sprintf(erase_progress, "Erasing W25Q sector %d/%d\r\n", i+1, N_SECTORS);
+        HAL_UART_Transmit(&debug_uart, (uint8_t *) erase_progress, strlen(erase_progress), HAL_MAX_DELAY);
         if (w25q_erase_sector(&w25q, i) != W25Q_ERR_OK) {
             w25q_initialized = 0;
         }
     }
+
+    HAL_UART_Transmit(&debug_uart, (uint8_t *) "Erased W25Q sectors\r\n", 21, HAL_MAX_DELAY);
 #else
     w25q_initialized = 1;
 #endif
@@ -368,10 +375,6 @@ int flash_save_operation(struct w25q_device w25q, IOOperation *operation, uint8_
 #ifdef MCU_H725ZGT6
     if (w25q_write_raw(&w25q, data_buffer, available, *w25q_write_ptr) != W25Q_ERR_OK) {
         return 0;
-    } else {
-        char buf[100];
-        sprintf(buf, "Wrote %d bytes to flash at %d\r\n", available, *w25q_write_ptr);
-        HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
     }
 #else
     memcpy(fake_flash_chip + *w25q_write_ptr, data_buffer, available);
@@ -390,11 +393,18 @@ int flash_reset_operation(struct w25q_device w25q, IOOperation *operation, size_
 
     *w25q_write_ptr = W25Q_WRITE_START;
 
+    HAL_UART_Transmit(&debug_uart, (uint8_t *) "Erasing W25Q sectors\r\n", 22, HAL_MAX_DELAY);
+
     for (size_t i = 0; i < N_SECTORS; i++) {
+        char erase_progress[100];
+        sprintf(erase_progress, "Erasing W25Q sector %d/%d\r\n", i+1, N_SECTORS);
+        HAL_UART_Transmit(&debug_uart, (uint8_t *) erase_progress, strlen(erase_progress), HAL_MAX_DELAY);
         if (w25q_erase_sector(&w25q, i) != W25Q_ERR_OK) {
             return 0;
         }
     }
+
+    HAL_UART_Transmit(&debug_uart, (uint8_t *) "Erased W25Q sectors\r\n", 21, HAL_MAX_DELAY);
 
     return 1;
 }

@@ -11,6 +11,7 @@ typedef struct {
     struct RocketGroundEKF ground_ekf;
     struct RocketSensorData sensor_data;
     struct RocketAnalogFeedbackData analog_feedback_data;
+    uint64_t launch_timestamp;
 } RocketState;
 
 

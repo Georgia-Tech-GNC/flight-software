@@ -31,8 +31,12 @@ StackType_t state_flash_task_stack[4096];
 StaticTask_t state_flash_task_buff;
 
 TaskHandle_t g_adc_convert_task_handle;
-StackType_t adc_convert_task_stack[4096];
+StackType_t adc_convert_task_stack[256];
 StaticTask_t adc_convert_task_buff;
+
+TaskHandle_t g_run_controls_task_handle;
+StackType_t run_controls_task_stack[4096];
+StaticTask_t run_controls_task_buff;
 
 SemaphoreHandle_t g_state_mutex_handle;
 StaticSemaphore_t state_mutex_buff;
@@ -63,6 +67,7 @@ uint8_t adc3_conv_ptr = 0;
 RocketState g_current_state = {0};
 
 int port_init(void) {
+
     /* Create mutexes */
     g_state_mutex_handle = xSemaphoreCreateMutexStatic(&state_mutex_buff);
 
@@ -82,7 +87,7 @@ int port_init(void) {
 
     g_periph_io_mb_handle = xMessageBufferCreateStatic(IO_MB_SIZE + 1, periph_io_mb_storage, &periph_io_mb_buff);
     if (g_periph_io_mb_handle == NULL) return 0;
-    
+
     /* Create tasks */
     g_periph_io_task_handle = xTaskCreateStatic(periph_io_task, "flash_task", 4096, NULL, tskIDLE_PRIORITY, periph_io_task_stack, &periph_io_task_buff);
     if (g_periph_io_task_handle == NULL) return 0;
@@ -102,8 +107,11 @@ int port_init(void) {
     g_state_flash_task_handle = xTaskCreateStatic(state_flash_task, "state_flash_task", 4096, NULL, tskIDLE_PRIORITY, state_flash_task_stack, &state_flash_task_buff);
     if (g_state_flash_task_handle == NULL) return 0;
 
-    g_adc_convert_task_handle = xTaskCreateStatic(adc_convert_task, "adc_convert_task", 4096, NULL, tskIDLE_PRIORITY, adc_convert_task_stack, &adc_convert_task_buff);
+    g_adc_convert_task_handle = xTaskCreateStatic(adc_convert_task, "adc_convert_task", 256, NULL, tskIDLE_PRIORITY, adc_convert_task_stack, &adc_convert_task_buff);
     if (g_adc_convert_task_handle == NULL) return 0;
+
+    g_run_controls_task_handle = xTaskCreateStatic(run_controls_task, "run_controls_task", 4096, NULL, tskIDLE_PRIORITY, run_controls_task_stack, &run_controls_task_buff);
+    if (g_run_controls_task_handle == NULL) return 0;
     
 #ifdef USE_TESTS
     g_test_task_handle = xTaskCreateStatic(test_task, "test_task", 2048, NULL, tskIDLE_PRIORITY, test_task_stack, &test_task_buff);
@@ -118,7 +126,7 @@ int port_init(void) {
     if (HAL_UARTEx_ReceiveToIdle_IT(&state_uart, state_uart_rx_buf, MAX_PACKET_SIZE_STATE) != HAL_OK) {
         return 0;
     }
-    
+
     return 1;
 }
 
@@ -148,7 +156,6 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-
     uint16_t adc_val = HAL_ADC_GetValue(hadc);
     ADC_Channel channel;
 
@@ -215,8 +222,6 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
 
     if (to_start != NULL) {
         HAL_ADC_Start_IT(to_start);
-    } else {
-        HAL_UART_Transmit(&debug_uart, (uint8_t *) "No next ADC\r\n", 14, HAL_MAX_DELAY);
     }
 
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);

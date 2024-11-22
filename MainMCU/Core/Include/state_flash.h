@@ -11,7 +11,7 @@
 
 #include "string.h"
 
-#define FLASH_FREQ_HZ 5
+#define FLASH_FREQ_HZ 10
 
 #define BEGIN_STATE_FLASH_NOTIFICATION_BIT 0x01
 

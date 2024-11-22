@@ -15,6 +15,7 @@
 #include "state_tx.h"
 #include "state_flash.h"
 #include "telemetry.h"
+#include "run_controls.h"
 #include "adc.h"
 #include "adc_convert.h"
 

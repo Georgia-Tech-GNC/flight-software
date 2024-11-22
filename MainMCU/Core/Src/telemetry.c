@@ -11,7 +11,7 @@
 
 #include "globals.h"
 
-void rx_process_byte(uint8_t byte, uint8_t *packet_buffer, uint8_t *extracted_buffer, uint8_t *packet_buffer_size);
+void rx_process_byte(uint8_t byte, uint8_t *packet_buffer, uint8_t *extracted_buffer, uint8_t *packet_buffer_size, uint8_t *recieved_uuids);
 int uart_transmit_message(Message *message, uint8_t *packet_buf);
 
 void process_command(int command_id);
@@ -88,6 +88,8 @@ void telemetry_rx_task(void *args) {
 
     uint8_t extracted_packet_buffer[MAX_PACKET_SIZE_TELEMETRY];
 
+    uint8_t recieved_uuids[256] = {0};
+
     /* Current size of incoming packet buffer */
     uint8_t packet_buffer_size = 0;
 
@@ -97,7 +99,7 @@ void telemetry_rx_task(void *args) {
 
         /* Process them */
         for (int i = 0; i < bytes_read; i ++) {
-            rx_process_byte(bytes_to_process[i], packet_buffer, extracted_packet_buffer, &packet_buffer_size);
+            rx_process_byte(bytes_to_process[i], packet_buffer, extracted_packet_buffer, &packet_buffer_size, recieved_uuids);
         }
     }
 }
@@ -109,7 +111,7 @@ void telemetry_rx_task(void *args) {
  * @param packet_buffer_size The current size of the incoming packet buffer
  * @param extracted_buffer The buffer to hold the extracted packet
  */
-void rx_process_byte(uint8_t byte, uint8_t *packet_buffer, uint8_t *extracted_buffer, uint8_t *packet_buffer_size) {
+void rx_process_byte(uint8_t byte, uint8_t *packet_buffer, uint8_t *extracted_buffer, uint8_t *packet_buffer_size, uint8_t *recieved_uuids) {
     int next_packet_buffer_size = process_incoming_byte(byte, packet_buffer, *packet_buffer_size);
     char buf[100];
     sprintf(buf, "%02x\r\n", byte);
@@ -128,6 +130,12 @@ void rx_process_byte(uint8_t byte, uint8_t *packet_buffer, uint8_t *extracted_bu
 
             int command_id = extracted_buffer[0];
             int command_uuid = extracted_buffer[1];
+
+            if (recieved_uuids[command_uuid] == 1) {
+                return;
+            }
+
+            recieved_uuids[command_uuid] = 1;
 
             char buf2[100];
             sprintf(buf2, "Command ID: %d, Command UUID: %d\r\n", command_id, command_uuid);
@@ -168,7 +176,8 @@ void process_command(int command_id) {
 
 void command_idle_to_ground() {
     HAL_UART_Transmit(&debug_uart, (uint8_t *) "Idle to ground\r\n", 17, HAL_MAX_DELAY);
-    HAL_UART_Transmit_IT(&state_uart, (uint8_t *) "GO", 2);
+
+    HAL_UART_Transmit(&state_uart, (uint8_t *) "GO", 2, HAL_MAX_DELAY);
 
     xTaskNotify(g_state_flash_task_handle, BEGIN_STATE_FLASH_NOTIFICATION_BIT, eSetBits);
     xTaskNotify(g_state_tx_task_handle, BEGIN_STATE_TX_NOTIFICATION_BIT, eSetBits);

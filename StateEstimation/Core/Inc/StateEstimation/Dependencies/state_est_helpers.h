@@ -31,7 +31,7 @@ typedef enum {
 #define WGS84_A 6378137.0   // Semi-major axis of WGS 84 ellipsoid (meters)
 #define WGS84_B 6356752.3 // semi-minor axis
 
-#define BURN_TIME 5.5
+#define BURN_TIME 4.5
 #define COM_DIST_START 1.0
 #define COM_DIST_END 0.2
 #define COM_TO_IMU_Y 0.01

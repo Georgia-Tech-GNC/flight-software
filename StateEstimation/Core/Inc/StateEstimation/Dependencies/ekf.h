@@ -58,6 +58,9 @@ typedef struct {
     float32_t gyro[3];
     float32_t magneto[3];
     float32_t gps_flat[3];
+    float32_t launch_gps[3];
+    float32_t launch_accel[3]; 
+    float32_t launch_gyro[3];
     float32_t barometer;
 } ExtKalmanFilter;
 

@@ -33,7 +33,13 @@ typedef struct {
   float32_t wx; // body frame
   float32_t wy;
   float32_t wz;
-  float32_t t; // time
+  float32_t P_1; // body frame
+  float32_t P_2;
+  float32_t P_3;
+  float32_t P_4; // body frame
+  float32_t P_5;
+  float32_t P_6;
+  float32_t t;
 } SerialData;
 
 

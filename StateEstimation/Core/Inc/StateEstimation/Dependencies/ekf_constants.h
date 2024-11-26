@@ -10,7 +10,7 @@ const uint16_t num_measurements = 3;
 arm_matrix_instance_f32 wn;
 arm_matrix_instance_f32 wnT;
 
-float32_t dfdx_f32[6*6] = {0.0};  // Initialize all elements to 0
+float32_t dfdx_f32[6*6] = {0.0};  
 float32_t dfdx_f32_ground[6*6] =  {
         1.0, 0,   0,   0,   0,   0,
         0,   1.0, 0,   0,   0,   0,
@@ -19,7 +19,11 @@ float32_t dfdx_f32_ground[6*6] =  {
         0,   0,   0,   0,   1.0, 0,
         0,   0,   0,   0,   0,   1.0
     };
-float32_t dhdx_f32[6*3] = {0.0};  // Initialize all elements to 0
+float32_t dhdx_f32[6*3] = {
+    1.0, 0,   0,   0,   0,   0,    
+    0,   0,   1.0, 0,   0,   0,    
+    0,   0,   0,   0,   1.0, 0    
+};
 float32_t dhdx_f32_ground[6 * 6] = {
         1.0, 0,   0,   0,   0,   0,
         0,   1.0, 0,   0,   0,   0,
@@ -28,24 +32,24 @@ float32_t dhdx_f32_ground[6 * 6] = {
         0,   0,   0,   0,   1.0, 0,
         0,   0,   0,   0,   0,   1.0
     };
-float32_t G_f32[3*3] = {0.0};     // Initialize all elements to 0
+float32_t G_f32[3*3] = {0.0};   
 
 float32_t Q_f32[6*6] = {
-    0.0025, 0.05,   0,   0,   0,   0,
-    0.05, 1.0, 0,   0,   0,   0,
-    0,   0,   0.0025, 0.05,   0,   0,
-    0,   0,   0.05,   1.0, 0,   0,
-    0,   0,   0,   0,   0.0025, 0.05,
-    0,   0,   0,   0,   0.05,   1.0
+    0.01,  0,     0,     0,     0,     0,    // x position variance
+    0,     0.1,   0,     0,     0,     0,    // x velocity variance
+    0,     0,     0.01,  0,     0,     0,    // y position variance
+    0,     0,     0,     0.1,   0,     0,    // y velocity variance
+    0,     0,     0,     0,     0.01,  0,    // z position variance
+    0,     0,     0,     0,     0,     0.1   // z velocity variance
 };
 
 float32_t K_f32[6*3] = {0.0};  // Initialize all elements to 0
 float32_t K_f32_ground[6*6] = {0.0};
 
 float32_t R_f32[3*3] = {
-    0.01, 0.0, 0.0,
-    0.0, 1.0, 0.0,
-    0.0, 0.0, 1.0
+    2.25,  0.0,   0.0, 
+    0.0,   2.25,  0.0,   
+    0.0,   0.0,   6.25   
 };
 
 float32_t R_f32_ground[6 * 6] = {
@@ -71,12 +75,12 @@ float32_t x_p[6] = {0.0};
 float32_t x_init[6] = {0.0};
 
 float32_t P_init[6*6] = {
-    0.1, 0,   0,   0,   0,   0,
-    0,   0.1, 0,   0,   0,   0,
-    0,   0,   0.1, 0,   0,   0,
-    0,   0,   0,   0.1, 0,   0,
-    0,   0,   0,   0,   0.1, 0,
-    0,   0,   0,   0,   0,   0.1
+    1.0, 0,   0,   0,   0,   0,
+    0,   1.0, 0,   0,   0,   0,
+    0,   0,   1.0, 0,   0,   0,
+    0,   0,   0,   1.0, 0,   0,
+    0,   0,   0,   0,   1.0, 0,
+    0,   0,   0,   0,   0,   1.0
 };
 
 float32_t P_init_ground[6*6] = {

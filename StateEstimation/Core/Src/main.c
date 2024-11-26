@@ -49,6 +49,8 @@ GroundExtKalmanFilter gekf;
 ExtKalmanFilter fekf;
 rocket_attitude rocket_atd;
 uint8_t signal_received[2];
+float32_t launch_time_stamp;
+uint8_t launched;
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -132,11 +134,11 @@ int main(void)
   char uart_buffer[128];
   uint8_t tmp;
   int len;
+  launched = 1;
   // Print initial message
-  const char *start_msg = "\r\nStarting Data Ready Pin Check...\r\n";
-  HAL_UART_Transmit(&huart3, (uint8_t*)start_msg, strlen(start_msg), HAL_MAX_DELAY);
   while(HAL_TIMEOUT != HAL_UART_Receive(&huart2, &tmp, 1, 10));
   HAL_UART_Receive_IT(&huart2, signal_received, 2);
+  prev_global_time = global_time;
   HAL_Delay(500);
   
   while (1)
@@ -160,34 +162,17 @@ int main(void)
             char debug[128];
             int debug_len = sprintf(debug, "GPS: lat=%f, lon=%f, height=%f\r\n", 
                               sensors.gps_x, sensors.gps_y, sensors.gps_z);
-            HAL_UART_Transmit(&huart3, (uint8_t*)debug, debug_len, HAL_MAX_DELAY);
-            float32_t x_flat, y_flat, z_flat, xr, yr, zr;
+            //HAL_UART_Transmit(&huart3, (uint8_t*)debug, debug_len, HAL_MAX_DELAY);
             GPS2FlatGround(&sensors, &gekf, 1);
             debug_len = sprintf(debug, "FLAT: x=%f, y=%f, z=%f\r\n",
             gekf.gps_flat[0], gekf.gps_flat[1], gekf.gps_flat[2]);
-            HAL_UART_Transmit(&huart3, (uint8_t*)debug, debug_len, HAL_MAX_DELAY);
+            //HAL_UART_Transmit(&huart3, (uint8_t*)debug, debug_len, HAL_MAX_DELAY);
             debug_len = sprintf(debug, "ACCEL: x=%f, y=%f, z=%f\r\n",
             sensors.accel_x, sensors.accel_y, sensors.accel_z);
-            HAL_UART_Transmit(&huart3, (uint8_t*)debug, debug_len, HAL_MAX_DELAY);
+            //HAL_UART_Transmit(&huart3, (uint8_t*)debug, debug_len, HAL_MAX_DELAY);
             debug_len = sprintf(debug, "GYRO: x=%f, y=%f, z=%f\r\n",
                               sensors.gyro_x, sensors.gyro_y, sensors.gyro_z);
-            HAL_UART_Transmit(&huart3, (uint8_t*)debug, debug_len, HAL_MAX_DELAY);
-            uint8_t start_byte = 'S';
-            uint8_t buffer[39];
-            buffer[0] = start_byte;
-            memcpy(&buffer[1], &sensors.accel_x, 4);
-            memcpy(&buffer[5], &sensors.accel_y, 4);
-            memcpy(&buffer[9], &sensors.accel_z, 4);
-            
-            memcpy(&buffer[13], &sensors.gyro_x, 4);
-            memcpy(&buffer[17], &sensors.gyro_y, 4);
-            memcpy(&buffer[21], &sensors.gyro_z, 4);
-            
-            memcpy(&buffer[25], &sensors.gps_x, 4);
-            memcpy(&buffer[29], &sensors.gps_y, 4);
-            memcpy(&buffer[33], &sensors.gps_z, 4);
-            memcpy(&buffer[37], &state_machine, 2);
-            HAL_UART_Transmit(&huart2, buffer, sizeof(buffer), HAL_MAX_DELAY);
+            //HAL_UART_Transmit(&huart3, (uint8_t*)debug, debug_len, HAL_MAX_DELAY);
             run_idle(&huart3);
             break;
         }
@@ -210,7 +195,10 @@ int main(void)
             fekf_initialize = 0;
           }
           GPS2Flat(&sensors, &fekf, 0);
-          if (sensors.accel_z - sensors.accel_bias_z > 1.0) {
+          fekf.launch_gps[0] = fekf.gps_flat[0];
+          fekf.launch_gps[1] = fekf.gps_flat[1];
+          fekf.launch_gps[2] = fekf.gps_flat[2];
+          if (fekf.accelerometer[0] > 4.9) {
               len = snprintf(debug_buffer, sizeof(debug_buffer), "Transitioning to FASTASCENT\r\n");
               state_machine = FASTASCENT;
               HAL_UART_Transmit(&huart3, (uint8_t*)debug_buffer, len, HAL_MAX_DELAY);
@@ -218,32 +206,54 @@ int main(void)
           break;
         }
         case FASTASCENT: {
+          if (launched) {
+            launch_time_stamp = HAL_GetTick();
+            launched = 0;
+          }
           run_fast_ascent(&fekf, &rocket_atd, &sensors, &serial_data, &huart3); 
-          print_rocket_attitude(&rocket_atd, &huart3); 
           break;
         }
         case SLOWASCENT: {
+          HAL_UART_Transmit(&huart3, "Slow Ascent\r\n", 
+                  sizeof("Slow Ascent\r\n"), HAL_MAX_DELAY);
           run_slow_ascent(&fekf, &rocket_atd, &sensors, &serial_data, &huart3);
           break;
         }
         case FREEFALL: {
+          HAL_UART_Transmit(&huart3, "Freefall\r\n", 
+                sizeof("Freefall\r\n"), HAL_MAX_DELAY);
           run_freefall(&fekf, &rocket_atd, &sensors, &serial_data, &huart3); 
           break;
         }
         case LANDED: {
+          serial_data.state = LANDED;
+          HAL_UART_Transmit(&huart3, "Landed\r\n", 
+                  sizeof("Landed\r\n"), HAL_MAX_DELAY);
           break;
         }
     }
-    log_data(&serial_data, &sensors, &huart2);
     global_time = HAL_GetTick();
-    global_time_seconds = (float32_t) global_time / 1000.0f;
+    global_time_seconds = global_time / 1000.0f;
+    if (state_machine > 2) {
+      serial_data.t =  (global_time - launch_time_stamp) / 1000.0f;
+    }
+    log_data(&serial_data, &sensors, &huart2);
     global_time_step = (float32_t)(global_time - prev_global_time) / 1000.0f;
+    gekf.time_step = 0.05f;
+    fekf.time_step = 0.05f;
+    rocket_atd.time_step = 0.1f;
     update_ekf(&fekf, &sensors);
-    gekf.time_step = global_time_step;
-    fekf.time_step = global_time_step / 10.0;
-    rocket_atd.time_step = global_time_step;
+    if (state_machine > 1) {
+        char debug[256];
+        int len = sprintf(debug, "Sensors:\r\nGPS (x,y,z): %.3f, %.3f, %.3f\r\nAccel (x,y,z): %.3f, %.3f, %.3f\r\nGyro (x,y,z): %.3f, %.3f, %.3f\r\n",
+                        fekf.gps[0], fekf.gps[1], fekf.gps[2],
+                        fekf.accelerometer[0], fekf.accelerometer[1], fekf.accelerometer[2],
+                        fekf.gyro[0], fekf.gyro[1], fekf.gyro[2]);
+        HAL_UART_Transmit(&huart3, (uint8_t*)debug, len, HAL_MAX_DELAY);
+        print_rocket_attitude(&rocket_atd, &huart3); 
+    }
     prev_global_time = global_time;
-    HAL_Delay(100);
+    HAL_Delay(40);
   }
   /* USER CODE END 3 */
 }
@@ -263,21 +273,23 @@ void SystemClock_Config(void)
 
   /** Configure the main internal regulator output voltage
   */
-  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE0);
 
   while(!__HAL_PWR_GET_FLAG(PWR_FLAG_VOSRDY)) {}
 
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  RCC_OscInitStruct.HSIState = RCC_HSI_DIV2;
+  RCC_OscInitStruct.HSICalibrationValue = 64;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLM = 1;
-  RCC_OscInitStruct.PLL.PLLN = 27;
-  RCC_OscInitStruct.PLL.PLLP = 3;
-  RCC_OscInitStruct.PLL.PLLQ = 5;
+  RCC_OscInitStruct.PLL.PLLN = 28;
+  RCC_OscInitStruct.PLL.PLLP = 1;
+  RCC_OscInitStruct.PLL.PLLQ = 2;
   RCC_OscInitStruct.PLL.PLLR = 2;
   RCC_OscInitStruct.PLL.PLLRGE = RCC_PLL1VCIRANGE_3;
   RCC_OscInitStruct.PLL.PLLVCOSEL = RCC_PLL1VCOWIDE;
@@ -297,10 +309,10 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.AHBCLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB3CLKDivider = RCC_APB3_DIV2;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_APB1_DIV2;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_APB2_DIV2;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_APB2_DIV4;
   RCC_ClkInitStruct.APB4CLKDivider = RCC_APB4_DIV2;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_3) != HAL_OK)
   {
     Error_Handler();
   }
@@ -322,7 +334,7 @@ static void MX_I2C4_Init(void)
 
   /* USER CODE END I2C4_Init 1 */
   hi2c4.Instance = I2C4;
-  hi2c4.Init.Timing = 0x00808CD2;
+  hi2c4.Init.Timing = 0x40505883;
   hi2c4.Init.OwnAddress1 = 0;
   hi2c4.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
   hi2c4.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
@@ -425,7 +437,7 @@ static void MX_SPI4_Init(void)
   hspi4.Init.CLKPolarity = SPI_POLARITY_HIGH;
   hspi4.Init.CLKPhase = SPI_PHASE_2EDGE;
   hspi4.Init.NSS = SPI_NSS_SOFT;
-  hspi4.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
+  hspi4.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
   hspi4.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi4.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi4.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;

@@ -15,20 +15,20 @@
 #ifndef __GROUND_H__
     #define __GROUND_H__
 
-void state_transition_ground(ExtKalmanFilter *gekf);
+void state_transition_ground(GroundExtKalmanFilter *gekf);
 
-void state_transition_jacob_ground(ExtKalmanFilter *gekf);
+void state_transition_jacob_ground(GroundExtKalmanFilter *gekf);
 
-void observation_ground(ExtKalmanFilter *gekf);
+void observation_ground(GroundExtKalmanFilter *gekf);
 
-void observation_jacob_ground(ExtKalmanFilter *gekf);
+void observation_jacob_ground(GroundExtKalmanFilter *gekf);
 
-void get_ground_attitude(ExtKalmanFilter *gekf);
+void get_ground_attitude(GroundExtKalmanFilter *gekf);
 
-uint8_t check_gekf_convergence(ExtKalmanFilter *gekf, UART_HandleTypeDef *huart);
+uint8_t check_gekf_convergence(GroundExtKalmanFilter *gekf, UART_HandleTypeDef *huart);
 
-void run_ground(ExtKalmanFilter *gekf, Sensors *sensors, SerialData *serial_data, UART_HandleTypeDef *huart);
+void run_ground(GroundExtKalmanFilter *gekf, Sensors *sensors, SerialData *serial_data, UART_HandleTypeDef *huart);
 
-void print_P_n(ExtKalmanFilter *ekf, UART_HandleTypeDef *huart);
+void print_P_n(GroundExtKalmanFilter *ekf, UART_HandleTypeDef *huart);
 
 #endif

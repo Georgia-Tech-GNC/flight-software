@@ -14,6 +14,7 @@ extern float32_t fast_ascent_start_time;
 extern float32_t global_time_seconds;
 extern uint32_t prev_global_time;
 extern int16_t first_iter;
+extern int16_t first_slow_ascent_iter;
 extern float32_t startTOV;
 extern int16_t activatedTOV;
 extern float32_t prev_alt;

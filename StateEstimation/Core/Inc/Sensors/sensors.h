@@ -35,6 +35,7 @@ extern struct ublox_gnss_cfg_val cfg[10];
 
 // Sensor readings
 typedef struct {
+  uint8_t start_byte;
   float32_t accel_x;
   float32_t accel_y;
   float32_t accel_z;

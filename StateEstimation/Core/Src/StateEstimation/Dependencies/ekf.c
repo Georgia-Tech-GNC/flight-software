@@ -144,7 +144,7 @@ void observation_function(ExtKalmanFilter *ekf, UART_HandleTypeDef *huart) {
     int len = snprintf(buffer, sizeof(buffer), "Current state (x_n): [%.4f, %.4f, %.4f, %.4f, %.4f, %.4f]\r\n",
                        ekf->x_n.pData[0], ekf->x_n.pData[1], ekf->x_n.pData[2],
                        ekf->x_n.pData[3], ekf->x_n.pData[4], ekf->x_n.pData[5]);
-    //HAL_UART_Transmit(huart, (uint8_t*)buffer, len, HAL_MAX_DELAY);
+    HAL_UART_Transmit(huart, (uint8_t*)buffer, len, HAL_MAX_DELAY);
 
     len = snprintf(buffer, sizeof(buffer), 
         "GPS origin: [%.4f, %.4f, %.4f]\r\n",
@@ -389,10 +389,6 @@ void update_covariance(ExtKalmanFilter *ekf, UART_HandleTypeDef *huart) {
             float value = (ekf->P_n.pData[i * ekf->nx + j] + ekf->P_n.pData[j * ekf->nx + i]) * 0.5;
             ekf->P_n.pData[i * ekf->nx + j] = ekf->P_n.pData[j * ekf->nx + i] = value;
         }
-        // Ensure positive diagonal elements
-        if (ekf->P_n.pData[i * ekf->nx + i] <= 0) {
-            ekf->P_n.pData[i * ekf->nx + i] = 1e-6;
-        }
     }
     //print_matrix("Final P_n", &ekf->P_n, huart);
 
@@ -466,7 +462,7 @@ void state_transition_jacobian(ExtKalmanFilter *ekf, UART_HandleTypeDef *huart) 
 void predict_state(ExtKalmanFilter *ekf, UART_HandleTypeDef *huart) {
     //HAL_UART_Transmit(huart, (uint8_t*)"Starting state prediction...\r\n", 30, HAL_MAX_DELAY);
 
-    print_matrix("Current state (x_n)", &ekf->x_n, huart);
+    //print_matrix("Current state (x_n)", &ekf->x_n, huart);
 
     // Use state_transition_function to update x_next
     ekf->x_next = ekf->f;
@@ -582,13 +578,11 @@ void GPS2Flat(Sensors *sensors, ExtKalmanFilter *ekf, uint8_t ground) {
     // Define intermediate variables
     double WGS84_E = 0.08181;
 
-    // Convert latitude and longitude from degrees to radians
     double clat = cos(sensors->gps_x * (PI / 180.0));
     double slat = sin(sensors->gps_x * (PI / 180.0));
     double clon = cos(sensors->gps_y * (PI / 180.0));
     double slon = sin(sensors->gps_y * (PI / 180.0));
 
-    // Convert LLA to ECEF
     double N = WGS84_A / sqrt(1.0 - WGS84_E * WGS84_E * slat * slat);
     double x_ecef = (N + sensors->gps_z) * clat * clon;
     double y_ecef = (N + sensors->gps_z) * clat * slon;
@@ -598,26 +592,20 @@ void GPS2Flat(Sensors *sensors, ExtKalmanFilter *ekf, uint8_t ground) {
         sensors->gps_offset_y = y_ecef;
         sensors->gps_offset_z = z_ecef;
     }
-
-    // Convert ECEF to ENU
-    // xr, yr, zr - ECEF coordinates of your ENU origin
-    // x_ecef, y_ecef, z_ecef - rocket's position in ENU
     double dx = x_ecef - sensors->gps_offset_x;
     double dy = y_ecef - sensors->gps_offset_y;
     double dz = z_ecef - sensors->gps_offset_z;
-
     double x_enu = -slon*dx  + clon*dy;
     double y_enu = -slat*clon*dx - slat*slon*dy + clat*dz;
     double z_enu = clat*clon*dx + clat*slon*dy + slat*dz;
-
     if (ground) {
         ekf->gps_flat[0] = sensors->gps_offset_x;
         ekf->gps_flat[1] = sensors->gps_offset_y;
         ekf->gps_flat[2] = sensors->gps_offset_z;
     } else {
-        ekf->gps_flat[0] = z_enu;
-        ekf->gps_flat[1] = y_enu;
-        ekf->gps_flat[2] = -1.0 * x_enu;
+        ekf->gps_flat[0] = z_enu - ekf->launch_gps[0];  // Subtract launch position
+        ekf->gps_flat[1] = y_enu - ekf->launch_gps[1];
+        ekf->gps_flat[2] = -1.0 * x_enu - ekf->launch_gps[2];
     }
 }
 
@@ -670,12 +658,12 @@ void update_ekf(ExtKalmanFilter *ekf, Sensors* sensors) {
     ekf->gps[0] = ekf->gps_flat[0];
     ekf->gps[1] = ekf->gps_flat[1];
     ekf->gps[2] = ekf->gps_flat[2];
-    ekf->accelerometer[0] = 9.81 - (sensors->accel_x - sensors->accel_bias_x);
-    ekf->accelerometer[1] = sensors->accel_y - sensors->accel_bias_y;
-    ekf->accelerometer[2] = sensors->accel_z - sensors->accel_bias_z;
-    ekf->gyro[0] = sensors->gyro_x - sensors->gyro_bias_x;
-    ekf->gyro[1] = sensors->gyro_y - sensors->gyro_bias_y;
-    ekf->gyro[2] = sensors->gyro_z - sensors->gyro_bias_z;
+    ekf->accelerometer[0] = -9.81 + ((sensors->accel_x + sensors->accel_bias_x));
+    ekf->accelerometer[1] = (sensors->accel_y - sensors->accel_bias_y);
+    ekf->accelerometer[2] = (sensors->accel_z - sensors->accel_bias_z);
+    ekf->gyro[0] = (sensors->gyro_x - sensors->gyro_bias_x);
+    ekf->gyro[1] = (sensors->gyro_y - sensors->gyro_bias_y);
+    ekf->gyro[2] = (sensors->gyro_z - sensors->gyro_bias_z);
 }
 
 void initialize_ekf_ground(GroundExtKalmanFilter *ekf, UART_HandleTypeDef *huart, Sensors *sensors, uint16_t nz){
@@ -739,9 +727,6 @@ void initialize_ekf_ground(GroundExtKalmanFilter *ekf, UART_HandleTypeDef *huart
 
     ekf->barometer = 0.0;
 
-    ekf->gps_origin[0] = sensors->gps_x;
-    ekf->gps_origin[1] = sensors->gps_y;
-    ekf->gps_origin[2] = sensors->gps_z;
     ekf->accel_offset[0] = sensors->accel_x;
     ekf->accel_offset[1] = sensors->accel_y;
     ekf->accel_offset[2] = sensors->accel_z;
@@ -776,10 +761,10 @@ void make_measurement_ground(GroundExtKalmanFilter *ekf, UART_HandleTypeDef *hua
     }
     arm_matrix_instance_f32 z_new;
     arm_mat_init_f32(&z_new, ekf->nz, 1, z_new_f32);
-    print_matrix("New measurement (z)", &z_new, huart);
+    //print_matrix("New measurement (z)", &z_new, huart);
     memcpy(ekf->z_data, z_new_f32, sizeof(float32_t) * ekf->nz);
     arm_mat_init_f32(&ekf->z, ekf->nz, 1, ekf->z_data);
-    print_matrix("Final measurement (z) in EKF", &ekf->z, huart);
+    //print_matrix("Final measurement (z) in EKF", &ekf->z, huart);
     HAL_UART_Transmit(huart, (uint8_t*)"make_measurement completed.\r\n", 29, HAL_MAX_DELAY);
 }
 
@@ -821,9 +806,9 @@ arm_status kalman_gain_ground(GroundExtKalmanFilter *ekf, UART_HandleTypeDef *hu
 
     HAL_UART_Transmit(huart, (uint8_t*)"Starting Kalman gain calculation...\r\n", 37, HAL_MAX_DELAY);
 
-    print_matrix("H matrix", &H, huart);
-    print_matrix("P matrix", &P, huart);
-    print_matrix("R matrix", &R_mat, huart);
+    //print_matrix("H matrix", &H, huart);
+    //print_matrix("P matrix", &P, huart);
+    //print_matrix("R matrix", &R_mat, huart);
 
     // Compute HP
     result = arm_mat_mult_f32(&H, &P, &HP);
@@ -831,7 +816,7 @@ arm_status kalman_gain_ground(GroundExtKalmanFilter *ekf, UART_HandleTypeDef *hu
         HAL_UART_Transmit(huart, (uint8_t*)"Error in HP calculation\r\n", 25, HAL_MAX_DELAY);
         return result;
     }
-    print_matrix("HP matrix", &HP, huart);
+    //print_matrix("HP matrix", &HP, huart);
     check_for_nan("HP matrix", &HP, huart);
 
     // Compute Ht
@@ -840,7 +825,7 @@ arm_status kalman_gain_ground(GroundExtKalmanFilter *ekf, UART_HandleTypeDef *hu
         HAL_UART_Transmit(huart, (uint8_t*)"Error in Ht calculation\r\n", 25, HAL_MAX_DELAY);
         return result;
     }
-    print_matrix("Ht matrix", &Ht, huart);
+    //print_matrix("Ht matrix", &Ht, huart);
 
     // Compute HPHt
     result = arm_mat_mult_f32(&HP, &Ht, &HPHt);
@@ -848,7 +833,7 @@ arm_status kalman_gain_ground(GroundExtKalmanFilter *ekf, UART_HandleTypeDef *hu
         HAL_UART_Transmit(huart, (uint8_t*)"Error in HPHt calculation\r\n", 27, HAL_MAX_DELAY);
         return result;
     }
-    print_matrix("HPHt matrix", &HPHt, huart);
+    //print_matrix("HPHt matrix", &HPHt, huart);
 
     // Compute HPHt + R
     result = arm_mat_add_f32(&HPHt, &R_mat, &HPHtR);
@@ -856,7 +841,7 @@ arm_status kalman_gain_ground(GroundExtKalmanFilter *ekf, UART_HandleTypeDef *hu
         HAL_UART_Transmit(huart, (uint8_t*)"Error in HPHt + R calculation\r\n", 31, HAL_MAX_DELAY);
         return result;
     }
-    print_matrix("HPHt + R matrix", &HPHtR, huart);
+    //print_matrix("HPHt + R matrix", &HPHtR, huart);
 
     // Compute (HPHt + R)^-1
     result = arm_mat_inverse_f32(&HPHtR, &HPHtRi);
@@ -864,7 +849,7 @@ arm_status kalman_gain_ground(GroundExtKalmanFilter *ekf, UART_HandleTypeDef *hu
         HAL_UART_Transmit(huart, (uint8_t*)"Error in (HPHt + R)^-1 calculation\r\n", 37, HAL_MAX_DELAY);
         return result;
     }
-    print_matrix("(HPHt + R)^-1 matrix", &HPHtRi, huart);
+    //print_matrix("(HPHt + R)^-1 matrix", &HPHtRi, huart);
 
     // Compute PHt
     result = arm_mat_mult_f32(&P, &Ht, &PHt);
@@ -872,7 +857,7 @@ arm_status kalman_gain_ground(GroundExtKalmanFilter *ekf, UART_HandleTypeDef *hu
         HAL_UART_Transmit(huart, (uint8_t*)"Error in PHt calculation\r\n", 26, HAL_MAX_DELAY);
         return result;
     }
-    print_matrix("PHt matrix", &PHt, huart);
+    //print_matrix("PHt matrix", &PHt, huart);
 
     // Compute K
     result = arm_mat_mult_f32(&PHt, &HPHtRi, &K_new);
@@ -882,7 +867,7 @@ arm_status kalman_gain_ground(GroundExtKalmanFilter *ekf, UART_HandleTypeDef *hu
     }
     memcpy(ekf->K_n_data, K_new.pData, sizeof(float32_t) * ekf->nx * ekf->nz);
     arm_mat_init_f32(&ekf->K_n, ekf->nx, ekf->nz, ekf->K_n_data);
-    print_matrix("K (Kalman gain) matrix", &ekf->K_n, huart);
+    //print_matrix("K (Kalman gain) matrix", &ekf->K_n, huart);
     HAL_UART_Transmit(huart, (uint8_t*)"Kalman gain calculation complete.\r\n", 35, HAL_MAX_DELAY);
     return result;
 }
@@ -896,7 +881,7 @@ arm_status kalman_gain_ground(GroundExtKalmanFilter *ekf, UART_HandleTypeDef *hu
 void update_state_ground(GroundExtKalmanFilter *ekf, UART_HandleTypeDef *huart) {
     HAL_UART_Transmit(huart, (uint8_t*)"Starting state update...\r\n", 26, HAL_MAX_DELAY);
     
-    print_matrix("Kalman gain K at start of update_state", &ekf->K_n, huart);
+    //print_matrix("Kalman gain K at start of update_state", &ekf->K_n, huart);
     check_for_nan("Kalman gain K at start", &ekf->K_n, huart);
 
     arm_status result = ARM_MATH_SUCCESS;
@@ -906,26 +891,26 @@ void update_state_ground(GroundExtKalmanFilter *ekf, UART_HandleTypeDef *huart) 
     arm_matrix_instance_f32 state_correction_mat = {ekf->nx, 1, state_correction};
 
     // Print H, P_, and R
-    print_matrix("Observation matrix H", &ekf->dhdx, huart);
-    print_matrix("Previous covariance P_", &ekf->P_prev, huart);
-    print_matrix("Measurement noise covariance R", &ekf->R, huart);
+    //print_matrix("Observation matrix H", &ekf->dhdx, huart);
+    //print_matrix("Previous covariance P_", &ekf->P_prev, huart);
+    //print_matrix("Measurement noise covariance R", &ekf->R, huart);
 
     // Print z, h, and x_prev
-    print_matrix("Measurement z", &ekf->z, huart);
-    print_matrix("Observation h", &ekf->h, huart);
-    print_matrix("Previous state x_prev", &ekf->x_prev, huart);
+    //print_matrix("Measurement z", &ekf->z, huart);
+    //print_matrix("Observation h", &ekf->h, huart);
+    //print_matrix("Previous state x_prev", &ekf->x_prev, huart);
 
     // Compute innovation (z - h)
     result |= arm_mat_sub_f32(&ekf->z, &ekf->h, &innovation_mat);
-    print_matrix("Innovation (z - h)", &innovation_mat, huart);
+    //print_matrix("Innovation (z - h)", &innovation_mat, huart);
 
     // Compute state correction K * (z - h)
     result |= arm_mat_mult_f32(&ekf->K_n, &innovation_mat, &state_correction_mat);
-    print_matrix("State correction K*(z - h)", &state_correction_mat, huart);
+    //print_matrix("State correction K*(z - h)", &state_correction_mat, huart);
 
     // Update state: x_n = x_prev + K * (z - h)
     result |= arm_mat_add_f32(&ekf->x_prev, &state_correction_mat, &ekf->x_n);
-    print_matrix("Updated state x_n", &ekf->x_n, huart);
+    //print_matrix("Updated state x_n", &ekf->x_n, huart);
 
     if (result != ARM_MATH_SUCCESS) {
         HAL_UART_Transmit(huart, (uint8_t*)"Error in state update\r\n", 23, HAL_MAX_DELAY);
@@ -933,14 +918,14 @@ void update_state_ground(GroundExtKalmanFilter *ekf, UART_HandleTypeDef *huart) 
         HAL_UART_Transmit(huart, (uint8_t*)"State update completed successfully\r\n", 37, HAL_MAX_DELAY);
     }
 
-    print_matrix("Kalman gain K at end of update_state", &ekf->K_n, huart);
+    //print_matrix("Kalman gain K at end of update_state", &ekf->K_n, huart);
     check_for_nan("Kalman gain K at end", &ekf->K_n, huart);
 }
 
 void update_covariance_ground(GroundExtKalmanFilter *ekf, UART_HandleTypeDef *huart) {
     HAL_UART_Transmit(huart, (uint8_t*)"Starting covariance update...\r\n", 31, HAL_MAX_DELAY);
 
-    print_matrix("Kalman gain K at start of update_covariance", &ekf->K_n, huart);
+    //print_matrix("Kalman gain K at start of update_covariance", &ekf->K_n, huart);
     check_for_nan("Kalman gain K at start", &ekf->K_n, huart);
 
     arm_status result = ARM_MATH_SUCCESS;
@@ -950,37 +935,37 @@ void update_covariance_ground(GroundExtKalmanFilter *ekf, UART_HandleTypeDef *hu
     arm_matrix_instance_f32 temp_mat = {ekf->nx, ekf->nx, temp};
 
     // Print H, P_, and R
-    print_matrix("Observation matrix H", &ekf->dhdx, huart);
-    print_matrix("Previous covariance P_", &ekf->P_prev, huart);
-    print_matrix("Measurement noise covariance R", &ekf->R, huart);
+    //print_matrix("Observation matrix H", &ekf->dhdx, huart);
+    //print_matrix("Previous covariance P_", &ekf->P_prev, huart);
+    //print_matrix("Measurement noise covariance R", &ekf->R, huart);
 
     // Compute KH
     result |= arm_mat_mult_f32(&ekf->K_n, &ekf->dhdx, &I_KH_mat);
-    print_matrix("KH", &I_KH_mat, huart);
+    //print_matrix("KH", &I_KH_mat, huart);
 
     // Compute I - KH
     for (int i = 0; i < ekf->nx * ekf->nx; i++) {
         I_KH[i] = (i % (ekf->nx + 1) == 0) ? 1.0f - I_KH[i] : -I_KH[i];
     }
-    print_matrix("I - KH", &I_KH_mat, huart);
+    //print_matrix("I - KH", &I_KH_mat, huart);
 
     // Compute (I - KH) * P_prev
     result |= arm_mat_mult_f32(&I_KH_mat, &ekf->P_prev, &temp_mat);
-    print_matrix("(I - KH) * P_prev", &temp_mat, huart);
+    //print_matrix("(I - KH) * P_prev", &temp_mat, huart);
 
     // Compute P_n = (I - KH) * P_prev * (I - KH)'
     result |= arm_mat_mult_f32(&temp_mat, &I_KH_mat, &ekf->P_n);
-    print_matrix("P_n before adding KRK'", &ekf->P_n, huart);
+    //print_matrix("P_n before adding KRK'", &ekf->P_n, huart);
 
     // Compute K * R
     float32_t KR[ekf->nx * ekf->nz];
     arm_matrix_instance_f32 KR_mat = {ekf->nx, ekf->nz, KR};
     result |= arm_mat_mult_f32(&ekf->K_n, &ekf->R, &KR_mat);
-    print_matrix("K * R", &KR_mat, huart);
+    //print_matrix("K * R", &KR_mat, huart);
 
     // Compute K * R * K'
     result |= arm_mat_mult_f32(&KR_mat, &(arm_matrix_instance_f32){ekf->nz, ekf->nx, ekf->K_n.pData}, &temp_mat);
-    print_matrix("K * R * K'", &temp_mat, huart);
+    //print_matrix("K * R * K'", &temp_mat, huart);
 
     // Add K * R * K' to P_n
     result |= arm_mat_add_f32(&ekf->P_n, &temp_mat, &ekf->P_n);
@@ -994,7 +979,7 @@ void update_covariance_ground(GroundExtKalmanFilter *ekf, UART_HandleTypeDef *hu
             ekf->P_n.pData[i * ekf->nx + i] = 1e-6;
         }
     }
-    print_matrix("Final P_n", &ekf->P_n, huart);
+    //print_matrix("Final P_n", &ekf->P_n, huart);
 
     if (result != ARM_MATH_SUCCESS) {
         HAL_UART_Transmit(huart, (uint8_t*)"Error in covariance update\r\n", 29, HAL_MAX_DELAY);
@@ -1002,7 +987,7 @@ void update_covariance_ground(GroundExtKalmanFilter *ekf, UART_HandleTypeDef *hu
         HAL_UART_Transmit(huart, (uint8_t*)"Covariance update completed successfully\r\n", 42, HAL_MAX_DELAY);
     }
 
-    print_matrix("Kalman gain K at end of update_covariance", &ekf->K_n, huart);
+    //print_matrix("Kalman gain K at end of update_covariance", &ekf->K_n, huart);
     check_for_nan("Kalman gain K at end", &ekf->K_n, huart);
 }
 
@@ -1016,9 +1001,9 @@ void predict_covariance_ground(GroundExtKalmanFilter *ekf, UART_HandleTypeDef *h
     arm_matrix_instance_f32 F = ekf->dfdx;
     arm_matrix_instance_f32 Q_mat = ekf->Q;
 
-    print_matrix("Current covariance (P)", &P, huart);
-    print_matrix("State transition Jacobian (F)", &F, huart);
-    print_matrix("Process noise covariance (Q)", &Q_mat, huart);
+    //print_matrix("Current covariance (P)", &P, huart);
+    //print_matrix("State transition Jacobian (F)", &F, huart);
+    //print_matrix("Process noise covariance (Q)", &Q_mat, huart);
 
     float32_t Ft_f32[ekf->nx * ekf->nx];
     float32_t FP_f32[ekf->nx * ekf->nx];
@@ -1034,19 +1019,19 @@ void predict_covariance_ground(GroundExtKalmanFilter *ekf, UART_HandleTypeDef *h
 
     // Compute FP
     result |= arm_mat_mult_f32(&F, &P, &FP);
-    print_matrix("FP", &FP, huart);
+    //print_matrix("FP", &FP, huart);
 
     // Compute Ft
     result |= arm_mat_trans_f32(&F, &Ft);
-    print_matrix("F transpose (Ft)", &Ft, huart);
+    //print_matrix("F transpose (Ft)", &Ft, huart);
 
     // Compute FPFt
     result |= arm_mat_mult_f32(&FP, &Ft, &FPFt);
-    print_matrix("FPFt", &FPFt, huart);
+    //print_matrix("FPFt", &FPFt, huart);
 
     // Compute P_next = FPFt + Q
     result |= arm_mat_add_f32(&FPFt, &Q_mat, &P_future);
-    print_matrix("P_future before regularization", &P_future, huart);
+    //print_matrix("P_future before regularization", &P_future, huart);
 
     // Copy P_future data to P_next_data
     memcpy(ekf->P_next_data, P_future.pData, sizeof(float32_t) * ekf->nx * ekf->nx);
@@ -1054,7 +1039,7 @@ void predict_covariance_ground(GroundExtKalmanFilter *ekf, UART_HandleTypeDef *h
     // Reinitialize P_next with the updated data
     arm_mat_init_f32(&ekf->P_next, ekf->nx, ekf->nx, ekf->P_next_data);
 
-    print_matrix("Predicted covariance (P_next)", &ekf->P_next, huart);
+    //print_matrix("Predicted covariance (P_next)", &ekf->P_next, huart);
 
     if (result != ARM_MATH_SUCCESS) {
         HAL_UART_Transmit(huart, (uint8_t*)"Error in covariance prediction calculations\r\n", 45, HAL_MAX_DELAY);
@@ -1079,7 +1064,7 @@ void update_ekf_ground(GroundExtKalmanFilter *ekf, Sensors* sensors) {
     ekf->gps[0] = ekf->gps_flat[0];
     ekf->gps[1] = ekf->gps_flat[1];
     ekf->gps[2] = ekf->gps_flat[2];
-    ekf->accelerometer[0] = 9.81 - (sensors->accel_x - sensors->accel_bias_x);
+    ekf->accelerometer[0] = -9.81 + (sensors->accel_x + sensors->accel_bias_x);
     ekf->accelerometer[1] = sensors->accel_y - sensors->accel_bias_y;
     ekf->accelerometer[2] = sensors->accel_z - sensors->accel_bias_z;
     ekf->gyro[0] = sensors->gyro_x - sensors->gyro_bias_x;

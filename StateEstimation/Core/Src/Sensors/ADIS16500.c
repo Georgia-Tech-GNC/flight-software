@@ -30,9 +30,11 @@ void DWT_Init(void) {
  * @param microseconds time in microseconds to delay
 */
 void delay_us(uint32_t microseconds) {
-    uint32_t startTick = DWT->CYCCNT,
-            delayTicks = microseconds * (SystemCoreClock / 1000000); 
-    while (DWT->CYCCNT - startTick < delayTicks); 
+    uint32_t startTick = DWT->CYCCNT;
+    uint32_t delayTicks = microseconds * (SystemCoreClock / 1000000);
+    
+    // Handle overflow case
+    while ((uint32_t)(DWT->CYCCNT - startTick) < delayTicks);
 }
 
 
@@ -43,6 +45,7 @@ void delay_us(uint32_t microseconds) {
  * @return data in bits, MSB first
 */
 int16_t adis_read_register(struct ADIS_Device *device, uint8_t addr) {
+	delay_us(5);
 	HAL_GPIO_WritePin((GPIO_TypeDef*) device->cs_pin, (uint16_t)device->cs_pin_port, GPIO_PIN_RESET);
 	uint8_t address[2] = {addr, 0x00};
 	HAL_SPI_Transmit((SPI_HandleTypeDef*)device->spi_handle, address, 2, HAL_MAX_DELAY);
@@ -53,6 +56,7 @@ int16_t adis_read_register(struct ADIS_Device *device, uint8_t addr) {
 	uint8_t rxbuf[2];
 	HAL_SPI_TransmitReceive((SPI_HandleTypeDef*)device->spi_handle, txbuf, rxbuf, 2, 150);
 	HAL_GPIO_WritePin((GPIO_TypeDef*) device->cs_pin, (uint16_t)device->cs_pin_port, GPIO_PIN_SET);
+	delay_us(5);
 	return (rxbuf[1] << 8) | (rxbuf[0] & 0xFF);
 }
 

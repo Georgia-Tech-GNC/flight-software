@@ -16,7 +16,7 @@
 #include "States/Ground.h"
 #include "gen_constants.h"
 
-void state_transition_ground(ExtKalmanFilter *gekf) {
+void state_transition_ground(GroundExtKalmanFilter *gekf) {
     // Calculates next state for ground EKF
 
     float32_t f_new_data[10];
@@ -35,7 +35,7 @@ void state_transition_ground(ExtKalmanFilter *gekf) {
     gekf->f = f_new;
 }
 
-void state_transition_jacob_ground(ExtKalmanFilter *gekf) {
+void state_transition_jacob_ground(GroundExtKalmanFilter *gekf) {
     // Calculates state transition jacobian for ground EKF
     float32_t dfdx_new_data[36];
     arm_matrix_instance_f32 dfdx_new;
@@ -43,7 +43,7 @@ void state_transition_jacob_ground(ExtKalmanFilter *gekf) {
     gekf->dfdx = dfdx_new;
 }
 
-void observation_ground(ExtKalmanFilter *gekf) {
+void observation_ground(GroundExtKalmanFilter *gekf) {
     // Calculates state-to-measurement relation for ground EKF
     float32_t h_new_data[6];
 
@@ -54,14 +54,13 @@ void observation_ground(ExtKalmanFilter *gekf) {
     h_new_data[4] = gekf->x_n.pData[4];
     h_new_data[5] = gekf->x_n.pData[5];
 
-
     arm_matrix_instance_f32 h_new = {6, 1, h_new_data};
     gekf->h = h_new;
 
 
 }
 
-void observation_jacob_ground(ExtKalmanFilter *gekf) {
+void observation_jacob_ground(GroundExtKalmanFilter *gekf) {
     float32_t dhdx_new_data[36] = {
         1.0, 0,   0,   0,   0,   0,
         0,   1.0, 0,   0,   0,   0,
@@ -75,7 +74,7 @@ void observation_jacob_ground(ExtKalmanFilter *gekf) {
     gekf->dhdx = dhdx_new;
 }
 
-uint8_t check_gekf_convergence(ExtKalmanFilter *gekf, UART_HandleTypeDef *huart) {
+uint8_t check_gekf_convergence(GroundExtKalmanFilter *gekf, UART_HandleTypeDef *huart) {
     uint8_t converged = 1;
     char debug_buffer[64];
     uint8_t len;
@@ -92,7 +91,7 @@ uint8_t check_gekf_convergence(ExtKalmanFilter *gekf, UART_HandleTypeDef *huart)
 }
 
 
-void print_P_n(ExtKalmanFilter *ekf, UART_HandleTypeDef *huart) {
+void print_P_n(GroundExtKalmanFilter *ekf, UART_HandleTypeDef *huart) {
     char buffer[100];
     int len = snprintf(buffer, sizeof(buffer), "P_n matrix:\r\n");
     HAL_UART_Transmit(huart, (uint8_t*)buffer, len, HAL_MAX_DELAY);
@@ -110,7 +109,7 @@ void print_P_n(ExtKalmanFilter *ekf, UART_HandleTypeDef *huart) {
 }
 
 
-void run_ground(ExtKalmanFilter* gekf, Sensors* sensors, SerialData *serial_data, UART_HandleTypeDef *huart) {
+void run_ground(GroundExtKalmanFilter* gekf, Sensors* sensors, SerialData *serial_data, UART_HandleTypeDef *huart) {
     serial_data->state = GROUND;
     serial_data->pos_x = 0.0;
     serial_data->pos_y = 0.0;
@@ -125,6 +124,13 @@ void run_ground(ExtKalmanFilter* gekf, Sensors* sensors, SerialData *serial_data
     serial_data->wx = 0.0;
     serial_data->wy = 0.0;
     serial_data->wz = 0.0;
+    serial_data->P_1 = gekf->P_n.pData[0 + 0 * 6];
+    serial_data->P_2 = gekf->P_n.pData[1 + 1 * 6];
+    serial_data->P_3 = gekf->P_n.pData[2 + 2 * 6];
+    serial_data->P_4 = gekf->P_n.pData[3 + 3 * 6];
+    serial_data->P_5 = gekf->P_n.pData[4 + 4 * 6];
+    serial_data->P_6 = gekf->P_n.pData[5 + 5 * 6];
+
     make_measurement_ground(gekf, huart);
     GPS2FlatGround(sensors, gekf, 1);
     observation_ground(gekf);

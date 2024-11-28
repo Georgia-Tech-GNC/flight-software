@@ -33,7 +33,7 @@ void run_freefall(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors *se
     //float32_ttheta = rocket_atd->theta;
     //float32_tpsi = rocket_atd->psi;
 
-    serial_data->state = 5; //Idle = 0, Ground = 1, Fast Ascent = 2, Slow Ascent = 3, Freefall = 4, Landed = 5
+    serial_data->state = FREEFALL; //Idle = 0, Ground = 1, Fast Ascent = 2, Slow Ascent = 3, Freefall = 4, Landed = 5
     serial_data->pos_x = ekf->x_n.pData[0];
     serial_data->pos_y = ekf->x_n.pData[2];
     serial_data->pos_z = ekf->x_n.pData[4];

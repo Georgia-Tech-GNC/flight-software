@@ -56,7 +56,6 @@ void update_sensors(Sensors *sensors, UART_HandleTypeDef *huart) {
             sensors->gps_x = gps_data.lat * 1e-7f;
             sensors->gps_y = gps_data.lon * 1e-7f;
             sensors->gps_z = gps_data.h_msl * 1e-3f;
-            
         }
     }
 }

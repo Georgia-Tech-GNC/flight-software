@@ -25,7 +25,6 @@ void run_slow_ascent(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors 
     float32_t gyro_data[3] = {sensors->gyro_x, sensors->gyro_y, sensors->gyro_z};
     run_attitude_estimation(rocket_atd, gyro_data);
     run_ekf(ekf, sensors, huart, 1);
-
     serial_data->state = SLOWASCENT;
     serial_data->pos_x = ekf->x_n.pData[0];
     serial_data->pos_y = ekf->x_n.pData[2];
@@ -50,7 +49,7 @@ void run_slow_ascent(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors 
         state_machine = SLOWASCENT;
         first_iter = 0;
     }
-    if ((ekf->x_n.pData[4] < prev_alt) && (counter % num_loops_before_check == 0)){ 
+    if ((ekf->x_n.pData[0] < prev_alt) && (counter % num_loops_before_check == 0)){ 
         if (activatedTOV) {
             float32_t TOV = global_time_seconds - startTOV;
             if (TOV > 3.0) {

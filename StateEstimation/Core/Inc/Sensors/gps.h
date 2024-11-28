@@ -182,6 +182,71 @@ struct ublox_gnss_nav_pvt {
   uint16_t mag_acc;
 };
 
+// High Precision Position ECEF struct
+struct ublox_gnss_nav_hpposecef {
+    uint32_t version;      // Message version (0x00 for this version)
+    uint32_t itow;         // GPS time of week
+    int32_t ecefX;        // ECEF X coordinate (cm)
+    int32_t ecefY;        // ECEF Y coordinate (cm)
+    int32_t ecefZ;        // ECEF Z coordinate (cm)
+    int8_t ecefXHp;      // High precision component of ECEF X (mm)
+    int8_t ecefYHp;      // High precision component of ECEF Y (mm)
+    int8_t ecefZHp;      // High precision component of ECEF Z (mm)
+    uint8_t reserved1;    // Reserved
+    uint32_t pAcc;        // Position Accuracy Estimate (0.1 mm)
+};
+
+// High Precision Position, Velocity and Time struct
+struct ublox_gnss_nav_hppvt {
+    uint32_t itow;         // GPS time of week
+    uint16_t year;         // Year (UTC)
+    uint8_t month;        // Month (UTC)
+    uint8_t day;          // Day of month (UTC)
+    uint8_t hour;         // Hour of day (UTC)
+    uint8_t min;          // Minute of hour (UTC)
+    uint8_t sec;          // Seconds of minute (UTC)
+    uint8_t valid;        // Valid flags
+    uint32_t tAcc;        // Time accuracy estimate (UTC)
+    int32_t nano;         // Fraction of second (ns)
+    uint8_t fixType;      // GNSS fix type
+    uint8_t flags;        // Fix status flags
+    uint8_t flags2;       // Additional flags
+    uint8_t numSV;        // Number of satellites used
+    int32_t lon;          // Longitude (deg * 1e-7)
+    int32_t lat;          // Latitude (deg * 1e-7)
+    int32_t height;       // Height above ellipsoid (mm)
+    int32_t hMSL;         // Height above mean sea level (mm)
+    int8_t lonHp;        // High precision component of longitude (deg * 1e-9)
+    int8_t latHp;        // High precision component of latitude (deg * 1e-9)
+    int8_t heightHp;     // High precision component of height (0.1 mm)
+    int8_t hMSLHp;       // High precision component of hMSL (0.1 mm)
+    uint32_t hAcc;        // Horizontal accuracy (0.1 mm)
+    uint32_t vAcc;        // Vertical accuracy (0.1 mm)
+    int32_t velN;         // NED north velocity (mm/s)
+    int32_t velE;         // NED east velocity (mm/s)
+    int32_t velD;         // NED down velocity (mm/s)
+    int32_t gSpeed;       // Ground Speed (mm/s)
+    int32_t headMot;      // Heading of motion (deg * 1e-5)
+    uint32_t sAcc;        // Speed accuracy (mm/s)
+    uint32_t headAcc;     // Heading accuracy (deg * 1e-5)
+    uint16_t pDOP;        // Position DOP * 0.01
+    uint8_t flags3;       // Additional flags
+    uint8_t reserved1[5]; // Reserved
+    int32_t headVeh;      // Heading of vehicle (deg * 1e-5)
+    int16_t magDec;       // Magnetic declination (deg * 1e-2)
+    uint16_t magAcc;      // Magnetic declination accuracy (deg * 1e-2)
+};
+
+#define UBLOX_GNSS_DEC_UBX_NAV_HPPOSECEF_BODY_LENGTH 28
+#define UBLOX_GNSS_DEC_UBX_NAV_HPPVT_BODY_LENGTH     68
+
+void ublox_gnss_dec_ubx_nav_hpposecef(uint8_t *msg, uint16_t msg_length_bytes,
+                                     struct ublox_gnss_nav_hpposecef *nav_hpposecef);
+
+void ublox_gnss_dec_ubx_nav_hppvt(uint8_t *msg, uint16_t msg_length_bytes,
+                                 struct ublox_gnss_nav_hppvt *nav_hppvt);
+
+
 struct ublox_gnss_nav_sat {
   uint32_t itow;
   uint8_t version;

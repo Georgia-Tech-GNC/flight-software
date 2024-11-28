@@ -37,8 +37,6 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-static uint32_t total_bytes_received = 0;
-static uint32_t last_bytes_received = 0;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -132,9 +130,7 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  char uart_buffer[128];
   uint8_t tmp;
-  int len;
   launched = 1;
   // Print initial message
   while(HAL_TIMEOUT != HAL_UART_Receive(&huart2, &tmp, 1, 10));
@@ -228,6 +224,9 @@ int main(void)
         }
         case LANDED: {
           serial_data.state = LANDED;
+          serial_data.vel_x = 0.0;
+          serial_data.vel_y = 0.0;
+          serial_data.vel_z = 0.0;
           HAL_UART_Transmit(&huart3, "Landed\r\n", 
                   sizeof("Landed\r\n"), HAL_MAX_DELAY);
           break;
@@ -239,9 +238,8 @@ int main(void)
       serial_data.t =  (global_time - launch_time_stamp) / 1000.0f;
     }
     log_data(&serial_data, &sensors, &huart2);
-    global_time_step = (float32_t)(global_time - prev_global_time) / 1000.0f;
     gekf.time_step = 0.05f;
-    fekf.time_step = 0.05f;
+    fekf.time_step = 0.06f;
     rocket_atd.time_step = 0.1f;
     update_ekf(&fekf, &sensors);
     if (state_machine > 1) {
@@ -253,7 +251,6 @@ int main(void)
         HAL_UART_Transmit(&huart3, (uint8_t*)debug, len, HAL_MAX_DELAY);
         print_rocket_attitude(&rocket_atd, &huart3); 
     }
-    prev_global_time = global_time;
     HAL_Delay(40);
   }
   /* USER CODE END 3 */
@@ -797,7 +794,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
     char debug[128];
     int len;
-    
     if (huart->Instance == UART4) {
         len = sprintf(debug, "UART4 Error 0x%lX\r\n", huart->ErrorCode);
         HAL_UART_Transmit(&huart3, (uint8_t*)debug, len, HAL_MAX_DELAY);
@@ -808,7 +804,6 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
 
 void print_rocket_attitude(rocket_attitude *rocket_atd, UART_HandleTypeDef *huart) {
     char buf[200];
-    
     // Print quaternion
     snprintf(buf, sizeof(buf), "Quaternion (s,x,y,z): %.3f, %.3f, %.3f, %.3f\r\n", 
              rocket_atd->q_current_s,

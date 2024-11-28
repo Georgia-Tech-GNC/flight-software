@@ -383,6 +383,28 @@ void ublox_gnss_dec_ubx_nav_posecef(
 
   memcpy(nav_posecef, &tmp, sizeof(tmp));
 }
+void ublox_gnss_dec_ubx_nav_hpposecef(uint8_t *msg, uint16_t msg_length_bytes,
+                                     struct ublox_gnss_nav_hpposecef *nav_hpposecef) {
+    if (msg_length_bytes != UBLOX_GNSS_DEC_UBX_NAV_HPPOSECEF_BODY_LENGTH) {
+        return;
+    }
+
+    struct ublox_gnss_nav_hpposecef tmp;
+
+    tmp.version = (uint32_t)*(msg);
+    tmp.itow = ublox_protocol_u32_decode(msg + 4);
+    tmp.ecefX = (int32_t)ublox_protocol_u32_decode(msg + 8);
+    tmp.ecefY = (int32_t)ublox_protocol_u32_decode(msg + 12);
+    tmp.ecefZ = (int32_t)ublox_protocol_u32_decode(msg + 16);
+    tmp.ecefXHp = (int8_t)*(msg + 20);
+    tmp.ecefYHp = (int8_t)*(msg + 21);
+    tmp.ecefZHp = (int8_t)*(msg + 22);
+    tmp.reserved1 = (uint8_t)*(msg + 23);
+    tmp.pAcc = ublox_protocol_u32_decode(msg + 24);
+
+    memcpy(nav_hpposecef, &tmp, sizeof(tmp));
+}
+
 
 void ublox_gnss_dec_ubx_nav_pvt(uint8_t *msg, uint16_t msg_length_bytes,
                                 struct ublox_gnss_nav_pvt *nav_pvt) {
@@ -447,6 +469,54 @@ void ublox_gnss_dec_ubx_nav_posllh(uint8_t *msg, uint16_t msg_length_bytes,
   tmp.v_acc = ublox_protocol_u32_decode(msg + 24);
 
   memcpy(nav_posllh, &tmp, sizeof(tmp));
+}
+
+void ublox_gnss_dec_ubx_nav_hppvt(uint8_t *msg, uint16_t msg_length_bytes,
+                                 struct ublox_gnss_nav_hppvt *nav_hppvt) {
+    if (msg_length_bytes != UBLOX_GNSS_DEC_UBX_NAV_HPPVT_BODY_LENGTH) {
+        return;
+    }
+
+    struct ublox_gnss_nav_hppvt tmp;
+
+    tmp.itow = ublox_protocol_u32_decode(msg);
+    tmp.year = ublox_protocol_u16_decode(msg + 4);
+    tmp.month = (uint8_t)*(msg + 6);
+    tmp.day = (uint8_t)*(msg + 7);
+    tmp.hour = (uint8_t)*(msg + 8);
+    tmp.min = (uint8_t)*(msg + 9);
+    tmp.sec = (uint8_t)*(msg + 10);
+    tmp.valid = (uint8_t)*(msg + 11);
+    tmp.tAcc = ublox_protocol_u32_decode(msg + 12);
+    tmp.nano = (int32_t)ublox_protocol_u32_decode(msg + 16);
+    tmp.fixType = (uint8_t)*(msg + 20);
+    tmp.flags = (uint8_t)*(msg + 21);
+    tmp.flags2 = (uint8_t)*(msg + 22);
+    tmp.numSV = (uint8_t)*(msg + 23);
+    tmp.lon = (int32_t)ublox_protocol_u32_decode(msg + 24);
+    tmp.lat = (int32_t)ublox_protocol_u32_decode(msg + 28);
+    tmp.height = (int32_t)ublox_protocol_u32_decode(msg + 32);
+    tmp.hMSL = (int32_t)ublox_protocol_u32_decode(msg + 36);
+    tmp.lonHp = (int8_t)*(msg + 40);
+    tmp.latHp = (int8_t)*(msg + 41);
+    tmp.heightHp = (int8_t)*(msg + 42);
+    tmp.hMSLHp = (int8_t)*(msg + 43);
+    tmp.hAcc = ublox_protocol_u32_decode(msg + 44);
+    tmp.vAcc = ublox_protocol_u32_decode(msg + 48);
+    tmp.velN = (int32_t)ublox_protocol_u32_decode(msg + 52);
+    tmp.velE = (int32_t)ublox_protocol_u32_decode(msg + 56);
+    tmp.velD = (int32_t)ublox_protocol_u32_decode(msg + 60);
+    tmp.gSpeed = (int32_t)ublox_protocol_u32_decode(msg + 64);
+    tmp.headMot = (int32_t)ublox_protocol_u32_decode(msg + 68);
+    tmp.sAcc = ublox_protocol_u32_decode(msg + 72);
+    tmp.headAcc = ublox_protocol_u32_decode(msg + 76);
+    tmp.pDOP = ublox_protocol_u16_decode(msg + 80);
+    tmp.flags3 = (uint8_t)*(msg + 82);
+    tmp.headVeh = (int32_t)ublox_protocol_u32_decode(msg + 88);
+    tmp.magDec = (int16_t)ublox_protocol_u16_decode(msg + 92);
+    tmp.magAcc = ublox_protocol_u16_decode(msg + 94);
+
+    memcpy(nav_hppvt, &tmp, sizeof(tmp));
 }
 
 __attribute__((weak)) enum ublox_gnss_err

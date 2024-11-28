@@ -50,12 +50,25 @@ void update_sensors(Sensors *sensors, UART_HandleTypeDef *huart) {
         uint8_t cls;
         uint8_t id;
         ublox_protocol_decode(tmp2, bytes_read, &cls, &id, msg, sizeof(msg), &msg_len, &rem);
-        if (cls == 0x01 && id == 0x07) {
-            struct ublox_gnss_nav_pvt gps_data;
-            ublox_gnss_dec_ubx_nav_pvt(msg, msg_len, &gps_data);
-            sensors->gps_x = gps_data.lat * 1e-7f;
-            sensors->gps_y = gps_data.lon * 1e-7f;
-            sensors->gps_z = gps_data.h_msl * 1e-3f;
+        if (cls == 0x01) { 
+            switch (id) {
+                case 0x13: { 
+                    struct ublox_gnss_nav_hpposecef ecef_data;
+                    ublox_gnss_dec_ubx_nav_hpposecef(msg, msg_len, &ecef_data);
+                    sensors->gps_offset_x = ecef_data.ecefX * 0.1 + ecef_data.ecefXHp * 0.0001;
+                    sensors->gps_offset_y = ecef_data.ecefY * 0.1 + ecef_data.ecefYHp * 0.0001;
+                    sensors->gps_offset_z = ecef_data.ecefZ * 0.1 + ecef_data.ecefZHp * 0.0001;
+                    break;
+                }
+                case 0x28: {
+                    struct ublox_gnss_nav_hppvt hppvt_data;
+                    ublox_gnss_dec_ubx_nav_hppvt(msg, msg_len, &hppvt_data);
+                    sensors->gps_x = hppvt_data.lat * 1e-7 + hppvt_data.latHp * 1e-9;
+                    sensors->gps_y = hppvt_data.lon * 1e-7 + hppvt_data.lonHp * 1e-9;
+                    sensors->gps_z = hppvt_data.height * 1e-3 + hppvt_data.heightHp * 1e-4;
+                    break;
+                }
+            }
         }
     }
 }
@@ -114,7 +127,7 @@ void sensors_init(Sensors *sensors) {
   cfg[8].value = 38400;  
 
   
-  ublox_gnss_cfg_val_set_list(&gps, cfg, 9, 0, 1);
+  ublox_gnss_cfg_val_set_list(&gps, cfg, 10, 0, 1);
   HAL_UARTEx_ReceiveToIdle_IT(&huart4, uart4_rx_dma_buffer, sizeof(uart4_rx_dma_buffer));
   ring_buffer_init(&uart4_rx_rb, uart4_rx_rb_data, sizeof(uart4_rx_rb_data));
   memset(sensors, 0, sizeof(Sensors));

@@ -143,7 +143,7 @@ void run_ground(GroundExtKalmanFilter* gekf, Sensors* sensors, SerialData *seria
     //state_transition_jacob_ground(gekf);
     //predict_state(gekf, huart);
     predict_covariance_ground(gekf, huart);
-    acknowledge_time_passed(gekf);
+    acknowledge_time_passed_ground(gekf);
     if (check_gekf_convergence(gekf, huart)) {
         sensors->accel_bias_x = gekf->x_n.pData[0];
         sensors->accel_bias_y = gekf->x_n.pData[1];

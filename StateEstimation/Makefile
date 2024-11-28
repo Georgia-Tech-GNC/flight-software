@@ -168,7 +168,6 @@ AS_INCLUDES =
 C_INCLUDES =  \
 -ICore/Inc \
 -ICore/Inc/Sensors \
--ICore/Inc/Configuration \
 -ICore/Inc/StateEstimation \
 -ICore/Inc/StateEstimation/Dependencies \
 -IDrivers/STM32H7xx_HAL_Driver/Inc \

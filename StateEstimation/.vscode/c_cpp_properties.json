@@ -4,7 +4,6 @@
       "name": "STM32",
       "includePath": [
         "Core/Inc",
-        "Core/Inc/Configuration",
         "Core/Inc/Sensors",
         "Core/Inc/StateEstimation",
         "Core/Inc/StateEstimation/Dependencies",

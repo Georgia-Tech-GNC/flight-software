@@ -76,6 +76,7 @@ static void MX_USART2_UART_Init(void);
 static void MX_USB_OTG_HS_PCD_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_UART4_Init(void);
+void print_rocket_attitude(rocket_attitude *rocket_atd, UART_HandleTypeDef *huart);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */

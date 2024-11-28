@@ -242,7 +242,10 @@ $(BUILD_DIR):
 #######################################
 clean:
 	-rm -fR $(BUILD_DIR)
-  
+	
+flash:
+	openocd -f ./openocd.cfg -c "program build/MCU-h725zgt6.elf verify reset exit"
+
 #######################################
 # dependencies
 #######################################

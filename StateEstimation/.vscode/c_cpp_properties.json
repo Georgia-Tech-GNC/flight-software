@@ -18,7 +18,7 @@
         "STM32H723xx",
         "USE_HAL_DRIVER"
       ],
-      "compilerPath": "/home/kanav/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.3.1-1.1.1/.content/bin/arm-none-eabi-gcc"
+      "compilerPath": "/usr/bin/arm-none-eabi-gcc"
     }
   ],
   "version": 4

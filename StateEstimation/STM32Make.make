@@ -89,6 +89,7 @@ Core/Src/StateEstimation/States/FastAscent.c \
 Core/Src/StateEstimation/States/FreeFall.c \
 Core/Src/StateEstimation/States/Ground.c \
 Core/Src/StateEstimation/States/Idle.c \
+Core/Src/StateEstimation/States/Landed.c \
 Core/Src/StateEstimation/States/SlowAscent.c \
 Core/Src/main.c \
 Core/Src/stm32h7xx_hal_msp.c \

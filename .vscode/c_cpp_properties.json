@@ -1,0 +1,21 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/StateEstimation/Drivers/CMSIS/DSP/Include",
+                "${workspaceFolder}/StateEstimation/Core/Inc",
+                "${workspaceFolder}/StateEstimation/Drivers/CMSIS/Include",
+                "${workspaceFolder}/StateEstimation/Core/Inc"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "compilerPath": "C:\\MinGW\\bin/gcc.exe"
+        }
+    ],
+    "version": 4
+}

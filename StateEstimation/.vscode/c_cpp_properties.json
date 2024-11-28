@@ -4,6 +4,12 @@
       "name": "STM32",
       "includePath": [
         "Core/Inc",
+        "Core/Inc/Configuration",
+        "Core/Inc/Sensors",
+        "Core/Inc/StateEstimation",
+        "Core/Inc/StateEstimation/Dependencies",
+        "Core/Inc/StateEstimation/States",
+        "Drivers/CMSIS/DSP/Include",
         "Drivers/CMSIS/Device/ST/STM32H7xx/Include",
         "Drivers/CMSIS/Include",
         "Drivers/STM32H7xx_HAL_Driver/Inc",
@@ -13,7 +19,7 @@
         "STM32H723xx",
         "USE_HAL_DRIVER"
       ],
-      "compilerPath": "/usr/bin/arm-none-eabi-gcc"
+      "compilerPath": "/home/kanav/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.3.1-1.1.1/.content/bin/arm-none-eabi-gcc"
     }
   ],
   "version": 4

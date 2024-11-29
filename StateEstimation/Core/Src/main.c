@@ -224,6 +224,7 @@ int main(void)
         }
         case LANDED: {
           serial_data.state = LANDED;
+          serial_data.pos_x = 0.0;
           serial_data.vel_x = 0.0;
           serial_data.vel_y = 0.0;
           serial_data.vel_z = 0.0;

@@ -42,7 +42,8 @@ Core/Src/StateEstimation/States/SlowAscent.c \
 Core/Src/StateEstimation/States/Idle.c \
 Core/Src/StateEstimation/States/Ground.c \
 Core/Src/StateEstimation/Dependencies/data_handling.c \
-Core/Src/StateEstimation/Dependencies/ekf.c \
+Core/Src/StateEstimation/Dependencies/ground_ekf.c \
+Core/Src/StateEstimation/Dependencies/flight_ekf.c \
 Core/Src/StateEstimation/Dependencies/attitude.c \
 Core/Src/StateEstimation/Dependencies/state_est_helpers.c \
 Core/Src/Sensors/ring_buffer.c \

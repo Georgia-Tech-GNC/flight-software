@@ -2,7 +2,7 @@
 #define __GEN_CONSTANTS_H_
 
 #include "data_handling.h"
-#include "ekf.h"
+#include "flight_ekf.h"
 #include "attitude.h"
 
 extern uint8_t gekf_initialize;

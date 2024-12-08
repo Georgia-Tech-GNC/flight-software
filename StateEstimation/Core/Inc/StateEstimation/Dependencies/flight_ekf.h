@@ -14,6 +14,7 @@
 #include "arm_math.h"
 #include "sensors.h"
 #include "gen_constants.h"
+#include "attitude.h"
 #include <sys/time.h>
 #include "stm32h7xx_hal.h"
 #include <stdbool.h>

@@ -26,8 +26,8 @@ void initialize_ekf(ExtKalmanFilter *ekf, UART_HandleTypeDef *huart, Sensors *se
 
     ekf->time_step = 0.02;
 
-    ekf->nx = num_states;
-    ekf->nu = num_inputs;
+    ekf->nx = 6;
+    ekf->nu = 0;
     ekf->nz = nz;
 
     //arm_mat_init_f32(&ekf->G, ekf->nu, ekf->nu, G_f32);
@@ -395,9 +395,9 @@ void state_transition_function(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd
                                                   {(2*(q1*q2 + q0*q3)), (2*(q0*q0 + q2*q2) - 1), (2*(q2*q3 - q0*q1))},
                                                   {(2*(q1*q3 - q0*q2)), (2*(q2*q3 + q0*q1)), (2*(q0*q0 + q3*q3) - 1)}};
 
-    float32_t vel_body_x = ekf->x_n[1];
-    float32_t vel_body_y = ekf->x_n[3];
-    float32_t vel_body_z = ekf->x_n[5];
+    float32_t vel_body_x = ekf->x_n.pData[1];
+    float32_t vel_body_y = ekf->x_n.pData[3];
+    float32_t vel_body_z = ekf->x_n.pData[5];
 
     float32_t vel_flat_x = q_rot_mat[0][0]*vel_body_x + q_rot_mat[0][1]*vel_body_y + q_rot_mat[0][2]*vel_body_z;
     float32_t vel_flat_y = q_rot_mat[1][0]*vel_body_x + q_rot_mat[1][1]*vel_body_y + q_rot_mat[1][2]*vel_body_z;

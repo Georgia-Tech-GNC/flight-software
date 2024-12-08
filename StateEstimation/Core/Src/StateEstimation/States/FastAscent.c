@@ -17,14 +17,14 @@
  * @return
  * @note Transmitting data to the main MCU and logging data are not unique fast ascent operations so are not included here.
 */
-void run_fast_ascent(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors *sensors, SerialData *serial_data, UART_HandleTypeDef *huart){
+void run_fast_ascent(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors *sensors, SerialData *serial_data, UART_HandleTypeDef *huart) {
 
     if (first_iter) {
         fast_ascent_start_time = (float32_t) (global_time) / 1000.0f;
         first_iter = 0;
     }
     run_attitude_estimation(rocket_atd, ekf->gyro);
-    run_ekf(ekf, sensors, huart, 1);
+    run_ekf(ekf, rocket_atd, sensors, huart, 1);
     serial_data->state = FASTASCENT;
     serial_data->pos_x = ekf->x_n.pData[0];
     serial_data->pos_y = ekf->x_n.pData[2];
@@ -47,5 +47,3 @@ void run_fast_ascent(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors 
         first_iter = 0;
     }
 }
-
-

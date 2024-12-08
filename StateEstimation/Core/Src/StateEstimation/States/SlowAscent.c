@@ -24,7 +24,7 @@ void run_slow_ascent(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors 
     }
     float32_t gyro_data[3] = {sensors->gyro_x, sensors->gyro_y, sensors->gyro_z};
     run_attitude_estimation(rocket_atd, gyro_data);
-    run_ekf(ekf, sensors, huart, 1);
+    run_ekf(ekf, rocket_atd, sensors, huart, 1);
     serial_data->state = SLOWASCENT;
     serial_data->pos_x = ekf->x_n.pData[0];
     serial_data->pos_y = ekf->x_n.pData[2];

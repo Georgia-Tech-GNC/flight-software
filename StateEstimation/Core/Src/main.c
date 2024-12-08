@@ -241,7 +241,7 @@ int main(void)
     gekf.time_step = 0.05f;
     fekf.time_step = 0.06f;
     rocket_atd.time_step = 0.1f;
-    update_ekf(&fekf, &sensors);
+    update_ekf(&fekf, &rocket_atd, &sensors);
     if (state_machine > 1) {
         char debug[256];
         int len = sprintf(debug, "Sensors:\r\nGPS (x,y,z): %.3f, %.3f, %.3f\r\nAccel (x,y,z): %.3f, %.3f, %.3f\r\nGyro (x,y,z): %.3f, %.3f, %.3f\r\n",

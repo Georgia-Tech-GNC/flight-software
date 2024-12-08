@@ -83,7 +83,8 @@ Core/Src/Sensors/ring_buffer.c \
 Core/Src/Sensors/sensors.c \
 Core/Src/StateEstimation/Dependencies/attitude.c \
 Core/Src/StateEstimation/Dependencies/data_handling.c \
-Core/Src/StateEstimation/Dependencies/ekf.c \
+Core/Src/StateEstimation/Dependencies/flight_ekf.c \
+Core/Src/StateEstimation/Dependencies/ground_ekf.c \
 Core/Src/StateEstimation/Dependencies/state_est_helpers.c \
 Core/Src/StateEstimation/States/FastAscent.c \
 Core/Src/StateEstimation/States/FreeFall.c \

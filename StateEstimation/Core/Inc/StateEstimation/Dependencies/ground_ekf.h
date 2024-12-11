@@ -22,7 +22,6 @@
 
 #define MAX_EKF_DIM 6
 #define MAX_EKF_MEAS 6 
-#define MAX_FLIGHT_MEAS 3
 
 
 typedef struct {

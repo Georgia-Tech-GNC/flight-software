@@ -50,7 +50,7 @@ void initialize_ekf(ExtKalmanFilter *ekf, UART_HandleTypeDef *huart, Sensors *se
 
     ekf->c[0] = -0.3; //vector from the IMU to the center of mass
     ekf->c[1] = 0.0;
-    ekf-> c[2] = 0.0;
+    ekf->c[2] = 0.0;
     //TODO: Confirm with structures that the above is correct in terms of IMU placement in the rocket.
 
     ekf->gps[0] = 0.0;
@@ -74,10 +74,6 @@ void initialize_ekf(ExtKalmanFilter *ekf, UART_HandleTypeDef *huart, Sensors *se
     ekf->magneto[2] = 0.0;
 
     ekf->barometer = 0.0;
-
-    ekf->gps_origin[0] = sensors->gps_x;
-    ekf->gps_origin[1] = sensors->gps_y;
-    ekf->gps_origin[2] = sensors->gps_z;
     ekf->accel_offset[0] = sensors->accel_x;
     ekf->accel_offset[1] = sensors->accel_y;
     ekf->accel_offset[2] = sensors->accel_z;

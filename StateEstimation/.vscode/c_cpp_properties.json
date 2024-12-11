@@ -4,6 +4,7 @@
       "name": "STM32",
       "includePath": [
         "Core/Inc",
+        "Core/Inc/Protocols",
         "Core/Inc/Sensors",
         "Core/Inc/StateEstimation",
         "Core/Inc/StateEstimation/Dependencies",
@@ -16,7 +17,8 @@
       ],
       "defines": [
         "STM32H723xx",
-        "USE_HAL_DRIVER"
+        "USE_HAL_DRIVER",
+        "USE_PWR_LDO_SUPPLY"
       ],
       "compilerPath": "/usr/bin/arm-none-eabi-gcc"
     }

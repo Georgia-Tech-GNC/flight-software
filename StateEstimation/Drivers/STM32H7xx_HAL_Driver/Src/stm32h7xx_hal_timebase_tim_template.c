@@ -157,14 +157,15 @@ void HAL_ResumeTick(void)
   * @param  htim TIM handle
   * @retval None
   */
+
+/*
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-  /* Prevent unused argument(s) compilation warning */
   UNUSED(htim);
 
   HAL_IncTick();
 }
-
+*/
 /**
   * @brief  This function handles TIM interrupt request.
   * @param  None

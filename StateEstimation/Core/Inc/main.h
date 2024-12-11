@@ -32,11 +32,26 @@ extern "C" {
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+#include "States/Idle.h"
+#include "States/Ground.h"
+#include "States/FastAscent.h"
+#include "States/SlowAscent.h"
+#include "States/FreeFall.h"
+
+#include "uart_ex.h"
+#include "state_est_helpers.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
-
+extern SerialData serial_data;
+extern Sensors sensors;
+extern GroundExtKalmanFilter gekf;
+extern ExtKalmanFilter fekf;
+extern rocket_attitude rocket_atd;
+extern uint8_t signal_received[2];
+extern float32_t launch_time_stamp;
+extern uint8_t launched;
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/

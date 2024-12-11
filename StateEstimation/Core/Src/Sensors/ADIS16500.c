@@ -13,29 +13,6 @@
 #include "ADIS16500.h"
 #include "arm_math.h"
 
-/**
- * @brief initializes DWT for advanced clock control
- * 
-*/
-void DWT_Init(void) {
-    if (!(DWT->CTRL & DWT_CTRL_CYCCNTENA_Msk)) {
-        CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
-        DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk; 
-        DWT->CYCCNT = 0; 
-    }
-}
-
-/**
- * @brief delays system thread by time in microseconds
- * @param microseconds time in microseconds to delay
-*/
-void delay_us(uint32_t microseconds) {
-    uint32_t startTick = DWT->CYCCNT;
-    uint32_t delayTicks = microseconds * (SystemCoreClock / 1000000);
-    
-    // Handle overflow case
-    while ((uint32_t)(DWT->CYCCNT - startTick) < delayTicks);
-}
 
 
 /**

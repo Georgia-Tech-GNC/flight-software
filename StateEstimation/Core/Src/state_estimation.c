@@ -9,7 +9,7 @@ static volatile uint32_t last_ekf_dwt = 0;
 static volatile uint32_t last_attitude_dwt = 0;
 
 /**
- * @brief Callback for timers 
+ * @brief Callback for timers for rocket attitude and state estimation
  */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {

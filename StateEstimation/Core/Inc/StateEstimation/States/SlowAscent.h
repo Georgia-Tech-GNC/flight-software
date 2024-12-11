@@ -17,7 +17,7 @@
 #include <string.h>
 #include <sys/time.h>
 
-#include "ekf.h"
+#include "flight_ekf.h"
 #include "attitude.h"
 #include "data_handling.h"
 

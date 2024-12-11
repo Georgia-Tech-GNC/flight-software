@@ -23,11 +23,11 @@ void run_freefall(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors *se
         first_iter = 0;
     }
 
-    float32_t GPS_data[3] = {sensors->gps_x, sensors->gps_y, sensors->gps_z};
-    float32_t accel_data[3] = {sensors->accel_x, sensors->accel_y, sensors->accel_z};
+    //float32_t GPS_data[3] = {sensors->gps_x, sensors->gps_y, sensors->gps_z};
+    //float32_t accel_data[3] = {sensors->accel_x, sensors->accel_y, sensors->accel_z};
     float32_t gyro_data[3] = {sensors->gyro_x, sensors->gyro_y, sensors->gyro_z};
     run_attitude_estimation(rocket_atd, gyro_data);
-    run_ekf(ekf, sensors, huart, 1);
+    run_ekf(ekf, rocket_atd, sensors, huart, 1);
 
     //float32_tphi = rocket_atd->phi;
     //float32_ttheta = rocket_atd->theta;

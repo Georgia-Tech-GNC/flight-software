@@ -8,18 +8,11 @@
 #include "LIS3MDL.h"
 #include "ring_buffer.h"
 
-extern I2C_HandleTypeDef hi2c4;
-
-extern SPI_HandleTypeDef hspi2;
-extern SPI_HandleTypeDef hspi4;
-extern SPI_HandleTypeDef hspi6;
-
-extern UART_HandleTypeDef huart4;
-extern UART_HandleTypeDef huart2;
-extern UART_HandleTypeDef huart3;
-extern DMA_HandleTypeDef hdma_usart3_rx;
-
-extern PCD_HandleTypeDef hpcd_USB_OTG_HS;
+#include "spi.h"
+#include "uart.h"
+#include "i2c.h"
+#include "system.h"
+#include "DWT.h"
 
 extern struct ADIS_Device imu_device;
 extern struct lis3mdl_device mag_device;
@@ -56,7 +49,10 @@ typedef struct {
   float32_t gps_offset_z;
 } Sensors;
 
+
+void IO_init(void);
 void update_sensors(Sensors *sensors, UART_HandleTypeDef *huart);
 void sensors_init(Sensors *sensors);
+
 
 #endif

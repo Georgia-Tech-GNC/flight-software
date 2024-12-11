@@ -7,6 +7,9 @@ SPI_HandleTypeDef hspi2;
 SPI_HandleTypeDef hspi4;
 SPI_HandleTypeDef hspi6;
 
+TIM_HandleTypeDef htim6;
+TIM_HandleTypeDef htim7;
+
 UART_HandleTypeDef huart4;
 UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart3;
@@ -26,10 +29,16 @@ struct ring_buffer usart3_rx_rb;
 uint8_t uart4_rx_rb_data[512];
 struct ublox_gnss_cfg_val cfg[10];
 
+
+/**
+ * @brief Updates sensor readings from all onboard sensors
+ * @param sensors Pointer to Sensors structure to store updated readings
+ * @param huart UART handle for debug output
+ */
 void update_sensors(Sensors *sensors, UART_HandleTypeDef *huart) {
     float32_t accel_readings[3];
     float32_t gyro_readings[3];
-    double mag_readings[3];
+    //double mag_readings[3];
     adis_read_accel(&imu_device, accel_readings);
     sensors->accel_x = -1.0 * accel_readings[0];
     sensors->accel_y = -1.0 * accel_readings[1];
@@ -73,6 +82,11 @@ void update_sensors(Sensors *sensors, UART_HandleTypeDef *huart) {
     }
 }
 
+/**
+ * @brief Initializes all onboard sensors and communication interfaces
+ * @param sensors Pointer to Sensors structure to initialize
+ * @details Initializes IMU, magnetometer, barometer, GPS, and communication interfaces
+ */
 void sensors_init(Sensors *sensors) {
   imu_device.spi_handle = &hspi4;
   imu_device.cs_pin = GPIOE;
@@ -126,9 +140,31 @@ void sensors_init(Sensors *sensors) {
   cfg[8].key_id = 0x40520001;
   cfg[8].value = 38400;  
 
-  
   ublox_gnss_cfg_val_set_list(&gps, cfg, 10, 0, 1);
   HAL_UARTEx_ReceiveToIdle_IT(&huart4, uart4_rx_dma_buffer, sizeof(uart4_rx_dma_buffer));
   ring_buffer_init(&uart4_rx_rb, uart4_rx_rb_data, sizeof(uart4_rx_rb_data));
   memset(sensors, 0, sizeof(Sensors));
+}
+
+
+/**
+ * @brief Initializes all IO peripherals
+ * @details Initializes system clock, DMA, I2C, SPI, UART, USB, timers, and GPIO
+ */
+void IO_init(void) {
+  HAL_Init();
+  SystemClock_Config();
+  DWT_Init();
+  MX_DMA_Init();
+  MX_I2C4_Init();
+  MX_SPI2_Init();
+  MX_SPI4_Init();
+  MX_SPI6_Init();
+  MX_USART2_UART_Init();
+  MX_USB_OTG_HS_PCD_Init();
+  MX_USART3_UART_Init();
+  MX_UART4_Init();
+  MX_TIM6_Init();
+  MX_TIM7_Init();
+  MX_GPIO_Init();
 }

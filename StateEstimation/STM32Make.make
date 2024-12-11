@@ -75,6 +75,12 @@ endif
 ######################################
 # C sources
 C_SOURCES =  \
+Core/Src/Protocols/DWT.c \
+Core/Src/Protocols/i2c.c \
+Core/Src/Protocols/spi.c \
+Core/Src/Protocols/system.c \
+Core/Src/Protocols/uart.c \
+Core/Src/Protocols/uart_ex.c \
 Core/Src/Sensors/ADIS16500.c \
 Core/Src/Sensors/LIS3MDL.c \
 Core/Src/Sensors/MS5607.c \
@@ -83,7 +89,8 @@ Core/Src/Sensors/ring_buffer.c \
 Core/Src/Sensors/sensors.c \
 Core/Src/StateEstimation/Dependencies/attitude.c \
 Core/Src/StateEstimation/Dependencies/data_handling.c \
-Core/Src/StateEstimation/Dependencies/ekf.c \
+Core/Src/StateEstimation/Dependencies/flight_ekf.c \
+Core/Src/StateEstimation/Dependencies/ground_ekf.c \
 Core/Src/StateEstimation/Dependencies/state_est_helpers.c \
 Core/Src/StateEstimation/States/FastAscent.c \
 Core/Src/StateEstimation/States/FreeFall.c \
@@ -92,6 +99,7 @@ Core/Src/StateEstimation/States/Idle.c \
 Core/Src/StateEstimation/States/Landed.c \
 Core/Src/StateEstimation/States/SlowAscent.c \
 Core/Src/main.c \
+Core/Src/state_estimation.c \
 Core/Src/stm32h7xx_hal_msp.c \
 Core/Src/stm32h7xx_it.c \
 Core/Src/syscalls.c \
@@ -215,13 +223,15 @@ AS_DEFS =
 # C defines
 C_DEFS =  \
 -DSTM32H723xx \
--DUSE_HAL_DRIVER
+-DUSE_HAL_DRIVER \
+-DUSE_PWR_LDO_SUPPLY
 
 
 # CXX defines
 CXX_DEFS =  \
 -DSTM32H723xx \
--DUSE_HAL_DRIVER
+-DUSE_HAL_DRIVER \
+-DUSE_PWR_LDO_SUPPLY
 
 
 # AS includes
@@ -230,6 +240,7 @@ AS_INCLUDES = \
 # C includes
 C_INCLUDES =  \
 -ICore/Inc \
+-ICore/Inc/Protocols \
 -ICore/Inc/Sensors \
 -ICore/Inc/StateEstimation \
 -ICore/Inc/StateEstimation/Dependencies \

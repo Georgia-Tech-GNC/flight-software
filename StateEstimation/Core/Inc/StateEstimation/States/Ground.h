@@ -8,12 +8,12 @@
  * This file must not be made publicly available anywhere.
 */
 
-#include "ekf.h"
+#include "ground_ekf.h"
 #include "data_handling.h"
 #include <stdbool.h>
 
 #ifndef __GROUND_H__
-    #define __GROUND_H__
+#define __GROUND_H__
 
 void state_transition_ground(GroundExtKalmanFilter *gekf);
 

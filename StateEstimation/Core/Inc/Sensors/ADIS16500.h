@@ -10,12 +10,12 @@
  */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-
 #ifndef _ADIS16500_H
 #define _ADIS16500_H
 
 #include "stm32h7xx_hal.h"
 #include "arm_math.h"
+#include "DWT.h"
 
 typedef enum {
     ADIS_DIAG_STAT = 0x02,
@@ -89,6 +89,13 @@ typedef struct {
     double temp_out;
 } ADIS16500_Data;
 
+struct ADIS_BurstData {
+    uint16_t diag_stat;      // Diagnostic status
+    float32_t gyro[3];       // Gyroscope data (X, Y, Z)
+    float32_t accel[3];      // Accelerometer data (X, Y, Z)
+    float32_t temp;          // Temperature
+    uint16_t timestamp;      // Time stamp
+};
 
 struct ADIS_Device { 
     SPI_HandleTypeDef* spi_handle;
@@ -99,7 +106,24 @@ struct ADIS_Device {
 void DWT_Init(void);
 void delay_us(uint32_t microseconds);
 int16_t adis_read_register(struct ADIS_Device *device, uint8_t addr);
-void adis_write_register(struct ADIS_Device *device,  uint8_t addr, uint16_t value);
+void adis_write_register(struct ADIS_Device *device, uint8_t addr, uint16_t value);
 void adis_read_gyro(struct ADIS_Device *device, float32_t gyro_readings[3]);
 void adis_read_accel(struct ADIS_Device *device, float32_t accel_readings[3]);
-#endif
+float32_t adis_accel_scale(int16_t raw_data);
+float32_t adis_gyro_scale(int16_t raw_data);
+float32_t adis_temp_scale(int16_t raw_data);
+uint8_t adis_burst_read(struct ADIS_Device *device, uint16_t *burst_data);
+void adis_parse_burst(uint16_t *raw_data, struct ADIS_BurstData *parsed_data);
+void adis_hardware_reset(struct ADIS_Device *device, GPIO_TypeDef* reset_pin, uint16_t reset_port, uint32_t delay_ms);
+int32_t adis_read_gyro_32bit(struct ADIS_Device *device, uint8_t low_reg, uint8_t high_reg);
+int32_t adis_read_accel_32bit(struct ADIS_Device *device, uint8_t low_reg, uint8_t high_reg);
+void adis_read_gyro_32bit_all(struct ADIS_Device *device, float32_t gyro_readings[3]);
+void adis_read_accel_32bit_all(struct ADIS_Device *device, float32_t accel_readings[3]);
+void adis_read_delta_angle(struct ADIS_Device *device, float32_t delta_angle[3]);
+void adis_read_delta_vel(struct ADIS_Device *device, float32_t delta_vel[3]);
+int32_t adis_read_delta_angle_32bit(struct ADIS_Device *device, uint8_t low_reg, uint8_t high_reg);
+int32_t adis_read_delta_vel_32bit(struct ADIS_Device *device, uint8_t low_reg, uint8_t high_reg);
+void adis_read_delta_angle_32bit_all(struct ADIS_Device *device, float32_t delta_angle[3]);
+void adis_read_delta_vel_32bit_all(struct ADIS_Device *device, float32_t delta_vel[3]);
+
+#endif /* _ADIS16500_H */

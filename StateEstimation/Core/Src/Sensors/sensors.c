@@ -151,7 +151,7 @@ void sensors_init(Sensors *sensors) {
  * @brief Initializes all IO peripherals
  * @details Initializes system clock, DMA, I2C, SPI, UART, USB, timers, and GPIO
  */
-void IO_init(void) {
+void protocol_init(void) {
   HAL_Init();
   SystemClock_Config();
   DWT_Init();

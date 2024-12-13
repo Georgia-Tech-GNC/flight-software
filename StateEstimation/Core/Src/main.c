@@ -3,6 +3,7 @@
   ******************************************************************************
   * @file           : main.c
   * @brief          : Main program body
+  * @author         : Kanav Chugh
   ******************************************************************************
   * @attention
   *
@@ -36,7 +37,7 @@ int main(void)
 {
   /* USER CODE BEGIN 2 */
 
-  IO_init();
+  protocol_init();
   sensors_init(&sensors);
   state_machine_init();
 

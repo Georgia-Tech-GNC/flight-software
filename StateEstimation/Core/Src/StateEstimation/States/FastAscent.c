@@ -40,10 +40,10 @@ void run_fast_ascent(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors 
     serial_data->wy = sensors->gyro_y;
     serial_data->wz = sensors->gyro_z;
     if (global_time_seconds - fast_ascent_start_time > BURN_TIME) {
-        state_machine = SLOWASCENT;
+        rocket_state = SLOWASCENT;
         first_iter = 1;
     } else {
-        state_machine = FASTASCENT;
+        rocket_state = FASTASCENT;
         first_iter = 0;
     }
 }

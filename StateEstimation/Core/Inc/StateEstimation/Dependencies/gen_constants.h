@@ -8,7 +8,7 @@
 extern uint8_t gekf_initialize;
 extern uint8_t fekf_initialize;
 
-extern uint16_t state_machine;
+extern uint16_t rocket_state;
 extern uint32_t global_time;
 extern float32_t fast_ascent_start_time;
 extern float32_t global_time_seconds;

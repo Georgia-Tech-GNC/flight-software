@@ -25,7 +25,7 @@ void run_idle(UART_HandleTypeDef *huart) {
             signal_received[2] = '\0';
             if (strcmp(signal_received, "GO") == 0) {
                 HAL_UART_Transmit(huart, "\r\nStarting EKF...\r\n", sizeof("\r\nStarting EKF...\r\n") - 1, HAL_MAX_DELAY);
-                state_machine = GROUND;
+                rocket_state = GROUND;
                 ready_message_printed = 0; 
             }
             receive_index = 0;  

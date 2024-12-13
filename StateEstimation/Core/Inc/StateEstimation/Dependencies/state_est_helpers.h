@@ -44,11 +44,11 @@ typedef void (*StateHandler)(void);
 // State machine structure
 typedef struct {
     RocketState currentState;
-    StateHandler stateHandlers[7];  // One handler for each state
+    StateHandler stateHandlers[7]; 
 } StateMachine;
 
 // External variable declarations
-extern uint16_t state_machine;
+extern uint16_t rocket_state;
 extern uint32_t global_time;
 extern float32_t fast_ascent_start_time;
 extern float32_t global_time_seconds;

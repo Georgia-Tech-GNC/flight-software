@@ -50,7 +50,7 @@ typedef struct {
 } Sensors;
 
 
-void IO_init(void);
+void protocol_init(void);
 void update_sensors(Sensors *sensors, UART_HandleTypeDef *huart);
 void sensors_init(Sensors *sensors);
 

@@ -407,6 +407,7 @@ void state_transition_function(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd
     ekf->f.pData[5] = ekf->accelerometer[2] * dt + ekf->x_n.pData[5];
 }
 
+
 void state_transition_jacobian(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, UART_HandleTypeDef *huart) {
     //HAL_UART_Transmit(huart, (uint8_t*)"Starting state transition Jacobian calculation...\r\n", 52, HAL_MAX_DELAY);
 
@@ -458,6 +459,12 @@ void state_transition_jacobian(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd
     //HAL_UART_Transmit(huart, (uint8_t*)"State transition Jacobian calculation completed.\r\n", 51, HAL_MAX_DELAY);
 }
 
+/**
+ * @brief Predicts next state based on current state and dynamics
+ * @param ekf Pointer to the flight EKF structure
+ * @param huart Pointer to UART handle for debug output
+ * @details Applies state transition function to predict next state
+ */
 void predict_state(ExtKalmanFilter *ekf, UART_HandleTypeDef *huart) {
     //HAL_UART_Transmit(huart, (uint8_t*)"Starting state prediction...\r\n", 30, HAL_MAX_DELAY);
 
@@ -538,6 +545,13 @@ void predict_covariance(ExtKalmanFilter *ekf, UART_HandleTypeDef *huart) {
 //   ekf->P_prev = ekf->P_next;
 //}
 
+/**
+ * @brief Converts GPS coordinates from WGS84 to a local flat Earth frame
+ * @param sensors Pointer to sensors structure containing GPS readings
+ * @param ekf Pointer to the flight EKF structure
+ * @param ground Flag indicating if conversion is for ground reference (1) or flight (0)
+ * @details Transforms GPS coordinates through ECEF to ENU frame, stores results in ekf->gps_flat
+ */
 void GPS2Flat(Sensors *sensors, ExtKalmanFilter *ekf, uint8_t ground) {
     // Converts from WGS84 to ECEF
 
@@ -575,6 +589,14 @@ void GPS2Flat(Sensors *sensors, ExtKalmanFilter *ekf, uint8_t ground) {
     }
 }
 
+/**
+ * @brief Updates the extended Kalman filter with current sensor readings and attitude
+ * @param ekf Pointer to the flight EKF structure
+ * @param rocket_atd Pointer to rocket attitude structure
+ * @param sensors Pointer to sensors structure with current readings
+ * @details Transforms sensor readings into body frame, computes gravity vector, 
+ *          and applies coriolis corrections for accelerometer readings
+ */
 void update_ekf(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors* sensors) {
     ekf->gps[0] = ekf->gps_flat[0];
     ekf->gps[1] = ekf->gps_flat[1];
@@ -618,6 +640,15 @@ void update_ekf(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors* sens
     //ekf->accelerometer[2] = (sensors->accel_z - sensors->accel_bias_z);
 }
 
+/**
+ * @brief Runs one complete iteration of the flight EKF
+ * @param ekf Pointer to the flight EKF structure
+ * @param rocket_atd Pointer to rocket attitude structure
+ * @param sensors Pointer to sensors structure
+ * @param huart Pointer to UART handle for debug output
+ * @param ekf_initialized Flag indicating if EKF has been initialized
+ * @details Performs prediction and update steps of the EKF, processes GPS measurements
+ */
 void run_ekf(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors *sensors, UART_HandleTypeDef *huart, int ekf_initialized) {
     char buffer[256];
     int len;
@@ -640,6 +671,13 @@ void run_ekf(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors *sensors
     //arm_matrix_instance_f32 curr_state = ekf->x_n;
 }
 
+/**
+ * @brief Performs the prediction step of the EKF
+ * @param ekf Pointer to the flight EKF structure
+ * @param rocket_atd Pointer to rocket attitude structure
+ * @param huart Pointer to UART handle for debug output
+ * @details Executes state transition, Jacobian computation, and covariance prediction
+ */
 void predict_step(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, UART_HandleTypeDef *huart) {
     state_transition_function(ekf, rocket_atd, huart);
     state_transition_jacobian(ekf, rocket_atd, huart);
@@ -647,6 +685,12 @@ void predict_step(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, UART_Handle
     predict_covariance(ekf, huart);
 }
 
+/**
+ * @brief Performs the update step of the EKF
+ * @param ekf Pointer to the flight EKF structure
+ * @param huart Pointer to UART handle for debug output
+ * @details Computes Kalman gain and updates state and covariance estimates using measurements
+ */
 void update_step(ExtKalmanFilter *ekf, UART_HandleTypeDef *huart){
     observation_function(ekf, huart);
     observation_jacobian(ekf, huart);

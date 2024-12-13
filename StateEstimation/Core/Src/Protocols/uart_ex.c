@@ -1,5 +1,12 @@
 #include "uart_ex.h"
 
+/**
+ * @brief Callback function for UART receive event with idle line detection
+ * @param huart Pointer to UART handle structure
+ * @param Size Number of bytes received
+ * @details Processes received UART data, handles UBX messages, and manages ring buffer
+ * @note Called automatically by HAL when UART receive is complete or idle line detected
+ */
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
     char debug[128];
     int len;
@@ -30,7 +37,12 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
         }
     }
 }
-
+/**
+ * @brief Callback function for completed UART receive operation
+ * @param huart Pointer to UART handle structure
+ * @details Handles "GO" command to start EKF and transitions state machine
+ * @note Called automatically by HAL when UART receive is complete
+ */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
     if (huart->Instance == USART2) {
         char buffer[6];
@@ -38,12 +50,18 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
         HAL_UART_Transmit(&huart3, buffer, strlen(buffer), HAL_MAX_DELAY);
         if (strncmp(signal_received, "GO", 2) == 0) {
             HAL_UART_Transmit(&huart3, "\r\nStarting EKF...\r\n", sizeof("\r\nStarting EKF...\r\n") - 1, HAL_MAX_DELAY);
-            state_machine = GROUND;
+            rocket_state = GROUND;
             ready_message_printed = 0; 
         }
     }
 }
 
+/**
+ * @brief Error callback function for UART operations
+ * @param huart Pointer to UART handle structure
+ * @details Handles UART errors by printing debug info and restarting receive operation
+ * @note Called automatically by HAL when UART error occurs
+ */
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
     char debug[128];
     int len;
@@ -55,6 +73,12 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
     }
 }
 
+/**
+ * @brief Prints rocket attitude information to UART
+ * @param rocket_atd Pointer to rocket attitude structure
+ * @param huart Pointer to UART handle structure
+ * @details Outputs quaternion, Euler angles, and gyroscope readings in human-readable format
+ */
 void print_rocket_attitude(rocket_attitude *rocket_atd, UART_HandleTypeDef *huart) {
     char buf[200];
     // Print quaternion

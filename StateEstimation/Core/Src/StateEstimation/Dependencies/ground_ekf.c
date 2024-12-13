@@ -11,7 +11,13 @@
 #include "ground_ekf.h"
 #include "gekf_constants.h"
 
-
+/**
+ * @brief Converts GPS coordinates to flat Earth frame for ground-based navigation
+ * @param sensors Pointer to sensors structure containing GPS readings
+ * @param ekf Pointer to the ground EKF structure
+ * @param ground Flag indicating if conversion is for ground reference
+ * @details Similar to GPS2Flat but specifically for ground operations
+ */
 void GPS2FlatGround(Sensors *sensors, GroundExtKalmanFilter *ekf, uint8_t ground) {
     // Converts from WGS84 to ECEF
 
@@ -56,7 +62,6 @@ void GPS2FlatGround(Sensors *sensors, GroundExtKalmanFilter *ekf, uint8_t ground
         ekf->gps_flat[2] = -1.0 * x_enu;
     }
 }
-
 
 
 void initialize_ekf_ground(GroundExtKalmanFilter *ekf, UART_HandleTypeDef *huart, Sensors *sensors, uint16_t nz){
@@ -299,6 +304,12 @@ void update_state_ground(GroundExtKalmanFilter *ekf, UART_HandleTypeDef *huart) 
     check_for_nan("Kalman gain K at end", &ekf->K_n, huart);
 }
 
+/**
+ * @brief Updates error covariance for ground EKF
+ * @param ekf Pointer to the ground EKF structure
+ * @param huart Pointer to UART handle for debug output
+ * @details Implements covariance update using Joseph form: P = (I-KH)P(I-KH)' + KRK'
+ */
 void update_covariance_ground(GroundExtKalmanFilter *ekf, UART_HandleTypeDef *huart) {
     HAL_UART_Transmit(huart, (uint8_t*)"Starting covariance update...\r\n", 31, HAL_MAX_DELAY);
 
@@ -368,7 +379,12 @@ void update_covariance_ground(GroundExtKalmanFilter *ekf, UART_HandleTypeDef *hu
     check_for_nan("Kalman gain K at end", &ekf->K_n, huart);
 }
 
-
+/**
+ * @brief Predicts error covariance for ground EKF
+ * @param ekf Pointer to the ground EKF structure
+ * @param huart Pointer to UART handle for debug output
+ * @details Implements covariance prediction: P = FPF' + Q
+ */
 void predict_covariance_ground(GroundExtKalmanFilter *ekf, UART_HandleTypeDef *huart) {
     HAL_UART_Transmit(huart, (uint8_t*)"Starting covariance prediction...\r\n", 35, HAL_MAX_DELAY);
 
@@ -436,7 +452,12 @@ void acknowledge_time_passed_ground(GroundExtKalmanFilter *ekf){
     ekf->P_prev = ekf->P_n;
 }
 
-
+/**
+ * @brief Updates the ground EKF with current sensor readings
+ * @param ekf Pointer to the ground EKF structure
+ * @param sensors Pointer to sensors structure
+ * @details Updates internal state with current sensor readings, applies bias corrections
+ */
 void update_ekf_ground(GroundExtKalmanFilter *ekf, Sensors* sensors) {
     ekf->gps[0] = ekf->gps_flat[0];
     ekf->gps[1] = ekf->gps_flat[1];

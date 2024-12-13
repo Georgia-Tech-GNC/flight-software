@@ -43,17 +43,17 @@ void run_slow_ascent(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors 
     int counter = 0;
     int num_loops_before_check = 20;
     if (global_time_seconds - fast_ascent_start_time > 11.0) {
-        state_machine = FREEFALL;
+        rocket_state = FREEFALL;
         first_iter = 1;
     } else {
-        state_machine = SLOWASCENT;
+        rocket_state = SLOWASCENT;
         first_iter = 0;
     }
     if ((ekf->x_n.pData[0] < prev_alt) && (counter % num_loops_before_check == 0)){ 
         if (activatedTOV) {
             float32_t TOV = global_time_seconds - startTOV;
             if (TOV > 3.0) {
-                state_machine = FREEFALL;
+                rocket_state = FREEFALL;
                 first_iter = 1;
             }
 

@@ -56,7 +56,7 @@ void run_freefall(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors *se
             float32_t TOV = global_time_seconds - startTOV;
             if (TOV > 3.0) {
                 // Switch states
-                state_machine = LANDED;
+                rocket_state = LANDED;
                 first_iter = 1;
             }
 

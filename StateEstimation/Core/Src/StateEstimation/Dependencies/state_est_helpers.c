@@ -1,6 +1,6 @@
 /**
  * @file state_est_helpers.c
- * @author Patrick Barry 
+ * @author Kanav Chugh, Patrick Barry 
  * @brief Source file for helper functions for the state estimation MCU
  * 
  * Copyright 2024 Georgia Tech. All rights reserved.
@@ -13,7 +13,7 @@
 #include "main.h"
 
 // Global variables
-uint16_t state_machine;
+uint16_t rocket_state;
 uint32_t global_time;
 float32_t fast_ascent_start_time;
 float32_t global_time_seconds;
@@ -41,7 +41,7 @@ uint8_t signal_received[2];
 float32_t launch_time_stamp;
 uint8_t launched;
 
-static StateMachine stateMachine;
+static StateMachine state_machine;
 
 /**
  * @brief Calculates center of mass to IMU vector
@@ -63,10 +63,21 @@ float32_t* com_to_imu(float32_t seconds_since_launch, int launch_has_occurred) {
     return (float32_t[3]){x_dist, COM_TO_IMU_Y, COM_TO_IMU_Z};
 }
 
+/**
+ * @brief Converts pressure to altitude using barometric formula
+ * @param pressure Pressure reading in mbar
+ * @return Calculated altitude in meters
+ */
 float32_t pressure2altitude(float32_t pressure) {
     return (float32_t) (44330 * (1.0 - pow((pressure/100) / 1013.25, 0.1903)));
 }
 
+/**
+ * @brief Initializes a square identity matrix
+ * @param matrix Pointer to the matrix instance to initialize
+ * @param size Dimension of the square matrix
+ * @param data Pointer to the data array to store matrix values
+ */
 void arm_mat_identity_f32(arm_matrix_instance_f32* matrix, uint16_t size, float32_t* data) {
     arm_mat_init_f32(matrix, size, size, data);
     for (uint16_t i = 0; i < size; i++) {
@@ -76,6 +87,12 @@ void arm_mat_identity_f32(arm_matrix_instance_f32* matrix, uint16_t size, float3
     }
 }
 
+/**
+ * @brief Checks matrix for NaN or Inf values and prints warnings
+ * @param name Name of the matrix for identification in output
+ * @param mat Pointer to the matrix to check
+ * @param huart Pointer to UART handle for debug output
+ */
 void check_for_nan(const char* name, arm_matrix_instance_f32* mat, UART_HandleTypeDef *huart) {
     char buffer[100];
     for (int i = 0; i < mat->numRows * mat->numCols; i++) {
@@ -89,6 +106,12 @@ void check_for_nan(const char* name, arm_matrix_instance_f32* mat, UART_HandleTy
     }
 }
 
+/**
+ * @brief Prints matrix contents to UART for debugging
+ * @param name Name of the matrix for identification in output
+ * @param mat Pointer to the matrix to print
+ * @param huart Pointer to UART handle for debug output
+ */
 void print_matrix(const char* name, arm_matrix_instance_f32* mat, UART_HandleTypeDef *huart) {
     char buffer[256];
     int len;
@@ -112,17 +135,17 @@ void print_matrix(const char* name, arm_matrix_instance_f32* mat, UART_HandleTyp
  */
 void state_machine_init(void) {
     // Initialize state handlers
-    stateMachine.stateHandlers[IDLE] = handle_idle;
-    stateMachine.stateHandlers[GROUND] = handle_ground;
-    stateMachine.stateHandlers[ARMED] = handle_armed;
-    stateMachine.stateHandlers[FASTASCENT] = handle_fast_ascent;
-    stateMachine.stateHandlers[SLOWASCENT] = handle_slow_ascent;
-    stateMachine.stateHandlers[FREEFALL] = handle_freefall;
-    stateMachine.stateHandlers[LANDED] = handle_landed;
+    state_machine.stateHandlers[IDLE] = handle_idle;
+    state_machine.stateHandlers[GROUND] = handle_ground;
+    state_machine.stateHandlers[ARMED] = handle_armed;
+    state_machine.stateHandlers[FASTASCENT] = handle_fast_ascent;
+    state_machine.stateHandlers[SLOWASCENT] = handle_slow_ascent;
+    state_machine.stateHandlers[FREEFALL] = handle_freefall;
+    state_machine.stateHandlers[LANDED] = handle_landed;
     
     // Initialize state machine variables
-    stateMachine.currentState = IDLE;
-    state_machine = IDLE;
+    state_machine.currentState = IDLE;
+    rocket_state = IDLE;
     global_time = HAL_GetTick();
     fast_ascent_start_time = 0.0f;
     global_time_seconds = (float32_t) global_time / 1000.0f;
@@ -143,7 +166,6 @@ void state_machine_init(void) {
     launched = 1;
     while(HAL_TIMEOUT != HAL_UART_Receive(&huart2, &tmp, 1, 10));
     HAL_UART_Receive_IT(&huart2, signal_received, 2);
-    
     initialize_ekf(&fekf, &huart3, &sensors, 3);  
     initialize_ekf_ground(&gekf, &huart3, &sensors, 6); 
     HAL_Delay(500);
@@ -155,13 +177,13 @@ void state_machine_init(void) {
  */
 void state_machine_run(void) {
     update_sensors(&sensors, &huart3);
-    if (stateMachine.stateHandlers[stateMachine.currentState] != NULL) {
-        stateMachine.stateHandlers[stateMachine.currentState]();
-        state_machine = stateMachine.currentState; // Update global state variable
+    if (state_machine.stateHandlers[state_machine.currentState] != NULL) {
+        state_machine.stateHandlers[state_machine.currentState]();
+        rocket_state = state_machine.currentState; // Update global state variable
     }
     global_time = HAL_GetTick();
     global_time_seconds = global_time / 1000.0f;
-    if (state_machine > ARMED) {
+    if (rocket_state > ARMED) {
       serial_data.t = (global_time - launch_time_stamp) / 1000.0f;
     }
     log_data(&serial_data, &sensors, &huart2);
@@ -172,8 +194,8 @@ void state_machine_run(void) {
  * @param newState The state to transition to
  */
 void transition_state(RocketState newState) {
-    stateMachine.currentState = newState;
-    state_machine = newState; // Update global state variable
+    state_machine.currentState = newState;
+    rocket_state = newState; // Update global state variable
 }
 
 /**
@@ -218,6 +240,10 @@ void handle_ground(void) {
     iterations++;
 }
 
+/**
+ * @brief Handles operations in ARMED state
+ * @details Initializes flight EKF and rocket attitude, monitors for launch conditions
+ */
 void handle_armed(void) {
     if (fekf_initialize) {
         initialize_ekf(&fekf, &huart3, &sensors, 3);
@@ -238,6 +264,10 @@ void handle_armed(void) {
     }
 }
 
+/**
+ * @brief Handles operations in FASTASCENT state
+ * @details Processes initial launch phase and fast ascent calculations
+ */
 void handle_fast_ascent(void) {
     if (launched) {
         launch_time_stamp = HAL_GetTick();
@@ -246,18 +276,30 @@ void handle_fast_ascent(void) {
     run_fast_ascent(&fekf, &rocket_atd, &sensors, &serial_data, &huart3);
 }
 
+/**
+ * @brief Handles operations in SLOWASCENT state
+ * @details Processes slow ascent phase calculations and monitoring
+ */
 void handle_slow_ascent(void) {
     HAL_UART_Transmit(&huart3, "Slow Ascent\r\n", 
             sizeof("Slow Ascent\r\n"), HAL_MAX_DELAY);
     run_slow_ascent(&fekf, &rocket_atd, &sensors, &serial_data, &huart3);
 }
 
+/**
+ * @brief Handles operations in FREEFALL state
+ * @details Processes freefall phase calculations and monitoring
+ */
 void handle_freefall(void) {
     HAL_UART_Transmit(&huart3, "Freefall\r\n", 
             sizeof("Freefall\r\n"), HAL_MAX_DELAY);
     run_freefall(&fekf, &rocket_atd, &sensors, &serial_data, &huart3);
 }
 
+/**
+ * @brief Handles operations in LANDED state
+ * @details Sets final state parameters and indicates landing completion
+ */
 void handle_landed(void) {
     serial_data.state = LANDED;
     serial_data.vel_x = 0.0;

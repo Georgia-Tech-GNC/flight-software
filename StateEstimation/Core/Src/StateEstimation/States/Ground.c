@@ -151,7 +151,7 @@ void run_ground(GroundExtKalmanFilter* gekf, Sensors* sensors, SerialData *seria
         sensors->gyro_bias_x = gekf->x_n.pData[3];
         sensors->gyro_bias_y = gekf->x_n.pData[4];
         sensors->gyro_bias_z = gekf->x_n.pData[5];
-        state_machine = ARMED;
+        rocket_state = ARMED;
     }
 }
 

@@ -134,7 +134,6 @@ void print_matrix(const char* name, arm_matrix_instance_f32* mat, UART_HandleTyp
  * @details Initializes state handlers, variables, EKF systems, and UART communications
  */
 void state_machine_init(void) {
-    // Initialize state handlers
     state_machine.stateHandlers[IDLE] = handle_idle;
     state_machine.stateHandlers[GROUND] = handle_ground;
     state_machine.stateHandlers[ARMED] = handle_armed;
@@ -143,7 +142,6 @@ void state_machine_init(void) {
     state_machine.stateHandlers[FREEFALL] = handle_freefall;
     state_machine.stateHandlers[LANDED] = handle_landed;
     
-    // Initialize state machine variables
     state_machine.currentState = IDLE;
     rocket_state = IDLE;
     global_time = HAL_GetTick();

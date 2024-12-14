@@ -11,7 +11,7 @@
 
 #include "attitude.h"
 
-void initialize_rocket_attitude(rocket_attitude *rocket_atd, float32_t qs, float32_t qx, float32_t qy, float32_t qz){
+void initialize_rocket_attitude(RocketAttitude *rocket_atd, float32_t qs, float32_t qx, float32_t qy, float32_t qz){
     rocket_atd->q_current_s = qs;
     rocket_atd->q_current_x = qx;
     rocket_atd->q_current_y = qy;
@@ -31,7 +31,7 @@ void initialize_rocket_attitude(rocket_attitude *rocket_atd, float32_t qs, float
  *  and sets the gyro value of the attitude estimation struct to the value of this measurement.
  * @param rocket_atd (struct that attitude estimation system is built out of)
 */
-void set_gyro(rocket_attitude *rocket_atd, float32_t* readings) {
+void set_gyro(RocketAttitude *rocket_atd, float32_t* readings) {
     rocket_atd->gyro_x = readings[0];
     rocket_atd->gyro_y = readings[1];
     rocket_atd->gyro_z = readings[2];
@@ -48,7 +48,7 @@ void set_gyro(rocket_attitude *rocket_atd, float32_t* readings) {
  * function failing due to division by zero. As a result, if all gyro measurements are zero, 0.01 is added to make the norm of 
  * the vector w = [wx, wy, wz] a nonzero value. 
 */
-void gyro_to_rotation_quat(rocket_attitude *rocket_atd){ 
+void gyro_to_rotation_quat(RocketAttitude *rocket_atd){ 
     float32_t omega[] = {rocket_atd->gyro_x, rocket_atd->gyro_y, rocket_atd->gyro_z}; //Create a vector omega = [wx, wy, wz]
     float32_t norm = sqrt(omega[0] * omega[0] + omega[1] * omega[1] + omega[2] * omega[2]); //Calculate the norm of this vector
 
@@ -86,7 +86,7 @@ void gyro_to_rotation_quat(rocket_attitude *rocket_atd){
  * 
  * @param rocket_atd (struct that attitude estimation system is built out of)
 */
-void quat_update(rocket_attitude *rocket_atd){
+void quat_update(RocketAttitude *rocket_atd){
 
     float32_t q_new_s = rocket_atd->q_current_s * rocket_atd->q_delt_s //Find the value of the scalar component q_s for the rocket's attitude quaternion.
                     - rocket_atd->q_current_x * rocket_atd->q_delt_x
@@ -121,7 +121,7 @@ void quat_update(rocket_attitude *rocket_atd){
  * @note This is not strictly necessary as our present control algorithm uses quaternion attitude representation. However, it may be helpful
  * if controls need to be based off of Euler angles or for debugging. 
 */
-void quat_to_euler_angs(rocket_attitude *rocket_atd){
+void quat_to_euler_angs(RocketAttitude *rocket_atd){
 
     float32_t qs = rocket_atd->q_current_s;
     float32_t qx = rocket_atd->q_current_x;
@@ -150,7 +150,7 @@ void quat_to_euler_angs(rocket_attitude *rocket_atd){
  * @return
  * @note
 */
-void run_attitude_estimation(rocket_attitude *rocket_atd, float32_t *w){
+void run_attitude_estimation(RocketAttitude *rocket_atd, float32_t *w){
     set_gyro(rocket_atd, w);
     gyro_to_rotation_quat(rocket_atd);
     quat_update(rocket_atd);

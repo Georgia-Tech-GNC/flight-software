@@ -74,15 +74,15 @@ void observation_jacobian(ExtKalmanFilter *ekf, UART_HandleTypeDef *huart);
 arm_status kalman_gain(ExtKalmanFilter *ekf, UART_HandleTypeDef *huart);
 void update_state(ExtKalmanFilter *ekf, UART_HandleTypeDef *huart);
 void update_covariance(ExtKalmanFilter *ekf, UART_HandleTypeDef *huart);
-void state_transition_function(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, UART_HandleTypeDef *huart);
-void state_transition_jacobian(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, UART_HandleTypeDef *huart);
+void state_transition_function(ExtKalmanFilter *ekf, RocketAttitude *rocket_atd, UART_HandleTypeDef *huart);
+void state_transition_jacobian(ExtKalmanFilter *ekf, RocketAttitude *rocket_atd, UART_HandleTypeDef *huart);
 void predict_state(ExtKalmanFilter *ekf, UART_HandleTypeDef *huart);
 void predict_covariance(ExtKalmanFilter *ekf, UART_HandleTypeDef *huart);
 void make_measurement(ExtKalmanFilter *ekf, UART_HandleTypeDef *huart);
 //void acknowledge_time_passed(ExtKalmanFilter *ekf);
-void run_ekf(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors *sensors, UART_HandleTypeDef *huart, int ekf_initialized);
-void update_ekf(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors* sensors);
-void predict_step(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, UART_HandleTypeDef *huart);
+void run_ekf(ExtKalmanFilter *ekf, RocketAttitude *rocket_atd, Sensors *sensors, UART_HandleTypeDef *huart, int ekf_initialized);
+void update_ekf(ExtKalmanFilter *ekf, RocketAttitude *rocket_atd, Sensors* sensors);
+void predict_step(ExtKalmanFilter *ekf, RocketAttitude *rocket_atd, UART_HandleTypeDef *huart);
 void update_step(ExtKalmanFilter *ekf, UART_HandleTypeDef *huart);
 
 #endif

@@ -79,7 +79,7 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
  * @param huart Pointer to UART handle structure
  * @details Outputs quaternion, Euler angles, and gyroscope readings in human-readable format
  */
-void print_rocket_attitude(rocket_attitude *rocket_atd, UART_HandleTypeDef *huart) {
+void print_rocket_attitude(RocketAttitude *rocket_atd, UART_HandleTypeDef *huart) {
     char buf[200];
     // Print quaternion
     snprintf(buf, sizeof(buf), "Quaternion (s,x,y,z): %.3f, %.3f, %.3f, %.3f\r\n", 

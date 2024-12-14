@@ -20,6 +20,6 @@
 #include "attitude.h"
 #include "data_handling.h"
 
-void run_freefall(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors *sensors, SerialData *serial_data, UART_HandleTypeDef *huart);
+void run_freefall(ExtKalmanFilter *ekf, RocketAttitude *rocket_atd, Sensors *sensors, SerialData *serial_data, UART_HandleTypeDef *huart);
 
 #endif

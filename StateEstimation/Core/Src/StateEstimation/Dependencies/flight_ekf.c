@@ -378,7 +378,7 @@ void update_covariance(ExtKalmanFilter *ekf, UART_HandleTypeDef *huart) {
  * flat Earth position
  * @param ekf, the EKF struct
 */
-void state_transition_function(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, UART_HandleTypeDef *huart) {
+void state_transition_function(ExtKalmanFilter *ekf, RocketAttitude *rocket_atd, UART_HandleTypeDef *huart) {
     float dt = ekf->time_step;
 
     //Extract the quaternion and convert it to the quaternion that rotates body frame into the flat Earth frame
@@ -408,7 +408,7 @@ void state_transition_function(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd
 }
 
 
-void state_transition_jacobian(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, UART_HandleTypeDef *huart) {
+void state_transition_jacobian(ExtKalmanFilter *ekf, RocketAttitude *rocket_atd, UART_HandleTypeDef *huart) {
     //HAL_UART_Transmit(huart, (uint8_t*)"Starting state transition Jacobian calculation...\r\n", 52, HAL_MAX_DELAY);
 
     float32_t dfdx_new[ekf->nx * ekf->nx];
@@ -597,7 +597,7 @@ void GPS2Flat(Sensors *sensors, ExtKalmanFilter *ekf, uint8_t ground) {
  * @details Transforms sensor readings into body frame, computes gravity vector, 
  *          and applies coriolis corrections for accelerometer readings
  */
-void update_ekf(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors* sensors) {
+void update_ekf(ExtKalmanFilter *ekf, RocketAttitude *rocket_atd, Sensors* sensors) {
     ekf->gps[0] = ekf->gps_flat[0];
     ekf->gps[1] = ekf->gps_flat[1];
     ekf->gps[2] = ekf->gps_flat[2];
@@ -649,7 +649,7 @@ void update_ekf(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors* sens
  * @param ekf_initialized Flag indicating if EKF has been initialized
  * @details Performs prediction and update steps of the EKF, processes GPS measurements
  */
-void run_ekf(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors *sensors, UART_HandleTypeDef *huart, int ekf_initialized) {
+void run_ekf(ExtKalmanFilter *ekf, RocketAttitude *rocket_atd, Sensors *sensors, UART_HandleTypeDef *huart, int ekf_initialized) {
     char buffer[256];
     int len;
     len = snprintf(buffer, sizeof(buffer), "State before update:\r\n");
@@ -678,7 +678,7 @@ void run_ekf(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors *sensors
  * @param huart Pointer to UART handle for debug output
  * @details Executes state transition, Jacobian computation, and covariance prediction
  */
-void predict_step(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, UART_HandleTypeDef *huart) {
+void predict_step(ExtKalmanFilter *ekf, RocketAttitude *rocket_atd, UART_HandleTypeDef *huart) {
     state_transition_function(ekf, rocket_atd, huart);
     state_transition_jacobian(ekf, rocket_atd, huart);
     predict_state(ekf, huart);

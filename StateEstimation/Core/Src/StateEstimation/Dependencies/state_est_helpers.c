@@ -36,7 +36,7 @@ SerialData serial_data;
 Sensors sensors;
 GroundExtKalmanFilter gekf;
 ExtKalmanFilter fekf;
-rocket_attitude rocket_atd;
+RocketAttitude rocket_atd;
 uint8_t signal_received[2];
 float32_t launch_time_stamp;
 uint8_t launched;
@@ -177,7 +177,7 @@ void state_machine_run(void) {
     update_sensors(&sensors, &huart3);
     if (state_machine.stateHandlers[state_machine.currentState] != NULL) {
         state_machine.stateHandlers[state_machine.currentState]();
-        rocket_state = state_machine.currentState; // Update global state variable
+        rocket_state = state_machine.currentState; 
     }
     global_time = HAL_GetTick();
     global_time_seconds = global_time / 1000.0f;

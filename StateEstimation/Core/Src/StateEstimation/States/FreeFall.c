@@ -16,7 +16,7 @@
  * @param ekf, the EKF struct; rocket_atd, the rocket attitude struct; sensors, a struct of most recent sensor measurements; serial_data, the data logging/transmitting struct
  * @note Transmitting data to the main MCU and logging data are not unique freefall operations so are not included here.
 */
-void run_freefall(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors *sensors, SerialData *serial_data, UART_HandleTypeDef *huart){
+void run_freefall(ExtKalmanFilter *ekf, RocketAttitude *rocket_atd, Sensors *sensors, SerialData *serial_data, UART_HandleTypeDef *huart){
 
     if (first_iter) {
         activatedTOV = 0;

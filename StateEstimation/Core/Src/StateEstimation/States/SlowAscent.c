@@ -17,7 +17,7 @@
  * @return
  * @note Transmitting data to the main MCU and logging data are not unique slow ascent operations so are not included here.
 */
-void run_slow_ascent(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors *sensors, SerialData *serial_data, UART_HandleTypeDef *huart) {
+void run_slow_ascent(ExtKalmanFilter *ekf, RocketAttitude *rocket_atd, Sensors *sensors, SerialData *serial_data, UART_HandleTypeDef *huart) {
     if (first_iter) {
         activatedTOV = 0;
         first_iter = 0;

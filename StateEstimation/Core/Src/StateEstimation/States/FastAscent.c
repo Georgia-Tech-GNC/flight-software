@@ -17,7 +17,7 @@
  * @return
  * @note Transmitting data to the main MCU and logging data are not unique fast ascent operations so are not included here.
 */
-void run_fast_ascent(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors *sensors, SerialData *serial_data, UART_HandleTypeDef *huart) {
+void run_fast_ascent(ExtKalmanFilter *ekf, RocketAttitude *rocket_atd, Sensors *sensors, SerialData *serial_data, UART_HandleTypeDef *huart) {
 
     if (first_iter) {
         fast_ascent_start_time = (float32_t) (global_time) / 1000.0f;

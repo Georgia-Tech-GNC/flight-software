@@ -20,6 +20,6 @@
 #include "attitude.h"
 #include "stm32h7xx_hal.h"
 
-void run_fast_ascent(ExtKalmanFilter *ekf, rocket_attitude *rocket_atd, Sensors *sensors, SerialData *serial_data, UART_HandleTypeDef *huart);
+void run_fast_ascent(ExtKalmanFilter *ekf, RocketAttitude *rocket_atd, Sensors *sensors, SerialData *serial_data, UART_HandleTypeDef *huart);
 
 #endif

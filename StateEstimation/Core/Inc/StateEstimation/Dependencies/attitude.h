@@ -38,14 +38,14 @@ typedef struct {
     float32_t phi;
     float32_t theta;
     float32_t psi;
-} rocket_attitude;
+} RocketAttitude;
 
-void initialize_rocket_attitude(rocket_attitude *rocket_atd, float32_t qs, float32_t qx, float32_t qy, float32_t qz);
-void set_gyro(rocket_attitude *rocket_atd, float32_t* readings);
-void gyro_to_rotation_quat(rocket_attitude *rocket_atd);
-void quat_update(rocket_attitude *rocket_atd);
-void quat_to_euler_angs(rocket_attitude *rocket_atd);
-void run_attitude_estimation(rocket_attitude *rocket_atd, float32_t* w);
+void initialize_rocket_attitude(RocketAttitude *rocket_atd, float32_t qs, float32_t qx, float32_t qy, float32_t qz);
+void set_gyro(RocketAttitude *rocket_atd, float32_t* readings);
+void gyro_to_rotation_quat(RocketAttitude *rocket_atd);
+void quat_update(RocketAttitude *rocket_atd);
+void quat_to_euler_angs(RocketAttitude *rocket_atd);
+void run_attitude_estimation(RocketAttitude *rocket_atd, float32_t* w);
 
 
 #endif

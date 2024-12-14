@@ -48,7 +48,7 @@ extern SerialData serial_data;
 extern Sensors sensors;
 extern GroundExtKalmanFilter gekf;
 extern ExtKalmanFilter fekf;
-extern rocket_attitude rocket_atd;
+extern RocketAttitude rocket_atd;
 extern uint8_t signal_received[2];
 extern float32_t launch_time_stamp;
 extern uint8_t launched;

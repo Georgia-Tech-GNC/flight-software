@@ -6,6 +6,6 @@
 #include <stdio.h>
 
 // Function declarations
-void print_rocket_attitude(rocket_attitude *rocket_atd, UART_HandleTypeDef *huart);
+void print_rocket_attitude(RocketAttitude *rocket_atd, UART_HandleTypeDef *huart);
 
 #endif /* UART_HANDLERS_H */

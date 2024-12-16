@@ -83,6 +83,7 @@ void state_machine_init(void);
 void state_machine_run(void);
 void transition_state(RocketState newState);
 
+
 // State handler declarations
 
 #endif /* __STATE_EST_HELPERS_H__ */

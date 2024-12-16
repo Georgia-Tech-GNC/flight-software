@@ -3,7 +3,7 @@
  * @author Kanav Chugh, Patrick Barry 
  * @brief Source file for helper functions for the state estimation MCU
  * 
- * Copyright 2024 Georgia Tech. All rights reserved.
+ * Copyright 2025 Georgia Tech. All rights reserved.
  * Copyrighted materials may not be further disseminated.
  * This file must not be made publicly available anywhere.
 */
@@ -175,9 +175,9 @@ void state_machine_init(void) {
  */
 void state_machine_run(void) {
     update_sensors(&sensors, &huart3);
+    state_machine.currentState = rocket_state;
     if (state_machine.stateHandlers[state_machine.currentState] != NULL) {
         state_machine.stateHandlers[state_machine.currentState]();
-        rocket_state = state_machine.currentState; 
     }
     global_time = HAL_GetTick();
     global_time_seconds = global_time / 1000.0f;
@@ -193,7 +193,7 @@ void state_machine_run(void) {
  */
 void transition_state(RocketState newState) {
     state_machine.currentState = newState;
-    rocket_state = newState; // Update global state variable
+    rocket_state = newState; 
 }
 
 /**
@@ -306,3 +306,4 @@ void handle_landed(void) {
     HAL_UART_Transmit(&huart3, "Landed\r\n", 
             sizeof("Landed\r\n"), HAL_MAX_DELAY);
 }
+

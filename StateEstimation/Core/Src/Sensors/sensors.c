@@ -75,6 +75,9 @@ void update_sensors(Sensors *sensors, UART_HandleTypeDef *huart) {
                     sensors->gps_x = hppvt_data.lat * 1e-7 + hppvt_data.latHp * 1e-9;
                     sensors->gps_y = hppvt_data.lon * 1e-7 + hppvt_data.lonHp * 1e-9;
                     sensors->gps_z = hppvt_data.height * 1e-3 + hppvt_data.heightHp * 1e-4;
+                    char d[100];
+                    sprintf(d, "GPS fix type: %d", hppvt_data.fixType);
+                    HAL_UART_Transmit(huart, (uint8_t *) d, strlen(d), 100);
                     break;
                 }
             }

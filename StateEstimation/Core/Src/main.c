@@ -1,42 +1,77 @@
+/* USER CODE BEGIN Header */
+/**
+  ******************************************************************************
+  * @file           : main.c
+  * @brief          : Main program body
+  * @author         : Kanav Chugh
+  ******************************************************************************
+  * @attention
+  *
+  * Copyright (c) 2024 STMicroelectronics.
+  * All rights reserved.  .buffer(NOLOAD) :
+  {
+    . = ALIGN (1);
+  } > RAM_D2
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
+  */
+/* USER CODE END Header */
+/* Includes ------------------------------------------------------------------*/
+#include "main.h"
+
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
 
 
-/*DEFINE: high-level sensor structs, state estimation time step, turn-on bias time step
-Initialize attitude struct with zero values.
-/
+/* USER CODE END Includes */
+
+/**
+  * @brief  The application entry point.
+  * @retval int
+  */
+int main(void)
+{
+  /* USER CODE BEGIN 2 */
+
+  protocol_init();
+  sensors_init(&sensors);
+  state_machine_init();
+
+  /* USER CODE END 2 */
+
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
+
+  
+  while (1)
+  {
+    /* USER CODE END WHILE */
+
+    /* USER CODE BEGIN 3 */
+    state_machine_run();
+    delay_us(20);
+  }
+  /* USER CODE END 3 */
+}
 
 
-//SETUP
-/*
-Wait for Xbee signal to start the sensor calibration
-
-1. Determine sensor turn-on bias.
-    a. Initialize arrays of 1000 elements
-    b. Run a while loop - condition is while arrays are not yet filled
-        c. Fill arrays with latest sensor measurements
-    d. Once while loop terminates, take average of each array. This is the turn-on bias.
-    e. Add the turn-on bias for each sensor measurement to each sensor measurement's struct.
-    f. Log the global time at which the turn-on bias was determined.
-2. Determine sensor run-on bias.
-    a. Initialize arrays to store values of average slope of sensor measurement error with respect to time.
-    b. while loop for one minute (condition is that current time is one minute beyond time of turn-on bias determination)
-    c. Read each sensor.
-    d. Determine instantaneous slope of sensor measurements with respect to time.
-    e. Store slope value from (c) in the circular buffer for each sensor measurement.
-    f. At intervals in the while loop, append the current average circular buffer slope to the arrays declared in (a).
-    g. Once while loop has terminated, take average value of arrays from (a) and take this as de/dt for each sensor measurement.
-    h. Store the de/dt of each sensor measurement in the struct for that sensor.
-3. Determine initial attitude.
-    a. Accelerometer gives roll and pitch, magnetometer gives yaw. Covnert this to initial quaternion.
-    b. Store initial attitude quaternion in attitude struct.
-
-Ground calibration is now complete. Send Xbee signal to ground station that calibration is complete and rocket is ready to be launched.
-*/
-
-//LOOP
-/*
-Awaiting Launch
-Powered Ascent
-Unpowered Ascent
-*/
-
-
+#ifdef  USE_FULL_ASSERT
+/**
+  * @brief  Reports the name of the source file and the source line number
+  *         where the assert_param error has occurred.
+  * @param  file: pointer to the source file name
+  * @param  line: assert_param error line source number
+  * @retval None
+  */
+void assert_failed(uint8_t *file, uint32_t line)
+{
+  /* USER CODE BEGIN 6 */
+  /* User can add his own implementation to report the file name and line number,
+     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+  /* USER CODE END 6 */
+}
+#endif /* USE_FULL_ASSERT */

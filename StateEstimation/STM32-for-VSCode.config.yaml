@@ -38,7 +38,10 @@ cFlags:
   - -fdata-sections
   - -ffunction-sections
 
-cxxFlags: []
+cxxFlags: 
+  - -fno-rtti
+  - -fno-exceptions
+
 assemblyFlags: 
   - -Wall
   - -fdata-sections

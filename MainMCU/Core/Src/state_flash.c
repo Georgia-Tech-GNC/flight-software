@@ -166,10 +166,10 @@ int sd_test(void) {
 }
 
 void write_to_flash(FlashBlock *flash_block, RocketState *rocket_state, size_t page_index) {
-    uint8_t raw_bytes[FLASH_PAGE_SIZE];
+    uint8_t raw_bytes[EXT_FLASH_PAGE_SIZE];
     memcpy(raw_bytes, rocket_state, sizeof(RocketState));
 
-    flash_write_block(flash_block, page_index * FLASH_PAGE_SIZE, raw_bytes, FLASH_PAGE_SIZE);
+    flash_write_block(flash_block, page_index * EXT_FLASH_PAGE_SIZE, raw_bytes, EXT_FLASH_PAGE_SIZE);
 }
 
 void flash_sd_card(FlashBlock *flash_block, SDFile *sd_file, size_t n_states) {
@@ -178,7 +178,7 @@ void flash_sd_card(FlashBlock *flash_block, SDFile *sd_file, size_t n_states) {
     }
 
     RocketState rocket_state;
-    uint8_t data_buffer[FLASH_PAGE_SIZE];
+    uint8_t data_buffer[EXT_FLASH_PAGE_SIZE];
 
     char line_buf[2048];
     HAL_UART_Transmit(&debug_uart, (uint8_t *) "Writing to SD card...\r\n", 23, HAL_MAX_DELAY);
@@ -190,7 +190,7 @@ void flash_sd_card(FlashBlock *flash_block, SDFile *sd_file, size_t n_states) {
         sprintf(progress, "Writing to SD card: %d/%d\r\n", i + 1, n_states);
         HAL_UART_Transmit(&debug_uart, (uint8_t *) progress, strlen(progress), HAL_MAX_DELAY);
 
-        flash_read_block(flash_block, i * FLASH_PAGE_SIZE, data_buffer, FLASH_PAGE_SIZE);
+        flash_read_block(flash_block, i * EXT_FLASH_PAGE_SIZE, data_buffer, EXT_FLASH_PAGE_SIZE);
 
         memcpy(&rocket_state, data_buffer, sizeof(RocketState));
 

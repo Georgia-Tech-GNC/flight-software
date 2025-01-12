@@ -116,9 +116,9 @@ int main(void)
   while(HAL_TIMEOUT != HAL_UART_Receive(&state_uart, &tmp, 1, 10));
 
   if (port_init()) {
-    HAL_UART_Transmit(&debug_uart, "Port initialized\r\n", 18, HAL_MAX_DELAY);
+    HAL_UART_Transmit(&debug_uart, (uint8_t *) "Port initialized\r\n", 18, HAL_MAX_DELAY);
   } else {
-    HAL_UART_Transmit(&debug_uart, "Port not initialized\r\n", 22, HAL_MAX_DELAY);
+    HAL_UART_Transmit(&debug_uart, (uint8_t *) "Port not initialized\r\n", 22, HAL_MAX_DELAY);
   }
 
   port_start();

@@ -11,7 +11,7 @@
 #include "w25q.h"
 
 /* Size of flash chip in software emulation */
-#define SW_FLASH_CHIP_SIZE (4 * FLASH_SECTOR_SIZE)
+#define SW_FLASH_CHIP_SIZE (4 * EXT_FLASH_SECTOR_SIZE)
 
 /* Buffer for software emulation of flash chip */
 #ifndef MCU_H725ZGT6
@@ -180,22 +180,22 @@ int flash_erase_block(FlashBlock *block) {
             }
         }
     #else
-        memset(fake_flash_chip + block->start_sector * FLASH_SECTOR_SIZE, 0, block->n_sectors * FLASH_SECTOR_SIZE);
+        memset(fake_flash_chip + block->start_sector * EXT_FLASH_SECTOR_SIZE, 0, block->n_sectors * EXT_FLASH_SECTOR_SIZE);
     #endif
 
     return 1;
 }
 
 int flash_write_block(FlashBlock *block, uint16_t start_addr, uint8_t *data, size_t len) {
-    if (block == NULL || !flash_init || start_addr % FLASH_PAGE_SIZE != 0) {
+    if (block == NULL || !flash_init || start_addr % EXT_FLASH_PAGE_SIZE != 0) {
         return 0;
     }
 
-    size_t addr = block->start_sector * FLASH_SECTOR_SIZE + start_addr;
+    size_t addr = block->start_sector * EXT_FLASH_SECTOR_SIZE + start_addr;
 
-    for (size_t offset = 0; offset < len; offset += FLASH_PAGE_SIZE) {
+    for (size_t offset = 0; offset < len; offset += EXT_FLASH_PAGE_SIZE) {
         size_t remaining = len - offset;
-        size_t write_size = (remaining > FLASH_PAGE_SIZE) ? FLASH_PAGE_SIZE : remaining;
+        size_t write_size = (remaining > EXT_FLASH_PAGE_SIZE) ? EXT_FLASH_PAGE_SIZE : remaining;
 
 #ifdef MCU_H725ZGT6
         if (w25q_write_raw(&flash_chip, data + offset, write_size, addr + offset) != W25Q_ERR_OK) {
@@ -210,15 +210,15 @@ int flash_write_block(FlashBlock *block, uint16_t start_addr, uint8_t *data, siz
 }
 
 int flash_read_block(FlashBlock *block, uint16_t start_addr, uint8_t *data, size_t len) {
-    if (block == NULL || !flash_init || start_addr % FLASH_PAGE_SIZE != 0) {
+    if (block == NULL || !flash_init || start_addr % EXT_FLASH_PAGE_SIZE != 0) {
         return 0;
     }
 
-    size_t addr = block->start_sector * FLASH_SECTOR_SIZE + start_addr;
+    size_t addr = block->start_sector * EXT_FLASH_SECTOR_SIZE + start_addr;
 
-    for (size_t offset = 0; offset < len; offset += FLASH_PAGE_SIZE) {
+    for (size_t offset = 0; offset < len; offset += EXT_FLASH_PAGE_SIZE) {
         size_t remaining = len - offset;
-        size_t read_size = (remaining > FLASH_PAGE_SIZE) ? FLASH_PAGE_SIZE : remaining;
+        size_t read_size = (remaining > EXT_FLASH_PAGE_SIZE) ? EXT_FLASH_PAGE_SIZE : remaining;
 
 #ifdef MCU_H725ZGT6
         if (w25q_read_raw(&flash_chip, data + offset, read_size, addr + offset) != W25Q_ERR_OK) {

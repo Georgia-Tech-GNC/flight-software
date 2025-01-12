@@ -98,7 +98,6 @@ Core/Src/port.c \
 ../Core/Src/run_controls.c \
 ../Core/Tests/Src/uart_test.c \
 ../Core/Tests/Src/sd_test.c \
-../Core/Tests/Src/flash_test.c \
 Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc.c \
 Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c
 

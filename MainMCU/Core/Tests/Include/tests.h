@@ -7,5 +7,5 @@
 
 //#define USE_TESTS
 
-#define test_task flash_test_task
+#define test_task sd_test_task
 #endif

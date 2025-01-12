@@ -140,4 +140,8 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configUSE_TASK_NOTIFICATIONS 1
 #define configTASK_NOTFICATION_ARRAY_ENTRIES 1
 
+#include "stm32f4xx_hal.h"
+#include "port_config.h"
+#define configASSERT( x ) if( ( x ) == 0 ) { HAL_GPIO_WritePin(LD3_GPIO_PORT, LD3_PIN, GPIO_PIN_SET); for( ;; ); }
+
 #endif /* FREERTOS_CONFIG_H */

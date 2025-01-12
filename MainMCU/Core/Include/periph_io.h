@@ -4,50 +4,42 @@
 #include "stdint.h"
 #include "FreeRTOS.h"
 #include "stream_buffer.h"
-#include "state_flash.h"
+#include "string.h"
+#include "ff.h"
 #include "w25q.h"
 
-#define MAX_IO_OPERATIONS_QUEUED 4
-#define IO_MB_SIZE (sizeof(IOOperation) * MAX_IO_OPERATIONS_QUEUED)
-
 #define SD_MAX_READ_WRITE_SIZE 512
-#define FLASH_MAX_READ_WRITE_SIZE 256
+#define FLASH_PAGE_SIZE W25Q_MEM_PAGE_SIZE
+#define FLASH_SECTOR_SIZE (W25Q_MEM_SECTOR_SIZE * 1024)
 
-#define IO_MODE_READ 0
-#define IO_MODE_WRITE 1
-
-#define IO_OPERATION_LOAD 0
-#define IO_OPERATION_SAVE 1
-#define IO_OPERATION_RESET 2
-
-#define IO_CHANNEL_TYPE_SD 0
-#define IO_CHANNEL_TYPE_FLASH 1
+#define SD_MAX_PATH_LEN 64
 
 typedef struct {
-    const char *file_path;
-    uint8_t type;
-    uint8_t mode;
-    uint8_t id;
-    StreamBufferHandle_t sb_handle;
-} IOChannel;
+    uint16_t start_sector;
+    uint16_t n_sectors;
+} FlashBlock;
 
 typedef struct {
-    uint8_t type;
-    IOChannel *channel;
-    size_t offset; /* Only used if type is IO_MODE_READ */
-    size_t n_bytes; /* Only used if type is IO_MODE_READ */
-} IOOperation;
+    char file_path[SD_MAX_PATH_LEN];
+    uint8_t is_open;
+    uint8_t is_deleted;
+    uint8_t current_mode;
+    FIL fil;
+} SDFile;
 
-int sd_channel_init(IOChannel *channel, const char *file_name, uint8_t mode, uint8_t id, StaticStreamBuffer_t *sb_buff, uint8_t *sb_storage_area, size_t sb_size);
-int flash_channel_init(IOChannel *channel, uint8_t mode, uint8_t id, StaticStreamBuffer_t *sb_buff, uint8_t *sb_storage_area, size_t sb_size);
+int io_init(void);
 
-size_t io_channel_get_free(IOChannel *channel);
-size_t io_channel_get_full(IOChannel *channel);
-int io_write_channel(IOChannel *channel, uint8_t *data, size_t len);
-int io_save_channel(IOChannel *channel);
-int io_reset_channel(IOChannel *channel);
-int io_load_channel(IOChannel *channel, size_t offset, size_t bytes_to_read);
-int io_read_channel(IOChannel *channel, uint8_t *data, size_t len);
-void periph_io_task(void *args);
+int sd_init_file(SDFile *file, const char *file_path);
+int flash_init_block(FlashBlock *block, uint16_t start_sector, uint16_t n_sectors);
+
+int sd_open_file(SDFile *file, uint8_t mode);
+int sd_write_file(SDFile *file, uint16_t start_addr, uint8_t *data, size_t len);
+int sd_read_file(SDFile *file, uint16_t start_addr, uint8_t *data, size_t len);
+int sd_close_file(SDFile *file);
+int sd_delete_file(SDFile *file);
+
+int flash_erase_block(FlashBlock *block);
+int flash_write_block(FlashBlock *block, uint16_t start_addr, uint8_t *data, size_t len);
+int flash_read_block(FlashBlock *block, uint16_t start_addr, uint8_t *data, size_t len);
 
 #endif

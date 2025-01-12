@@ -3,9 +3,13 @@
 
 #include "globals.h"
 
+#include "port_config.h"
 #include "FreeRTOS.h"
 #include "semphr.h"
 
+/**
+ * @brief Task to run the controls algorithm
+ */
 void run_controls_task(void *args) {
     controller controller;
     float state[9];
@@ -22,7 +26,7 @@ void run_controls_task(void *args) {
 
     while (1) {
         if (xSemaphoreTake(g_state_mutex_handle, portMAX_DELAY) == pdTRUE) {
-            /* TODO: Update state vector */
+            /* Update state vector */
             state[0] = g_current_state.state_vector.velocity_y;
             state[1] = g_current_state.state_vector.velocity_x;
             state[2] = g_current_state.state_vector.velocity_z;
@@ -33,9 +37,11 @@ void run_controls_task(void *args) {
             state[7] = g_current_state.state_vector.attitude_x;
             state[8] = g_current_state.state_vector.attitude_z;
 
+            /* Calculate time since launch */
             uint64_t ms_since_launch = pdTICKS_TO_MS(xTaskGetTickCount() - g_current_state.launch_timestamp);
             seconds_since_launch = (float) ms_since_launch / 1000.0;
 
+            /* Stop running controls after (???) state */
             if (g_current_state.rocket_state.rocket_state > 3) {
                 xSemaphoreGive(g_state_mutex_handle);
                 break;
@@ -44,13 +50,13 @@ void run_controls_task(void *args) {
             xSemaphoreGive(g_state_mutex_handle);
         }
 
-
         run_controls(&controller, state, seconds_since_launch);
 
         char buf[100];
         sprintf(buf, "Running controls timestamp %f servos %f %f %f %f\r\n", seconds_since_launch, controller.servo_deflections[0], controller.servo_deflections[1], controller.servo_deflections[2], controller.servo_deflections[3]);
         HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
-       
+    
+        /* Update servo deflections */
         if (xSemaphoreTake(g_state_mutex_handle, portMAX_DELAY) == pdTRUE) {
             g_current_state.servo_deflection.servo_deflection_1 = controller.servo_deflections[0];
             g_current_state.servo_deflection.servo_deflection_2 = controller.servo_deflections[1];
@@ -60,11 +66,12 @@ void run_controls_task(void *args) {
             xSemaphoreGive(g_state_mutex_handle);
         }
 
+        /* Next ADC Conversion */
+        HAL_ADC_Start_IT(FIRST_ADC);
+
         vTaskDelay(pdMS_TO_TICKS(50));
     }
 
-    while (1) {
-        vTaskDelay(10000);
-    }
-
+    /* Tasks are not allowed to exit, so stall here */
+    vTaskDelay(portMAX_DELAY);
 }

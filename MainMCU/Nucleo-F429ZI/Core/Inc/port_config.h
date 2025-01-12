@@ -25,6 +25,15 @@
 #define ADC2_NEXT           &hadc3
 #define ADC3_NEXT           NULL
 
+#define LD1_GPIO_PORT       GPIOB
+#define LD1_PIN             GPIO_PIN_0
+
+#define LD2_GPIO_PORT       GPIOB
+#define LD2_PIN             GPIO_PIN_7
+
+#define LD3_GPIO_PORT       GPIOB
+#define LD3_PIN             GPIO_PIN_14
+
 static const ADC_Channel ADC2_SEQUENCE[ADC2_N_CHANNELS] = {
     ADC_PYRO_I_2,
 };

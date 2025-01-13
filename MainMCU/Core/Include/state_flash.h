@@ -12,7 +12,7 @@
 #define STATE_FLASH_START_SECTOR 0
 #define STATE_FLASH_N_SECTORS 16
 
-#define FLASH_TEST_SIZE FLASH_SECTOR_SIZE
+#define FLASH_TEST_SIZE EXT_FLASH_SECTOR_SIZE
 #define SD_TEST_SIZE 2048
 
 void state_flash_task(void *args);

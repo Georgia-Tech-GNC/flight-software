@@ -6,6 +6,7 @@ StackType_t test_task_stack[2048];
 StaticTask_t test_task_buff;
 #endif
 
+/* Static memory for tasks, mutexes, etc */
 TaskHandle_t g_telemetry_rx_task_handle;
 StackType_t telemetry_rx_task_stack[4096];
 StaticTask_t telemetry_rx_task_buff;
@@ -29,6 +30,7 @@ StreamBufferHandle_t g_telemetry_rx_sb_handle;
 uint8_t telemetry_rx_sb_storage[TELEMETRY_RX_MAX_PROCESS_SIZE + 2];
 StaticStreamBuffer_t telemetry_rx_sb_buff;
 
+/* Global rocket state struct */
 RocketState g_current_state = {0};
 
 /**
@@ -75,9 +77,4 @@ int port_init(void) {
  */
 void port_start(void) {
     vTaskStartScheduler();
-}
-
-void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName) {
-    HAL_UART_Transmit(&debug_uart, (uint8_t *) "Stack overflow\r\n", 16, HAL_MAX_DELAY);
-    while(1);
 }

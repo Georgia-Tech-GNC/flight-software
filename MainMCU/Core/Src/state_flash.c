@@ -9,12 +9,14 @@ size_t to_csv_line(RocketState *rocket_state, char *line);
 size_t printf_fixed_float(char *buf, float f);
 
 void state_flash_task(void *args) {
+    /* Initialize flash chip and SD card */
     if (!io_init()) {
         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to initialize IO\r\n", 26, HAL_MAX_DELAY);
     } else {
         HAL_UART_Transmit(&debug_uart, (uint8_t *) "IO initialized\r\n", 17, HAL_MAX_DELAY);
     }
 
+    /* Run tests */
     if (flash_test()) {
         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Flash test PASS\r\n", 17, HAL_MAX_DELAY);
     } else {
@@ -27,12 +29,11 @@ void state_flash_task(void *args) {
         HAL_UART_Transmit(&debug_uart, (uint8_t *) "SD test FAIL\r\n", 16, HAL_MAX_DELAY);
     }
 
+    /* Wait for notification before beginning */
     uint32_t notification_value = 0;
     while ((notification_value & BEGIN_STATE_FLASH_NOTIFICATION_BIT) == 0) {
         xTaskNotifyWait(0, BEGIN_STATE_FLASH_NOTIFICATION_BIT, &notification_value, portMAX_DELAY);
     }
-
-    RocketState rocket_state;
 
     FlashBlock flash_block;
     SDFile sd_file;
@@ -43,8 +44,10 @@ void state_flash_task(void *args) {
     size_t flash_page_index = 0;
 
     while (1) {
+        /* Wait for next notification */
         xTaskNotifyWait(0, FLASH_STATE_NOTIFICATION_BIT | FLASH_SD_CARD_NOTIFICATION_BIT, &notification_value, portMAX_DELAY);
 
+        /* Flash state to SD card */
         if (notification_value & FLASH_SD_CARD_NOTIFICATION_BIT) {
             HAL_UART_Transmit(&debug_uart, (uint8_t *) "Flashing SD card...\r\n", 20, HAL_MAX_DELAY);
             flash_sd_card(&flash_block, &sd_file, flash_page_index);
@@ -56,13 +59,19 @@ void state_flash_task(void *args) {
             vTaskDelay(portMAX_DELAY);
         }
 
+        /* Write state to flash chip */
         if (notification_value & FLASH_STATE_NOTIFICATION_BIT) {
+            uint8_t state_bytes[EXT_FLASH_PAGE_SIZE];
+
+            /* Always use mutex on g_current_state */
             if (xSemaphoreTake(g_state_mutex_handle, portMAX_DELAY) == pdTRUE) {
-                memcpy(&rocket_state, &g_current_state, sizeof(RocketState));
+                /* Memcpy out so we can give back the mutex as fast as possible */
+                memcpy(state_bytes, &g_current_state, sizeof(RocketState));
                 xSemaphoreGive(g_state_mutex_handle);
             }
 
-            write_to_flash(&flash_block, &rocket_state, flash_page_index);
+            /* Flash state */
+            flash_write_block(&flash_block, flash_page_index * EXT_FLASH_PAGE_SIZE, state_bytes, EXT_FLASH_PAGE_SIZE);
             flash_page_index ++;
         }
     }
@@ -163,13 +172,6 @@ int sd_test(void) {
     }
 
     return 1;
-}
-
-void write_to_flash(FlashBlock *flash_block, RocketState *rocket_state, size_t page_index) {
-    uint8_t raw_bytes[EXT_FLASH_PAGE_SIZE];
-    memcpy(raw_bytes, rocket_state, sizeof(RocketState));
-
-    flash_write_block(flash_block, page_index * EXT_FLASH_PAGE_SIZE, raw_bytes, EXT_FLASH_PAGE_SIZE);
 }
 
 void flash_sd_card(FlashBlock *flash_block, SDFile *sd_file, size_t n_states) {

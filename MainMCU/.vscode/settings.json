@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "state_tx.h": "c",
+        "globals.h": "c",
+        "protocol.h": "c",
+        "stdint.h": "c"
+    }
+}

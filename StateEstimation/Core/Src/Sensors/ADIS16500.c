@@ -70,9 +70,9 @@ void adis_write_register(struct ADIS_Device *device, uint8_t addr, uint16_t valu
  * @note The gyroscope readings are in degrees per second
  */
 void adis_read_gyro(struct ADIS_Device *device, float32_t gyro_readings[3]) {
-    gyro_readings[0] = (float)(adis_read_register(device, ADIS_X_GYRO_OUT)) * 0.1f;
-    gyro_readings[1] = (float)(adis_read_register(device, ADIS_Y_GYRO_OUT)) * 0.1f;
-    gyro_readings[2] = (float)(adis_read_register(device, ADIS_Z_GYRO_OUT)) * 0.1f;
+    gyro_readings[0] = (float32_t)(adis_read_register(device, ADIS_X_GYRO_OUT)) * 0.1f;
+    gyro_readings[1] = (float32_t)(adis_read_register(device, ADIS_Y_GYRO_OUT)) * 0.1f;
+    gyro_readings[2] = (float32_t)(adis_read_register(device, ADIS_Z_GYRO_OUT)) * 0.1f;
 }
 
 /**
@@ -82,9 +82,9 @@ void adis_read_gyro(struct ADIS_Device *device, float32_t gyro_readings[3]) {
  * @note The accelerometer readings are in g-forces
  */
 void adis_read_accel(struct ADIS_Device *device, float32_t accel_readings[3]) {
-    accel_readings[0] = (float) (adis_read_register(device, ADIS_X_ACCL_OUT)) * 0.01225f;
-    accel_readings[1] = (float) (adis_read_register(device, ADIS_Y_ACCL_OUT)) * 0.01225f;
-    accel_readings[2] = (float) (adis_read_register(device, ADIS_Z_ACCL_OUT)) * 0.01225f;
+    accel_readings[0] = (float32_t) (adis_read_register(device, ADIS_X_ACCL_OUT)) * 0.01225f;
+    accel_readings[1] = (float32_t) (adis_read_register(device, ADIS_Y_ACCL_OUT)) * 0.01225f;
+    accel_readings[2] = (float32_t) (adis_read_register(device, ADIS_Z_ACCL_OUT)) * 0.01225f;
 }
 
 

@@ -23,8 +23,8 @@ void run_fast_ascent(ExtKalmanFilter *ekf, RocketAttitude *rocket_atd, Sensors *
         fast_ascent_start_time = (float32_t) (global_time) / 1000.0f;
         first_iter = 0;
     }
-    run_attitude_estimation(rocket_atd, ekf->gyro);
-    run_ekf(ekf, rocket_atd, sensors, huart, 1);
+    //run_attitude_estimation(rocket_atd, ekf->gyro);
+    //run_ekf(ekf, rocket_atd, sensors, huart, 1);
     serial_data->state = FASTASCENT;
     serial_data->pos_x = ekf->x_n.pData[0];
     serial_data->pos_y = ekf->x_n.pData[2];

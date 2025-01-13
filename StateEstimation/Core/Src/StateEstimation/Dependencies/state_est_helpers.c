@@ -233,9 +233,7 @@ void handle_ground(void) {
         initialize_ekf_ground(&gekf, &huart3, &sensors, 6);
         gekf_initialize = 0;
     }
-    update_ekf_ground(&gekf, &sensors);
     run_ground(&gekf, &sensors, &serial_data, &huart3);
-    iterations++;
 }
 
 /**

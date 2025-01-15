@@ -69,16 +69,15 @@ void update_sensors(Sensors *sensors, UART_HandleTypeDef *huart) {
                     sensors->gps_offset_z = ecef_data.ecefZ * 0.1 + ecef_data.ecefZHp * 0.0001;
                     break;
                 }
-                case 0x28: {
-                    struct ublox_gnss_nav_hppvt hppvt_data;
-                    ublox_gnss_dec_ubx_nav_hppvt(msg, msg_len, &hppvt_data);
-                    sensors->gps_x = hppvt_data.lat * 1e-7 + hppvt_data.latHp * 1e-9;
-                    sensors->gps_y = hppvt_data.lon * 1e-7 + hppvt_data.lonHp * 1e-9;
-                    sensors->gps_z = hppvt_data.height * 1e-3 + hppvt_data.heightHp * 1e-4;
+                case 0x07: {
+                    struct ublox_gnss_nav_pvt gps_data;
+                    ublox_gnss_dec_ubx_nav_pvt(msg, msg_len, &gps_data);
+                    sensors->gps_x = gps_data.lat * 1e-7f;
+                    sensors->gps_y = gps_data.lon * 1e-7f;
+                    sensors->gps_z = gps_data.h_msl * 1e-3f;
                     char d[100];
-                    sprintf(d, "GPS fix type: %d", hppvt_data.fixType);
-                    HAL_UART_Transmit(huart, (uint8_t *) d, strlen(d), 100);
-                    break;
+                    sprintf(d, "ZED GPS fix type: %d\r\n", gps_data.fix_type);
+                    HAL_UART_Transmit(&huart3, (uint8_t *) d, strlen(d), 100);
                 }
             }
         }

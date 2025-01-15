@@ -251,6 +251,18 @@ void handle_armed(void) {
     fekf.launch_gps[0] = fekf.gps_flat[0];
     fekf.launch_gps[1] = fekf.gps_flat[1];
     fekf.launch_gps[2] = fekf.gps_flat[2];
+    char debug[128];
+    int debug_len = sprintf(debug, "GPS: lat=%f, lon=%f, height=%f\r\n", 
+                      sensors.gps_x, sensors.gps_y, sensors.gps_z);
+    HAL_UART_Transmit(&huart3, debug, debug_len, HAL_MAX_DELAY);
+    debug_len = sprintf(debug, "FLAT: x=%f, y=%f, z=%f\r\n",
+                       fekf.gps_flat[0], fekf.gps_flat[1], fekf.gps_flat[2]);
+    HAL_UART_Transmit(&huart3, debug, debug_len, HAL_MAX_DELAY);
+    debug_len = sprintf(debug, "ACCEL: x=%f, y=%f, z=%f\r\n",
+                       sensors.accel_x, sensors.accel_y, sensors.accel_z);
+    HAL_UART_Transmit(&huart3, debug, debug_len, HAL_MAX_DELAY);
+    debug_len = sprintf(debug, "GYRO: x=%f, y=%f, z=%f\r\n",
+                       sensors.gyro_x, sensors.gyro_y, sensors.gyro_z);
     
     if (fekf.accelerometer[0] > 4.9) {
         char debug_buffer[256];

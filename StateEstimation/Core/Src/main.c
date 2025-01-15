@@ -52,8 +52,9 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    //HAL_UART_Transmit(&huart3, "A\r\n", sizeof("A\r\n"), HAL_MAX_DELAY);
     state_machine_run();
-    delay_us(20);
+    HAL_Delay(100);
   }
   /* USER CODE END 3 */
 }

@@ -631,7 +631,7 @@ void update_ekf(ExtKalmanFilter *ekf, RocketAttitude *rocket_atd, Sensors* senso
 
 
     //Accelerometer readings: bias removed, transformed to be about center of mass, with gravity in body frame removed
-    ekf->accelerometer[0] = (sensors->accel_x + sensors->accel_bias_x) + coriolis_mat[0][0]*ekf->c[0] + coriolis_mat[0][1]*ekf->c[1] + coriolis_mat[0][2]*ekf->c[2] + g_bx;
+    ekf->accelerometer[0] = (sensors->accel_x - sensors->accel_bias_x) + coriolis_mat[0][0]*ekf->c[0] + coriolis_mat[0][1]*ekf->c[1] + coriolis_mat[0][2]*ekf->c[2] + g_bx;
     ekf->accelerometer[1] = (sensors->accel_y - sensors->accel_bias_y) + coriolis_mat[1][0]*ekf->c[0] + coriolis_mat[1][1]*ekf->c[1] + coriolis_mat[1][2]*ekf->c[2] + g_by;
     ekf->accelerometer[2] = (sensors->accel_z - sensors->accel_bias_z) + coriolis_mat[2][0]*ekf->c[0] + coriolis_mat[2][1]*ekf->c[1] + coriolis_mat[2][2]*ekf->c[2] + g_bz;
 

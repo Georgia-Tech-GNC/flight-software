@@ -17,6 +17,7 @@ static volatile bool rocket_atd_init = false;
  */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
+    //HAL_UART_Transmit(&huart3, "Testing\r\b", sizeof("Testing\r\b"), HAL_MAX_DELAY);
     if (htim->Instance == TIM6) {
         uint32_t current_dwt = DWT->CYCCNT;
         if (rocket_state == GROUND) {

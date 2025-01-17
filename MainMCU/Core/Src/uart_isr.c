@@ -10,11 +10,18 @@ uint8_t state_bytes_received = 0;
 void process_state_bytes(uint16_t size, BaseType_t *xHigherPriorityTaskWoken);
 void update_rocket_state(BaseType_t *xHigherPriorityTaskWoken);
 
+/**
+ * @brief Begin listening for UART data over telemetry_uart and state_uart
+ * @return 1 if successful, 0 otherwise
+ */
 int begin_uart_listen(void) {
+    /**
+     * RecieveToIdle will call the RxEventCallback interrupt when either an idle event is detected
+     * or the expected amount of data is recieved
+    */ 
     if (HAL_UARTEx_ReceiveToIdle_IT(&telemetry_uart, telemetry_uart_rx_buf, TELEMETRY_RX_MAX_PROCESS_SIZE) != HAL_OK) {
         return 0;
     }
-    
     
     if (HAL_UARTEx_ReceiveToIdle_IT(&state_uart, state_uart_rx_buf, STATE_PACKET_SIZE) != HAL_OK) {
         return 0;
@@ -24,46 +31,67 @@ int begin_uart_listen(void) {
 }
 
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
+    /* FreeRTOS boilerplate */
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
+    /* Direct uart data to the appropriate place */
     if (huart->Instance == telemetry_uart.Instance) {
-        HAL_GPIO_WritePin(LD2_GPIO_PORT, LD2_PIN, GPIO_PIN_SET);
+        /* Send telemetry data to the telemetry_rx task */
         xStreamBufferSendFromISR(g_telemetry_rx_sb_handle, telemetry_uart_rx_buf, size, &xHigherPriorityTaskWoken);
         HAL_UARTEx_ReceiveToIdle_IT(&telemetry_uart, telemetry_uart_rx_buf, TELEMETRY_RX_MAX_PROCESS_SIZE);
     } else if (huart->Instance == state_uart.Instance) {
-        HAL_GPIO_WritePin(LD1_GPIO_PORT, LD1_PIN, GPIO_PIN_SET);
         process_state_bytes(size, &xHigherPriorityTaskWoken);
         HAL_UARTEx_ReceiveToIdle_IT(&state_uart, state_uart_rx_buf, STATE_PACKET_SIZE);
     }
 
+    /* FreeRTOS boilerplate */
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
+/**
+ * @brief Process bytes recieved from the state estimation over UART
+ * When a full packet is recieved, update the rocket state
+ * @param size Number of bytes recieved
+ * @param xHigherPriorityTaskWoken FreeRTOS boilerplate
+ */
 void process_state_bytes(uint16_t size, BaseType_t *xHigherPriorityTaskWoken) {
     uint16_t size_to_recieve = size;
-
+    
+    /* Clamp initial size to recieve to not exceed STATE_PACKET_SIZE */
     if (state_bytes_received + size > STATE_PACKET_SIZE) {
         size_to_recieve = STATE_PACKET_SIZE - state_bytes_received;
     }
 
+    /* Fill state buffer */
     memcpy(state_bytes + state_bytes_received, state_uart_rx_buf, size_to_recieve);
-
     state_bytes_received += size_to_recieve;
 
+    /* If a full packet is recieved, update the rocket state */
     if (state_bytes_received == STATE_PACKET_SIZE) {
-        HAL_GPIO_TogglePin(LD2_GPIO_PORT, LD2_PIN);
         update_rocket_state(xHigherPriorityTaskWoken);
         state_bytes_received = 0;
     }
 
     uint16_t remaining_size = size - size_to_recieve;
 
+    /* Copy remaining data */
     memcpy(state_bytes + state_bytes_received, state_uart_rx_buf + size_to_recieve, remaining_size);
     state_bytes_received += remaining_size;
 }
 
+/**
+ * @brief Update the rocket state from the data in the state_bytes buffer
+ * @param xHigherPriorityTaskWoken FreeRTOS boilerplate
+ */
 void update_rocket_state(BaseType_t *xHigherPriorityTaskWoken) {
+    /* Always use mutex with g_current_state */
     if (xSemaphoreTakeFromISR(g_state_mutex_handle, xHigherPriorityTaskWoken) == pdTRUE) {
+        /**
+         * This code here should REALLY be auto-generated. All it does is take the bytes 
+         * and copy them to the correct fields in g_current_state. The reason we do this
+         * manually instead of in one memcpy is to avoid alignment issues.
+        */
+
         uint8_t *serial_buffer = state_bytes + 37;
         uint8_t *sensors_buffer = state_bytes;
 
@@ -140,11 +168,19 @@ void update_rocket_state(BaseType_t *xHigherPriorityTaskWoken) {
 
         xSemaphoreGiveFromISR(g_state_mutex_handle, xHigherPriorityTaskWoken);
 
+        /* Notify tasks to do something with the updated state */
         xTaskNotifyFromISR(g_state_tx_task_handle, SEND_STATE_NOTIFICATION_BIT, eSetBits, xHigherPriorityTaskWoken);
         xTaskNotifyFromISR(g_state_flash_task_handle, FLASH_STATE_NOTIFICATION_BIT, eSetBits, xHigherPriorityTaskWoken);
     }
+
+    /* Check for specific conditions in the rocket state */
+    check_state_markers(xHigherPriorityTaskWoken);
 }
 
+/**
+ * @brief Check for specific conditions in the rocket state
+ * @param xHigherPriorityTaskWoken FreeRTOS boilerplate
+ */
 void check_state_markers(BaseType_t *xHigherPriorityTaskWoken) {
     static uint8_t launched = 0;
     static uint8_t landed = 0;
@@ -159,16 +195,19 @@ void check_state_markers(BaseType_t *xHigherPriorityTaskWoken) {
         xTaskNotifyFromISR(g_run_controls_task_handle, BEGIN_CONTROLS_NOTIFICATION_BIT, eSetBits, xHigherPriorityTaskWoken);
     }
 
+    /* Landed */
     if (landed == 0 && g_current_state.rocket_state.rocket_state == 6) {
         landed = 1;        
         xTaskNotifyFromISR(g_state_flash_task_handle, FLASH_SD_CARD_NOTIFICATION_BIT, eSetBits, xHigherPriorityTaskWoken);
     }
 
+    /* Deploy drogue parachute */
     if (drogue_parachute_deploy == 0 && g_current_state.rocket_state.rocket_state == 5) {
         drogue_parachute_deploy = 1;
         g_current_state.rocket_state.firing_channel_1 = 1;
     }
 
+    /* Deploy main parachute */
     if (main_parachute_deploy == 0 && (g_current_state.rocket_state.rocket_state == 5 && (g_current_state.state_vector.position_z < 250 || g_current_state.state_vector.position_z > -250))) {
         main_parachute_deploy = 1;
         g_current_state.rocket_state.firing_channel_2 = 1;

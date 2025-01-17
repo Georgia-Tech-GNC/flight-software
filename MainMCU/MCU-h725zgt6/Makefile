@@ -200,8 +200,6 @@ LIBDIR =
 LDFLAGS = $(MCU) -specs=nano.specs -T$(LDSCRIPT) $(LIBDIR) $(LIBS) -Wl,-Map=$(BUILD_DIR)/$(TARGET).map,--cref -Wl,--gc-sections
 LDFLAGS += -u _printf_float
 
-# default action: build all
-all: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).hex $(BUILD_DIR)/$(TARGET).bin
 
 
 #######################################
@@ -244,11 +242,25 @@ clean:
 	-rm -fR $(BUILD_DIR)
 	
 flash:
-	openocd -f ./openocd.cfg -c "program build/MCU-h725zgt6.elf verify reset exit"
+	openocd -s /usr/share/openocd/scripts -f ./openocd.cfg -c "program build/MCU-h725zgt6.elf verify reset exit"
 
 #######################################
 # dependencies
 #######################################
 -include $(wildcard $(BUILD_DIR)/*.d)
 
+
+# default action: build all
+all: 
+	$(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).hex $(BUILD_DIR)/$(TARGET).bin
+	
+rebuild:
+	$(MAKE) clean
+	$(MAKE) -j4
+
+super:
+	$(MAKE) -j4
+	$(MAKE) flash
 # *** EOF ***
+
+

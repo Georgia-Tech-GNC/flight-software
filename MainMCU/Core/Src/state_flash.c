@@ -8,6 +8,10 @@ void flash_sd_card(FlashBlock *flash_block, SDFile *sd_file, size_t n_states);
 size_t to_csv_line(RocketState *rocket_state, char *line);
 size_t printf_fixed_float(char *buf, float f);
 
+/**
+ * @brief Task to handle writing state to flash chip and SD card
+ * @param args Unused
+ */
 void state_flash_task(void *args) {
     /* Initialize flash chip and SD card */
     if (!io_init()) {
@@ -77,23 +81,29 @@ void state_flash_task(void *args) {
     }
 }
 
-
+/**
+ * @brief Do a simple test of the flash chip.
+ * Writes a test pattern to the flash chip, reads it back, and erases the block.
+ * @return 1 if the test passes, 0 otherwise
+ */
 int flash_test(void) {
     FlashBlock test_block;
 
+    /* Allocate a new 2-sector block starting at sector 1 */
     if (!flash_init_block(&test_block, 1, 2)) {
         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to initialize flash block\r\n", 32, HAL_MAX_DELAY);
         return 0;
     }
 
     uint8_t test_bytes[FLASH_TEST_SIZE];
-
     const uint8_t offset = xTaskGetTickCount() % 256;
 
+    /* Create test pattern */
     for (size_t i = 0; i < FLASH_TEST_SIZE; i ++) {
         test_bytes[i] = (i + offset) % 256;
     }
 
+    /* Write pattern to flash chip */
     if (!flash_write_block(&test_block, 0, test_bytes, FLASH_TEST_SIZE)) {
         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to write to flash\r\n", 26, HAL_MAX_DELAY);
         return 0;
@@ -101,17 +111,20 @@ int flash_test(void) {
 
     memset(test_bytes, 0, FLASH_TEST_SIZE);
 
+    /* Read it back */
     if (!flash_read_block(&test_block, 0, test_bytes, FLASH_TEST_SIZE)) {
         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to read from flash\r\n", 27, HAL_MAX_DELAY);
         return 0;
     }
 
+    /* Check if the pattern matches */
     for (size_t i = 0; i < FLASH_TEST_SIZE; i ++) {
         if (test_bytes[i] != (i + offset) % 256) {
             return 0;
         }
     }
 
+    /* Erase what we just wroe */
     if (!flash_erase_block(&test_block)) {
         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to erase flash\r\n", 29, HAL_MAX_DELAY);
         return 0;
@@ -120,6 +133,11 @@ int flash_test(void) {
     return 1;
 }
 
+/**
+ * @brief Do a simple test of the SD card.
+ * Writes a test pattern to the SD card, reads it back, and deletes the file.
+ * @return 1 if the test passes, 0 otherwise
+ */
 int sd_test(void) {
     SDFile test_file;
 
@@ -134,13 +152,14 @@ int sd_test(void) {
     }
 
     uint8_t test_bytes[SD_TEST_SIZE + 1];
-
     const uint8_t offset = xTaskGetTickCount() % 256;
 
+    /* Create test pattern */
     for (size_t i = 0; i < SD_TEST_SIZE; i ++) {
         test_bytes[i] = (i + offset) % 256;
     }
 
+    /* Write pattern to SD card */
     if (!sd_write_file(&test_file, 0, test_bytes, SD_TEST_SIZE)) {
         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to write to SD card\r\n", 28, HAL_MAX_DELAY);
         return 0;
@@ -148,11 +167,13 @@ int sd_test(void) {
 
     memset(test_bytes, 0, SD_TEST_SIZE);
 
+    /* Read it back */
     if (!sd_read_file(&test_file, 0, test_bytes, SD_TEST_SIZE)) {
         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to read from SD card\r\n", 29, HAL_MAX_DELAY);
         return 0;
     }
 
+    /* Check if the pattern matches */
     for (size_t i = 0; i < SD_TEST_SIZE; i ++) {
         if (test_bytes[i] != (i + offset) % 256) {
             HAL_UART_Transmit(&debug_uart, (uint8_t *) "SD card read error\r\n", 20, HAL_MAX_DELAY);
@@ -165,7 +186,7 @@ int sd_test(void) {
         return 0;
     }
 
-
+    /* Erase what we just wrote */
     if (!sd_delete_file(&test_file)) {
         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to delete SD card file\r\n", 31, HAL_MAX_DELAY);
         return 0;
@@ -174,6 +195,12 @@ int sd_test(void) {
     return 1;
 }
 
+/**
+ * @brief Copy the state from the flash chip to the SD card
+ * @param flash_block Flash block to read from
+ * @param sd_file SD card file to write to
+ * @param n_states Number of states to copy
+ */
 void flash_sd_card(FlashBlock *flash_block, SDFile *sd_file, size_t n_states) {
     if (sd_open_file(sd_file, FA_READ | FA_WRITE | FA_CREATE_ALWAYS)) {
         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Successfully opened SD card file\r\n", 34, HAL_MAX_DELAY);
@@ -201,6 +228,7 @@ void flash_sd_card(FlashBlock *flash_block, SDFile *sd_file, size_t n_states) {
         if (sd_write_file(sd_file, sd_bytes_written, (uint8_t *) line_buf, line_len)) {
             HAL_UART_Transmit(&debug_uart, (uint8_t *) "writing to SD card\r\n", 20, HAL_MAX_DELAY);
         }
+
         sd_bytes_written += line_len;
     }
 
@@ -211,6 +239,12 @@ void flash_sd_card(FlashBlock *flash_block, SDFile *sd_file, size_t n_states) {
     HAL_UART_Transmit(&debug_uart, (uint8_t *) "Wrote to SD card\r\n", 18, HAL_MAX_DELAY);
 }
 
+/**
+ * @brief Write a RocketState to a CSV line
+ * @param rocket_state RocketState to write
+ * @param line Buffer to write to
+ * @return Number of bytes written
+ */
 size_t to_csv_line(RocketState *rocket_state, char *line) {
     size_t len = 0;
     
@@ -274,6 +308,13 @@ size_t to_csv_line(RocketState *rocket_state, char *line) {
     return len;
 }
 
+/**
+ * @brief Print a float to a buffer with fixed precision (3 decimal places)
+ * This helps us avoid adding floating point support to printf with -u _printf_float
+ * @param buf Buffer to write to
+ * @param f Float to write
+ * @return Number of bytes written
+ */
 size_t printf_fixed_float(char *buf, float f) {
     int i = (int) f;
     int d = (int) ((f - i) * 1000);

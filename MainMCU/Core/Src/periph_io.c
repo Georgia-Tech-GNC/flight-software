@@ -27,22 +27,17 @@ FATFS fs;
 
 int io_init(void) {
     HAL_UART_Transmit(&debug_uart, (uint8_t *) "Initializing IO devices...\r\n", 28, HAL_MAX_DELAY);
-    HAL_UART_Transmit(&debug_uart, (uint8_t *) "Mounting SD card...\r\n", 22, HAL_MAX_DELAY);
-
     if (f_mount(&fs, "/", 1) == FR_OK) {
-        HAL_UART_Transmit(&debug_uart, (uint8_t *) "Mounted SD card\r\n", 17, HAL_MAX_DELAY);
         sd_mounted = 1;
     } else {
-        HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to mount SD card\r\n", 25, HAL_MAX_DELAY);
         sd_mounted = 0;
     }
+    HAL_UART_Transmit(&debug_uart, (uint8_t *) "Mounted SD card\r\n", 17, HAL_MAX_DELAY);
 
 #ifdef MCU_H725ZGT6
     if (w25q_init(&flash_chip) == W25Q_ERR_OK) {
-        HAL_UART_Transmit(&debug_uart, (uint8_t *) "Initialized flash chip\r\n", 25, HAL_MAX_DELAY);
         flash_init = 1;
     } else {
-        HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to initialize flash chip\r\n", 33, HAL_MAX_DELAY);
         flash_init = 0;
     }
 #else

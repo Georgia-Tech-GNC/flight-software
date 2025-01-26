@@ -90,6 +90,7 @@ Core/Src/port.c \
 ../Core/Src/port_layer.c \
 ../Core/Src/protocol.c \
 ../Core/Src/run_controls.c \
+../Core/Src/servo.c \
 ../Core/Src/state_flash.c \
 ../Core/Src/state_tx.c \
 ../Core/Src/telemetry_rx.c \

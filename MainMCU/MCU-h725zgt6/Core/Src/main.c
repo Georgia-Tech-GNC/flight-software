@@ -23,6 +23,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "port_layer.h"
+#include "servo.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -135,13 +136,20 @@ int main(void)
 
   HAL_UART_Transmit(&debug_uart, (uint8_t *) "Foobar\r\n", 9, HAL_MAX_DELAY);
 
+  /*
   if (port_init()) {
     HAL_UART_Transmit(&debug_uart, (uint8_t *) "Port initialized\r\n", 18, HAL_MAX_DELAY);
   } else {
     HAL_UART_Transmit(&debug_uart, (uint8_t *) "Port not initialized\r\n", 22, HAL_MAX_DELAY);
   }
+  */
 
-  port_start();
+  //port_start();
+
+  Servo_T servo;
+  initServo(&servo, &htim3, TIM_CHANNEL_2);
+  enableServo(&servo);
+  //setServoAngle(&servo, 1.5);
 
   /*
   HAL_UART_Transmit(&huart4, "+++", 3, HAL_MAX_DELAY);
@@ -154,8 +162,12 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  int count = 0;
   while (1)
   {
+    setServoAngle(&servo, 3.1415/1000 * count);
+    count = (count + 1) % 1000;
+    HAL_Delay(5);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

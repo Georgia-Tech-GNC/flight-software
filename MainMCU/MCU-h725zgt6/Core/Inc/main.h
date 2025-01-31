@@ -67,6 +67,8 @@ void Error_Handler(void);
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
+#include "servo.h"
+extern Servo_T servo;
 
 #ifdef __cplusplus
 }

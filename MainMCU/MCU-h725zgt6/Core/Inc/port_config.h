@@ -28,25 +28,35 @@
 
 #define flash_spi           hospi1
 
-//#define USE_ADC1
+#define USE_ADC1
 #define USE_ADC2
 #define USE_ADC3
 
-#define ADC2_N_CHANNELS     1
-#define ADC3_N_CHANNELS     3
+#define ADC1_N_CHANNELS     3
+#define ADC2_N_CHANNELS     2
+#define ADC3_N_CHANNELS     4
 
-#define FIRST_ADC           &hadc2
+#define FIRST_ADC           &hadc1
+#define ADC1_NEXT           &hadc2
 #define ADC2_NEXT           &hadc3
 #define ADC3_NEXT           NULL
 
+static const ADC_Channel ADC1_SEQUENCE[ADC1_N_CHANNELS] = {
+    ADC_SERVO_2,
+    ADC_SERVO_1,
+    ADC_SERVO_0,
+};
+
 static const ADC_Channel ADC2_SEQUENCE[ADC2_N_CHANNELS] = {
-    ADC_PYRO_I_2,
+    ADC_SERVO_3,
+    ADC_PYRO_I_2
 };
 
 static const ADC_Channel ADC3_SEQUENCE[ADC3_N_CHANNELS] = {
+    ADC_SERVO_4,
     ADC_PYRO_I_0,
     ADC_PYRO_I_1,
-    ADC_VCC_I,
+    ADC_VCC_I
 };
 
 #endif

@@ -3,6 +3,7 @@
         "state_tx.h": "c",
         "globals.h": "c",
         "protocol.h": "c",
-        "stdint.h": "c"
+        "stdint.h": "c",
+        "servo.h": "c"
     }
 }

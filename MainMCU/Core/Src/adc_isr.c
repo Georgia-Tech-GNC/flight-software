@@ -70,28 +70,57 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
 #endif
 
     /* Always use mutex with g_current_state */
-    if (xSemaphoreTakeFromISR(g_state_mutex_handle, &xHigherPriorityTaskWoken) == pdTRUE) {
+    //if (xSemaphoreTakeFromISR(g_state_mutex_handle, &xHigherPriorityTaskWoken) == pdTRUE) {
         /* Update the appropriate field in g_current_state */
+        char buf[100];
         switch (channel) {
             case ADC_PYRO_I_0:
+                sprintf(buf, "ADC_PYRO_I_0: %d\r\n", adc_val);
+                //HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
                 g_current_state.analog_feedback_data.pyro_0_cont = adc_val;
                 break;
             case ADC_PYRO_I_1:
+                sprintf(buf, "ADC_PYRO_I_1: %d\r\n", adc_val);
+                //HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
                 g_current_state.analog_feedback_data.pyro_1_cont = adc_val;
                 break;
             case ADC_PYRO_I_2:
+                sprintf(buf, "ADC_PYRO_I_2: %d\r\n", adc_val);
+                //HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
                 g_current_state.analog_feedback_data.pyro_2_cont = adc_val;
                 break;
             case ADC_VCC_I:
+                sprintf(buf, "ADC_VCC_I: %d\r\n", adc_val);
+                //HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
                 g_current_state.analog_feedback_data.current_fb_33 = adc_val;
+                break;
+            case ADC_SERVO_0:
+                sprintf(buf, "ADC_SERVO_0: %d\r\n", adc_val);
+                //HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
+                break;
+            case ADC_SERVO_1:
+                sprintf(buf, "ADC_SERVO_1: %d\r\n", adc_val);
+                //HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
+                break;
+            case ADC_SERVO_2:
+                sprintf(buf, "ADC_SERVO_2: %d\r\n", adc_val);
+                //HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
+                break;
+            case ADC_SERVO_3:
+                sprintf(buf, "ADC_SERVO_3: %d\r\n", adc_val);
+                //HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
+                break;
+            case ADC_SERVO_4:
+                sprintf(buf, "ADC_SERVO_4: %d\r\n", adc_val);
+                HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
                 break;
         }
 
         /* Update timestamp */
         g_current_state.analog_feedback_data.timestamp = xTaskGetTickCount();
 
-        xSemaphoreGiveFromISR(g_state_mutex_handle, &xHigherPriorityTaskWoken);
-    }
+        //xSemaphoreGiveFromISR(g_state_mutex_handle, &xHigherPriorityTaskWoken);
+    //}
 
     /* Start next ADC */
     if (to_start != NULL) {
@@ -99,5 +128,5 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
     }
 
     /* FreeRTOS boilerplate */
-    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+    //portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }

@@ -31,6 +31,11 @@ typedef enum {
     ADC_PYRO_I_1 = 1,
     ADC_PYRO_I_2 = 2,
     ADC_VCC_I = 3,
+    ADC_SERVO_0 = 4,
+    ADC_SERVO_1 = 5,
+    ADC_SERVO_2 = 6,
+    ADC_SERVO_3 = 7,
+    ADC_SERVO_4 = 8,
 } ADC_Channel;
 
 #endif

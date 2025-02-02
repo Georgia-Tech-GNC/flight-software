@@ -59,4 +59,23 @@ static const ADC_Channel ADC3_SEQUENCE[ADC3_N_CHANNELS] = {
     ADC_VCC_I
 };
 
+#define USE_TIM2
+#define USE_TIM3
+#define USE_TIM4
+
+#define PWM0_TIMER &htim2
+#define PWM0_CHANNEL TIM_CHANNEL_1
+
+#define PWM1_TIMER &htim2
+#define PWM1_CHANNEL TIM_CHANNEL_2
+
+#define PWM2_TIMER &htim2
+#define PWM2_CHANNEL TIM_CHANNEL_3
+
+#define PWM3_TIMER &htim4
+#define PWM3_CHANNEL TIM_CHANNEL_2
+
+#define PWM4_TIMER &htim3
+#define PWM4_CHANNEL TIM_CHANNEL_2
+
 #endif

@@ -3,8 +3,16 @@
 #include "stm32h7xx_hal.h"
 
 #define ARR 64000
-#define MIN_ANG_COUNT 1600
-#define MAX_ANG_COUNT 8000
+#define APB1_TIMER_FREQ 96000000
+#define TIMER_PRESC 29
+
+#define COUNTS_PER_MS (APB1_TIMER_FREQ / (TIMER_PRESC + 1) / 1000)
+
+#define MIN_PULSE_WIDTH_US 500
+#define MAX_PULSE_WIDTH_US 2500
+
+#define MIN_ANG_COUNT ((COUNTS_PER_MS * MIN_PULSE_WIDTH_US) / 1000)
+#define MAX_ANG_COUNT ((COUNTS_PER_MS * MAX_PULSE_WIDTH_US) / 1000)
 #define MIN_ANG_RAD 0
 #define MAX_ANG_RAD 3.1415
 
@@ -15,7 +23,6 @@ PWM2 = PB10, TIM2_CH3
 PWM3 = PB7, TIM4_CH2
 PWM4 = PC7, TIM3_CH2
 */
-
 
 typedef struct {
   TIM_HandleTypeDef *htim;

@@ -38,6 +38,19 @@ extern ADC_HandleTypeDef hadc2;
 extern ADC_HandleTypeDef hadc3;
 #endif
 
+#ifdef USE_TIM1
+extern TIM_HandleTypeDef htim1;
+#endif
+#ifdef USE_TIM2
+extern TIM_HandleTypeDef htim2;
+#endif
+#ifdef USE_TIM3
+extern TIM_HandleTypeDef htim3;
+#endif
+#ifdef USE_TIM4
+extern TIM_HandleTypeDef htim4;
+#endif
+
 #ifdef MCU_H725ZGT6
 extern OSPI_HandleTypeDef flash_spi;
 #endif

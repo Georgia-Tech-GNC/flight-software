@@ -134,62 +134,21 @@ int main(void)
   /* USER CODE BEGIN 2 */
   uint8_t tmp;
   while(HAL_TIMEOUT != HAL_UART_Receive(&state_uart, &tmp, 1, 10));
-
-  HAL_UART_Transmit(&debug_uart, (uint8_t *) "Foobar\r\n", 9, HAL_MAX_DELAY);
-
-  if (HAL_TIM_Base_Start_IT(&htim2) != HAL_OK) {
-    HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to start TIM2\r\n", 22, HAL_MAX_DELAY);
-  } else {
-    HAL_UART_Transmit(&debug_uart, (uint8_t *) "TIM2 started\r\n", 15, HAL_MAX_DELAY);
-  }
-
-  /*
+  
   if (port_init()) {
     HAL_UART_Transmit(&debug_uart, (uint8_t *) "Port initialized\r\n", 18, HAL_MAX_DELAY);
   } else {
     HAL_UART_Transmit(&debug_uart, (uint8_t *) "Port not initialized\r\n", 22, HAL_MAX_DELAY);
   }
-  */
 
-  //port_start();
+  port_start();
 
-  initServo(&servo, &htim3, TIM_CHANNEL_2);
-  HAL_UART_Transmit(&debug_uart, (uint8_t *) "Servo initialized\r\n", 19, HAL_MAX_DELAY);
-  enableServo(&servo);
-  HAL_UART_Transmit(&debug_uart, (uint8_t *) "Servo enabled\r\n", 15, HAL_MAX_DELAY);
-  //setServoAngle(&servo, 1.5);
-
-  /*
-  HAL_UART_Transmit(&huart4, "+++", 3, HAL_MAX_DELAY);
-  HAL_Delay(1000);
-  HAL_UART_Transmit(&huart4, "ATBD 6\r\n", 8, HAL_MAX_DELAY); 
-  HAL_Delay(1000);
-  HAL_UART_Transmit(&huart4, "ATWR\r\n", 6, HAL_MAX_DELAY);
-  */
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  int count = 0;
-  int direction = 1;
   while (1)
   {
-    //HAL_ADC_Start_IT(FIRST_ADC);
-    //setServoAngle(&servo, 80.0 / 180.0 * 3.1415/300.0 * count);
-    servo_angle = 80.0 / 180.0 * 3.1415/300.0 * count;
-    
-    count += direction * 30;
-
-    if (count == 300) {
-      direction = -1;
-      HAL_Delay(100);
-    } else if (count == 0) {
-      direction = 1;
-      HAL_Delay(100);
-    }
-    
-    setServoAngle(&servo, servo_angle);
-    HAL_Delay(1000);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

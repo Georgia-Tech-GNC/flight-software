@@ -37,10 +37,13 @@ void static_fire_task(void *args) {
         setServoAngle(&servo4, angle_rad);
 
         if (xSemaphoreTake(g_state_mutex_handle, portMAX_DELAY) == pdTRUE) {
-            g_current_state.servo_deflections.servo_1_desired = angle_rad;
-            g_current_state.servo_deflections.servo_2_desired = angle_rad;
-            g_current_state.servo_deflections.servo_3_desired = angle_rad;
-            g_current_state.servo_deflections.servo_4_desired = angle_rad;
+            uint16_t adc_angle = SERVO_RAD_TO_ADC(angle_rad);
+
+            g_current_state.servo_deflections.servo_1_desired = adc_angle;
+            g_current_state.servo_deflections.servo_2_desired = adc_angle;
+            g_current_state.servo_deflections.servo_3_desired = adc_angle;
+            g_current_state.servo_deflections.servo_4_desired = adc_angle;
+            
             xSemaphoreGive(g_state_mutex_handle);
         }
 

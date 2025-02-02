@@ -1,6 +1,7 @@
 #pragma once
 #include <stdint.h>
 #include "stm32h7xx_hal.h"
+#include "main.h"
 
 #define ARR 64000
 #define APB1_TIMER_FREQ 96000000
@@ -14,7 +15,12 @@
 #define MIN_ANG_COUNT ((COUNTS_PER_MS * MIN_PULSE_WIDTH_US) / 1000)
 #define MAX_ANG_COUNT ((COUNTS_PER_MS * MAX_PULSE_WIDTH_US) / 1000)
 #define MIN_ANG_RAD 0
-#define MAX_ANG_RAD 3.1415
+#define MAX_ANG_RAD PI
+
+#define ADC_MIN 0
+#define ADC_MAX 1023
+
+#define SERVO_RAD_TO_ADC(x) (((float) x - MIN_ANG_RAD) / (MAX_ANG_RAD - MIN_ANG_RAD) * (ADC_MAX - ADC_MIN) + ADC_MIN)
 
 /*
 PWM0 = PA15, TIM2_CH1

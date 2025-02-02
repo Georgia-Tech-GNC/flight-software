@@ -49,6 +49,8 @@ extern "C" {
 
 /* USER CODE END EM */
 
+void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
+
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
 
@@ -63,10 +65,8 @@ void Error_Handler(void);
 #define SD_CS_GPIO_Port GPIOG
 
 /* USER CODE BEGIN Private defines */
-
+#define PI 3.14159265358979323846
 /* USER CODE END Private defines */
-#include "servo.h"
-extern Servo_T servo;
 
 #ifdef __cplusplus
 }

@@ -16,7 +16,12 @@ extern TaskHandle_t g_test_task_handle;
 extern TaskHandle_t g_telemetry_rx_task_handle;
 extern TaskHandle_t g_state_tx_task_handle;
 extern TaskHandle_t g_state_flash_task_handle;
+
+#ifndef STATIC_FIRE
 extern TaskHandle_t g_run_controls_task_handle;
+#else
+extern TaskHandle_t g_static_fire_task_handle;
+#endif
 
 extern SemaphoreHandle_t g_state_mutex_handle;
 

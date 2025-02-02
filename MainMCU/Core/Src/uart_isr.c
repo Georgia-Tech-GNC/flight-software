@@ -30,6 +30,7 @@ int begin_uart_listen(void) {
     return 1;
 }
 
+#ifndef STATIC_FIRE
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
     /* FreeRTOS boilerplate */
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
@@ -213,3 +214,4 @@ void check_state_markers(BaseType_t *xHigherPriorityTaskWoken) {
         g_current_state.rocket_state.firing_channel_2 = 1;
     }
 }
+#endif

@@ -1,6 +1,7 @@
 #ifndef TELEMETRY_RX_H
 #define TELEMETRY_RX_H
 
+#include "static_fire.h"
 #include <string.h>
 
 #include "telemetry.h"

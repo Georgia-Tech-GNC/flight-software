@@ -74,6 +74,7 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
         /* Update the appropriate field in g_current_state */
         char buf[100];
         switch (channel) {
+#ifndef STATIC_FIRE
             case ADC_PYRO_I_0:
                 sprintf(buf, "ADC_PYRO_I_0: %d\r\n", adc_val);
                 //HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
@@ -94,21 +95,26 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
                 //HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
                 g_current_state.analog_feedback_data.current_fb_33 = adc_val;
                 break;
+#endif
             case ADC_SERVO_0:
                 sprintf(buf, "ADC_SERVO_0: %d\r\n", adc_val);
                 //HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
+                g_current_state.servo_deflections.servo_1_actual = adc_val;
                 break;
             case ADC_SERVO_1:
                 sprintf(buf, "ADC_SERVO_1: %d\r\n", adc_val);
                 //HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
+                g_current_state.servo_deflections.servo_2_actual = adc_val;
                 break;
             case ADC_SERVO_2:
                 sprintf(buf, "ADC_SERVO_2: %d\r\n", adc_val);
                 //HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
+                g_current_state.servo_deflections.servo_3_actual = adc_val;
                 break;
             case ADC_SERVO_3:
                 sprintf(buf, "ADC_SERVO_3: %d\r\n", adc_val);
                 //HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
+                g_current_state.servo_deflections.servo_4_actual = adc_val;
                 break;
             case ADC_SERVO_4:
                 sprintf(buf, "ADC_SERVO_4: %d\r\n", adc_val);
@@ -117,7 +123,10 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
         }
 
         /* Update timestamp */
+#ifndef STATIC_FIRE
         g_current_state.analog_feedback_data.timestamp = xTaskGetTickCount();
+#endif
+        g_current_state.servo_deflections.timestamp = xTaskGetTickCount();
 
         //xSemaphoreGiveFromISR(g_state_mutex_handle, &xHigherPriorityTaskWoken);
     //}

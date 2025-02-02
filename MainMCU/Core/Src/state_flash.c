@@ -250,6 +250,7 @@ size_t to_csv_line(RocketState *rocket_state, char *line) {
     
     len += sprintf(line + len, "%lu,", (uint32_t) rocket_state->launch_timestamp);
 
+#ifndef STATIC_FIRE
     len += sprintf(line + len, "%lu,", (uint32_t) (rocket_state->state_vector.timestamp));
     len += printf_fixed_float(line + len, rocket_state->state_vector.velocity_x);
     len += printf_fixed_float(line + len, rocket_state->state_vector.velocity_y);
@@ -264,15 +265,27 @@ size_t to_csv_line(RocketState *rocket_state, char *line) {
     len += printf_fixed_float(line + len, rocket_state->state_vector.world_x);
     len += printf_fixed_float(line + len, rocket_state->state_vector.world_y);
     len += printf_fixed_float(line + len, rocket_state->state_vector.world_z);
-
     len += sprintf(line + len, "%lu,", (uint32_t) (rocket_state->servo_deflection.timestamp));
     len += printf_fixed_float(line + len, rocket_state->servo_deflection.servo_deflection_1);
     len += printf_fixed_float(line + len, rocket_state->servo_deflection.servo_deflection_2);
     len += printf_fixed_float(line + len, rocket_state->servo_deflection.servo_deflection_3);
     len += printf_fixed_float(line + len, rocket_state->servo_deflection.servo_deflection_4);
+#endif
+
+    len += sprintf(line + len, "%lu,", (uint32_t) rocket_state->servo_deflections.timestamp);
+    len += sprintf(line + len, "%d", rocket_state->servo_deflections.servo_1_desired);
+    len += sprintf(line + len, "%d", rocket_state->servo_deflections.servo_1_actual);
+    len += sprintf(line + len, "%d", rocket_state->servo_deflections.servo_2_desired);
+    len += sprintf(line + len, "%d", rocket_state->servo_deflections.servo_2_actual);
+    len += sprintf(line + len, "%d", rocket_state->servo_deflections.servo_3_desired);
+    len += sprintf(line + len, "%d", rocket_state->servo_deflections.servo_3_actual);
+    len += sprintf(line + len, "%d", rocket_state->servo_deflections.servo_4_desired);
+    len += sprintf(line + len, "%d", rocket_state->servo_deflections.servo_4_actual);
 
     len += sprintf(line + len, "%lu,", (uint32_t) (rocket_state->rocket_state.timestamp));
     len += sprintf(line + len, "%d,", rocket_state->rocket_state.rocket_state);
+    
+#ifndef STATIC_FIRE
     len += sprintf(line + len, "%d,", rocket_state->rocket_state.firing_channel_1);
     len += sprintf(line + len, "%d,", rocket_state->rocket_state.firing_channel_2);
     len += sprintf(line + len, "%d,", rocket_state->rocket_state.firing_channel_3);
@@ -302,7 +315,8 @@ size_t to_csv_line(RocketState *rocket_state, char *line) {
     len += sprintf(line + len, "%d,", rocket_state->analog_feedback_data.pyro_1_cont);
     len += sprintf(line + len, "%d,", rocket_state->analog_feedback_data.pyro_2_cont);
     len += sprintf(line + len, "%d", rocket_state->analog_feedback_data.pyro_channel_deploy);
-    
+#endif
+
     line[len++] = '\n';
 
     return len;

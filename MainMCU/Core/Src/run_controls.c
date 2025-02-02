@@ -11,6 +11,7 @@
  * @brief Task to run the controls algorithm
  * @param args Unused
  */
+#ifndef STATIC_FIRE
 void run_controls_task(void *args) {
     controller controller;
     float state[9];
@@ -79,3 +80,4 @@ void run_controls_task(void *args) {
     /* Tasks are not allowed to exit, so stall here */
     vTaskDelay(portMAX_DELAY);
 }
+#endif

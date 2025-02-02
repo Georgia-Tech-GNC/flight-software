@@ -7,7 +7,7 @@ void process_command(int command_id);
 void command_idle_to_ground();
 void command_fire_pyro();
 void command_flash_sd_card();
-void command_run_vane_activation_test();
+void command_ignite();
 
 /**
  * Task to handle incoming telemetry data
@@ -98,6 +98,7 @@ void rx_process_byte(uint8_t byte, uint8_t *packet_buffer, uint8_t *extracted_bu
  */
 void process_command(int command_id) {
     switch (command_id) {
+#ifndef STATIC_FIRE
         case ROCKET_IDLE_TO_GROUND_COMMAND_ID:
             command_idle_to_ground();
             break;
@@ -107,6 +108,11 @@ void process_command(int command_id) {
         case ROCKET_FLASH_SD_CARD_COMMAND_ID:
             command_flash_sd_card();
             break;
+#else
+        case IGNITE_COMMAND_ID:
+            command_ignite();
+            break;
+#endif
     }
 }
 
@@ -138,6 +144,7 @@ void command_flash_sd_card() {
 /**
  * @brief Perform the vane activation test command
  */
-void command_run_vane_activation_test() {
-    /* Unimplemented */
+void command_ignite() {
+    xTaskNotify(g_state_tx_task_handle, BEGIN_STATE_TX_NOTIFICATION_BIT, eSetBits);
+    xTaskNotify(g_static_fire_task_handle, BEGIN_STATIC_FIRE_NOTIFICATION_BIT, eSetBits);
 }

@@ -7,7 +7,8 @@
                 "${workspaceFolder}/MCU-h725zgt6/**"
             ],
             "defines": [
-                "STM32H725xx"
+                "STM32H725xx",
+                "STATIC_FIRE"
             ],
             "compilerPath": "/usr/bin/arm-none-eabi-gcc",
             "cStandard": "c17",

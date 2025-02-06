@@ -896,7 +896,17 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOA_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOE, PYRO_0_Pin|PYRO_1_Pin|PYRO_2_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOG, FLASH_CS_Pin|SD_CS_Pin, GPIO_PIN_SET);
+
+  /*Configure GPIO pins : PYRO_0_Pin PYRO_1_Pin PYRO_2_Pin */
+  GPIO_InitStruct.Pin = PYRO_0_Pin|PYRO_1_Pin|PYRO_2_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
   /*Configure GPIO pins : FLASH_CS_Pin SD_CS_Pin */
   GPIO_InitStruct.Pin = FLASH_CS_Pin|SD_CS_Pin;

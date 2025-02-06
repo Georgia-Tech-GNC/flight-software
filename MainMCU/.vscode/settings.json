@@ -9,6 +9,7 @@
         "port_layer.h": "c",
         "telemetry_rx.h": "c",
         "telemetry.h": "c",
-        "message_buffer.h": "c"
+        "message_buffer.h": "c",
+        "main.h": "c"
     }
 }

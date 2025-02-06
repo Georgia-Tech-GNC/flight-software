@@ -8,6 +8,7 @@ void command_idle_to_ground();
 void command_fire_pyro();
 void command_flash_sd_card();
 void command_ignite();
+void command_zero_servos();
 
 /**
  * Task to handle incoming telemetry data
@@ -50,7 +51,7 @@ void telemetry_rx_task(void *args) {
 void rx_process_byte(uint8_t byte, uint8_t *packet_buffer, uint8_t *extracted_buffer, uint8_t *packet_buffer_size, uint8_t *recieved_uuids) {
     int next_packet_buffer_size = process_incoming_byte(byte, packet_buffer, *packet_buffer_size);
     char buf[100];
-    sprintf(buf, "%02x\r\n", byte);
+    sprintf(buf, "Recieved byte: %02x\r\n", byte);
     HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
 
     if (next_packet_buffer_size < 0) {
@@ -112,6 +113,9 @@ void process_command(int command_id) {
         case IGNITE_COMMAND_ID:
             command_ignite();
             break;
+        case ZERO_SERVOS_COMMAND_ID:
+            command_zero_servos();
+            break;
 #endif
     }
 }
@@ -146,5 +150,13 @@ void command_flash_sd_card() {
  */
 void command_ignite() {
     xTaskNotify(g_state_tx_task_handle, BEGIN_STATE_TX_NOTIFICATION_BIT, eSetBits);
+    xTaskNotify(g_state_flash_task_handle, BEGIN_STATE_FLASH_NOTIFICATION_BIT, eSetBits);
     xTaskNotify(g_static_fire_task_handle, BEGIN_STATIC_FIRE_NOTIFICATION_BIT, eSetBits);
+}
+
+/**
+ * @brief Perform the zero servos command
+ */
+void command_zero_servos() {
+    xTaskNotify(g_static_fire_task_handle, ZERO_SERVOS_NOTIFICATION_BIT, eSetBits);
 }

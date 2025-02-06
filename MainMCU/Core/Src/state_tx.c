@@ -25,11 +25,11 @@ void state_tx_task(void *args) {
     }
 
     while (1) {
-        /* Wait for next notification */
+        uint32_t notification_value = 0;
         while ((notification_value & SEND_STATE_NOTIFICATION_BIT) == 0) {
             xTaskNotifyWait(0, SEND_STATE_NOTIFICATION_BIT, &notification_value, portMAX_DELAY);
         }
-        
+
         /* Always use mutex with g_current_state */
         if (xSemaphoreTake(g_state_mutex_handle, portMAX_DELAY) == pdTRUE) {
             /* Memcpy data out of global rocket state so we an give back mutex quickly */
@@ -58,8 +58,6 @@ void state_tx_task(void *args) {
         send_analog_feedback_data(&rocket_state, payload_buf);
         vTaskDelay(pdMS_TO_TICKS((ROCKETANALOGFEEDBACKDATA_SIZE + 5) * MULT));
 #endif
-
-        vTaskDelay(pdMS_TO_TICKS(200));
     }
 }
 

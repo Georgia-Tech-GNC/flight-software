@@ -42,9 +42,10 @@ struct CommandStruct {
 #define COMMAND_ACK_MSG_ID 2
 
 #define IGNITE_COMMAND_ID 1
-#define PING_ROCKET_COMMAND_ID 2
+#define ZERO_SERVOS_COMMAND_ID 2
+#define PING_ROCKET_COMMAND_ID 3
 
-#define NUM_COMMAND_TYPES 2
+#define NUM_COMMAND_TYPES 3
 
 /**
  * Checks if the inputted packet represents a command

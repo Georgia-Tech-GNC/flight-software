@@ -11,10 +11,10 @@
 #include "w25q.h"
 
 /* Size of flash chip in software emulation */
-#define SW_FLASH_CHIP_SIZE (4 * EXT_FLASH_SECTOR_SIZE)
+#define SW_FLASH_CHIP_SIZE (16 * EXT_FLASH_SECTOR_SIZE)
 
 /* Buffer for software emulation of flash chip */
-#ifndef MCU_H725ZGT6
+#ifndef USE_HW_FLASH_CHIP
 uint8_t _fake_flash_chip[SW_FLASH_CHIP_SIZE];
 uint8_t *fake_flash_chip = _fake_flash_chip;
 #endif
@@ -27,17 +27,23 @@ FATFS fs;
 
 int io_init(void) {
     HAL_UART_Transmit(&debug_uart, (uint8_t *) "Initializing IO devices...\r\n", 28, HAL_MAX_DELAY);
-    if (f_mount(&fs, "/", 1) == FR_OK) {
+    int sd_status = f_mount(&fs, "/", 1);
+    if (sd_status == FR_OK) {
+        HAL_UART_Transmit(&debug_uart, (uint8_t *) "Mounted SD card\r\n", 17, HAL_MAX_DELAY);
         sd_mounted = 1;
     } else {
+        char buf[100];
+        sprintf(buf, "Failed to mount SD card: %d\r\n", sd_status);
+        HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
         sd_mounted = 0;
     }
-    HAL_UART_Transmit(&debug_uart, (uint8_t *) "Mounted SD card\r\n", 17, HAL_MAX_DELAY);
 
 #ifdef MCU_H725ZGT6
     if (w25q_init(&flash_chip) == W25Q_ERR_OK) {
+        HAL_UART_Transmit(&debug_uart, (uint8_t *) "Initialized flash chip\r\n", 24, HAL_MAX_DELAY);
         flash_init = 1;
     } else {
+        HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to initialize flash chip\r\n", 32, HAL_MAX_DELAY);
         flash_init = 0;
     }
 #else
@@ -173,7 +179,7 @@ int flash_erase_block(FlashBlock *block) {
         return 0;
     }
 
-    #ifdef MCU_H725ZGT6
+    #ifdef USE_HW_FLASH_CHIP
         for (size_t i = 0; i < block->n_sectors; i++) {
             if (w25q_erase_sector(&flash_chip, block->start_sector + i) != W25Q_ERR_OK) {
                 return 0;
@@ -197,7 +203,7 @@ int flash_write_block(FlashBlock *block, uint16_t start_addr, uint8_t *data, siz
         size_t remaining = len - offset;
         size_t write_size = (remaining > EXT_FLASH_PAGE_SIZE) ? EXT_FLASH_PAGE_SIZE : remaining;
 
-#ifdef MCU_H725ZGT6
+#ifdef USE_HW_FLASH_CHIP
         if (w25q_write_raw(&flash_chip, data + offset, write_size, addr + offset) != W25Q_ERR_OK) {
             return 0;
         }
@@ -220,7 +226,7 @@ int flash_read_block(FlashBlock *block, uint16_t start_addr, uint8_t *data, size
         size_t remaining = len - offset;
         size_t read_size = (remaining > EXT_FLASH_PAGE_SIZE) ? EXT_FLASH_PAGE_SIZE : remaining;
 
-#ifdef MCU_H725ZGT6
+#ifdef USE_HW_FLASH_CHIP
         if (w25q_read_raw(&flash_chip, data + offset, read_size, addr + offset) != W25Q_ERR_OK) {
             return 0;
         }

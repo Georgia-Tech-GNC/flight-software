@@ -98,22 +98,22 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
 #endif
             case ADC_SERVO_0:
                 sprintf(buf, "ADC_SERVO_0: %d\r\n", adc_val);
-                //HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
+                HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
                 g_current_state.servo_deflections.servo_1_actual = adc_val;
                 break;
             case ADC_SERVO_1:
                 sprintf(buf, "ADC_SERVO_1: %d\r\n", adc_val);
-                //HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
+                HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
                 g_current_state.servo_deflections.servo_2_actual = adc_val;
                 break;
             case ADC_SERVO_2:
                 sprintf(buf, "ADC_SERVO_2: %d\r\n", adc_val);
-                //HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
+                HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
                 g_current_state.servo_deflections.servo_3_actual = adc_val;
                 break;
             case ADC_SERVO_3:
                 sprintf(buf, "ADC_SERVO_3: %d\r\n", adc_val);
-                //HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
+                HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
                 g_current_state.servo_deflections.servo_4_actual = adc_val;
                 break;
             case ADC_SERVO_4:

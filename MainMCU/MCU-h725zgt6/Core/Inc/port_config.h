@@ -42,21 +42,15 @@
 #define ADC3_NEXT           NULL
 
 static const ADC_Channel ADC1_SEQUENCE[ADC1_N_CHANNELS] = {
-    ADC_SERVO_2,
-    ADC_SERVO_1,
-    ADC_SERVO_0,
+
 };
 
 static const ADC_Channel ADC2_SEQUENCE[ADC2_N_CHANNELS] = {
-    ADC_SERVO_3,
-    ADC_PYRO_I_2
+
 };
 
 static const ADC_Channel ADC3_SEQUENCE[ADC3_N_CHANNELS] = {
-    ADC_SERVO_4,
-    ADC_PYRO_I_0,
-    ADC_PYRO_I_1,
-    ADC_VCC_I
+
 };
 
 #define USE_TIM2

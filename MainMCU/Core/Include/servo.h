@@ -2,26 +2,20 @@
 #include <stdint.h>
 #include "stm32h7xx_hal.h"
 #include "main.h"
+#include "arm_math.h"
+#include <stdbool.h>
 
 #define ARR 64000
 #define APB1_TIMER_FREQ 96000000
 #define TIMER_PRESC 29
 
-#define COUNTS_PER_MS (APB1_TIMER_FREQ / (TIMER_PRESC + 1) / 1000)
+#define COUNTS_PER_US (APB1_TIMER_FREQ / (TIMER_PRESC + 1) / 1e6)
 
 #define MIN_PULSE_WIDTH_US 500
 #define MAX_PULSE_WIDTH_US 2500
 
-#define MIN_ANG_COUNT ((COUNTS_PER_MS * MIN_PULSE_WIDTH_US) / 1000)
-#define MAX_ANG_COUNT ((COUNTS_PER_MS * MAX_PULSE_WIDTH_US) / 1000)
-#define MIN_ANG_RAD 0
-#define MAX_ANG_RAD PI
-
-#define ADC_MIN 0
-#define ADC_MAX 1023
-
-#define SERVO_RAD_TO_ADC(x) (((float) x - MIN_ANG_RAD) / (MAX_ANG_RAD - MIN_ANG_RAD) * (ADC_MAX - ADC_MIN) + ADC_MIN)
-
+#define SERVO_RANGE (81.0/255.0 * 355.0/180.0 * PI)
+#define CALI_RANGE (PI/2)
 /*
 PWM0 = PA15, TIM2_CH1
 PWM1 = PB3, TIM2_CH2
@@ -33,34 +27,36 @@ PWM4 = PC7, TIM3_CH2
 typedef struct {
   TIM_HandleTypeDef *htim;
   uint32_t tim_channel;
+  uint16_t adc_zero;
+  double angle_zero;
+  double setpoint;
+  uint16_t adc_range[2];
+  bool invert;
 } Servo_T;
 
 // Initialize Servo Struct
-void initServo(Servo_T *servo, TIM_HandleTypeDef *htim, uint32_t channel);
+void servo_init(Servo_T *servo, TIM_HandleTypeDef *htim, uint32_t channel, bool invert);
 
 // Enable Servo Output
-void enableServo(Servo_T *servo);
+void servo_enable(Servo_T *servo);
 
 // Disable Servo Output
-void disableServo(Servo_T *servo);
+void servo_disable(Servo_T *servo);
 
 // Command servo angle
-void setServoAngle(Servo_T *servo, double angle_radians);
+uint16_t servo_set_angle(Servo_T *servo, double angle_rad);
+
 // Get Commanded Angle
-double getCommandedAngle(Servo_T *servo);
+double servo_get_angle(Servo_T *servo);
 
-// Read servo angle
+// Convert an adc reading into a servo deflection from the zero point
+double servo_adc_to_rad(Servo_T *servo, uint16_t adc_value);
 
-// PID Controller
-typedef struct {
-  double kP;
-  double kI;
-  double kD;
-  double lastError;
-  double integrator;
-  uint32_t lastTime;
-  double lastOutput;
-  double setPoint;
-} PIDController_T;
+uint16_t servo_rad_to_adc(Servo_T *servo);
 
-double updatePID(PIDController_T *pid, double measurement, double newTime);
+// Go to callibration points
+void servo_go_to_calibration_start(Servo_T *servo);
+void servo_go_to_calibration_end(Servo_T *servo);
+
+// Perform zero point calculation
+void servo_set_zero(Servo_T *servo, uint16_t adc_start, uint16_t adc_end, uint16_t adc_zero);

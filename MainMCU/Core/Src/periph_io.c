@@ -11,7 +11,7 @@
 #include "w25q.h"
 
 /* Size of flash chip in software emulation */
-#define SW_FLASH_CHIP_SIZE (16 * EXT_FLASH_SECTOR_SIZE)
+#define SW_FLASH_CHIP_SIZE (8 * EXT_FLASH_SECTOR_SIZE)
 
 /* Buffer for software emulation of flash chip */
 #ifndef USE_HW_FLASH_CHIP

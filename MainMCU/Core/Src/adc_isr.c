@@ -73,26 +73,30 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
     //if (xSemaphoreTakeFromISR(g_state_mutex_handle, &xHigherPriorityTaskWoken) == pdTRUE) {
         /* Update the appropriate field in g_current_state */
         char buf[100];
+
+        sprintf(buf, "\tConverting channel: %d\r\n", channel);
+        HAL_UART_Transmit(&debug_uart, buf, strlen(buf), HAL_MAX_DELAY);
+
         switch (channel) {
 #ifndef STATIC_FIRE
             case ADC_PYRO_I_0:
                 sprintf(buf, "ADC_PYRO_I_0: %d\r\n", adc_val);
-                //HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
+                HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
                 g_current_state.analog_feedback_data.pyro_0_cont = adc_val;
                 break;
             case ADC_PYRO_I_1:
                 sprintf(buf, "ADC_PYRO_I_1: %d\r\n", adc_val);
-                //HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
+                HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
                 g_current_state.analog_feedback_data.pyro_1_cont = adc_val;
                 break;
             case ADC_PYRO_I_2:
                 sprintf(buf, "ADC_PYRO_I_2: %d\r\n", adc_val);
-                //HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
+                HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
                 g_current_state.analog_feedback_data.pyro_2_cont = adc_val;
                 break;
             case ADC_VCC_I:
                 sprintf(buf, "ADC_VCC_I: %d\r\n", adc_val);
-                //HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
+                HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
                 g_current_state.analog_feedback_data.current_fb_33 = adc_val;
                 break;
 #endif

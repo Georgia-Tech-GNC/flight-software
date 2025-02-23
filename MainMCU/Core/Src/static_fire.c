@@ -1,4 +1,5 @@
 #include "static_fire.h"
+#include "adc.h"
 
 void init_servos(Servo_T *servos);
 void enable_servos(Servo_T *servos);
@@ -9,10 +10,10 @@ void measure_adc_with_delay(void);
 void calibrate_servos(Servo_T *servos, uint16_t **servo_deflections);
 
 void init_servos(Servo_T *servos) {
-    servo_init(&servos[0], PWM0_TIMER, PWM0_CHANNEL, false);
-    servo_init(&servos[1], PWM1_TIMER, PWM1_CHANNEL, false);
-    servo_init(&servos[2], PWM2_TIMER, PWM2_CHANNEL, false);
-    servo_init(&servos[3], PWM3_TIMER, PWM3_CHANNEL, false);
+    servo_init(&servos[3], PWM0_TIMER, PWM0_CHANNEL, false);
+    servo_init(&servos[2], PWM1_TIMER, PWM1_CHANNEL, false);
+    servo_init(&servos[1], PWM2_TIMER, PWM2_CHANNEL, false);
+    servo_init(&servos[0], PWM3_TIMER, PWM3_CHANNEL, false);
 }
 
 void enable_servos(Servo_T *servos) {
@@ -35,13 +36,8 @@ void set_servo_angles(Servo_T *servos, float angle_rad) {
     }
 }
 
-void measure_adc_with_delay(void) {
-    HAL_ADC_Start_IT(FIRST_ADC);
-    vTaskDelay(pdMS_TO_TICKS(2));
-}
-
 void record_servo_adcs(uint16_t *adcs, uint16_t **servo_deflections) {
-    measure_adc_with_delay();
+    poll_adcs();
 
     if (xSemaphoreTake(g_state_mutex_handle, portMAX_DELAY) == pdTRUE) {
         for (int i = 0; i < 4; i++) {
@@ -59,6 +55,10 @@ void calibrate_servos(Servo_T *servos, uint16_t **servo_deflections) {
     
     record_servo_adcs(adc_zeros, servo_deflections);
 
+    char buf1[100];
+    sprintf(buf1, "Servo zero %d\r\n", adc_zeros[2]);
+    HAL_UART_Transmit(&debug_uart, buf1, strlen(buf1), 10);
+
     // Wait to remove jig
     vTaskDelay(pdMS_TO_TICKS(5000));
 
@@ -68,13 +68,14 @@ void calibrate_servos(Servo_T *servos, uint16_t **servo_deflections) {
     for (int i = 0; i < 4; ++i) {
         servo_go_to_calibration_start(&servos[i]);
     }
-    vTaskDelay(pdMS_TO_TICKS(750));
+    vTaskDelay(pdMS_TO_TICKS(4000));
     record_servo_adcs(adc_starts, servo_deflections);
-
+    
     for (int i = 0; i < 4; ++i) {
         servo_go_to_calibration_end(&servos[i]);
     }
-    vTaskDelay(pdMS_TO_TICKS(750));
+    vTaskDelay(pdMS_TO_TICKS(4000));
+    
     record_servo_adcs(adc_ends, servo_deflections);
 
     for (int i = 0; i < 4; ++i) {
@@ -82,7 +83,7 @@ void calibrate_servos(Servo_T *servos, uint16_t **servo_deflections) {
     }
 
     char buf[100];
-    sprintf(buf, "Zero: %d, Start: %d, End: %d\n", adc_zeros[3], adc_starts[3], adc_ends[3]);
+    sprintf(buf, "Zero: %d, Start: %d, End: %d\n", adc_zeros[2], adc_starts[2], adc_ends[2]);
     HAL_UART_Transmit(&debug_uart, buf, strlen(buf), 10);
 
     // Go back to zero position
@@ -105,8 +106,10 @@ void static_fire_task(void *args) {
 
     uint16_t *servo_deflections[] = {servo1_deflection, servo2_deflection, servo3_deflection, servo4_deflection};
 
+    vTaskDelay(1000);
+
     init_servos(servos);
-    
+
     /*
     // Wait for zero servo notification
     /*uint32_t notification_value = 0;
@@ -114,44 +117,49 @@ void static_fire_task(void *args) {
         xTaskNotifyWait(0, ZERO_SERVOS_NOTIFICATION_BIT, &notification_value, portMAX_DELAY);
     }*/
 
-    //vTaskDelay(pdMS_TO_TICKS(5000));
-
     // Calibrate servos
-    //calibrate_servos(servos, servo_deflections);
+
+    //vTaskDelay(pdMS_TO_TICKS(5000));
+    
+    calibrate_servos(servos, servo_deflections);
     
     /* Wait for notification to begin */
     /*notification_value = 0;
     while ((notification_value & BEGIN_STATIC_FIRE_NOTIFICATION_BIT) == 0) {
         xTaskNotifyWait(0, BEGIN_STATIC_FIRE_NOTIFICATION_BIT, &notification_value, portMAX_DELAY);
     }*/
-   /*
-    vTaskDelay(pdMS_TO_TICKS(2000));
+   
+    //vTaskDelay(pdMS_TO_TICKS(2000));
 
     HAL_GPIO_WritePin(PYRO_0_GPIO_Port, PYRO_0_Pin, GPIO_PIN_SET);
 
-    vTaskDelay(pdMS_TO_TICKS(MOTOR_STARTUP_TIME));
+    //vTaskDelay(pdMS_TO_TICKS(MOTOR_STARTUP_TIME));
 
     TickType_t start_ms = pdTICKS_TO_MS(xTaskGetTickCount());
-    */
+    
     while (1) {
-        /*
         TickType_t current_ms = pdTICKS_TO_MS(xTaskGetTickCount());
 
         float t = (float) (current_ms - start_ms) / STATIC_FIRE_ACTUATION_TIME_MS;
-        float angle_rad = t * STATIC_FIRE_ACTUATION_RANGE_DEG;
+        float angle_rad = t * STATIC_FIRE_ACTUATION_RANGE_RAD;
 
-        float desired_angles[4] = {PI / 2 + angle_rad, 0, PI / 2 - angle_rad, 0};
+        char foo[100];
+        sprintf(foo, "Time: %f, Angle: %f\r\n", t, angle_rad);
+        //HAL_UART_Transmit(&debug_uart, foo, strlen(foo), HAL_MAX_DELAY);
+
+        float desired_angles[4] = {angle_rad, 0, -angle_rad, 0};
         
 
         for (int i = 0; i < 4; i++) {
             char buf[100];
-            sprintf(buf, "Setting servo %d angle %f\r\n", i, desired_angles[i]);
-            HAL_UART_Transmit(&debug_uart, buf, strlen(buf), HAL_MAX_DELAY);
-
+            //sprintf(buf, "Setting servo %d angle %f\r\n", i, desired_angles[i]);
+            //HAL_UART_Transmit(&debug_uart, buf, strlen(buf), HAL_MAX_DELAY);
+            
+            //__HAL_TIM_SET_COMPARE(servos[i].htim, servos[i].tim_channel, 8000 - t * (8000 - 1600));
             servo_set_angle(&servos[i], desired_angles[i]);
         }
 
-        /*
+        
         if (xSemaphoreTake(g_state_mutex_handle, portMAX_DELAY) == pdTRUE) {
             g_current_state.servo_deflections.servo_1_desired = servo_rad_to_adc(&servos[0]);
             g_current_state.servo_deflections.servo_2_desired = servo_rad_to_adc(&servos[1]);
@@ -166,15 +174,15 @@ void static_fire_task(void *args) {
         if (current_ms - start_ms > STATIC_FIRE_ACTUATION_TIME_MS) {
             break;
         }
-        */
+        
         /* Trigger ADC conversion sequence */
         
-        measure_adc_with_delay();
+        poll_adcs();
 
         //xTaskNotify(g_state_tx_task_handle, SEND_STATE_NOTIFICATION_BIT, eSetBits);
         //xTaskNotify(g_state_flash_task_handle, FLASH_STATE_NOTIFICATION_BIT, eSetBits);
 
-        vTaskDelay(pdMS_TO_TICKS(2));
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
 
     xTaskNotify(g_state_flash_task_handle, FLASH_SD_CARD_NOTIFICATION_BIT, eSetBits);

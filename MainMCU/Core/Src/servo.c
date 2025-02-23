@@ -19,12 +19,16 @@ void servo_enable(Servo_T *servo) {
 void servo_disable(Servo_T *servo) {
   HAL_TIM_PWM_Stop(servo->htim, servo->tim_channel);
 }
-
+#include "port_config.h"
+#include "globals.h"
 // Set servo angle
 uint16_t servo_set_angle(Servo_T *servo, double angle_radians) {
   servo->setpoint = angle_radians;
   double real_angle = (INVERT(servo->invert) * angle_radians) + servo->angle_zero;
   uint16_t count = ((real_angle + SERVO_RANGE/2)/SERVO_RANGE * (MAX_PULSE_WIDTH_US - MIN_PULSE_WIDTH_US) + MIN_PULSE_WIDTH_US) * COUNTS_PER_US;
+  char buf[100];
+  sprintf(buf, "Setting servo to %f degrees, %d counts\r\n", angle_radians, count);
+  HAL_UART_Transmit(&debug_uart, buf, strlen(buf), HAL_MAX_DELAY);
   __HAL_TIM_SET_COMPARE(servo->htim, servo->tim_channel, count);
   return count;
 }

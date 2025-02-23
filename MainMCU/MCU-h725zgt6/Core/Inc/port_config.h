@@ -2,6 +2,7 @@
 #define PORT_CONFIG_H
 
 #include "stm32h7xx_hal.h"
+#include "stdint.h"
 #include "adc.h"
 
 /* Change these to the values for your board */
@@ -37,20 +38,44 @@
 #define ADC3_N_CHANNELS     4
 
 #define FIRST_ADC           &hadc1
-#define ADC1_NEXT           &hadc2
-#define ADC2_NEXT           &hadc3
+#define ADC1_NEXT           NULL
+#define ADC2_NEXT           NULL
 #define ADC3_NEXT           NULL
 
 static const ADC_Channel ADC1_SEQUENCE[ADC1_N_CHANNELS] = {
+    ADC_SERVO_2,
+    ADC_SERVO_3,
+    ADC_SERVO_4
+};
 
+static const uint32_t ADC1_CHANNELS[ADC1_N_CHANNELS] = {
+    ADC_CHANNEL_2,
+    ADC_CHANNEL_5,
+    ADC_CHANNEL_9,
+};
+
+static const uint32_t ADC2_CHANNELS[ADC2_N_CHANNELS] = {
+    ADC_CHANNEL_6,
+    ADC_CHANNEL_10,
+};
+
+static const uint32_t ADC3_CHANNELS[ADC3_N_CHANNELS] = {
+    ADC_CHANNEL_0,
+    ADC_CHANNEL_2,
+    ADC_CHANNEL_6,
+    ADC_CHANNEL_8,
 };
 
 static const ADC_Channel ADC2_SEQUENCE[ADC2_N_CHANNELS] = {
-
+    ADC_SERVO_1,
+    ADC_PYRO_I_2,
 };
 
 static const ADC_Channel ADC3_SEQUENCE[ADC3_N_CHANNELS] = {
-
+    ADC_SERVO_0,
+    ADC_PYRO_I_0,
+    ADC_PYRO_I_1,
+    ADC_VCC_I,
 };
 
 #define USE_TIM2

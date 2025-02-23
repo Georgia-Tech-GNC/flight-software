@@ -35,6 +35,7 @@ typedef struct {
   uint16_t adc_zero;
   double angle_zero;
   double setpoint;
+  double actual;
   uint16_t adc_range[2];
   bool invert;
 } Servo_T;

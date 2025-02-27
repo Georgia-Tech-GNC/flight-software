@@ -74,4 +74,4 @@ void servo_go_to_calibration_end(Servo_T *servo);
 // Perform zero point calculation
 void servo_set_zero(Servo_T *servo, uint16_t adc_start, uint16_t adc_end, uint16_t adc_zero);
 
-void update_servo_true_command_position(Servo_T *servo);
+void update_servo_true_command_position(Servo_T *servo, uint64_t update_period);

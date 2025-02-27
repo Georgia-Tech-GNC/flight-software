@@ -6,7 +6,8 @@
 void servo_init(Servo_T *servo, TIM_HandleTypeDef *htim, uint32_t channel, bool invert) {
   servo->htim = htim;
   servo->tim_channel = channel;
-  servo->setpoint = 0;
+  servo->setpoint_pwm = 0;
+  servo->current_pwm = 0;
   servo->angle_zero = 0;
 };
 
@@ -21,21 +22,26 @@ void servo_disable(Servo_T *servo) {
 }
 #include "port_config.h"
 #include "globals.h"
+
 // Set servo angle
 uint16_t servo_set_angle(Servo_T *servo, double angle_radians) {
-  servo->setpoint = angle_radians;
   double real_angle = (INVERT(servo->invert) * angle_radians) + servo->angle_zero;
-  uint16_t count = ((real_angle + SERVO_RANGE/2)/SERVO_RANGE * (MAX_PULSE_WIDTH_US - MIN_PULSE_WIDTH_US) + MIN_PULSE_WIDTH_US) * COUNTS_PER_US;
-  char buf[100];
-  sprintf(buf, "Setting servo to %f degrees, %d counts\r\n", angle_radians, count);
-  HAL_UART_Transmit(&debug_uart, buf, strlen(buf), HAL_MAX_DELAY);
-  __HAL_TIM_SET_COMPARE(servo->htim, servo->tim_channel, count);
-  return count;
+  uint16_t desired_pwm = ((real_angle + SERVO_RANGE/2)/SERVO_RANGE * (MAX_PULSE_WIDTH_US - MIN_PULSE_WIDTH_US) + MIN_PULSE_WIDTH_US);
+  servo->setpoint_pwm = desired_pwm;
+  return desired_pwm * COUNTS_PER_US;
 }
 
-// Get servo set angleservo
+uint16_t servo_set_angle_from_direct_ratio(Servo_T *servo, double ratio) {
+  servo->setpoint_pwm = ratio*(MAX_PULSE_WIDTH_US - MIN_PULSE_WIDTH_US) + MIN_PULSE_WIDTH_US;
+  return servo->setpoint_pwm * COUNTS_PER_US;
+}
+
+// Get servo setpoint angle in radians
 double servo_get_angle(Servo_T *servo) {
-  return servo->setpoint;
+  uint16_t pwm_offset = servo->setpoint_pwm - MIN_PULSE_WIDTH_US;
+  double true_angle_rad = pwm_offset * (SERVO_RANGE / (MAX_PULSE_WIDTH_US - MIN_PULSE_WIDTH_US)) - SERVO_RANGE/2;
+
+  return INVERT(servo->invert) * (true_angle_rad - servo->angle_zero);
 }
 
 double servo_adc_to_rad(Servo_T *servo, uint16_t adc_value) {
@@ -43,22 +49,45 @@ double servo_adc_to_rad(Servo_T *servo, uint16_t adc_value) {
 }
 
 uint16_t servo_rad_to_adc(Servo_T *servo) {
-  return ((double) servo->setpoint / INVERT(servo->invert) * (servo->adc_range[1] - servo->adc_range[0]) / CALI_RANGE) + servo->adc_zero;
+  uint16_t pwm_offset = servo->setpoint_pwm - MIN_PULSE_WIDTH_US;
+  double true_angle_rad = pwm_offset * (SERVO_RANGE / (MAX_PULSE_WIDTH_US - MIN_PULSE_WIDTH_US)) - SERVO_RANGE/2;
+
+  return ((double) true_angle_rad * INVERT(servo->invert) * (servo->adc_range[1] - servo->adc_range[0]) / CALI_RANGE) + servo->adc_zero;
 }
 
 // Go to callibration points
 void servo_go_to_calibration_start(Servo_T *servo) {
-  __HAL_TIM_SET_COMPARE(servo->htim, servo->tim_channel, ((SERVO_RANGE - CALI_RANGE)/ (2* SERVO_RANGE) * (MAX_PULSE_WIDTH_US - MIN_PULSE_WIDTH_US) + MIN_PULSE_WIDTH_US) * COUNTS_PER_US);
+  servo_set_angle_from_direct_ratio(servo, (SERVO_RANGE - CALI_RANGE)/ (2* SERVO_RANGE));
 }
 
 void servo_go_to_calibration_end(Servo_T *servo) {
-  __HAL_TIM_SET_COMPARE(servo->htim, servo->tim_channel, ((SERVO_RANGE + CALI_RANGE)/ (2* SERVO_RANGE) * (MAX_PULSE_WIDTH_US - MIN_PULSE_WIDTH_US) + MIN_PULSE_WIDTH_US) * COUNTS_PER_US);
+  servo_set_angle_from_direct_ratio(servo, (SERVO_RANGE + CALI_RANGE)/ (2* SERVO_RANGE));
 }
 
 // Perform zero point calculation
-void servo_set_zero(Servo_T *servo, uint16_t adc_start, uint16_t adc_end, uint16_t adc_zero) {__HAL_TIM_SET_COMPARE(servo->htim, servo->tim_channel, ((SERVO_RANGE - CALI_RANGE)/ (2 * SERVO_RANGE) * (MAX_PULSE_WIDTH_US - MIN_PULSE_WIDTH_US) + MIN_PULSE_WIDTH_US) * COUNTS_PER_US);
+void servo_set_zero(Servo_T *servo, uint16_t adc_start, uint16_t adc_end, uint16_t adc_zero) {
+  // TODO: why are we setting pwm values here?
+  // __HAL_TIM_SET_COMPARE(servo->htim, servo->tim_channel, ((SERVO_RANGE - CALI_RANGE)/ (2 * SERVO_RANGE) * (MAX_PULSE_WIDTH_US - MIN_PULSE_WIDTH_US) + MIN_PULSE_WIDTH_US) * COUNTS_PER_US);
   servo->adc_range[0] = adc_start;
   servo->adc_range[1] = adc_end;
   servo->adc_zero = adc_zero;
   servo->angle_zero = CALI_RANGE/(adc_end - adc_start) * (adc_zero - (adc_start + adc_end)/2);
+}
+
+void update_servo_true_command_position(Servo_T *servo, uint64_t update_period) {
+  if (servo->current_pwm == servo->setpoint_pwm) return; // Servo already at correct position
+
+  uint16_t max_travel = (update_period * MAX_SERVO_PWM_SPEED);
+  uint16_t desired_travel = servo->setpoint_pwm - servo->current_pwm;
+  if (desired_travel > 0) {
+    servo->current_pwm += (max_travel < desired_travel) ? max_travel : desired_travel;
+  } else {
+    servo->current_pwm -= (max_travel < -desired_travel) ? max_travel : -desired_travel;
+  }
+
+  // Set servo position
+  char buf[100];
+  sprintf(buf, "Setting servo to %d pwm, target %d\r\n", servo->current_pwm, servo->setpoint_pwm);
+  HAL_UART_Transmit(&debug_uart, buf, strlen(buf), HAL_MAX_DELAY);
+  __HAL_TIM_SET_COMPARE(servo->htim, servo->tim_channel, servo->current_pwm * COUNTS_PER_US);
 }

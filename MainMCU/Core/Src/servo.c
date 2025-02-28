@@ -66,15 +66,13 @@ void servo_go_to_calibration_end(Servo_T *servo) {
 
 // Perform zero point calculation
 void servo_set_zero(Servo_T *servo, uint16_t adc_start, uint16_t adc_end, uint16_t adc_zero) {
-  // TODO: why are we setting pwm values here?
-  // __HAL_TIM_SET_COMPARE(servo->htim, servo->tim_channel, ((SERVO_RANGE - CALI_RANGE)/ (2 * SERVO_RANGE) * (MAX_PULSE_WIDTH_US - MIN_PULSE_WIDTH_US) + MIN_PULSE_WIDTH_US) * COUNTS_PER_US);
   servo->adc_range[0] = adc_start;
   servo->adc_range[1] = adc_end;
   servo->adc_zero = adc_zero;
   servo->angle_zero = CALI_RANGE/(adc_end - adc_start) * (adc_zero - (adc_start + adc_end)/2);
 }
 
-void update_servo_true_command_position(Servo_T *servo, uint64_t update_period) {
+void update_servo_true_command_position(Servo_T *servo, TickType_t update_period) {
   if (servo->current_pwm == servo->setpoint_pwm) return; // Servo already at correct position
 
   uint16_t max_travel = (update_period * MAX_SERVO_PWM_SPEED);

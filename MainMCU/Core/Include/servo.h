@@ -21,6 +21,8 @@
 
 #define SERVO_RANGE (81.0/255.0 * 355.0/180.0 * PI)
 #define CALI_RANGE (PI/2)
+
+#define MAX_SERVO_PWM_SPEED 10
 /*
 PWM0 = PA15, TIM2_CH1
 PWM1 = PB3, TIM2_CH2
@@ -34,8 +36,8 @@ typedef struct {
   uint32_t tim_channel;
   uint16_t adc_zero;
   double angle_zero;
-  double setpoint;
-  double actual;
+  uint16_t setpoint_pwm;
+  uint16_t current_pwm;
   uint16_t adc_range[2];
   bool invert;
 } Servo_T;
@@ -52,7 +54,12 @@ void servo_disable(Servo_T *servo);
 // Command servo angle
 uint16_t servo_set_angle(Servo_T *servo, double angle_rad);
 
-// Get Commanded Angle
+/** Command the servo angle via a number from 0 to 1 as a proportion of the full pwm range
+ * This method disregards zero values or servo invert status
+ */
+uint16_t servo_set_angle_from_direct_ratio(Servo_T *servo, double ratio);
+
+// Get Commanded Angle PWM
 double servo_get_angle(Servo_T *servo);
 
 // Convert an adc reading into a servo deflection from the zero point
@@ -66,3 +73,5 @@ void servo_go_to_calibration_end(Servo_T *servo);
 
 // Perform zero point calculation
 void servo_set_zero(Servo_T *servo, uint16_t adc_start, uint16_t adc_end, uint16_t adc_zero);
+
+void update_servo_true_command_position(Servo_T *servo, uint64_t update_period);

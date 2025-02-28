@@ -3,6 +3,7 @@
 #include "FreeRTOS.h"
 #include "portmacro.h"
 #include "adc.h"
+#include "string.h"
 
 /**
  * This interrupt is called every time a single ADC conversion is completed.

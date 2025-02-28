@@ -11,7 +11,6 @@
 
 #include "telemetry_rx.h"
 #include "port_config.h"
-
 #include "periph_io.h"
 #include "state_tx.h"
 #include "telemetry.h"

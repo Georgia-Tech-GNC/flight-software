@@ -9,6 +9,28 @@ void record_servo_adcs(uint16_t *zeros, uint16_t **servo_deflections);
 void measure_adc_with_delay(void);
 void calibrate_servos(Servo_T *servos, uint16_t **servo_deflections);
 
+
+void update_servos_for_ms(Servo_T *servos, uint32_t ms) {
+    static TickType_t last_ticks = 0;
+
+    uint32_t n_iters = ms / 20;
+
+    if (last_ticks == 0) {
+        last_ticks = xTaskGetTickCount();
+    }
+
+    for (int i = 0; i < n_iters; i ++) {
+        TickType_t diff_ticks = xTaskGetTickCount() - last_ticks;
+
+        for (int j = 0; j < 4; j ++) {
+            update_servo_true_command_position(&servos[j], diff_ticks);
+        }
+
+        last_ticks = xTaskGetTickCount();
+        vTaskDelay(pdMS_TO_TICKS(20));
+    }
+}
+
 void init_servos(Servo_T *servos) {
     servo_init(&servos[3], PWM0_TIMER, PWM0_CHANNEL, false);
     servo_init(&servos[2], PWM1_TIMER, PWM1_CHANNEL, false);
@@ -60,7 +82,7 @@ void calibrate_servos(Servo_T *servos, uint16_t **servo_deflections) {
     HAL_UART_Transmit(&debug_uart, buf1, strlen(buf1), 10);
 
     // Wait to remove jig
-    vTaskDelay(pdMS_TO_TICKS(5000));
+    update_servos_for_ms(servos, 5000);
 
     // Enable Servos and sweep to record end points
     enable_servos(servos);
@@ -68,13 +90,13 @@ void calibrate_servos(Servo_T *servos, uint16_t **servo_deflections) {
     for (int i = 0; i < 4; ++i) {
         servo_go_to_calibration_start(&servos[i]);
     }
-    vTaskDelay(pdMS_TO_TICKS(4000));
+    update_servos_for_ms(servos, 15000);
     record_servo_adcs(adc_starts, servo_deflections);
     
     for (int i = 0; i < 4; ++i) {
         servo_go_to_calibration_end(&servos[i]);
     }
-    vTaskDelay(pdMS_TO_TICKS(4000));
+    update_servos_for_ms(servos, 15000);
     
     record_servo_adcs(adc_ends, servo_deflections);
 
@@ -145,7 +167,7 @@ void static_fire_task(void *args) {
 
         char foo[100];
         sprintf(foo, "Time: %f, Angle: %f\r\n", t, angle_rad);
-        //HAL_UART_Transmit(&debug_uart, foo, strlen(foo), HAL_MAX_DELAY);
+        HAL_UART_Transmit(&debug_uart, foo, strlen(foo), HAL_MAX_DELAY);
 
         float desired_angles[4] = {angle_rad, 0, -angle_rad, 0};
         
@@ -182,7 +204,7 @@ void static_fire_task(void *args) {
         //xTaskNotify(g_state_tx_task_handle, SEND_STATE_NOTIFICATION_BIT, eSetBits);
         //xTaskNotify(g_state_flash_task_handle, FLASH_STATE_NOTIFICATION_BIT, eSetBits);
 
-        vTaskDelay(pdMS_TO_TICKS(100));
+        update_servos_for_ms(servos, 100);
     }
 
     xTaskNotify(g_state_flash_task_handle, FLASH_SD_CARD_NOTIFICATION_BIT, eSetBits);

@@ -3,6 +3,7 @@
 #include "stm32h7xx_hal.h"
 #include "main.h"
 #include "arm_math.h"
+#include "FreeRTOS.h"
 #include <stdbool.h>
 
 #define ARR 64000
@@ -11,18 +12,19 @@
 
 #define COUNTS_PER_US (APB1_TIMER_FREQ / (TIMER_PRESC + 1) / 1e6)
 
-/*
+
 #define MIN_PULSE_WIDTH_US 500
 #define MAX_PULSE_WIDTH_US 2500
-*/
 
-#define MIN_PULSE_WIDTH_US 1000
-#define MAX_PULSE_WIDTH_US 2000
+#define SERVO_RANGE (SERVO_RANGE_DEG/180.0 * PI)
+#define SERVO_RANGE_DEG (81.0/255.0 * 355.0)
 
-#define SERVO_RANGE (81.0/255.0 * 355.0/180.0 * PI)
 #define CALI_RANGE (PI/2)
 
-#define MAX_SERVO_PWM_SPEED 10
+#define MAX_SERVO_DEGREES_PER_SEC 50.0
+/* Degrees / second * 1 second / msToTicks(1000ms)ticks * (MIN - MAX)us / SERVO_RANGE_DEG * COUNTS_PER_US counts / 1 us*/
+#define MAX_SERVO_PWM_SPEED (MAX_SERVO_DEGREES_PER_SEC / pdMS_TO_TICKS(1000) * (MAX_PULSE_WIDTH_US - MIN_PULSE_WIDTH_US) / SERVO_RANGE_DEG * COUNTS_PER_US)
+//#define MAX_SERVO_PWM_SPEED 1
 /*
 PWM0 = PA15, TIM2_CH1
 PWM1 = PB3, TIM2_CH2
@@ -74,4 +76,4 @@ void servo_go_to_calibration_end(Servo_T *servo);
 // Perform zero point calculation
 void servo_set_zero(Servo_T *servo, uint16_t adc_start, uint16_t adc_end, uint16_t adc_zero);
 
-void update_servo_true_command_position(Servo_T *servo, uint64_t update_period);
+void update_servo_true_command_position(Servo_T *servo, TickType_t update_period);

@@ -74,6 +74,16 @@ void run_controls_task(void *args) {
         HAL_ADC_Start_IT(FIRST_ADC);
 
         /* Maximum frequency of 20Hz */
+        static TickType_t last_ticks = xTaskGetTickCount();
+        TickType_t diff_ticks = xTaskGetTickCount() - last_ticks;
+
+        for (int i = 0; i < 4; i ++) {
+            update_servo_true_command_position(&servos[i], diff_ticks);
+
+        }
+
+        last_ticks = xTaskGetTickCount();
+
         vTaskDelay(pdMS_TO_TICKS(50));
     }
 

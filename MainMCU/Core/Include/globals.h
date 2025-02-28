@@ -9,6 +9,7 @@
 #include "message_buffer.h"
 #include "state.h"
 #include "tests.h"
+#include "servo.h"
 
 #ifdef USE_TESTS
 extern TaskHandle_t g_test_task_handle;

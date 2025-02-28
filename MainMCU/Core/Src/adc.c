@@ -91,7 +91,7 @@ void poll_adcs() {
 
     char buf[100];
     sprintf(buf, "Servo 1 ADC: %d\r\n", (uint16_t) servo_1_actual);
-    HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
+    //HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
     /*
     sprintf(buf, "Servo 2 ADC: %d\r\n", adc_readings[ADC_SERVO_2]);
     HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);

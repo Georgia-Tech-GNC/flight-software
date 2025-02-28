@@ -28,6 +28,9 @@ uint16_t servo_set_angle(Servo_T *servo, double angle_radians) {
   double real_angle = (INVERT(servo->invert) * angle_radians) + servo->angle_zero;
   uint16_t desired_pwm = ((real_angle + SERVO_RANGE/2)/SERVO_RANGE * (MAX_PULSE_WIDTH_US - MIN_PULSE_WIDTH_US) + MIN_PULSE_WIDTH_US);
   servo->setpoint_pwm = desired_pwm;
+  char augh[100];
+  //sprintf(augh, "Setpoint pwm: %d, angle_zero %d\r\n", desired_pwm, servo->angle_zero);
+  HAL_UART_Transmit(&debug_uart, augh, strlen(augh), HAL_MAX_DELAY);
   return desired_pwm * COUNTS_PER_US;
 }
 
@@ -76,7 +79,7 @@ void update_servo_true_command_position(Servo_T *servo, TickType_t update_period
   if (servo->current_pwm == servo->setpoint_pwm) return; // Servo already at correct position
 
   uint16_t max_travel = (update_period * MAX_SERVO_PWM_SPEED);
-  uint16_t desired_travel = servo->setpoint_pwm - servo->current_pwm;
+  int16_t desired_travel = (int16_t) servo->setpoint_pwm - (int16_t) servo->current_pwm;
   if (desired_travel > 0) {
     servo->current_pwm += (max_travel < desired_travel) ? max_travel : desired_travel;
   } else {

@@ -205,7 +205,7 @@ CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"
 # LDFLAGS
 #######################################
 # link script
-LDSCRIPT = stm32h723vetx_flash.ld
+LDSCRIPT = STM32H723VETx_FLASH.ld
 
 # libraries
 LIBS = -lc -lm -lnosys 
@@ -255,6 +255,10 @@ $(BUILD_DIR):
 #######################################
 clean:
 	-rm -fR $(BUILD_DIR)
+
+flash:
+	openocd -s /usr/share/openocd/scripts -f ./openocd.cfg -c "program build/H723.elf verify reset exit"
+
   
 #######################################
 # dependencies

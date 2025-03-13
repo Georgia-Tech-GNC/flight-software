@@ -87,8 +87,5 @@ void update_servo_true_command_position(Servo_T *servo, TickType_t update_period
   }
 
   // Set servo position
-  char buf[100];
-  sprintf(buf, "Setting servo to %d pwm, target %d\r\n", servo->current_pwm, servo->setpoint_pwm);
-  HAL_UART_Transmit(&debug_uart, buf, strlen(buf), HAL_MAX_DELAY);
-  __HAL_TIM_SET_COMPARE(servo->htim, servo->tim_channel, servo->current_pwm * COUNTS_PER_US);
+__HAL_TIM_SET_COMPARE(servo->htim, servo->tim_channel, servo->current_pwm * COUNTS_PER_US);
 }

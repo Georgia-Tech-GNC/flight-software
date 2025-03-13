@@ -81,22 +81,23 @@ void calibrate_servos(Servo_T *servos, uint16_t **servo_deflections) {
     sprintf(buf1, "Servo zero %d\r\n", adc_zeros[2]);
     HAL_UART_Transmit(&debug_uart, buf1, strlen(buf1), 10);
 
-    // Wait to remove jig
-    update_servos_for_ms(servos, 5000);
-
     // Enable Servos and sweep to record end points
     enable_servos(servos);
 
     for (int i = 0; i < 4; ++i) {
         servo_go_to_calibration_start(&servos[i]);
     }
+    HAL_UART_Transmit(&debug_uart, (uint8_t *) "Going to start position...", 26, HAL_MAX_DELAY);
     update_servos_for_ms(servos, 15000);
+    HAL_UART_Transmit(&debug_uart, (uint8_t *) "Done\r\n", 6, HAL_MAX_DELAY);
     record_servo_adcs(adc_starts, servo_deflections);
     
     for (int i = 0; i < 4; ++i) {
         servo_go_to_calibration_end(&servos[i]);
     }
+    HAL_UART_Transmit(&debug_uart, (uint8_t *) "Going to end position...", 24, HAL_MAX_DELAY);
     update_servos_for_ms(servos, 15000);
+    HAL_UART_Transmit(&debug_uart, (uint8_t *) "Done\r\n", 6, HAL_MAX_DELAY);
     
     record_servo_adcs(adc_ends, servo_deflections);
 
@@ -121,6 +122,17 @@ void static_fire_task(void *args) {
 
     Servo_T servos[] = {servo1, servo2, servo3, servo4};
 
+    /*
+    init_servos(servos);
+    enable_servos(servos);
+    servo_set_angle_from_direct_ratio(&servos[0], 0.5);
+    servo_set_angle_from_direct_ratio(&servos[1], 0.5);
+    servo_set_angle_from_direct_ratio(&servos[2], 0.5);
+    servo_set_angle_from_direct_ratio(&servos[3], 0.5);
+
+    update_servos_for_ms(servos, 5000);
+    */
+
     uint16_t *servo1_deflection = &g_current_state.servo_deflections.servo_1_actual;
     uint16_t *servo2_deflection = &g_current_state.servo_deflections.servo_2_actual;
     uint16_t *servo3_deflection = &g_current_state.servo_deflections.servo_3_actual;
@@ -132,24 +144,36 @@ void static_fire_task(void *args) {
 
     init_servos(servos);
 
-    /*
     // Wait for zero servo notification
-    /*uint32_t notification_value = 0;
+    /*
+    uint32_t notification_value = 0;
     while ((notification_value & ZERO_SERVOS_NOTIFICATION_BIT) == 0) {
         xTaskNotifyWait(0, ZERO_SERVOS_NOTIFICATION_BIT, &notification_value, portMAX_DELAY);
-    }*/
+    }
+    */
 
     // Calibrate servos
 
     //vTaskDelay(pdMS_TO_TICKS(5000));
     
     calibrate_servos(servos, servo_deflections);
+
+    HAL_UART_Transmit(&debug_uart, (uint8_t *) "Calibrated servos\r\n", 20, HAL_MAX_DELAY);
+
+    servo_set_angle(&servos[0], 0);
+    servo_set_angle(&servos[1], 0);
+    servo_set_angle(&servos[2], 0);
+    servo_set_angle(&servos[3], 0);
     
+    update_servos_for_ms(servos, 2000);
+
     /* Wait for notification to begin */
-    /*notification_value = 0;
+    uint32_t notification_value = 0;
     while ((notification_value & BEGIN_STATIC_FIRE_NOTIFICATION_BIT) == 0) {
         xTaskNotifyWait(0, BEGIN_STATIC_FIRE_NOTIFICATION_BIT, &notification_value, portMAX_DELAY);
-    }*/
+    }
+
+    HAL_UART_Transmit(&debug_uart, (uint8_t *) "Beginning static fire\r\n", 24, HAL_MAX_DELAY);
    
     //vTaskDelay(pdMS_TO_TICKS(2000));
 
@@ -201,8 +225,9 @@ void static_fire_task(void *args) {
         
         poll_adcs();
 
-        //xTaskNotify(g_state_tx_task_handle, SEND_STATE_NOTIFICATION_BIT, eSetBits);
-        //xTaskNotify(g_state_flash_task_handle, FLASH_STATE_NOTIFICATION_BIT, eSetBits);
+        xTaskNotify(g_state_tx_task_handle, SEND_STATE_NOTIFICATION_BIT, eSetBits);
+        xTaskNotify(g_state_flash_task_handle, FLASH_STATE_NOTIFICATION_BIT, eSetBits);
+        HAL_UART_Transmit(&debug_uart, (uint8_t *) "Sent state\r\n", 11, HAL_MAX_DELAY);
 
         update_servos_for_ms(servos, 100);
     }

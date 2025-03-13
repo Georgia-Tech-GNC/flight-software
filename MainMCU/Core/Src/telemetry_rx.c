@@ -142,13 +142,15 @@ void command_fire_pyro() {
  * @brief Perform the flash SD card command
  */
 void command_flash_sd_card() {
+    HAL_UART_Transmit(&debug_uart, (uint8_t *) "Flash SD card\r\n", 15, HAL_MAX_DELAY);
     xTaskNotify(g_state_flash_task_handle, FLASH_SD_CARD_NOTIFICATION_BIT, eSetBits);
 }
 
 /**
- * @brief Perform the vane activation test command
+ * @brief Perform the ignite command
  */
 void command_ignite() {
+    HAL_UART_Transmit(&debug_uart, (uint8_t *) "Ignite\r\n", 8, HAL_MAX_DELAY);
     xTaskNotify(g_state_tx_task_handle, BEGIN_STATE_TX_NOTIFICATION_BIT, eSetBits);
     xTaskNotify(g_state_flash_task_handle, BEGIN_STATE_FLASH_NOTIFICATION_BIT, eSetBits);
     xTaskNotify(g_static_fire_task_handle, BEGIN_STATIC_FIRE_NOTIFICATION_BIT, eSetBits);
@@ -158,5 +160,6 @@ void command_ignite() {
  * @brief Perform the zero servos command
  */
 void command_zero_servos() {
+    HAL_UART_Transmit(&debug_uart, (uint8_t *) "Zero servos\r\n", 12, HAL_MAX_DELAY);
     xTaskNotify(g_static_fire_task_handle, ZERO_SERVOS_NOTIFICATION_BIT, eSetBits);
 }

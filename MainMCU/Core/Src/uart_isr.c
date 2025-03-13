@@ -30,10 +30,10 @@ int begin_uart_listen(void) {
     return 1;
 }
 
-#ifndef STATIC_FIRE
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
     /* FreeRTOS boilerplate */
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    HAL_UART_Transmit(&debug_uart, (uint8_t *) "Recieved data\r\n", 15, HAL_MAX_DELAY);
 
     /* Direct uart data to the appropriate place */
     if (huart->Instance == telemetry_uart.Instance) {
@@ -85,6 +85,7 @@ void process_state_bytes(uint16_t size, BaseType_t *xHigherPriorityTaskWoken) {
  * @param xHigherPriorityTaskWoken FreeRTOS boilerplate
  */
 void update_rocket_state(BaseType_t *xHigherPriorityTaskWoken) {
+#ifndef STATIC_FIRE
     /* Always use mutex with g_current_state */
     if (xSemaphoreTakeFromISR(g_state_mutex_handle, xHigherPriorityTaskWoken) == pdTRUE) {
         /**
@@ -176,6 +177,7 @@ void update_rocket_state(BaseType_t *xHigherPriorityTaskWoken) {
 
     /* Check for specific conditions in the rocket state */
     check_state_markers(xHigherPriorityTaskWoken);
+#endif
 }
 
 /**
@@ -183,6 +185,7 @@ void update_rocket_state(BaseType_t *xHigherPriorityTaskWoken) {
  * @param xHigherPriorityTaskWoken FreeRTOS boilerplate
  */
 void check_state_markers(BaseType_t *xHigherPriorityTaskWoken) {
+#ifndef STATIC_FIRE
     static uint8_t launched = 0;
     static uint8_t landed = 0;
 
@@ -213,5 +216,5 @@ void check_state_markers(BaseType_t *xHigherPriorityTaskWoken) {
         main_parachute_deploy = 1;
         g_current_state.rocket_state.firing_channel_2 = 1;
     }
-}
 #endif
+}

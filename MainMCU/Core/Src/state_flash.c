@@ -273,14 +273,14 @@ size_t to_csv_line(RocketState *rocket_state, char *line) {
 #endif
 
     len += sprintf(line + len, "%lu,", (uint32_t) rocket_state->servo_deflections.timestamp);
-    len += sprintf(line + len, "%d", rocket_state->servo_deflections.servo_1_desired);
-    len += sprintf(line + len, "%d", rocket_state->servo_deflections.servo_1_actual);
-    len += sprintf(line + len, "%d", rocket_state->servo_deflections.servo_2_desired);
-    len += sprintf(line + len, "%d", rocket_state->servo_deflections.servo_2_actual);
-    len += sprintf(line + len, "%d", rocket_state->servo_deflections.servo_3_desired);
-    len += sprintf(line + len, "%d", rocket_state->servo_deflections.servo_3_actual);
-    len += sprintf(line + len, "%d", rocket_state->servo_deflections.servo_4_desired);
-    len += sprintf(line + len, "%d", rocket_state->servo_deflections.servo_4_actual);
+    len += sprintf(line + len, "%d,", rocket_state->servo_deflections.servo_1_desired);
+    len += sprintf(line + len, "%d,", rocket_state->servo_deflections.servo_1_actual);
+    len += sprintf(line + len, "%d,", rocket_state->servo_deflections.servo_2_desired);
+    len += sprintf(line + len, "%d,", rocket_state->servo_deflections.servo_2_actual);
+    len += sprintf(line + len, "%d,", rocket_state->servo_deflections.servo_3_desired);
+    len += sprintf(line + len, "%d,", rocket_state->servo_deflections.servo_3_actual);
+    len += sprintf(line + len, "%d,", rocket_state->servo_deflections.servo_4_desired);
+    len += sprintf(line + len, "%d,", rocket_state->servo_deflections.servo_4_actual);
 
     len += sprintf(line + len, "%lu,", (uint32_t) (rocket_state->rocket_state.timestamp));
     len += sprintf(line + len, "%d,", rocket_state->rocket_state.rocket_state);

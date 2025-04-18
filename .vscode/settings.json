@@ -12,5 +12,9 @@
         "fatfs_sd.h": "c",
         "globals.h": "c"
     },
-    "C_Cpp.errorSquiggles": "enabled"
+    "C_Cpp.errorSquiggles": "enabled",
+    
+    "files.exclude": {
+        "**/.git": false
+    }
 }

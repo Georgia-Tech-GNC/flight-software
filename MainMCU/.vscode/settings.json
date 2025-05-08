@@ -1,0 +1,15 @@
+{
+    "files.associations": {
+        "state_tx.h": "c",
+        "globals.h": "c",
+        "protocol.h": "c",
+        "stdint.h": "c",
+        "servo.h": "c",
+        "static_fire.h": "c",
+        "port_layer.h": "c",
+        "telemetry_rx.h": "c",
+        "telemetry.h": "c",
+        "message_buffer.h": "c",
+        "main.h": "c"
+    }
+}

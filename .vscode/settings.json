@@ -1,0 +1,16 @@
+{
+    "C_Cpp.default.compilerPath": "c:\\MinGW\\bin\\gcc.exe",
+    "files.associations": {
+        "*.tex": "latex",
+        "ekf.h": "c",
+        "ground.h": "c",
+        "adc.h": "c",
+        "port_layer.h": "c",
+        "port_config.h": "c",
+        "cstdint": "c",
+        "servo.h": "c",
+        "fatfs_sd.h": "c",
+        "globals.h": "c"
+    },
+    "C_Cpp.errorSquiggles": "enabled"
+}

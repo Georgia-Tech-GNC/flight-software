@@ -1,0 +1,1 @@
+/* port.h is a freeRTOS thing to allow the kernel to be ported to different MCUs. You can find the correct ones for each target online somewhere */

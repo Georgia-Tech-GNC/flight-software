@@ -1,0 +1,1 @@
+/* Hardware-specific definitions such as TELEMETRY_UART, SD_CS_PIN, ADC channels, etc. */

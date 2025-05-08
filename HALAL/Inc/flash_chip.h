@@ -1,0 +1,1 @@
+/* Whatever functions you think all flash chips should have in common */

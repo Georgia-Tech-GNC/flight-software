@@ -1,0 +1,1 @@
+/* Whatever functions you think all barometers should have in common */

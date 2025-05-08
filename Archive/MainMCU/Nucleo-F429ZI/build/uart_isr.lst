@@ -1,0 +1,1330 @@
+ARM GAS  /tmp/ccuhv0Ge.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"uart_isr.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.begin_uart_listen,"ax",%progbits
+  18              		.align	1
+  19              		.global	begin_uart_listen
+  20              		.arch armv7e-m
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  24              		.fpu fpv4-sp-d16
+  26              	begin_uart_listen:
+  27              	.LFB246:
+  28              		.file 1 "../Core/Src/uart_isr.c"
+   1:../Core/Src/uart_isr.c **** #include "uart_isr.h"
+   2:../Core/Src/uart_isr.c **** 
+   3:../Core/Src/uart_isr.c **** uint8_t telemetry_uart_rx_buf[TELEMETRY_RX_MAX_PROCESS_SIZE];
+   4:../Core/Src/uart_isr.c **** uint8_t state_uart_rx_buf[STATE_PACKET_SIZE];
+   5:../Core/Src/uart_isr.c **** 
+   6:../Core/Src/uart_isr.c **** uint8_t state_bytes[STATE_PACKET_SIZE];
+   7:../Core/Src/uart_isr.c **** 
+   8:../Core/Src/uart_isr.c **** uint8_t state_bytes_received = 0;
+   9:../Core/Src/uart_isr.c **** 
+  10:../Core/Src/uart_isr.c **** void process_state_bytes(uint16_t size, BaseType_t *xHigherPriorityTaskWoken);
+  11:../Core/Src/uart_isr.c **** void update_rocket_state(BaseType_t *xHigherPriorityTaskWoken);
+  12:../Core/Src/uart_isr.c **** 
+  13:../Core/Src/uart_isr.c **** int begin_uart_listen(void) {
+  29              		.loc 1 13 29 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33 0000 08B5     		push	{r3, lr}
+  34              	.LCFI0:
+  35              		.cfi_def_cfa_offset 8
+  36              		.cfi_offset 3, -8
+  37              		.cfi_offset 14, -4
+  14:../Core/Src/uart_isr.c ****     if (HAL_UARTEx_ReceiveToIdle_IT(&telemetry_uart, telemetry_uart_rx_buf, TELEMETRY_RX_MAX_PROCES
+  38              		.loc 1 14 5 view .LVU1
+  39              		.loc 1 14 9 is_stmt 0 view .LVU2
+  40 0002 4022     		movs	r2, #64
+  41 0004 0849     		ldr	r1, .L7
+  42 0006 0948     		ldr	r0, .L7+4
+  43 0008 FFF7FEFF 		bl	HAL_UARTEx_ReceiveToIdle_IT
+  44              	.LVL0:
+ARM GAS  /tmp/ccuhv0Ge.s 			page 2
+
+
+  45              		.loc 1 14 8 view .LVU3
+  46 000c 08B1     		cbz	r0, .L6
+  15:../Core/Src/uart_isr.c ****         return 0;
+  47              		.loc 1 15 16 view .LVU4
+  48 000e 0020     		movs	r0, #0
+  49              	.L1:
+  16:../Core/Src/uart_isr.c ****     }
+  17:../Core/Src/uart_isr.c ****     
+  18:../Core/Src/uart_isr.c ****     
+  19:../Core/Src/uart_isr.c ****     if (HAL_UARTEx_ReceiveToIdle_IT(&state_uart, state_uart_rx_buf, STATE_PACKET_SIZE) != HAL_OK) {
+  20:../Core/Src/uart_isr.c ****         return 0;
+  21:../Core/Src/uart_isr.c ****     }
+  22:../Core/Src/uart_isr.c **** 
+  23:../Core/Src/uart_isr.c ****     return 1;
+  24:../Core/Src/uart_isr.c **** }
+  50              		.loc 1 24 1 view .LVU5
+  51 0010 08BD     		pop	{r3, pc}
+  52              	.L6:
+  19:../Core/Src/uart_isr.c ****         return 0;
+  53              		.loc 1 19 5 is_stmt 1 view .LVU6
+  19:../Core/Src/uart_isr.c ****         return 0;
+  54              		.loc 1 19 9 is_stmt 0 view .LVU7
+  55 0012 7622     		movs	r2, #118
+  56 0014 0649     		ldr	r1, .L7+8
+  57 0016 0748     		ldr	r0, .L7+12
+  58 0018 FFF7FEFF 		bl	HAL_UARTEx_ReceiveToIdle_IT
+  59              	.LVL1:
+  19:../Core/Src/uart_isr.c ****         return 0;
+  60              		.loc 1 19 8 view .LVU8
+  61 001c 08B9     		cbnz	r0, .L4
+  23:../Core/Src/uart_isr.c **** }
+  62              		.loc 1 23 12 view .LVU9
+  63 001e 0120     		movs	r0, #1
+  64 0020 F6E7     		b	.L1
+  65              	.L4:
+  20:../Core/Src/uart_isr.c ****     }
+  66              		.loc 1 20 16 view .LVU10
+  67 0022 0020     		movs	r0, #0
+  68 0024 F4E7     		b	.L1
+  69              	.L8:
+  70 0026 00BF     		.align	2
+  71              	.L7:
+  72 0028 00000000 		.word	.LANCHOR0
+  73 002c 00000000 		.word	huart2
+  74 0030 00000000 		.word	.LANCHOR1
+  75 0034 00000000 		.word	huart6
+  76              		.cfi_endproc
+  77              	.LFE246:
+  79              		.section	.text.update_rocket_state,"ax",%progbits
+  80              		.align	1
+  81              		.global	update_rocket_state
+  82              		.syntax unified
+  83              		.thumb
+  84              		.thumb_func
+  85              		.fpu fpv4-sp-d16
+  87              	update_rocket_state:
+  88              	.LVL2:
+ARM GAS  /tmp/ccuhv0Ge.s 			page 3
+
+
+  89              	.LFB249:
+  25:../Core/Src/uart_isr.c **** 
+  26:../Core/Src/uart_isr.c **** void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
+  27:../Core/Src/uart_isr.c ****     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+  28:../Core/Src/uart_isr.c **** 
+  29:../Core/Src/uart_isr.c ****     if (huart->Instance == telemetry_uart.Instance) {
+  30:../Core/Src/uart_isr.c ****         HAL_GPIO_WritePin(LD2_GPIO_PORT, LD2_PIN, GPIO_PIN_SET);
+  31:../Core/Src/uart_isr.c ****         xStreamBufferSendFromISR(g_telemetry_rx_sb_handle, telemetry_uart_rx_buf, size, &xHigherPri
+  32:../Core/Src/uart_isr.c ****         HAL_UARTEx_ReceiveToIdle_IT(&telemetry_uart, telemetry_uart_rx_buf, TELEMETRY_RX_MAX_PROCES
+  33:../Core/Src/uart_isr.c ****     } else if (huart->Instance == state_uart.Instance) {
+  34:../Core/Src/uart_isr.c ****         HAL_GPIO_WritePin(LD1_GPIO_PORT, LD1_PIN, GPIO_PIN_SET);
+  35:../Core/Src/uart_isr.c ****         process_state_bytes(size, &xHigherPriorityTaskWoken);
+  36:../Core/Src/uart_isr.c ****         HAL_UARTEx_ReceiveToIdle_IT(&state_uart, state_uart_rx_buf, STATE_PACKET_SIZE);
+  37:../Core/Src/uart_isr.c ****     }
+  38:../Core/Src/uart_isr.c **** 
+  39:../Core/Src/uart_isr.c ****     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+  40:../Core/Src/uart_isr.c **** }
+  41:../Core/Src/uart_isr.c **** 
+  42:../Core/Src/uart_isr.c **** void process_state_bytes(uint16_t size, BaseType_t *xHigherPriorityTaskWoken) {
+  43:../Core/Src/uart_isr.c ****     uint16_t size_to_recieve = size;
+  44:../Core/Src/uart_isr.c **** 
+  45:../Core/Src/uart_isr.c ****     if (state_bytes_received + size > STATE_PACKET_SIZE) {
+  46:../Core/Src/uart_isr.c ****         size_to_recieve = STATE_PACKET_SIZE - state_bytes_received;
+  47:../Core/Src/uart_isr.c ****     }
+  48:../Core/Src/uart_isr.c **** 
+  49:../Core/Src/uart_isr.c ****     memcpy(state_bytes + state_bytes_received, state_uart_rx_buf, size_to_recieve);
+  50:../Core/Src/uart_isr.c **** 
+  51:../Core/Src/uart_isr.c ****     state_bytes_received += size_to_recieve;
+  52:../Core/Src/uart_isr.c **** 
+  53:../Core/Src/uart_isr.c ****     if (state_bytes_received == STATE_PACKET_SIZE) {
+  54:../Core/Src/uart_isr.c ****         HAL_GPIO_TogglePin(LD2_GPIO_PORT, LD2_PIN);
+  55:../Core/Src/uart_isr.c ****         update_rocket_state(xHigherPriorityTaskWoken);
+  56:../Core/Src/uart_isr.c ****         state_bytes_received = 0;
+  57:../Core/Src/uart_isr.c ****     }
+  58:../Core/Src/uart_isr.c **** 
+  59:../Core/Src/uart_isr.c ****     uint16_t remaining_size = size - size_to_recieve;
+  60:../Core/Src/uart_isr.c **** 
+  61:../Core/Src/uart_isr.c ****     memcpy(state_bytes + state_bytes_received, state_uart_rx_buf + size_to_recieve, remaining_size)
+  62:../Core/Src/uart_isr.c ****     state_bytes_received += remaining_size;
+  63:../Core/Src/uart_isr.c **** }
+  64:../Core/Src/uart_isr.c **** 
+  65:../Core/Src/uart_isr.c **** void update_rocket_state(BaseType_t *xHigherPriorityTaskWoken) {
+  90              		.loc 1 65 64 is_stmt 1 view -0
+  91              		.cfi_startproc
+  92              		@ args = 0, pretend = 0, frame = 0
+  93              		@ frame_needed = 0, uses_anonymous_args = 0
+  94              		.loc 1 65 64 is_stmt 0 view .LVU12
+  95 0000 70B5     		push	{r4, r5, r6, lr}
+  96              	.LCFI1:
+  97              		.cfi_def_cfa_offset 16
+  98              		.cfi_offset 4, -16
+  99              		.cfi_offset 5, -12
+ 100              		.cfi_offset 6, -8
+ 101              		.cfi_offset 14, -4
+ 102 0002 82B0     		sub	sp, sp, #8
+ 103              	.LCFI2:
+ 104              		.cfi_def_cfa_offset 24
+ARM GAS  /tmp/ccuhv0Ge.s 			page 4
+
+
+ 105 0004 0546     		mov	r5, r0
+  66:../Core/Src/uart_isr.c ****     if (xSemaphoreTakeFromISR(g_state_mutex_handle, xHigherPriorityTaskWoken) == pdTRUE) {
+ 106              		.loc 1 66 5 is_stmt 1 view .LVU13
+ 107              		.loc 1 66 9 is_stmt 0 view .LVU14
+ 108 0006 0246     		mov	r2, r0
+ 109 0008 0021     		movs	r1, #0
+ 110 000a 4C4B     		ldr	r3, .L13
+ 111 000c 1868     		ldr	r0, [r3]
+ 112              	.LVL3:
+ 113              		.loc 1 66 9 view .LVU15
+ 114 000e FFF7FEFF 		bl	xQueueReceiveFromISR
+ 115              	.LVL4:
+ 116              		.loc 1 66 8 view .LVU16
+ 117 0012 0128     		cmp	r0, #1
+ 118 0014 01D0     		beq	.L12
+ 119              	.L9:
+  67:../Core/Src/uart_isr.c ****         uint8_t *serial_buffer = state_bytes + 37;
+  68:../Core/Src/uart_isr.c ****         uint8_t *sensors_buffer = state_bytes;
+  69:../Core/Src/uart_isr.c **** 
+  70:../Core/Src/uart_isr.c ****         uint16_t offset = 1;
+  71:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.sensor_data.accelerometer_x, sensors_buffer + offset, 4);
+  72:../Core/Src/uart_isr.c ****         offset += 4;
+  73:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.sensor_data.accelerometer_y, sensors_buffer + offset, 4);
+  74:../Core/Src/uart_isr.c ****         offset += 4;
+  75:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.sensor_data.accelerometer_z, sensors_buffer + offset, 4);
+  76:../Core/Src/uart_isr.c ****         offset += 4;
+  77:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.sensor_data.gyro_x, sensors_buffer + offset, 4);
+  78:../Core/Src/uart_isr.c ****         offset += 4;
+  79:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.sensor_data.gyro_y, sensors_buffer + offset, 4);
+  80:../Core/Src/uart_isr.c ****         offset += 4;
+  81:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.sensor_data.gyro_z, sensors_buffer + offset, 4);
+  82:../Core/Src/uart_isr.c ****         offset += 4;
+  83:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.sensor_data.gps_x, sensors_buffer + offset, 4);
+  84:../Core/Src/uart_isr.c ****         offset += 4;
+  85:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.sensor_data.gps_y, sensors_buffer + offset, 4);
+  86:../Core/Src/uart_isr.c ****         offset += 4;
+  87:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.sensor_data.gps_z, sensors_buffer + offset, 4);
+  88:../Core/Src/uart_isr.c ****         
+  89:../Core/Src/uart_isr.c ****         offset = 0;
+  90:../Core/Src/uart_isr.c **** 
+  91:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.rocket_state.rocket_state, serial_buffer + offset, sizeof(uint8_t))
+  92:../Core/Src/uart_isr.c ****         offset += sizeof(uint8_t);
+  93:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.state_vector.position_x, serial_buffer + offset, 4);
+  94:../Core/Src/uart_isr.c ****         offset += 4;
+  95:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.state_vector.position_y, serial_buffer + offset, 4);
+  96:../Core/Src/uart_isr.c ****         offset += 4;
+  97:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.state_vector.position_z, serial_buffer + offset, 4);
+  98:../Core/Src/uart_isr.c ****         offset += 4;
+  99:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.state_vector.velocity_x, serial_buffer + offset, 4);
+ 100:../Core/Src/uart_isr.c ****         offset += 4;
+ 101:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.state_vector.velocity_y, serial_buffer + offset, 4);
+ 102:../Core/Src/uart_isr.c ****         offset += 4;
+ 103:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.state_vector.velocity_z, serial_buffer + offset, 4);
+ 104:../Core/Src/uart_isr.c ****         offset += 4;
+ 105:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.state_vector.attitude_w, serial_buffer + offset, 4);
+ 106:../Core/Src/uart_isr.c ****         offset += 4;
+ 107:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.state_vector.attitude_x, serial_buffer + offset, 4);
+ARM GAS  /tmp/ccuhv0Ge.s 			page 5
+
+
+ 108:../Core/Src/uart_isr.c ****         offset += 4;
+ 109:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.state_vector.attitude_y, serial_buffer + offset, 4);
+ 110:../Core/Src/uart_isr.c ****         offset += 4;
+ 111:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.state_vector.attitude_z, serial_buffer + offset, 4);
+ 112:../Core/Src/uart_isr.c ****         offset += 4;
+ 113:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.state_vector.world_x, serial_buffer + offset, 4);
+ 114:../Core/Src/uart_isr.c ****         offset += 4;
+ 115:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.state_vector.world_y, serial_buffer + offset, 4);
+ 116:../Core/Src/uart_isr.c ****         offset += 4;
+ 117:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.state_vector.world_z, serial_buffer + offset, 4);
+ 118:../Core/Src/uart_isr.c ****         offset += 4;
+ 119:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.ground_ekf.pn_matrix_d1, serial_buffer + offset, 4);
+ 120:../Core/Src/uart_isr.c ****         offset += 4;
+ 121:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.ground_ekf.pn_matrix_d2, serial_buffer + offset, 4);
+ 122:../Core/Src/uart_isr.c ****         offset += 4;
+ 123:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.ground_ekf.pn_matrix_d3, serial_buffer + offset, 4);
+ 124:../Core/Src/uart_isr.c ****         offset += 4;
+ 125:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.ground_ekf.pn_matrix_d4, serial_buffer + offset, 4);
+ 126:../Core/Src/uart_isr.c ****         offset += 4;
+ 127:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.ground_ekf.pn_matrix_d5, serial_buffer + offset, 4);
+ 128:../Core/Src/uart_isr.c ****         offset += 4;
+ 129:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.ground_ekf.pn_matrix_d6, serial_buffer + offset, 4);
+ 130:../Core/Src/uart_isr.c ****         offset += 4;
+ 131:../Core/Src/uart_isr.c **** 
+ 132:../Core/Src/uart_isr.c ****         TickType_t ticks = xTaskGetTickCount();
+ 133:../Core/Src/uart_isr.c **** 
+ 134:../Core/Src/uart_isr.c ****         g_current_state.analog_feedback_data.timestamp = ticks;
+ 135:../Core/Src/uart_isr.c ****         g_current_state.ground_ekf.timestamp = ticks;
+ 136:../Core/Src/uart_isr.c ****         g_current_state.state_vector.timestamp = ticks;
+ 137:../Core/Src/uart_isr.c ****         g_current_state.sensor_data.timestamp = ticks;
+ 138:../Core/Src/uart_isr.c ****         g_current_state.rocket_state.timestamp = ticks;
+ 139:../Core/Src/uart_isr.c ****         g_current_state.servo_deflection.timestamp = ticks;
+ 140:../Core/Src/uart_isr.c **** 
+ 141:../Core/Src/uart_isr.c ****         xSemaphoreGiveFromISR(g_state_mutex_handle, xHigherPriorityTaskWoken);
+ 142:../Core/Src/uart_isr.c **** 
+ 143:../Core/Src/uart_isr.c ****         xTaskNotifyFromISR(g_state_tx_task_handle, SEND_STATE_NOTIFICATION_BIT, eSetBits, xHigherPr
+ 144:../Core/Src/uart_isr.c ****         xTaskNotifyFromISR(g_state_flash_task_handle, FLASH_STATE_NOTIFICATION_BIT, eSetBits, xHigh
+ 145:../Core/Src/uart_isr.c ****     }
+ 146:../Core/Src/uart_isr.c **** }
+ 120              		.loc 1 146 1 view .LVU17
+ 121 0016 02B0     		add	sp, sp, #8
+ 122              	.LCFI3:
+ 123              		.cfi_remember_state
+ 124              		.cfi_def_cfa_offset 16
+ 125              		@ sp needed
+ 126 0018 70BD     		pop	{r4, r5, r6, pc}
+ 127              	.LVL5:
+ 128              	.L12:
+ 129              	.LCFI4:
+ 130              		.cfi_restore_state
+ 131              	.LBB2:
+  67:../Core/Src/uart_isr.c ****         uint8_t *serial_buffer = state_bytes + 37;
+ 132              		.loc 1 67 9 is_stmt 1 view .LVU18
+  68:../Core/Src/uart_isr.c **** 
+ 133              		.loc 1 68 9 view .LVU19
+  70:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.sensor_data.accelerometer_x, sensors_buffer + offset, 4);
+ 134              		.loc 1 70 9 view .LVU20
+ARM GAS  /tmp/ccuhv0Ge.s 			page 6
+
+
+  71:../Core/Src/uart_isr.c ****         offset += 4;
+ 135              		.loc 1 71 9 view .LVU21
+ 136 001a 494C     		ldr	r4, .L13+4
+ 137 001c 494B     		ldr	r3, .L13+8
+ 138 001e D3F80120 		ldr	r2, [r3, #1]	@ unaligned
+ 139 0022 C4F88820 		str	r2, [r4, #136]
+  72:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.sensor_data.accelerometer_y, sensors_buffer + offset, 4);
+ 140              		.loc 1 72 9 view .LVU22
+ 141              	.LVL6:
+  73:../Core/Src/uart_isr.c ****         offset += 4;
+ 142              		.loc 1 73 9 view .LVU23
+ 143 0026 D3F80520 		ldr	r2, [r3, #5]	@ unaligned
+ 144 002a C4F88C20 		str	r2, [r4, #140]
+  74:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.sensor_data.accelerometer_z, sensors_buffer + offset, 4);
+ 145              		.loc 1 74 9 view .LVU24
+ 146              	.LVL7:
+  75:../Core/Src/uart_isr.c ****         offset += 4;
+ 147              		.loc 1 75 9 view .LVU25
+ 148 002e D3F80920 		ldr	r2, [r3, #9]	@ unaligned
+ 149 0032 C4F89020 		str	r2, [r4, #144]
+  76:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.sensor_data.gyro_x, sensors_buffer + offset, 4);
+ 150              		.loc 1 76 9 view .LVU26
+ 151              	.LVL8:
+  77:../Core/Src/uart_isr.c ****         offset += 4;
+ 152              		.loc 1 77 9 view .LVU27
+ 153 0036 D3F80D20 		ldr	r2, [r3, #13]	@ unaligned
+ 154 003a C4F89420 		str	r2, [r4, #148]
+  78:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.sensor_data.gyro_y, sensors_buffer + offset, 4);
+ 155              		.loc 1 78 9 view .LVU28
+ 156              	.LVL9:
+  79:../Core/Src/uart_isr.c ****         offset += 4;
+ 157              		.loc 1 79 9 view .LVU29
+ 158 003e D3F81120 		ldr	r2, [r3, #17]	@ unaligned
+ 159 0042 C4F89820 		str	r2, [r4, #152]
+  80:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.sensor_data.gyro_z, sensors_buffer + offset, 4);
+ 160              		.loc 1 80 9 view .LVU30
+ 161              	.LVL10:
+  81:../Core/Src/uart_isr.c ****         offset += 4;
+ 162              		.loc 1 81 9 view .LVU31
+ 163 0046 D3F81520 		ldr	r2, [r3, #21]	@ unaligned
+ 164 004a C4F89C20 		str	r2, [r4, #156]
+  82:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.sensor_data.gps_x, sensors_buffer + offset, 4);
+ 165              		.loc 1 82 9 view .LVU32
+ 166              	.LVL11:
+  83:../Core/Src/uart_isr.c ****         offset += 4;
+ 167              		.loc 1 83 9 view .LVU33
+ 168 004e D3F81920 		ldr	r2, [r3, #25]	@ unaligned
+ 169 0052 C4F8A020 		str	r2, [r4, #160]
+  84:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.sensor_data.gps_y, sensors_buffer + offset, 4);
+ 170              		.loc 1 84 9 view .LVU34
+ 171              	.LVL12:
+  85:../Core/Src/uart_isr.c ****         offset += 4;
+ 172              		.loc 1 85 9 view .LVU35
+ 173 0056 D3F81D20 		ldr	r2, [r3, #29]	@ unaligned
+ 174 005a C4F8A420 		str	r2, [r4, #164]
+  86:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.sensor_data.gps_z, sensors_buffer + offset, 4);
+ 175              		.loc 1 86 9 view .LVU36
+ARM GAS  /tmp/ccuhv0Ge.s 			page 7
+
+
+ 176              	.LVL13:
+  87:../Core/Src/uart_isr.c ****         
+ 177              		.loc 1 87 9 view .LVU37
+ 178 005e D3F82120 		ldr	r2, [r3, #33]	@ unaligned
+ 179 0062 C4F8A820 		str	r2, [r4, #168]
+  89:../Core/Src/uart_isr.c **** 
+ 180              		.loc 1 89 9 view .LVU38
+ 181              	.LVL14:
+  91:../Core/Src/uart_isr.c ****         offset += sizeof(uint8_t);
+ 182              		.loc 1 91 9 view .LVU39
+ 183 0066 93F82520 		ldrb	r2, [r3, #37]	@ zero_extendqisi2
+ 184 006a 84F85820 		strb	r2, [r4, #88]
+  92:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.state_vector.position_x, serial_buffer + offset, 4);
+ 185              		.loc 1 92 9 view .LVU40
+ 186              	.LVL15:
+  93:../Core/Src/uart_isr.c ****         offset += 4;
+ 187              		.loc 1 93 9 view .LVU41
+ 188 006e D3F82620 		ldr	r2, [r3, #38]	@ unaligned
+ 189 0072 E261     		str	r2, [r4, #28]
+  94:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.state_vector.position_y, serial_buffer + offset, 4);
+ 190              		.loc 1 94 9 view .LVU42
+ 191              	.LVL16:
+  95:../Core/Src/uart_isr.c ****         offset += 4;
+ 192              		.loc 1 95 9 view .LVU43
+ 193 0074 D3F82A20 		ldr	r2, [r3, #42]	@ unaligned
+ 194 0078 2262     		str	r2, [r4, #32]
+  96:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.state_vector.position_z, serial_buffer + offset, 4);
+ 195              		.loc 1 96 9 view .LVU44
+ 196              	.LVL17:
+  97:../Core/Src/uart_isr.c ****         offset += 4;
+ 197              		.loc 1 97 9 view .LVU45
+ 198 007a D3F82E20 		ldr	r2, [r3, #46]	@ unaligned
+ 199 007e 6262     		str	r2, [r4, #36]
+  98:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.state_vector.velocity_x, serial_buffer + offset, 4);
+ 200              		.loc 1 98 9 view .LVU46
+ 201              	.LVL18:
+  99:../Core/Src/uart_isr.c ****         offset += 4;
+ 202              		.loc 1 99 9 view .LVU47
+ 203 0080 D3F83220 		ldr	r2, [r3, #50]	@ unaligned
+ 204 0084 2260     		str	r2, [r4]
+ 100:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.state_vector.velocity_y, serial_buffer + offset, 4);
+ 205              		.loc 1 100 9 view .LVU48
+ 206              	.LVL19:
+ 101:../Core/Src/uart_isr.c ****         offset += 4;
+ 207              		.loc 1 101 9 view .LVU49
+ 208 0086 D3F83620 		ldr	r2, [r3, #54]	@ unaligned
+ 209 008a 6260     		str	r2, [r4, #4]
+ 102:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.state_vector.velocity_z, serial_buffer + offset, 4);
+ 210              		.loc 1 102 9 view .LVU50
+ 211              	.LVL20:
+ 103:../Core/Src/uart_isr.c ****         offset += 4;
+ 212              		.loc 1 103 9 view .LVU51
+ 213 008c D3F83A20 		ldr	r2, [r3, #58]	@ unaligned
+ 214 0090 A260     		str	r2, [r4, #8]
+ 104:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.state_vector.attitude_w, serial_buffer + offset, 4);
+ 215              		.loc 1 104 9 view .LVU52
+ 216              	.LVL21:
+ARM GAS  /tmp/ccuhv0Ge.s 			page 8
+
+
+ 105:../Core/Src/uart_isr.c ****         offset += 4;
+ 217              		.loc 1 105 9 view .LVU53
+ 218 0092 D3F83E20 		ldr	r2, [r3, #62]	@ unaligned
+ 219 0096 E260     		str	r2, [r4, #12]
+ 106:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.state_vector.attitude_x, serial_buffer + offset, 4);
+ 220              		.loc 1 106 9 view .LVU54
+ 221              	.LVL22:
+ 107:../Core/Src/uart_isr.c ****         offset += 4;
+ 222              		.loc 1 107 9 view .LVU55
+ 223 0098 D3F84220 		ldr	r2, [r3, #66]	@ unaligned
+ 224 009c 2261     		str	r2, [r4, #16]
+ 108:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.state_vector.attitude_y, serial_buffer + offset, 4);
+ 225              		.loc 1 108 9 view .LVU56
+ 226              	.LVL23:
+ 109:../Core/Src/uart_isr.c ****         offset += 4;
+ 227              		.loc 1 109 9 view .LVU57
+ 228 009e D3F84620 		ldr	r2, [r3, #70]	@ unaligned
+ 229 00a2 6261     		str	r2, [r4, #20]
+ 110:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.state_vector.attitude_z, serial_buffer + offset, 4);
+ 230              		.loc 1 110 9 view .LVU58
+ 231              	.LVL24:
+ 111:../Core/Src/uart_isr.c ****         offset += 4;
+ 232              		.loc 1 111 9 view .LVU59
+ 233 00a4 D3F84A20 		ldr	r2, [r3, #74]	@ unaligned
+ 234 00a8 A261     		str	r2, [r4, #24]
+ 112:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.state_vector.world_x, serial_buffer + offset, 4);
+ 235              		.loc 1 112 9 view .LVU60
+ 236              	.LVL25:
+ 113:../Core/Src/uart_isr.c ****         offset += 4;
+ 237              		.loc 1 113 9 view .LVU61
+ 238 00aa D3F84E20 		ldr	r2, [r3, #78]	@ unaligned
+ 239 00ae A262     		str	r2, [r4, #40]
+ 114:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.state_vector.world_y, serial_buffer + offset, 4);
+ 240              		.loc 1 114 9 view .LVU62
+ 241              	.LVL26:
+ 115:../Core/Src/uart_isr.c ****         offset += 4;
+ 242              		.loc 1 115 9 view .LVU63
+ 243 00b0 D3F85220 		ldr	r2, [r3, #82]	@ unaligned
+ 244 00b4 E262     		str	r2, [r4, #44]
+ 116:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.state_vector.world_z, serial_buffer + offset, 4);
+ 245              		.loc 1 116 9 view .LVU64
+ 246              	.LVL27:
+ 117:../Core/Src/uart_isr.c ****         offset += 4;
+ 247              		.loc 1 117 9 view .LVU65
+ 248 00b6 D3F85620 		ldr	r2, [r3, #86]	@ unaligned
+ 249 00ba 2263     		str	r2, [r4, #48]
+ 118:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.ground_ekf.pn_matrix_d1, serial_buffer + offset, 4);
+ 250              		.loc 1 118 9 view .LVU66
+ 251              	.LVL28:
+ 119:../Core/Src/uart_isr.c ****         offset += 4;
+ 252              		.loc 1 119 9 view .LVU67
+ 253 00bc D3F85A20 		ldr	r2, [r3, #90]	@ unaligned
+ 254 00c0 A266     		str	r2, [r4, #104]
+ 120:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.ground_ekf.pn_matrix_d2, serial_buffer + offset, 4);
+ 255              		.loc 1 120 9 view .LVU68
+ 256              	.LVL29:
+ 121:../Core/Src/uart_isr.c ****         offset += 4;
+ARM GAS  /tmp/ccuhv0Ge.s 			page 9
+
+
+ 257              		.loc 1 121 9 view .LVU69
+ 258 00c2 D3F85E20 		ldr	r2, [r3, #94]	@ unaligned
+ 259 00c6 E266     		str	r2, [r4, #108]
+ 122:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.ground_ekf.pn_matrix_d3, serial_buffer + offset, 4);
+ 260              		.loc 1 122 9 view .LVU70
+ 261              	.LVL30:
+ 123:../Core/Src/uart_isr.c ****         offset += 4;
+ 262              		.loc 1 123 9 view .LVU71
+ 263 00c8 D3F86220 		ldr	r2, [r3, #98]	@ unaligned
+ 264 00cc 2267     		str	r2, [r4, #112]
+ 124:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.ground_ekf.pn_matrix_d4, serial_buffer + offset, 4);
+ 265              		.loc 1 124 9 view .LVU72
+ 266              	.LVL31:
+ 125:../Core/Src/uart_isr.c ****         offset += 4;
+ 267              		.loc 1 125 9 view .LVU73
+ 268 00ce D3F86620 		ldr	r2, [r3, #102]	@ unaligned
+ 269 00d2 6267     		str	r2, [r4, #116]
+ 126:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.ground_ekf.pn_matrix_d5, serial_buffer + offset, 4);
+ 270              		.loc 1 126 9 view .LVU74
+ 271              	.LVL32:
+ 127:../Core/Src/uart_isr.c ****         offset += 4;
+ 272              		.loc 1 127 9 view .LVU75
+ 273 00d4 D3F86A20 		ldr	r2, [r3, #106]	@ unaligned
+ 274 00d8 A267     		str	r2, [r4, #120]
+ 128:../Core/Src/uart_isr.c ****         memcpy(&g_current_state.ground_ekf.pn_matrix_d6, serial_buffer + offset, 4);
+ 275              		.loc 1 128 9 view .LVU76
+ 276              	.LVL33:
+ 129:../Core/Src/uart_isr.c ****         offset += 4;
+ 277              		.loc 1 129 9 view .LVU77
+ 278 00da D3F86E30 		ldr	r3, [r3, #110]	@ unaligned
+ 279 00de E367     		str	r3, [r4, #124]
+ 130:../Core/Src/uart_isr.c **** 
+ 280              		.loc 1 130 9 view .LVU78
+ 281              	.LVL34:
+ 132:../Core/Src/uart_isr.c **** 
+ 282              		.loc 1 132 9 view .LVU79
+ 132:../Core/Src/uart_isr.c **** 
+ 283              		.loc 1 132 28 is_stmt 0 view .LVU80
+ 284 00e0 FFF7FEFF 		bl	xTaskGetTickCount
+ 285              	.LVL35:
+ 134:../Core/Src/uart_isr.c ****         g_current_state.ground_ekf.timestamp = ticks;
+ 286              		.loc 1 134 9 is_stmt 1 view .LVU81
+ 134:../Core/Src/uart_isr.c ****         g_current_state.ground_ekf.timestamp = ticks;
+ 287              		.loc 1 134 56 is_stmt 0 view .LVU82
+ 288 00e4 0026     		movs	r6, #0
+ 289 00e6 C4F8C800 		str	r0, [r4, #200]
+ 290 00ea C4F8CC60 		str	r6, [r4, #204]
+ 135:../Core/Src/uart_isr.c ****         g_current_state.state_vector.timestamp = ticks;
+ 291              		.loc 1 135 9 is_stmt 1 view .LVU83
+ 135:../Core/Src/uart_isr.c ****         g_current_state.state_vector.timestamp = ticks;
+ 292              		.loc 1 135 46 is_stmt 0 view .LVU84
+ 293 00ee C4F88000 		str	r0, [r4, #128]
+ 294 00f2 C4F88460 		str	r6, [r4, #132]
+ 136:../Core/Src/uart_isr.c ****         g_current_state.sensor_data.timestamp = ticks;
+ 295              		.loc 1 136 9 is_stmt 1 view .LVU85
+ 136:../Core/Src/uart_isr.c ****         g_current_state.sensor_data.timestamp = ticks;
+ 296              		.loc 1 136 48 is_stmt 0 view .LVU86
+ARM GAS  /tmp/ccuhv0Ge.s 			page 10
+
+
+ 297 00f6 A063     		str	r0, [r4, #56]
+ 298 00f8 E663     		str	r6, [r4, #60]
+ 137:../Core/Src/uart_isr.c ****         g_current_state.rocket_state.timestamp = ticks;
+ 299              		.loc 1 137 9 is_stmt 1 view .LVU87
+ 137:../Core/Src/uart_isr.c ****         g_current_state.rocket_state.timestamp = ticks;
+ 300              		.loc 1 137 47 is_stmt 0 view .LVU88
+ 301 00fa C4F8B000 		str	r0, [r4, #176]
+ 302 00fe C4F8B460 		str	r6, [r4, #180]
+ 138:../Core/Src/uart_isr.c ****         g_current_state.servo_deflection.timestamp = ticks;
+ 303              		.loc 1 138 9 is_stmt 1 view .LVU89
+ 138:../Core/Src/uart_isr.c ****         g_current_state.servo_deflection.timestamp = ticks;
+ 304              		.loc 1 138 48 is_stmt 0 view .LVU90
+ 305 0102 2066     		str	r0, [r4, #96]
+ 306 0104 6666     		str	r6, [r4, #100]
+ 139:../Core/Src/uart_isr.c **** 
+ 307              		.loc 1 139 9 is_stmt 1 view .LVU91
+ 139:../Core/Src/uart_isr.c **** 
+ 308              		.loc 1 139 52 is_stmt 0 view .LVU92
+ 309 0106 2065     		str	r0, [r4, #80]
+ 310 0108 6665     		str	r6, [r4, #84]
+ 141:../Core/Src/uart_isr.c **** 
+ 311              		.loc 1 141 9 is_stmt 1 view .LVU93
+ 312 010a 2946     		mov	r1, r5
+ 313 010c 0B4B     		ldr	r3, .L13
+ 314 010e 1868     		ldr	r0, [r3]
+ 315              	.LVL36:
+ 141:../Core/Src/uart_isr.c **** 
+ 316              		.loc 1 141 9 is_stmt 0 view .LVU94
+ 317 0110 FFF7FEFF 		bl	xQueueGiveFromISR
+ 318              	.LVL37:
+ 143:../Core/Src/uart_isr.c ****         xTaskNotifyFromISR(g_state_flash_task_handle, FLASH_STATE_NOTIFICATION_BIT, eSetBits, xHigh
+ 319              		.loc 1 143 9 is_stmt 1 view .LVU95
+ 320 0114 0195     		str	r5, [sp, #4]
+ 321 0116 0096     		str	r6, [sp]
+ 322 0118 0123     		movs	r3, #1
+ 323 011a 1A46     		mov	r2, r3
+ 324 011c 3146     		mov	r1, r6
+ 325 011e 0A48     		ldr	r0, .L13+12
+ 326 0120 0068     		ldr	r0, [r0]
+ 327 0122 FFF7FEFF 		bl	xTaskGenericNotifyFromISR
+ 328              	.LVL38:
+ 144:../Core/Src/uart_isr.c ****     }
+ 329              		.loc 1 144 9 view .LVU96
+ 330 0126 0195     		str	r5, [sp, #4]
+ 331 0128 0096     		str	r6, [sp]
+ 332 012a 0123     		movs	r3, #1
+ 333 012c 1A46     		mov	r2, r3
+ 334 012e 3146     		mov	r1, r6
+ 335 0130 0648     		ldr	r0, .L13+16
+ 336 0132 0068     		ldr	r0, [r0]
+ 337 0134 FFF7FEFF 		bl	xTaskGenericNotifyFromISR
+ 338              	.LVL39:
+ 339              	.LBE2:
+ 340              		.loc 1 146 1 is_stmt 0 view .LVU97
+ 341 0138 6DE7     		b	.L9
+ 342              	.L14:
+ 343 013a 00BF     		.align	2
+ARM GAS  /tmp/ccuhv0Ge.s 			page 11
+
+
+ 344              	.L13:
+ 345 013c 00000000 		.word	g_state_mutex_handle
+ 346 0140 00000000 		.word	g_current_state
+ 347 0144 00000000 		.word	.LANCHOR2
+ 348 0148 00000000 		.word	g_state_tx_task_handle
+ 349 014c 00000000 		.word	g_state_flash_task_handle
+ 350              		.cfi_endproc
+ 351              	.LFE249:
+ 353              		.section	.text.process_state_bytes,"ax",%progbits
+ 354              		.align	1
+ 355              		.global	process_state_bytes
+ 356              		.syntax unified
+ 357              		.thumb
+ 358              		.thumb_func
+ 359              		.fpu fpv4-sp-d16
+ 361              	process_state_bytes:
+ 362              	.LVL40:
+ 363              	.LFB248:
+  42:../Core/Src/uart_isr.c ****     uint16_t size_to_recieve = size;
+ 364              		.loc 1 42 79 is_stmt 1 view -0
+ 365              		.cfi_startproc
+ 366              		@ args = 0, pretend = 0, frame = 0
+ 367              		@ frame_needed = 0, uses_anonymous_args = 0
+  42:../Core/Src/uart_isr.c ****     uint16_t size_to_recieve = size;
+ 368              		.loc 1 42 79 is_stmt 0 view .LVU99
+ 369 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 370              	.LCFI5:
+ 371              		.cfi_def_cfa_offset 24
+ 372              		.cfi_offset 3, -24
+ 373              		.cfi_offset 4, -20
+ 374              		.cfi_offset 5, -16
+ 375              		.cfi_offset 6, -12
+ 376              		.cfi_offset 7, -8
+ 377              		.cfi_offset 14, -4
+ 378 0002 0446     		mov	r4, r0
+ 379 0004 0F46     		mov	r7, r1
+  43:../Core/Src/uart_isr.c **** 
+ 380              		.loc 1 43 5 is_stmt 1 view .LVU100
+ 381              	.LVL41:
+  45:../Core/Src/uart_isr.c ****         size_to_recieve = STATE_PACKET_SIZE - state_bytes_received;
+ 382              		.loc 1 45 5 view .LVU101
+  45:../Core/Src/uart_isr.c ****         size_to_recieve = STATE_PACKET_SIZE - state_bytes_received;
+ 383              		.loc 1 45 30 is_stmt 0 view .LVU102
+ 384 0006 194B     		ldr	r3, .L21
+ 385 0008 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 386 000a 1A18     		adds	r2, r3, r0
+  45:../Core/Src/uart_isr.c ****         size_to_recieve = STATE_PACKET_SIZE - state_bytes_received;
+ 387              		.loc 1 45 8 view .LVU103
+ 388 000c 762A     		cmp	r2, #118
+ 389 000e 1FDD     		ble	.L18
+  46:../Core/Src/uart_isr.c ****     }
+ 390              		.loc 1 46 9 is_stmt 1 view .LVU104
+  46:../Core/Src/uart_isr.c ****     }
+ 391              		.loc 1 46 25 is_stmt 0 view .LVU105
+ 392 0010 C3F17605 		rsb	r5, r3, #118
+ 393 0014 ADB2     		uxth	r5, r5
+ 394              	.LVL42:
+ARM GAS  /tmp/ccuhv0Ge.s 			page 12
+
+
+ 395              	.L16:
+  49:../Core/Src/uart_isr.c **** 
+ 396              		.loc 1 49 5 is_stmt 1 view .LVU106
+ 397 0016 2E46     		mov	r6, r5
+ 398 0018 2A46     		mov	r2, r5
+ 399 001a 1549     		ldr	r1, .L21+4
+ 400              	.LVL43:
+  49:../Core/Src/uart_isr.c **** 
+ 401              		.loc 1 49 5 is_stmt 0 view .LVU107
+ 402 001c 1548     		ldr	r0, .L21+8
+ 403              	.LVL44:
+  49:../Core/Src/uart_isr.c **** 
+ 404              		.loc 1 49 5 view .LVU108
+ 405 001e 1844     		add	r0, r0, r3
+ 406 0020 FFF7FEFF 		bl	memcpy
+ 407              	.LVL45:
+  51:../Core/Src/uart_isr.c **** 
+ 408              		.loc 1 51 5 is_stmt 1 view .LVU109
+  51:../Core/Src/uart_isr.c **** 
+ 409              		.loc 1 51 26 is_stmt 0 view .LVU110
+ 410 0024 114A     		ldr	r2, .L21
+ 411 0026 1378     		ldrb	r3, [r2]	@ zero_extendqisi2
+ 412 0028 2B44     		add	r3, r3, r5
+ 413 002a DBB2     		uxtb	r3, r3
+ 414 002c 1370     		strb	r3, [r2]
+  53:../Core/Src/uart_isr.c ****         HAL_GPIO_TogglePin(LD2_GPIO_PORT, LD2_PIN);
+ 415              		.loc 1 53 5 is_stmt 1 view .LVU111
+  53:../Core/Src/uart_isr.c ****         HAL_GPIO_TogglePin(LD2_GPIO_PORT, LD2_PIN);
+ 416              		.loc 1 53 8 is_stmt 0 view .LVU112
+ 417 002e 762B     		cmp	r3, #118
+ 418 0030 10D0     		beq	.L20
+ 419              	.L17:
+  59:../Core/Src/uart_isr.c **** 
+ 420              		.loc 1 59 5 is_stmt 1 view .LVU113
+  59:../Core/Src/uart_isr.c **** 
+ 421              		.loc 1 59 14 is_stmt 0 view .LVU114
+ 422 0032 641B     		subs	r4, r4, r5
+ 423 0034 A4B2     		uxth	r4, r4
+ 424              	.LVL46:
+  61:../Core/Src/uart_isr.c ****     state_bytes_received += remaining_size;
+ 425              		.loc 1 61 5 is_stmt 1 view .LVU115
+ 426 0036 0D4D     		ldr	r5, .L21
+ 427              	.LVL47:
+  61:../Core/Src/uart_isr.c ****     state_bytes_received += remaining_size;
+ 428              		.loc 1 61 5 is_stmt 0 view .LVU116
+ 429 0038 2B78     		ldrb	r3, [r5]	@ zero_extendqisi2
+ 430 003a 2246     		mov	r2, r4
+ 431 003c 0C49     		ldr	r1, .L21+4
+ 432 003e 3144     		add	r1, r1, r6
+ 433 0040 0C48     		ldr	r0, .L21+8
+ 434 0042 1844     		add	r0, r0, r3
+ 435 0044 FFF7FEFF 		bl	memcpy
+ 436              	.LVL48:
+  62:../Core/Src/uart_isr.c **** }
+ 437              		.loc 1 62 5 is_stmt 1 view .LVU117
+  62:../Core/Src/uart_isr.c **** }
+ 438              		.loc 1 62 26 is_stmt 0 view .LVU118
+ARM GAS  /tmp/ccuhv0Ge.s 			page 13
+
+
+ 439 0048 2B78     		ldrb	r3, [r5]	@ zero_extendqisi2
+ 440 004a 1C44     		add	r4, r4, r3
+ 441              	.LVL49:
+  62:../Core/Src/uart_isr.c **** }
+ 442              		.loc 1 62 26 view .LVU119
+ 443 004c 2C70     		strb	r4, [r5]
+  63:../Core/Src/uart_isr.c **** 
+ 444              		.loc 1 63 1 view .LVU120
+ 445 004e F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 446              	.LVL50:
+ 447              	.L18:
+  43:../Core/Src/uart_isr.c **** 
+ 448              		.loc 1 43 14 view .LVU121
+ 449 0050 0546     		mov	r5, r0
+ 450 0052 E0E7     		b	.L16
+ 451              	.LVL51:
+ 452              	.L20:
+  54:../Core/Src/uart_isr.c ****         update_rocket_state(xHigherPriorityTaskWoken);
+ 453              		.loc 1 54 9 is_stmt 1 view .LVU122
+ 454 0054 8021     		movs	r1, #128
+ 455 0056 0848     		ldr	r0, .L21+12
+ 456 0058 FFF7FEFF 		bl	HAL_GPIO_TogglePin
+ 457              	.LVL52:
+  55:../Core/Src/uart_isr.c ****         state_bytes_received = 0;
+ 458              		.loc 1 55 9 view .LVU123
+ 459 005c 3846     		mov	r0, r7
+ 460 005e FFF7FEFF 		bl	update_rocket_state
+ 461              	.LVL53:
+  56:../Core/Src/uart_isr.c ****     }
+ 462              		.loc 1 56 9 view .LVU124
+  56:../Core/Src/uart_isr.c ****     }
+ 463              		.loc 1 56 30 is_stmt 0 view .LVU125
+ 464 0062 024B     		ldr	r3, .L21
+ 465 0064 0022     		movs	r2, #0
+ 466 0066 1A70     		strb	r2, [r3]
+ 467 0068 E3E7     		b	.L17
+ 468              	.L22:
+ 469 006a 00BF     		.align	2
+ 470              	.L21:
+ 471 006c 00000000 		.word	.LANCHOR3
+ 472 0070 00000000 		.word	.LANCHOR1
+ 473 0074 00000000 		.word	.LANCHOR2
+ 474 0078 00040240 		.word	1073873920
+ 475              		.cfi_endproc
+ 476              	.LFE248:
+ 478              		.section	.text.HAL_UARTEx_RxEventCallback,"ax",%progbits
+ 479              		.align	1
+ 480              		.global	HAL_UARTEx_RxEventCallback
+ 481              		.syntax unified
+ 482              		.thumb
+ 483              		.thumb_func
+ 484              		.fpu fpv4-sp-d16
+ 486              	HAL_UARTEx_RxEventCallback:
+ 487              	.LVL54:
+ 488              	.LFB247:
+  26:../Core/Src/uart_isr.c ****     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+ 489              		.loc 1 26 75 is_stmt 1 view -0
+ARM GAS  /tmp/ccuhv0Ge.s 			page 14
+
+
+ 490              		.cfi_startproc
+ 491              		@ args = 0, pretend = 0, frame = 8
+ 492              		@ frame_needed = 0, uses_anonymous_args = 0
+  26:../Core/Src/uart_isr.c ****     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+ 493              		.loc 1 26 75 is_stmt 0 view .LVU127
+ 494 0000 30B5     		push	{r4, r5, lr}
+ 495              	.LCFI6:
+ 496              		.cfi_def_cfa_offset 12
+ 497              		.cfi_offset 4, -12
+ 498              		.cfi_offset 5, -8
+ 499              		.cfi_offset 14, -4
+ 500 0002 83B0     		sub	sp, sp, #12
+ 501              	.LCFI7:
+ 502              		.cfi_def_cfa_offset 24
+ 503 0004 0D46     		mov	r5, r1
+  27:../Core/Src/uart_isr.c **** 
+ 504              		.loc 1 27 5 is_stmt 1 view .LVU128
+  27:../Core/Src/uart_isr.c **** 
+ 505              		.loc 1 27 16 is_stmt 0 view .LVU129
+ 506 0006 0023     		movs	r3, #0
+ 507 0008 0193     		str	r3, [sp, #4]
+  29:../Core/Src/uart_isr.c ****         HAL_GPIO_WritePin(LD2_GPIO_PORT, LD2_PIN, GPIO_PIN_SET);
+ 508              		.loc 1 29 5 is_stmt 1 view .LVU130
+  29:../Core/Src/uart_isr.c ****         HAL_GPIO_WritePin(LD2_GPIO_PORT, LD2_PIN, GPIO_PIN_SET);
+ 509              		.loc 1 29 14 is_stmt 0 view .LVU131
+ 510 000a 0368     		ldr	r3, [r0]
+  29:../Core/Src/uart_isr.c ****         HAL_GPIO_WritePin(LD2_GPIO_PORT, LD2_PIN, GPIO_PIN_SET);
+ 511              		.loc 1 29 42 view .LVU132
+ 512 000c 1B4C     		ldr	r4, .L30
+ 513 000e 2468     		ldr	r4, [r4]
+  29:../Core/Src/uart_isr.c ****         HAL_GPIO_WritePin(LD2_GPIO_PORT, LD2_PIN, GPIO_PIN_SET);
+ 514              		.loc 1 29 8 view .LVU133
+ 515 0010 A342     		cmp	r3, r4
+ 516 0012 11D0     		beq	.L28
+  33:../Core/Src/uart_isr.c ****         HAL_GPIO_WritePin(LD1_GPIO_PORT, LD1_PIN, GPIO_PIN_SET);
+ 517              		.loc 1 33 12 is_stmt 1 view .LVU134
+  33:../Core/Src/uart_isr.c ****         HAL_GPIO_WritePin(LD1_GPIO_PORT, LD1_PIN, GPIO_PIN_SET);
+ 518              		.loc 1 33 45 is_stmt 0 view .LVU135
+ 519 0014 1A4A     		ldr	r2, .L30+4
+ 520 0016 1268     		ldr	r2, [r2]
+  33:../Core/Src/uart_isr.c ****         HAL_GPIO_WritePin(LD1_GPIO_PORT, LD1_PIN, GPIO_PIN_SET);
+ 521              		.loc 1 33 15 view .LVU136
+ 522 0018 9342     		cmp	r3, r2
+ 523 001a 20D0     		beq	.L29
+ 524              	.LVL55:
+ 525              	.L25:
+  39:../Core/Src/uart_isr.c **** }
+ 526              		.loc 1 39 5 is_stmt 1 view .LVU137
+  39:../Core/Src/uart_isr.c **** }
+ 527              		.loc 1 39 5 view .LVU138
+ 528 001c 019B     		ldr	r3, [sp, #4]
+ 529 001e 4BB1     		cbz	r3, .L23
+  39:../Core/Src/uart_isr.c **** }
+ 530              		.loc 1 39 5 discriminator 1 view .LVU139
+  39:../Core/Src/uart_isr.c **** }
+ 531              		.loc 1 39 5 discriminator 1 view .LVU140
+ 532 0020 4FF0E023 		mov	r3, #-536813568
+ARM GAS  /tmp/ccuhv0Ge.s 			page 15
+
+
+ 533 0024 4FF08052 		mov	r2, #268435456
+ 534 0028 C3F8042D 		str	r2, [r3, #3332]
+  39:../Core/Src/uart_isr.c **** }
+ 535              		.loc 1 39 5 discriminator 1 view .LVU141
+ 536              		.syntax unified
+ 537              	@ 39 "../Core/Src/uart_isr.c" 1
+ 538 002c BFF34F8F 		dsb
+ 539              	@ 0 "" 2
+  39:../Core/Src/uart_isr.c **** }
+ 540              		.loc 1 39 5 discriminator 1 view .LVU142
+ 541              	@ 39 "../Core/Src/uart_isr.c" 1
+ 542 0030 BFF36F8F 		isb
+ 543              	@ 0 "" 2
+  39:../Core/Src/uart_isr.c **** }
+ 544              		.loc 1 39 5 discriminator 1 view .LVU143
+  39:../Core/Src/uart_isr.c **** }
+ 545              		.loc 1 39 5 discriminator 1 view .LVU144
+  39:../Core/Src/uart_isr.c **** }
+ 546              		.loc 1 39 5 discriminator 1 view .LVU145
+ 547              		.thumb
+ 548              		.syntax unified
+ 549              	.L23:
+  40:../Core/Src/uart_isr.c **** 
+ 550              		.loc 1 40 1 is_stmt 0 view .LVU146
+ 551 0034 03B0     		add	sp, sp, #12
+ 552              	.LCFI8:
+ 553              		.cfi_remember_state
+ 554              		.cfi_def_cfa_offset 12
+ 555              		@ sp needed
+ 556 0036 30BD     		pop	{r4, r5, pc}
+ 557              	.LVL56:
+ 558              	.L28:
+ 559              	.LCFI9:
+ 560              		.cfi_restore_state
+  30:../Core/Src/uart_isr.c ****         xStreamBufferSendFromISR(g_telemetry_rx_sb_handle, telemetry_uart_rx_buf, size, &xHigherPri
+ 561              		.loc 1 30 9 is_stmt 1 view .LVU147
+ 562 0038 0122     		movs	r2, #1
+ 563 003a 8021     		movs	r1, #128
+ 564              	.LVL57:
+  30:../Core/Src/uart_isr.c ****         xStreamBufferSendFromISR(g_telemetry_rx_sb_handle, telemetry_uart_rx_buf, size, &xHigherPri
+ 565              		.loc 1 30 9 is_stmt 0 view .LVU148
+ 566 003c 1148     		ldr	r0, .L30+8
+ 567              	.LVL58:
+  30:../Core/Src/uart_isr.c ****         xStreamBufferSendFromISR(g_telemetry_rx_sb_handle, telemetry_uart_rx_buf, size, &xHigherPri
+ 568              		.loc 1 30 9 view .LVU149
+ 569 003e FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 570              	.LVL59:
+  31:../Core/Src/uart_isr.c ****         HAL_UARTEx_ReceiveToIdle_IT(&telemetry_uart, telemetry_uart_rx_buf, TELEMETRY_RX_MAX_PROCES
+ 571              		.loc 1 31 9 is_stmt 1 view .LVU150
+ 572 0042 114C     		ldr	r4, .L30+12
+ 573 0044 01AB     		add	r3, sp, #4
+ 574 0046 2A46     		mov	r2, r5
+ 575 0048 2146     		mov	r1, r4
+ 576 004a 1048     		ldr	r0, .L30+16
+ 577 004c 0068     		ldr	r0, [r0]
+ 578 004e FFF7FEFF 		bl	xStreamBufferSendFromISR
+ 579              	.LVL60:
+ARM GAS  /tmp/ccuhv0Ge.s 			page 16
+
+
+  32:../Core/Src/uart_isr.c ****     } else if (huart->Instance == state_uart.Instance) {
+ 580              		.loc 1 32 9 view .LVU151
+ 581 0052 4022     		movs	r2, #64
+ 582 0054 2146     		mov	r1, r4
+ 583 0056 0948     		ldr	r0, .L30
+ 584 0058 FFF7FEFF 		bl	HAL_UARTEx_ReceiveToIdle_IT
+ 585              	.LVL61:
+ 586 005c DEE7     		b	.L25
+ 587              	.LVL62:
+ 588              	.L29:
+  34:../Core/Src/uart_isr.c ****         process_state_bytes(size, &xHigherPriorityTaskWoken);
+ 589              		.loc 1 34 9 view .LVU152
+ 590 005e 0122     		movs	r2, #1
+ 591 0060 1146     		mov	r1, r2
+ 592              	.LVL63:
+  34:../Core/Src/uart_isr.c ****         process_state_bytes(size, &xHigherPriorityTaskWoken);
+ 593              		.loc 1 34 9 is_stmt 0 view .LVU153
+ 594 0062 0848     		ldr	r0, .L30+8
+ 595              	.LVL64:
+  34:../Core/Src/uart_isr.c ****         process_state_bytes(size, &xHigherPriorityTaskWoken);
+ 596              		.loc 1 34 9 view .LVU154
+ 597 0064 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 598              	.LVL65:
+  35:../Core/Src/uart_isr.c ****         HAL_UARTEx_ReceiveToIdle_IT(&state_uart, state_uart_rx_buf, STATE_PACKET_SIZE);
+ 599              		.loc 1 35 9 is_stmt 1 view .LVU155
+ 600 0068 01A9     		add	r1, sp, #4
+ 601 006a 2846     		mov	r0, r5
+ 602 006c FFF7FEFF 		bl	process_state_bytes
+ 603              	.LVL66:
+  36:../Core/Src/uart_isr.c ****     }
+ 604              		.loc 1 36 9 view .LVU156
+ 605 0070 7622     		movs	r2, #118
+ 606 0072 0749     		ldr	r1, .L30+20
+ 607 0074 0248     		ldr	r0, .L30+4
+ 608 0076 FFF7FEFF 		bl	HAL_UARTEx_ReceiveToIdle_IT
+ 609              	.LVL67:
+ 610 007a CFE7     		b	.L25
+ 611              	.L31:
+ 612              		.align	2
+ 613              	.L30:
+ 614 007c 00000000 		.word	huart2
+ 615 0080 00000000 		.word	huart6
+ 616 0084 00040240 		.word	1073873920
+ 617 0088 00000000 		.word	.LANCHOR0
+ 618 008c 00000000 		.word	g_telemetry_rx_sb_handle
+ 619 0090 00000000 		.word	.LANCHOR1
+ 620              		.cfi_endproc
+ 621              	.LFE247:
+ 623              		.section	.text.check_state_markers,"ax",%progbits
+ 624              		.align	1
+ 625              		.global	check_state_markers
+ 626              		.syntax unified
+ 627              		.thumb
+ 628              		.thumb_func
+ 629              		.fpu fpv4-sp-d16
+ 631              	check_state_markers:
+ 632              	.LVL68:
+ARM GAS  /tmp/ccuhv0Ge.s 			page 17
+
+
+ 633              	.LFB250:
+ 147:../Core/Src/uart_isr.c **** 
+ 148:../Core/Src/uart_isr.c **** void check_state_markers(BaseType_t *xHigherPriorityTaskWoken) {
+ 634              		.loc 1 148 64 view -0
+ 635              		.cfi_startproc
+ 636              		@ args = 0, pretend = 0, frame = 0
+ 637              		@ frame_needed = 0, uses_anonymous_args = 0
+ 638              		.loc 1 148 64 is_stmt 0 view .LVU158
+ 639 0000 30B5     		push	{r4, r5, lr}
+ 640              	.LCFI10:
+ 641              		.cfi_def_cfa_offset 12
+ 642              		.cfi_offset 4, -12
+ 643              		.cfi_offset 5, -8
+ 644              		.cfi_offset 14, -4
+ 645 0002 83B0     		sub	sp, sp, #12
+ 646              	.LCFI11:
+ 647              		.cfi_def_cfa_offset 24
+ 648 0004 0446     		mov	r4, r0
+ 149:../Core/Src/uart_isr.c ****     static uint8_t launched = 0;
+ 649              		.loc 1 149 5 is_stmt 1 view .LVU159
+ 150:../Core/Src/uart_isr.c ****     static uint8_t landed = 0;
+ 650              		.loc 1 150 5 view .LVU160
+ 151:../Core/Src/uart_isr.c **** 
+ 152:../Core/Src/uart_isr.c ****     static uint8_t drogue_parachute_deploy = 0;
+ 651              		.loc 1 152 5 view .LVU161
+ 153:../Core/Src/uart_isr.c ****     static uint8_t main_parachute_deploy = 0;
+ 652              		.loc 1 153 5 view .LVU162
+ 154:../Core/Src/uart_isr.c **** 
+ 155:../Core/Src/uart_isr.c ****     /* Launched */
+ 156:../Core/Src/uart_isr.c ****     if (launched == 0 && g_current_state.rocket_state.rocket_state >= 2) {
+ 653              		.loc 1 156 5 view .LVU163
+ 654              		.loc 1 156 18 is_stmt 0 view .LVU164
+ 655 0006 304B     		ldr	r3, .L44
+ 656 0008 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 657              		.loc 1 156 8 view .LVU165
+ 658 000a 23B9     		cbnz	r3, .L33
+ 659              		.loc 1 156 54 discriminator 1 view .LVU166
+ 660 000c 2F4B     		ldr	r3, .L44+4
+ 661 000e 93F85830 		ldrb	r3, [r3, #88]	@ zero_extendqisi2
+ 662              		.loc 1 156 23 discriminator 1 view .LVU167
+ 663 0012 012B     		cmp	r3, #1
+ 664 0014 19D8     		bhi	.L40
+ 665              	.LVL69:
+ 666              	.L33:
+ 157:../Core/Src/uart_isr.c ****         launched = 1;
+ 158:../Core/Src/uart_isr.c ****         g_current_state.launch_timestamp = xTaskGetTickCount();
+ 159:../Core/Src/uart_isr.c ****         xTaskNotifyFromISR(g_run_controls_task_handle, BEGIN_CONTROLS_NOTIFICATION_BIT, eSetBits, x
+ 160:../Core/Src/uart_isr.c ****     }
+ 161:../Core/Src/uart_isr.c **** 
+ 162:../Core/Src/uart_isr.c ****     if (landed == 0 && g_current_state.rocket_state.rocket_state == 6) {
+ 667              		.loc 1 162 5 is_stmt 1 view .LVU168
+ 668              		.loc 1 162 16 is_stmt 0 view .LVU169
+ 669 0016 2E4B     		ldr	r3, .L44+8
+ 670 0018 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 671              		.loc 1 162 8 view .LVU170
+ 672 001a 23B9     		cbnz	r3, .L34
+ 673              		.loc 1 162 52 discriminator 1 view .LVU171
+ARM GAS  /tmp/ccuhv0Ge.s 			page 18
+
+
+ 674 001c 2B4B     		ldr	r3, .L44+4
+ 675 001e 93F85830 		ldrb	r3, [r3, #88]	@ zero_extendqisi2
+ 676              		.loc 1 162 21 discriminator 1 view .LVU172
+ 677 0022 062B     		cmp	r3, #6
+ 678 0024 25D0     		beq	.L41
+ 679              	.L34:
+ 163:../Core/Src/uart_isr.c ****         landed = 1;        
+ 164:../Core/Src/uart_isr.c ****         xTaskNotifyFromISR(g_state_flash_task_handle, FLASH_SD_CARD_NOTIFICATION_BIT, eSetBits, xHi
+ 165:../Core/Src/uart_isr.c ****     }
+ 166:../Core/Src/uart_isr.c **** 
+ 167:../Core/Src/uart_isr.c ****     if (drogue_parachute_deploy == 0 && g_current_state.rocket_state.rocket_state == 5) {
+ 680              		.loc 1 167 5 is_stmt 1 view .LVU173
+ 681              		.loc 1 167 33 is_stmt 0 view .LVU174
+ 682 0026 2B4B     		ldr	r3, .L44+12
+ 683 0028 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 684              		.loc 1 167 8 view .LVU175
+ 685 002a 23B9     		cbnz	r3, .L35
+ 686              		.loc 1 167 69 discriminator 1 view .LVU176
+ 687 002c 274B     		ldr	r3, .L44+4
+ 688 002e 93F85830 		ldrb	r3, [r3, #88]	@ zero_extendqisi2
+ 689              		.loc 1 167 38 discriminator 1 view .LVU177
+ 690 0032 052B     		cmp	r3, #5
+ 691 0034 29D0     		beq	.L42
+ 692              	.L35:
+ 168:../Core/Src/uart_isr.c ****         drogue_parachute_deploy = 1;
+ 169:../Core/Src/uart_isr.c ****         g_current_state.rocket_state.firing_channel_1 = 1;
+ 170:../Core/Src/uart_isr.c ****     }
+ 171:../Core/Src/uart_isr.c **** 
+ 172:../Core/Src/uart_isr.c ****     if (main_parachute_deploy == 0 && (g_current_state.rocket_state.rocket_state == 5 && (g_current
+ 693              		.loc 1 172 5 is_stmt 1 view .LVU178
+ 694              		.loc 1 172 31 is_stmt 0 view .LVU179
+ 695 0036 284B     		ldr	r3, .L44+16
+ 696 0038 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 697              		.loc 1 172 8 view .LVU180
+ 698 003a 23B9     		cbnz	r3, .L32
+ 699              		.loc 1 172 68 discriminator 1 view .LVU181
+ 700 003c 234B     		ldr	r3, .L44+4
+ 701 003e 93F85830 		ldrb	r3, [r3, #88]	@ zero_extendqisi2
+ 702              		.loc 1 172 36 discriminator 1 view .LVU182
+ 703 0042 052B     		cmp	r3, #5
+ 704 0044 28D0     		beq	.L43
+ 705              	.L32:
+ 173:../Core/Src/uart_isr.c ****         main_parachute_deploy = 1;
+ 174:../Core/Src/uart_isr.c ****         g_current_state.rocket_state.firing_channel_2 = 1;
+ 175:../Core/Src/uart_isr.c ****     }
+ 176:../Core/Src/uart_isr.c **** }...
+ 706              		.loc 1 176 1 view .LVU183
+ 707 0046 03B0     		add	sp, sp, #12
+ 708              	.LCFI12:
+ 709              		.cfi_remember_state
+ 710              		.cfi_def_cfa_offset 12
+ 711              		@ sp needed
+ 712 0048 30BD     		pop	{r4, r5, pc}
+ 713              	.LVL70:
+ 714              	.L40:
+ 715              	.LCFI13:
+ 716              		.cfi_restore_state
+ARM GAS  /tmp/ccuhv0Ge.s 			page 19
+
+
+ 157:../Core/Src/uart_isr.c ****         launched = 1;
+ 717              		.loc 1 157 9 is_stmt 1 view .LVU184
+ 157:../Core/Src/uart_isr.c ****         launched = 1;
+ 718              		.loc 1 157 18 is_stmt 0 view .LVU185
+ 719 004a 0125     		movs	r5, #1
+ 720 004c 1E4B     		ldr	r3, .L44
+ 721 004e 1D70     		strb	r5, [r3]
+ 158:../Core/Src/uart_isr.c ****         g_current_state.launch_timestamp = xTaskGetTickCount();
+ 722              		.loc 1 158 9 is_stmt 1 view .LVU186
+ 158:../Core/Src/uart_isr.c ****         g_current_state.launch_timestamp = xTaskGetTickCount();
+ 723              		.loc 1 158 44 is_stmt 0 view .LVU187
+ 724 0050 FFF7FEFF 		bl	xTaskGetTickCount
+ 725              	.LVL71:
+ 158:../Core/Src/uart_isr.c ****         g_current_state.launch_timestamp = xTaskGetTickCount();
+ 726              		.loc 1 158 44 view .LVU188
+ 727 0054 0021     		movs	r1, #0
+ 158:../Core/Src/uart_isr.c ****         g_current_state.launch_timestamp = xTaskGetTickCount();
+ 728              		.loc 1 158 42 view .LVU189
+ 729 0056 1D4B     		ldr	r3, .L44+4
+ 730 0058 C3F8D000 		str	r0, [r3, #208]
+ 731 005c C3F8D410 		str	r1, [r3, #212]
+ 159:../Core/Src/uart_isr.c ****         xTaskNotifyFromISR(g_run_controls_task_handle, BEGIN_CONTROLS_NOTIFICATION_BIT, eSetBits, x
+ 732              		.loc 1 159 9 is_stmt 1 view .LVU190
+ 733 0060 0194     		str	r4, [sp, #4]
+ 734 0062 0091     		str	r1, [sp]
+ 735 0064 2B46     		mov	r3, r5
+ 736 0066 2A46     		mov	r2, r5
+ 737 0068 1C48     		ldr	r0, .L44+20
+ 738 006a 0068     		ldr	r0, [r0]
+ 739 006c FFF7FEFF 		bl	xTaskGenericNotifyFromISR
+ 740              	.LVL72:
+ 741 0070 D1E7     		b	.L33
+ 742              	.L41:
+ 163:../Core/Src/uart_isr.c ****         landed = 1;        
+ 743              		.loc 1 163 9 view .LVU191
+ 163:../Core/Src/uart_isr.c ****         landed = 1;        
+ 744              		.loc 1 163 16 is_stmt 0 view .LVU192
+ 745 0072 0123     		movs	r3, #1
+ 746 0074 164A     		ldr	r2, .L44+8
+ 747 0076 1370     		strb	r3, [r2]
+ 164:../Core/Src/uart_isr.c ****         xTaskNotifyFromISR(g_state_flash_task_handle, FLASH_SD_CARD_NOTIFICATION_BIT, eSetBits, xHi
+ 748              		.loc 1 164 9 is_stmt 1 view .LVU193
+ 749 0078 0194     		str	r4, [sp, #4]
+ 750 007a 0021     		movs	r1, #0
+ 751 007c 0091     		str	r1, [sp]
+ 752 007e 0222     		movs	r2, #2
+ 753 0080 1748     		ldr	r0, .L44+24
+ 754 0082 0068     		ldr	r0, [r0]
+ 755 0084 FFF7FEFF 		bl	xTaskGenericNotifyFromISR
+ 756              	.LVL73:
+ 757 0088 CDE7     		b	.L34
+ 758              	.L42:
+ 168:../Core/Src/uart_isr.c ****         drogue_parachute_deploy = 1;
+ 759              		.loc 1 168 9 view .LVU194
+ 168:../Core/Src/uart_isr.c ****         drogue_parachute_deploy = 1;
+ 760              		.loc 1 168 33 is_stmt 0 view .LVU195
+ 761 008a 0123     		movs	r3, #1
+ARM GAS  /tmp/ccuhv0Ge.s 			page 20
+
+
+ 762 008c 114A     		ldr	r2, .L44+12
+ 763 008e 1370     		strb	r3, [r2]
+ 169:../Core/Src/uart_isr.c ****         g_current_state.rocket_state.firing_channel_1 = 1;
+ 764              		.loc 1 169 9 is_stmt 1 view .LVU196
+ 169:../Core/Src/uart_isr.c ****         g_current_state.rocket_state.firing_channel_1 = 1;
+ 765              		.loc 1 169 55 is_stmt 0 view .LVU197
+ 766 0090 0E4A     		ldr	r2, .L44+4
+ 767 0092 82F85930 		strb	r3, [r2, #89]
+ 768 0096 CEE7     		b	.L35
+ 769              	.L43:
+ 172:../Core/Src/uart_isr.c ****     if (main_parachute_deploy == 0 && (g_current_state.rocket_state.rocket_state == 5 && (g_current
+ 770              		.loc 1 172 119 discriminator 2 view .LVU198
+ 771 0098 0C4B     		ldr	r3, .L44+4
+ 772 009a D3ED097A 		vldr.32	s15, [r3, #36]
+ 172:../Core/Src/uart_isr.c ****     if (main_parachute_deploy == 0 && (g_current_state.rocket_state.rocket_state == 5 && (g_current
+ 773              		.loc 1 172 87 discriminator 2 view .LVU199
+ 774 009e 9FED117A 		vldr.32	s14, .L44+28
+ 775 00a2 F4EEC77A 		vcmpe.f32	s15, s14
+ 776 00a6 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 777 00aa 06D4     		bmi	.L37
+ 172:../Core/Src/uart_isr.c ****     if (main_parachute_deploy == 0 && (g_current_state.rocket_state.rocket_state == 5 && (g_current
+ 778              		.loc 1 172 137 discriminator 3 view .LVU200
+ 779 00ac 9FED0E7A 		vldr.32	s14, .L44+32
+ 780 00b0 F4EEC77A 		vcmpe.f32	s15, s14
+ 781 00b4 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 782 00b8 C5DD     		ble	.L32
+ 783              	.L37:
+ 173:../Core/Src/uart_isr.c ****         main_parachute_deploy = 1;
+ 784              		.loc 1 173 9 is_stmt 1 view .LVU201
+ 173:../Core/Src/uart_isr.c ****         main_parachute_deploy = 1;
+ 785              		.loc 1 173 31 is_stmt 0 view .LVU202
+ 786 00ba 0123     		movs	r3, #1
+ 787 00bc 064A     		ldr	r2, .L44+16
+ 788 00be 1370     		strb	r3, [r2]
+ 174:../Core/Src/uart_isr.c ****         g_current_state.rocket_state.firing_channel_2 = 1;
+ 789              		.loc 1 174 9 is_stmt 1 view .LVU203
+ 174:../Core/Src/uart_isr.c ****         g_current_state.rocket_state.firing_channel_2 = 1;
+ 790              		.loc 1 174 55 is_stmt 0 view .LVU204
+ 791 00c0 024A     		ldr	r2, .L44+4
+ 792 00c2 82F85A30 		strb	r3, [r2, #90]
+ 793              		.loc 1 176 1 view .LVU205
+ 794 00c6 BEE7     		b	.L32
+ 795              	.L45:
+ 796              		.align	2
+ 797              	.L44:
+ 798 00c8 00000000 		.word	.LANCHOR4
+ 799 00cc 00000000 		.word	g_current_state
+ 800 00d0 00000000 		.word	.LANCHOR5
+ 801 00d4 00000000 		.word	.LANCHOR6
+ 802 00d8 00000000 		.word	.LANCHOR7
+ 803 00dc 00000000 		.word	g_run_controls_task_handle
+ 804 00e0 00000000 		.word	g_state_flash_task_handle
+ 805 00e4 00007A43 		.word	1132068864
+ 806 00e8 00007AC3 		.word	-1015414784
+ 807              		.cfi_endproc
+ 808              	.LFE250:
+ 810              		.global	state_bytes_received
+ARM GAS  /tmp/ccuhv0Ge.s 			page 21
+
+
+ 811              		.global	state_bytes
+ 812              		.global	state_uart_rx_buf
+ 813              		.global	telemetry_uart_rx_buf
+ 814              		.section	.bss.drogue_parachute_deploy.1,"aw",%nobits
+ 815              		.set	.LANCHOR6,. + 0
+ 818              	drogue_parachute_deploy.1:
+ 819 0000 00       		.space	1
+ 820              		.section	.bss.landed.2,"aw",%nobits
+ 821              		.set	.LANCHOR5,. + 0
+ 824              	landed.2:
+ 825 0000 00       		.space	1
+ 826              		.section	.bss.launched.3,"aw",%nobits
+ 827              		.set	.LANCHOR4,. + 0
+ 830              	launched.3:
+ 831 0000 00       		.space	1
+ 832              		.section	.bss.main_parachute_deploy.0,"aw",%nobits
+ 833              		.set	.LANCHOR7,. + 0
+ 836              	main_parachute_deploy.0:
+ 837 0000 00       		.space	1
+ 838              		.section	.bss.state_bytes,"aw",%nobits
+ 839              		.align	2
+ 840              		.set	.LANCHOR2,. + 0
+ 843              	state_bytes:
+ 844 0000 00000000 		.space	118
+ 844      00000000 
+ 844      00000000 
+ 844      00000000 
+ 844      00000000 
+ 845              		.section	.bss.state_bytes_received,"aw",%nobits
+ 846              		.set	.LANCHOR3,. + 0
+ 849              	state_bytes_received:
+ 850 0000 00       		.space	1
+ 851              		.section	.bss.state_uart_rx_buf,"aw",%nobits
+ 852              		.align	2
+ 853              		.set	.LANCHOR1,. + 0
+ 856              	state_uart_rx_buf:
+ 857 0000 00000000 		.space	118
+ 857      00000000 
+ 857      00000000 
+ 857      00000000 
+ 857      00000000 
+ 858              		.section	.bss.telemetry_uart_rx_buf,"aw",%nobits
+ 859              		.align	2
+ 860              		.set	.LANCHOR0,. + 0
+ 863              	telemetry_uart_rx_buf:
+ 864 0000 00000000 		.space	64
+ 864      00000000 
+ 864      00000000 
+ 864      00000000 
+ 864      00000000 
+ 865              		.text
+ 866              	.Letext0:
+ 867              		.file 2 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stdint.h"
+ 868              		.file 3 "Core/Inc/portmacro.h"
+ 869              		.file 4 "../Core/FreeRTOS-Kernel/include/task.h"
+ 870              		.file 5 "../Core/Include/protocol.h"
+ 871              		.file 6 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f429xx.h"
+ARM GAS  /tmp/ccuhv0Ge.s 			page 22
+
+
+ 872              		.file 7 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h"
+ 873              		.file 8 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h"
+ 874              		.file 9 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h"
+ 875              		.file 10 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h"
+ 876              		.file 11 "../Core/Include/adc.h"
+ 877              		.file 12 "Core/Inc/port_config.h"
+ 878              		.file 13 "../Core/FreeRTOS-Kernel/include/stream_buffer.h"
+ 879              		.file 14 "../Core/FreeRTOS-Kernel/include/queue.h"
+ 880              		.file 15 "../Core/FreeRTOS-Kernel/include/semphr.h"
+ 881              		.file 16 "../Core/Include/state.h"
+ 882              		.file 17 "../Core/Include/globals.h"
+ 883              		.file 18 "<built-in>"
+ARM GAS  /tmp/ccuhv0Ge.s 			page 23
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 uart_isr.c
+     /tmp/ccuhv0Ge.s:18     .text.begin_uart_listen:0000000000000000 $t
+     /tmp/ccuhv0Ge.s:26     .text.begin_uart_listen:0000000000000000 begin_uart_listen
+     /tmp/ccuhv0Ge.s:72     .text.begin_uart_listen:0000000000000028 $d
+     /tmp/ccuhv0Ge.s:80     .text.update_rocket_state:0000000000000000 $t
+     /tmp/ccuhv0Ge.s:87     .text.update_rocket_state:0000000000000000 update_rocket_state
+     /tmp/ccuhv0Ge.s:345    .text.update_rocket_state:000000000000013c $d
+     /tmp/ccuhv0Ge.s:354    .text.process_state_bytes:0000000000000000 $t
+     /tmp/ccuhv0Ge.s:361    .text.process_state_bytes:0000000000000000 process_state_bytes
+     /tmp/ccuhv0Ge.s:471    .text.process_state_bytes:000000000000006c $d
+     /tmp/ccuhv0Ge.s:479    .text.HAL_UARTEx_RxEventCallback:0000000000000000 $t
+     /tmp/ccuhv0Ge.s:486    .text.HAL_UARTEx_RxEventCallback:0000000000000000 HAL_UARTEx_RxEventCallback
+     /tmp/ccuhv0Ge.s:614    .text.HAL_UARTEx_RxEventCallback:000000000000007c $d
+     /tmp/ccuhv0Ge.s:624    .text.check_state_markers:0000000000000000 $t
+     /tmp/ccuhv0Ge.s:631    .text.check_state_markers:0000000000000000 check_state_markers
+     /tmp/ccuhv0Ge.s:798    .text.check_state_markers:00000000000000c8 $d
+     /tmp/ccuhv0Ge.s:849    .bss.state_bytes_received:0000000000000000 state_bytes_received
+     /tmp/ccuhv0Ge.s:843    .bss.state_bytes:0000000000000000 state_bytes
+     /tmp/ccuhv0Ge.s:856    .bss.state_uart_rx_buf:0000000000000000 state_uart_rx_buf
+     /tmp/ccuhv0Ge.s:863    .bss.telemetry_uart_rx_buf:0000000000000000 telemetry_uart_rx_buf
+     /tmp/ccuhv0Ge.s:818    .bss.drogue_parachute_deploy.1:0000000000000000 drogue_parachute_deploy.1
+     /tmp/ccuhv0Ge.s:819    .bss.drogue_parachute_deploy.1:0000000000000000 $d
+     /tmp/ccuhv0Ge.s:824    .bss.landed.2:0000000000000000 landed.2
+     /tmp/ccuhv0Ge.s:825    .bss.landed.2:0000000000000000 $d
+     /tmp/ccuhv0Ge.s:830    .bss.launched.3:0000000000000000 launched.3
+     /tmp/ccuhv0Ge.s:831    .bss.launched.3:0000000000000000 $d
+     /tmp/ccuhv0Ge.s:836    .bss.main_parachute_deploy.0:0000000000000000 main_parachute_deploy.0
+     /tmp/ccuhv0Ge.s:837    .bss.main_parachute_deploy.0:0000000000000000 $d
+     /tmp/ccuhv0Ge.s:839    .bss.state_bytes:0000000000000000 $d
+     /tmp/ccuhv0Ge.s:850    .bss.state_bytes_received:0000000000000000 $d
+     /tmp/ccuhv0Ge.s:852    .bss.state_uart_rx_buf:0000000000000000 $d
+     /tmp/ccuhv0Ge.s:859    .bss.telemetry_uart_rx_buf:0000000000000000 $d
+
+UNDEFINED SYMBOLS
+HAL_UARTEx_ReceiveToIdle_IT
+huart2
+huart6
+xQueueReceiveFromISR
+xTaskGetTickCount
+xQueueGiveFromISR
+xTaskGenericNotifyFromISR
+g_state_mutex_handle
+g_current_state
+g_state_tx_task_handle
+g_state_flash_task_handle
+memcpy
+HAL_GPIO_TogglePin
+HAL_GPIO_WritePin
+xStreamBufferSendFromISR
+g_telemetry_rx_sb_handle
+g_run_controls_task_handle

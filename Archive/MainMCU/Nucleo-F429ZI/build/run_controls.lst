@@ -1,0 +1,624 @@
+ARM GAS  /tmp/ccghVtr5.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"run_controls.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.rodata.run_controls_task.str1.4,"aMS",%progbits,1
+  18              		.align	2
+  19              	.LC0:
+  20 0000 52756E6E 		.ascii	"Running controls\015\012\000"
+  20      696E6720 
+  20      636F6E74 
+  20      726F6C73 
+  20      0D0A00
+  21              		.global	__aeabi_uldivmod
+  22              		.global	__aeabi_ul2f
+  23              		.global	__aeabi_f2d
+  24 0013 00       		.align	2
+  25              	.LC1:
+  26 0014 52756E6E 		.ascii	"Running controls timestamp %f servos %f %f %f %f\015"
+  26      696E6720 
+  26      636F6E74 
+  26      726F6C73 
+  26      2074696D 
+  27 0045 0A00     		.ascii	"\012\000"
+  28              		.section	.text.run_controls_task,"ax",%progbits
+  29              		.align	1
+  30              		.global	run_controls_task
+  31              		.arch armv7e-m
+  32              		.syntax unified
+  33              		.thumb
+  34              		.thumb_func
+  35              		.fpu fpv4-sp-d16
+  37              	run_controls_task:
+  38              	.LVL0:
+  39              	.LFB279:
+  40              		.file 1 "../Core/Src/run_controls.c"
+   1:../Core/Src/run_controls.c **** #include "run_controls.h"
+   2:../Core/Src/run_controls.c **** #include "controls.h"
+   3:../Core/Src/run_controls.c **** 
+   4:../Core/Src/run_controls.c **** #include "globals.h"
+   5:../Core/Src/run_controls.c **** 
+   6:../Core/Src/run_controls.c **** #include "port_config.h"
+   7:../Core/Src/run_controls.c **** #include "FreeRTOS.h"
+   8:../Core/Src/run_controls.c **** #include "semphr.h"
+   9:../Core/Src/run_controls.c **** 
+  10:../Core/Src/run_controls.c **** /**
+ARM GAS  /tmp/ccghVtr5.s 			page 2
+
+
+  11:../Core/Src/run_controls.c ****  * @brief Task to run the controls algorithm
+  12:../Core/Src/run_controls.c ****  */
+  13:../Core/Src/run_controls.c **** void run_controls_task(void *args) {
+  41              		.loc 1 13 36 view -0
+  42              		.cfi_startproc
+  43              		@ args = 0, pretend = 0, frame = 488
+  44              		@ frame_needed = 0, uses_anonymous_args = 0
+  45              		.loc 1 13 36 is_stmt 0 view .LVU1
+  46 0000 2DE9F043 		push	{r4, r5, r6, r7, r8, r9, lr}
+  47              	.LCFI0:
+  48              		.cfi_def_cfa_offset 28
+  49              		.cfi_offset 4, -28
+  50              		.cfi_offset 5, -24
+  51              		.cfi_offset 6, -20
+  52              		.cfi_offset 7, -16
+  53              		.cfi_offset 8, -12
+  54              		.cfi_offset 9, -8
+  55              		.cfi_offset 14, -4
+  56 0004 2DED028B 		vpush.64	{d8}
+  57              	.LCFI1:
+  58              		.cfi_def_cfa_offset 36
+  59              		.cfi_offset 80, -36
+  60              		.cfi_offset 81, -32
+  61 0008 ADF5037D 		sub	sp, sp, #524
+  62              	.LCFI2:
+  63              		.cfi_def_cfa_offset 560
+  14:../Core/Src/run_controls.c ****     controller controller;
+  64              		.loc 1 14 5 is_stmt 1 view .LVU2
+  15:../Core/Src/run_controls.c ****     float state[9];
+  65              		.loc 1 15 5 view .LVU3
+  16:../Core/Src/run_controls.c ****     float seconds_since_launch = 0;
+  66              		.loc 1 16 5 view .LVU4
+  67              	.LVL1:
+  17:../Core/Src/run_controls.c **** 
+  18:../Core/Src/run_controls.c ****     initialize_controls(&controller);
+  68              		.loc 1 18 5 view .LVU5
+  69 000c 2BA8     		add	r0, sp, #172
+  70              	.LVL2:
+  71              		.loc 1 18 5 is_stmt 0 view .LVU6
+  72 000e FFF7FEFF 		bl	initialize_controls
+  73              	.LVL3:
+  19:../Core/Src/run_controls.c **** 
+  20:../Core/Src/run_controls.c ****     uint32_t notification_value = 0;
+  74              		.loc 1 20 5 is_stmt 1 view .LVU7
+  75              		.loc 1 20 14 is_stmt 0 view .LVU8
+  76 0012 0023     		movs	r3, #0
+  77 0014 2193     		str	r3, [sp, #132]
+  21:../Core/Src/run_controls.c ****     while ((notification_value & BEGIN_CONTROLS_NOTIFICATION_BIT) == 0) {
+  78              		.loc 1 21 5 is_stmt 1 view .LVU9
+  79              		.loc 1 21 11 is_stmt 0 view .LVU10
+  80 0016 08E0     		b	.L2
+  81              	.L3:
+  22:../Core/Src/run_controls.c ****         xTaskNotifyWait(0, BEGIN_CONTROLS_NOTIFICATION_BIT, &notification_value, portMAX_DELAY);
+  82              		.loc 1 22 9 is_stmt 1 view .LVU11
+  83 0018 4FF0FF33 		mov	r3, #-1
+  84 001c 0093     		str	r3, [sp]
+  85 001e 21AB     		add	r3, sp, #132
+ARM GAS  /tmp/ccghVtr5.s 			page 3
+
+
+  86 0020 0122     		movs	r2, #1
+  87 0022 0021     		movs	r1, #0
+  88 0024 0846     		mov	r0, r1
+  89 0026 FFF7FEFF 		bl	xTaskGenericNotifyWait
+  90              	.LVL4:
+  91              	.L2:
+  21:../Core/Src/run_controls.c ****     while ((notification_value & BEGIN_CONTROLS_NOTIFICATION_BIT) == 0) {
+  92              		.loc 1 21 11 view .LVU12
+  21:../Core/Src/run_controls.c ****     while ((notification_value & BEGIN_CONTROLS_NOTIFICATION_BIT) == 0) {
+  93              		.loc 1 21 32 is_stmt 0 view .LVU13
+  94 002a 219B     		ldr	r3, [sp, #132]
+  21:../Core/Src/run_controls.c ****     while ((notification_value & BEGIN_CONTROLS_NOTIFICATION_BIT) == 0) {
+  95              		.loc 1 21 11 view .LVU14
+  96 002c 13F0010F 		tst	r3, #1
+  97 0030 F2D0     		beq	.L3
+  23:../Core/Src/run_controls.c ****     }
+  24:../Core/Src/run_controls.c **** 
+  25:../Core/Src/run_controls.c ****     HAL_UART_Transmit(&debug_uart, (uint8_t *) "Running controls\r\n", 18, HAL_MAX_DELAY);
+  98              		.loc 1 25 5 is_stmt 1 view .LVU15
+  99 0032 4FF0FF33 		mov	r3, #-1
+ 100 0036 1222     		movs	r2, #18
+ 101 0038 6149     		ldr	r1, .L12
+ 102 003a 6248     		ldr	r0, .L12+4
+ 103 003c FFF7FEFF 		bl	HAL_UART_Transmit
+ 104              	.LVL5:
+  16:../Core/Src/run_controls.c **** 
+ 105              		.loc 1 16 11 is_stmt 0 view .LVU16
+ 106 0040 9FED618A 		vldr.32	s16, .L12+8
+ 107 0044 54E0     		b	.L7
+ 108              	.LVL6:
+ 109              	.L11:
+ 110              	.LBB2:
+ 111              	.LBB3:
+  26:../Core/Src/run_controls.c **** 
+  27:../Core/Src/run_controls.c ****     while (1) {
+  28:../Core/Src/run_controls.c ****         if (xSemaphoreTake(g_state_mutex_handle, portMAX_DELAY) == pdTRUE) {
+  29:../Core/Src/run_controls.c ****             /* Update state vector */
+  30:../Core/Src/run_controls.c ****             state[0] = g_current_state.state_vector.velocity_y;
+  31:../Core/Src/run_controls.c ****             state[1] = g_current_state.state_vector.velocity_x;
+  32:../Core/Src/run_controls.c ****             state[2] = g_current_state.state_vector.velocity_z;
+  33:../Core/Src/run_controls.c ****             state[3] = g_current_state.sensor_data.gyro_y;
+  34:../Core/Src/run_controls.c ****             state[4] = g_current_state.sensor_data.gyro_x;
+  35:../Core/Src/run_controls.c ****             state[5] = g_current_state.sensor_data.gyro_z;
+  36:../Core/Src/run_controls.c ****             state[6] = g_current_state.state_vector.attitude_y;
+  37:../Core/Src/run_controls.c ****             state[7] = g_current_state.state_vector.attitude_x;
+  38:../Core/Src/run_controls.c ****             state[8] = g_current_state.state_vector.attitude_z;
+  39:../Core/Src/run_controls.c **** 
+  40:../Core/Src/run_controls.c ****             /* Calculate time since launch */
+  41:../Core/Src/run_controls.c ****             uint64_t ms_since_launch = pdTICKS_TO_MS(xTaskGetTickCount() - g_current_state.launch_t
+  42:../Core/Src/run_controls.c ****             seconds_since_launch = (float) ms_since_launch / 1000.0;
+  43:../Core/Src/run_controls.c **** 
+  44:../Core/Src/run_controls.c ****             /* Stop running controls after (???) state */
+  45:../Core/Src/run_controls.c ****             if (g_current_state.rocket_state.rocket_state > 3) {
+  46:../Core/Src/run_controls.c ****                 xSemaphoreGive(g_state_mutex_handle);
+ 112              		.loc 1 46 17 is_stmt 1 view .LVU17
+ 113 0046 0023     		movs	r3, #0
+ 114 0048 1A46     		mov	r2, r3
+ARM GAS  /tmp/ccghVtr5.s 			page 4
+
+
+ 115 004a 1946     		mov	r1, r3
+ 116 004c 5F48     		ldr	r0, .L12+12
+ 117 004e 0068     		ldr	r0, [r0]
+ 118 0050 FFF7FEFF 		bl	xQueueGenericSend
+ 119              	.LVL7:
+  47:../Core/Src/run_controls.c ****                 break;
+ 120              		.loc 1 47 17 view .LVU18
+ 121              	.LBE3:
+ 122              	.LBE2:
+  48:../Core/Src/run_controls.c ****             }
+  49:../Core/Src/run_controls.c **** 
+  50:../Core/Src/run_controls.c ****             xSemaphoreGive(g_state_mutex_handle);
+  51:../Core/Src/run_controls.c ****         }
+  52:../Core/Src/run_controls.c **** 
+  53:../Core/Src/run_controls.c ****         run_controls(&controller, state, seconds_since_launch);
+  54:../Core/Src/run_controls.c **** 
+  55:../Core/Src/run_controls.c ****         char buf[100];
+  56:../Core/Src/run_controls.c ****         sprintf(buf, "Running controls timestamp %f servos %f %f %f %f\r\n", seconds_since_launch, 
+  57:../Core/Src/run_controls.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
+  58:../Core/Src/run_controls.c ****     
+  59:../Core/Src/run_controls.c ****         /* Update servo deflections */
+  60:../Core/Src/run_controls.c ****         if (xSemaphoreTake(g_state_mutex_handle, portMAX_DELAY) == pdTRUE) {
+  61:../Core/Src/run_controls.c ****             g_current_state.servo_deflection.servo_deflection_1 = controller.servo_deflections[0];
+  62:../Core/Src/run_controls.c ****             g_current_state.servo_deflection.servo_deflection_2 = controller.servo_deflections[1];
+  63:../Core/Src/run_controls.c ****             g_current_state.servo_deflection.servo_deflection_3 = controller.servo_deflections[2];
+  64:../Core/Src/run_controls.c ****             g_current_state.servo_deflection.servo_deflection_4 = controller.servo_deflections[3];
+  65:../Core/Src/run_controls.c **** 
+  66:../Core/Src/run_controls.c ****             xSemaphoreGive(g_state_mutex_handle);
+  67:../Core/Src/run_controls.c ****         }
+  68:../Core/Src/run_controls.c **** 
+  69:../Core/Src/run_controls.c ****         /* Next ADC Conversion */
+  70:../Core/Src/run_controls.c ****         HAL_ADC_Start_IT(FIRST_ADC);
+  71:../Core/Src/run_controls.c **** 
+  72:../Core/Src/run_controls.c ****         vTaskDelay(pdMS_TO_TICKS(50));
+  73:../Core/Src/run_controls.c ****     }
+  74:../Core/Src/run_controls.c **** 
+  75:../Core/Src/run_controls.c ****     /* Tasks are not allowed to exit, so stall here */
+  76:../Core/Src/run_controls.c ****     vTaskDelay(portMAX_DELAY);
+ 123              		.loc 1 76 5 view .LVU19
+ 124 0054 4FF0FF30 		mov	r0, #-1
+ 125 0058 FFF7FEFF 		bl	vTaskDelay
+ 126              	.LVL8:
+  77:../Core/Src/run_controls.c **** }...
+ 127              		.loc 1 77 1 is_stmt 0 view .LVU20
+ 128 005c 0DF5037D 		add	sp, sp, #524
+ 129              	.LCFI3:
+ 130              		.cfi_remember_state
+ 131              		.cfi_def_cfa_offset 36
+ 132              		@ sp needed
+ 133 0060 BDEC028B 		vldm	sp!, {d8}
+ 134              	.LCFI4:
+ 135              		.cfi_restore 80
+ 136              		.cfi_restore 81
+ 137              		.cfi_def_cfa_offset 28
+ 138              	.LVL9:
+ 139              		.loc 1 77 1 view .LVU21
+ 140 0064 BDE8F083 		pop	{r4, r5, r6, r7, r8, r9, pc}
+ARM GAS  /tmp/ccghVtr5.s 			page 5
+
+
+ 141              	.LVL10:
+ 142              	.L4:
+ 143              	.LCFI5:
+ 144              		.cfi_restore_state
+ 145              	.LBB5:
+  53:../Core/Src/run_controls.c ****         run_controls(&controller, state, seconds_since_launch);
+ 146              		.loc 1 53 9 is_stmt 1 view .LVU22
+ 147 0068 B0EE480A 		vmov.f32	s0, s16
+ 148 006c 22A9     		add	r1, sp, #136
+ 149 006e 2BA8     		add	r0, sp, #172
+ 150 0070 FFF7FEFF 		bl	run_controls
+ 151              	.LVL11:
+  55:../Core/Src/run_controls.c ****         char buf[100];
+ 152              		.loc 1 55 9 view .LVU23
+  56:../Core/Src/run_controls.c ****         sprintf(buf, "Running controls timestamp %f servos %f %f %f %f\r\n", seconds_since_launch, 
+ 153              		.loc 1 56 9 view .LVU24
+  56:../Core/Src/run_controls.c ****         sprintf(buf, "Running controls timestamp %f servos %f %f %f %f\r\n", seconds_since_launch, 
+ 154              		.loc 1 56 128 is_stmt 0 view .LVU25
+ 155 0074 6E9E     		ldr	r6, [sp, #440]	@ float
+  56:../Core/Src/run_controls.c ****         sprintf(buf, "Running controls timestamp %f servos %f %f %f %f\r\n", seconds_since_launch, 
+ 156              		.loc 1 56 161 view .LVU26
+ 157 0076 6F9F     		ldr	r7, [sp, #444]	@ float
+  56:../Core/Src/run_controls.c ****         sprintf(buf, "Running controls timestamp %f servos %f %f %f %f\r\n", seconds_since_launch, 
+ 158              		.loc 1 56 194 view .LVU27
+ 159 0078 DDF8C081 		ldr	r8, [sp, #448]	@ float
+  56:../Core/Src/run_controls.c ****         sprintf(buf, "Running controls timestamp %f servos %f %f %f %f\r\n", seconds_since_launch, 
+ 160              		.loc 1 56 227 view .LVU28
+ 161 007c DDF8C491 		ldr	r9, [sp, #452]	@ float
+  56:../Core/Src/run_controls.c ****         sprintf(buf, "Running controls timestamp %f servos %f %f %f %f\r\n", seconds_since_launch, 
+ 162              		.loc 1 56 9 view .LVU29
+ 163 0080 18EE100A 		vmov	r0, s16
+ 164 0084 FFF7FEFF 		bl	__aeabi_f2d
+ 165              	.LVL12:
+ 166 0088 0446     		mov	r4, r0
+ 167 008a 0D46     		mov	r5, r1
+ 168 008c 4846     		mov	r0, r9	@ float
+ 169 008e FFF7FEFF 		bl	__aeabi_f2d
+ 170              	.LVL13:
+ 171 0092 CDE90601 		strd	r0, [sp, #24]
+ 172 0096 4046     		mov	r0, r8	@ float
+ 173 0098 FFF7FEFF 		bl	__aeabi_f2d
+ 174              	.LVL14:
+ 175 009c CDE90401 		strd	r0, [sp, #16]
+ 176 00a0 3846     		mov	r0, r7	@ float
+ 177 00a2 FFF7FEFF 		bl	__aeabi_f2d
+ 178              	.LVL15:
+ 179 00a6 CDE90201 		strd	r0, [sp, #8]
+ 180 00aa 3046     		mov	r0, r6	@ float
+ 181 00ac FFF7FEFF 		bl	__aeabi_f2d
+ 182              	.LVL16:
+ 183 00b0 CDE90001 		strd	r0, [sp]
+ 184 00b4 2246     		mov	r2, r4
+ 185 00b6 2B46     		mov	r3, r5
+ 186 00b8 4549     		ldr	r1, .L12+16
+ 187 00ba 08A8     		add	r0, sp, #32
+ 188 00bc FFF7FEFF 		bl	sprintf
+ 189              	.LVL17:
+ARM GAS  /tmp/ccghVtr5.s 			page 6
+
+
+  57:../Core/Src/run_controls.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
+ 190              		.loc 1 57 9 is_stmt 1 view .LVU30
+  57:../Core/Src/run_controls.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
+ 191              		.loc 1 57 57 is_stmt 0 view .LVU31
+ 192 00c0 08A8     		add	r0, sp, #32
+ 193 00c2 FFF7FEFF 		bl	strlen
+ 194              	.LVL18:
+  57:../Core/Src/run_controls.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
+ 195              		.loc 1 57 9 view .LVU32
+ 196 00c6 4FF0FF33 		mov	r3, #-1
+ 197 00ca 82B2     		uxth	r2, r0
+ 198 00cc 08A9     		add	r1, sp, #32
+ 199 00ce 3D48     		ldr	r0, .L12+4
+ 200 00d0 FFF7FEFF 		bl	HAL_UART_Transmit
+ 201              	.LVL19:
+  60:../Core/Src/run_controls.c ****         if (xSemaphoreTake(g_state_mutex_handle, portMAX_DELAY) == pdTRUE) {
+ 202              		.loc 1 60 9 is_stmt 1 view .LVU33
+  60:../Core/Src/run_controls.c ****         if (xSemaphoreTake(g_state_mutex_handle, portMAX_DELAY) == pdTRUE) {
+ 203              		.loc 1 60 13 is_stmt 0 view .LVU34
+ 204 00d4 4FF0FF31 		mov	r1, #-1
+ 205 00d8 3C4B     		ldr	r3, .L12+12
+ 206 00da 1868     		ldr	r0, [r3]
+ 207 00dc FFF7FEFF 		bl	xQueueSemaphoreTake
+ 208              	.LVL20:
+  60:../Core/Src/run_controls.c ****         if (xSemaphoreTake(g_state_mutex_handle, portMAX_DELAY) == pdTRUE) {
+ 209              		.loc 1 60 12 view .LVU35
+ 210 00e0 0128     		cmp	r0, #1
+ 211 00e2 5CD0     		beq	.L10
+ 212              	.L6:
+  70:../Core/Src/run_controls.c ****         HAL_ADC_Start_IT(FIRST_ADC);
+ 213              		.loc 1 70 9 is_stmt 1 view .LVU36
+ 214 00e4 3B48     		ldr	r0, .L12+20
+ 215 00e6 FFF7FEFF 		bl	HAL_ADC_Start_IT
+ 216              	.LVL21:
+  72:../Core/Src/run_controls.c ****         vTaskDelay(pdMS_TO_TICKS(50));
+ 217              		.loc 1 72 9 view .LVU37
+ 218 00ea 3220     		movs	r0, #50
+ 219 00ec FFF7FEFF 		bl	vTaskDelay
+ 220              	.LVL22:
+ 221              	.LBE5:
+  27:../Core/Src/run_controls.c ****     while (1) {
+ 222              		.loc 1 27 11 view .LVU38
+ 223              	.L7:
+  27:../Core/Src/run_controls.c ****     while (1) {
+ 224              		.loc 1 27 5 view .LVU39
+ 225              	.LBB6:
+  28:../Core/Src/run_controls.c ****         if (xSemaphoreTake(g_state_mutex_handle, portMAX_DELAY) == pdTRUE) {
+ 226              		.loc 1 28 9 view .LVU40
+  28:../Core/Src/run_controls.c ****         if (xSemaphoreTake(g_state_mutex_handle, portMAX_DELAY) == pdTRUE) {
+ 227              		.loc 1 28 13 is_stmt 0 view .LVU41
+ 228 00f0 4FF0FF31 		mov	r1, #-1
+ 229 00f4 354B     		ldr	r3, .L12+12
+ 230 00f6 1868     		ldr	r0, [r3]
+ 231 00f8 FFF7FEFF 		bl	xQueueSemaphoreTake
+ 232              	.LVL23:
+  28:../Core/Src/run_controls.c ****         if (xSemaphoreTake(g_state_mutex_handle, portMAX_DELAY) == pdTRUE) {
+ 233              		.loc 1 28 12 view .LVU42
+ARM GAS  /tmp/ccghVtr5.s 			page 7
+
+
+ 234 00fc 0128     		cmp	r0, #1
+ 235 00fe B3D1     		bne	.L4
+ 236              	.LBB4:
+  30:../Core/Src/run_controls.c ****             state[0] = g_current_state.state_vector.velocity_y;
+ 237              		.loc 1 30 13 is_stmt 1 view .LVU43
+  30:../Core/Src/run_controls.c ****             state[0] = g_current_state.state_vector.velocity_y;
+ 238              		.loc 1 30 52 is_stmt 0 view .LVU44
+ 239 0100 354C     		ldr	r4, .L12+24
+ 240 0102 6368     		ldr	r3, [r4, #4]	@ float
+  30:../Core/Src/run_controls.c ****             state[0] = g_current_state.state_vector.velocity_y;
+ 241              		.loc 1 30 22 view .LVU45
+ 242 0104 2293     		str	r3, [sp, #136]	@ float
+  31:../Core/Src/run_controls.c ****             state[1] = g_current_state.state_vector.velocity_x;
+ 243              		.loc 1 31 13 is_stmt 1 view .LVU46
+  31:../Core/Src/run_controls.c ****             state[1] = g_current_state.state_vector.velocity_x;
+ 244              		.loc 1 31 52 is_stmt 0 view .LVU47
+ 245 0106 2368     		ldr	r3, [r4]	@ float
+  31:../Core/Src/run_controls.c ****             state[1] = g_current_state.state_vector.velocity_x;
+ 246              		.loc 1 31 22 view .LVU48
+ 247 0108 2393     		str	r3, [sp, #140]	@ float
+  32:../Core/Src/run_controls.c ****             state[2] = g_current_state.state_vector.velocity_z;
+ 248              		.loc 1 32 13 is_stmt 1 view .LVU49
+  32:../Core/Src/run_controls.c ****             state[2] = g_current_state.state_vector.velocity_z;
+ 249              		.loc 1 32 52 is_stmt 0 view .LVU50
+ 250 010a A368     		ldr	r3, [r4, #8]	@ float
+  32:../Core/Src/run_controls.c ****             state[2] = g_current_state.state_vector.velocity_z;
+ 251              		.loc 1 32 22 view .LVU51
+ 252 010c 2493     		str	r3, [sp, #144]	@ float
+  33:../Core/Src/run_controls.c ****             state[3] = g_current_state.sensor_data.gyro_y;
+ 253              		.loc 1 33 13 is_stmt 1 view .LVU52
+  33:../Core/Src/run_controls.c ****             state[3] = g_current_state.sensor_data.gyro_y;
+ 254              		.loc 1 33 51 is_stmt 0 view .LVU53
+ 255 010e D4F89830 		ldr	r3, [r4, #152]	@ float
+  33:../Core/Src/run_controls.c ****             state[3] = g_current_state.sensor_data.gyro_y;
+ 256              		.loc 1 33 22 view .LVU54
+ 257 0112 2593     		str	r3, [sp, #148]	@ float
+  34:../Core/Src/run_controls.c ****             state[4] = g_current_state.sensor_data.gyro_x;
+ 258              		.loc 1 34 13 is_stmt 1 view .LVU55
+  34:../Core/Src/run_controls.c ****             state[4] = g_current_state.sensor_data.gyro_x;
+ 259              		.loc 1 34 51 is_stmt 0 view .LVU56
+ 260 0114 D4F89430 		ldr	r3, [r4, #148]	@ float
+  34:../Core/Src/run_controls.c ****             state[4] = g_current_state.sensor_data.gyro_x;
+ 261              		.loc 1 34 22 view .LVU57
+ 262 0118 2693     		str	r3, [sp, #152]	@ float
+  35:../Core/Src/run_controls.c ****             state[5] = g_current_state.sensor_data.gyro_z;
+ 263              		.loc 1 35 13 is_stmt 1 view .LVU58
+  35:../Core/Src/run_controls.c ****             state[5] = g_current_state.sensor_data.gyro_z;
+ 264              		.loc 1 35 51 is_stmt 0 view .LVU59
+ 265 011a D4F89C30 		ldr	r3, [r4, #156]	@ float
+  35:../Core/Src/run_controls.c ****             state[5] = g_current_state.sensor_data.gyro_z;
+ 266              		.loc 1 35 22 view .LVU60
+ 267 011e 2793     		str	r3, [sp, #156]	@ float
+  36:../Core/Src/run_controls.c ****             state[6] = g_current_state.state_vector.attitude_y;
+ 268              		.loc 1 36 13 is_stmt 1 view .LVU61
+  36:../Core/Src/run_controls.c ****             state[6] = g_current_state.state_vector.attitude_y;
+ 269              		.loc 1 36 52 is_stmt 0 view .LVU62
+ 270 0120 6369     		ldr	r3, [r4, #20]	@ float
+ARM GAS  /tmp/ccghVtr5.s 			page 8
+
+
+  36:../Core/Src/run_controls.c ****             state[6] = g_current_state.state_vector.attitude_y;
+ 271              		.loc 1 36 22 view .LVU63
+ 272 0122 2893     		str	r3, [sp, #160]	@ float
+  37:../Core/Src/run_controls.c ****             state[7] = g_current_state.state_vector.attitude_x;
+ 273              		.loc 1 37 13 is_stmt 1 view .LVU64
+  37:../Core/Src/run_controls.c ****             state[7] = g_current_state.state_vector.attitude_x;
+ 274              		.loc 1 37 52 is_stmt 0 view .LVU65
+ 275 0124 2369     		ldr	r3, [r4, #16]	@ float
+  37:../Core/Src/run_controls.c ****             state[7] = g_current_state.state_vector.attitude_x;
+ 276              		.loc 1 37 22 view .LVU66
+ 277 0126 2993     		str	r3, [sp, #164]	@ float
+  38:../Core/Src/run_controls.c ****             state[8] = g_current_state.state_vector.attitude_z;
+ 278              		.loc 1 38 13 is_stmt 1 view .LVU67
+  38:../Core/Src/run_controls.c ****             state[8] = g_current_state.state_vector.attitude_z;
+ 279              		.loc 1 38 52 is_stmt 0 view .LVU68
+ 280 0128 A369     		ldr	r3, [r4, #24]	@ float
+  38:../Core/Src/run_controls.c ****             state[8] = g_current_state.state_vector.attitude_z;
+ 281              		.loc 1 38 22 view .LVU69
+ 282 012a 2A93     		str	r3, [sp, #168]	@ float
+  41:../Core/Src/run_controls.c ****             uint64_t ms_since_launch = pdTICKS_TO_MS(xTaskGetTickCount() - g_current_state.launch_t
+ 283              		.loc 1 41 13 is_stmt 1 view .LVU70
+  41:../Core/Src/run_controls.c ****             uint64_t ms_since_launch = pdTICKS_TO_MS(xTaskGetTickCount() - g_current_state.launch_t
+ 284              		.loc 1 41 40 is_stmt 0 view .LVU71
+ 285 012c FFF7FEFF 		bl	xTaskGetTickCount
+ 286              	.LVL24:
+ 287 0130 D4F8D010 		ldr	r1, [r4, #208]
+ 288 0134 D4F8D430 		ldr	r3, [r4, #212]
+ 289 0138 401A     		subs	r0, r0, r1
+ 290 013a 63EB4303 		sbc	r3, r3, r3, lsl #1
+ 291 013e 4FEA431C 		lsl	ip, r3, #5
+ 292 0142 4CEAD06C 		orr	ip, ip, r0, lsr #27
+ 293 0146 4101     		lsls	r1, r0, #5
+ 294 0148 091A     		subs	r1, r1, r0
+ 295 014a 6CEB030C 		sbc	ip, ip, r3
+ 296 014e 4FEA8C0C 		lsl	ip, ip, #2
+ 297 0152 4CEA917C 		orr	ip, ip, r1, lsr #30
+ 298 0156 8900     		lsls	r1, r1, #2
+ 299 0158 0918     		adds	r1, r1, r0
+ 300 015a 43EB0C03 		adc	r3, r3, ip
+ 301 015e 4FEAC30C 		lsl	ip, r3, #3
+ 302 0162 4FF47A72 		mov	r2, #1000
+ 303 0166 0023     		movs	r3, #0
+ 304 0168 C800     		lsls	r0, r1, #3
+ 305 016a 4CEA5171 		orr	r1, ip, r1, lsr #29
+ 306 016e FFF7FEFF 		bl	__aeabi_uldivmod
+ 307              	.LVL25:
+  42:../Core/Src/run_controls.c ****             seconds_since_launch = (float) ms_since_launch / 1000.0;
+ 308              		.loc 1 42 13 is_stmt 1 view .LVU72
+  42:../Core/Src/run_controls.c ****             seconds_since_launch = (float) ms_since_launch / 1000.0;
+ 309              		.loc 1 42 36 is_stmt 0 view .LVU73
+ 310 0172 0021     		movs	r1, #0
+ 311              	.LVL26:
+  42:../Core/Src/run_controls.c ****             seconds_since_launch = (float) ms_since_launch / 1000.0;
+ 312              		.loc 1 42 36 view .LVU74
+ 313 0174 FFF7FEFF 		bl	__aeabi_ul2f
+ 314              	.LVL27:
+  42:../Core/Src/run_controls.c ****             seconds_since_launch = (float) ms_since_launch / 1000.0;
+ARM GAS  /tmp/ccghVtr5.s 			page 9
+
+
+ 315              		.loc 1 42 36 view .LVU75
+ 316 0178 07EE100A 		vmov	s14, r0
+  42:../Core/Src/run_controls.c ****             seconds_since_launch = (float) ms_since_launch / 1000.0;
+ 317              		.loc 1 42 34 view .LVU76
+ 318 017c DFED177A 		vldr.32	s15, .L12+28
+ 319 0180 87EE278A 		vdiv.f32	s16, s14, s15
+ 320              	.LVL28:
+  45:../Core/Src/run_controls.c ****             if (g_current_state.rocket_state.rocket_state > 3) {
+ 321              		.loc 1 45 13 is_stmt 1 view .LVU77
+  45:../Core/Src/run_controls.c ****             if (g_current_state.rocket_state.rocket_state > 3) {
+ 322              		.loc 1 45 45 is_stmt 0 view .LVU78
+ 323 0184 94F85830 		ldrb	r3, [r4, #88]	@ zero_extendqisi2
+  45:../Core/Src/run_controls.c ****             if (g_current_state.rocket_state.rocket_state > 3) {
+ 324              		.loc 1 45 16 view .LVU79
+ 325 0188 032B     		cmp	r3, #3
+ 326 018a 3FF65CAF 		bhi	.L11
+  50:../Core/Src/run_controls.c ****             xSemaphoreGive(g_state_mutex_handle);
+ 327              		.loc 1 50 13 is_stmt 1 view .LVU80
+ 328 018e 0023     		movs	r3, #0
+ 329 0190 1A46     		mov	r2, r3
+ 330 0192 1946     		mov	r1, r3
+ 331 0194 0D48     		ldr	r0, .L12+12
+ 332 0196 0068     		ldr	r0, [r0]
+ 333 0198 FFF7FEFF 		bl	xQueueGenericSend
+ 334              	.LVL29:
+ 335 019c 64E7     		b	.L4
+ 336              	.L10:
+  50:../Core/Src/run_controls.c ****             xSemaphoreGive(g_state_mutex_handle);
+ 337              		.loc 1 50 13 is_stmt 0 view .LVU81
+ 338              	.LBE4:
+  61:../Core/Src/run_controls.c ****             g_current_state.servo_deflection.servo_deflection_1 = controller.servo_deflections[0];
+ 339              		.loc 1 61 13 is_stmt 1 view .LVU82
+  61:../Core/Src/run_controls.c ****             g_current_state.servo_deflection.servo_deflection_1 = controller.servo_deflections[0];
+ 340              		.loc 1 61 95 is_stmt 0 view .LVU83
+ 341 019e 6E9A     		ldr	r2, [sp, #440]	@ float
+  61:../Core/Src/run_controls.c ****             g_current_state.servo_deflection.servo_deflection_1 = controller.servo_deflections[0];
+ 342              		.loc 1 61 65 view .LVU84
+ 343 01a0 0D4B     		ldr	r3, .L12+24
+ 344 01a2 1A64     		str	r2, [r3, #64]	@ float
+  62:../Core/Src/run_controls.c ****             g_current_state.servo_deflection.servo_deflection_2 = controller.servo_deflections[1];
+ 345              		.loc 1 62 13 is_stmt 1 view .LVU85
+  62:../Core/Src/run_controls.c ****             g_current_state.servo_deflection.servo_deflection_2 = controller.servo_deflections[1];
+ 346              		.loc 1 62 95 is_stmt 0 view .LVU86
+ 347 01a4 6F9A     		ldr	r2, [sp, #444]	@ float
+  62:../Core/Src/run_controls.c ****             g_current_state.servo_deflection.servo_deflection_2 = controller.servo_deflections[1];
+ 348              		.loc 1 62 65 view .LVU87
+ 349 01a6 5A64     		str	r2, [r3, #68]	@ float
+  63:../Core/Src/run_controls.c ****             g_current_state.servo_deflection.servo_deflection_3 = controller.servo_deflections[2];
+ 350              		.loc 1 63 13 is_stmt 1 view .LVU88
+  63:../Core/Src/run_controls.c ****             g_current_state.servo_deflection.servo_deflection_3 = controller.servo_deflections[2];
+ 351              		.loc 1 63 95 is_stmt 0 view .LVU89
+ 352 01a8 709A     		ldr	r2, [sp, #448]	@ float
+  63:../Core/Src/run_controls.c ****             g_current_state.servo_deflection.servo_deflection_3 = controller.servo_deflections[2];
+ 353              		.loc 1 63 65 view .LVU90
+ 354 01aa 9A64     		str	r2, [r3, #72]	@ float
+  64:../Core/Src/run_controls.c ****             g_current_state.servo_deflection.servo_deflection_4 = controller.servo_deflections[3];
+ 355              		.loc 1 64 13 is_stmt 1 view .LVU91
+ARM GAS  /tmp/ccghVtr5.s 			page 10
+
+
+  64:../Core/Src/run_controls.c ****             g_current_state.servo_deflection.servo_deflection_4 = controller.servo_deflections[3];
+ 356              		.loc 1 64 95 is_stmt 0 view .LVU92
+ 357 01ac 719A     		ldr	r2, [sp, #452]	@ float
+  64:../Core/Src/run_controls.c ****             g_current_state.servo_deflection.servo_deflection_4 = controller.servo_deflections[3];
+ 358              		.loc 1 64 65 view .LVU93
+ 359 01ae DA64     		str	r2, [r3, #76]	@ float
+  66:../Core/Src/run_controls.c ****             xSemaphoreGive(g_state_mutex_handle);
+ 360              		.loc 1 66 13 is_stmt 1 view .LVU94
+ 361 01b0 0023     		movs	r3, #0
+ 362 01b2 1A46     		mov	r2, r3
+ 363 01b4 1946     		mov	r1, r3
+ 364 01b6 0548     		ldr	r0, .L12+12
+ 365 01b8 0068     		ldr	r0, [r0]
+ 366 01ba FFF7FEFF 		bl	xQueueGenericSend
+ 367              	.LVL30:
+ 368 01be 91E7     		b	.L6
+ 369              	.L13:
+ 370              		.align	2
+ 371              	.L12:
+ 372 01c0 00000000 		.word	.LC0
+ 373 01c4 00000000 		.word	huart3
+ 374 01c8 00000000 		.word	0
+ 375 01cc 00000000 		.word	g_state_mutex_handle
+ 376 01d0 14000000 		.word	.LC1
+ 377 01d4 00000000 		.word	hadc2
+ 378 01d8 00000000 		.word	g_current_state
+ 379 01dc 00007A44 		.word	1148846080
+ 380              	.LBE6:
+ 381              		.cfi_endproc
+ 382              	.LFE279:
+ 384              		.text
+ 385              	.Letext0:
+ 386              		.file 2 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stdint.h"
+ 387              		.file 3 "Drivers/CMSIS/DSP/Include/arm_math_types.h"
+ 388              		.file 4 "../Core/Include/controls.h"
+ 389              		.file 5 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f429xx.h"
+ 390              		.file 6 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h"
+ 391              		.file 7 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h"
+ 392              		.file 8 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h"
+ 393              		.file 9 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_adc.h"
+ 394              		.file 10 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h"
+ 395              		.file 11 "../Core/Include/adc.h"
+ 396              		.file 12 "Core/Inc/port_config.h"
+ 397              		.file 13 "Core/Inc/portmacro.h"
+ 398              		.file 14 "../Core/FreeRTOS-Kernel/include/queue.h"
+ 399              		.file 15 "../Core/FreeRTOS-Kernel/include/semphr.h"
+ 400              		.file 16 "../Core/Include/protocol.h"
+ 401              		.file 17 "../Core/Include/state.h"
+ 402              		.file 18 "../Core/Include/globals.h"
+ 403              		.file 19 "../Core/FreeRTOS-Kernel/include/task.h"
+ 404              		.file 20 "/usr/include/newlib/stdio.h"
+ 405              		.file 21 "/usr/include/newlib/string.h"
+ARM GAS  /tmp/ccghVtr5.s 			page 11
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 run_controls.c
+     /tmp/ccghVtr5.s:18     .rodata.run_controls_task.str1.4:0000000000000000 $d
+     /tmp/ccghVtr5.s:29     .text.run_controls_task:0000000000000000 $t
+     /tmp/ccghVtr5.s:37     .text.run_controls_task:0000000000000000 run_controls_task
+     /tmp/ccghVtr5.s:372    .text.run_controls_task:00000000000001c0 $d
+
+UNDEFINED SYMBOLS
+__aeabi_uldivmod
+__aeabi_ul2f
+__aeabi_f2d
+initialize_controls
+xTaskGenericNotifyWait
+HAL_UART_Transmit
+xQueueGenericSend
+vTaskDelay
+run_controls
+sprintf
+strlen
+xQueueSemaphoreTake
+HAL_ADC_Start_IT
+xTaskGetTickCount
+huart3
+g_state_mutex_handle
+hadc2
+g_current_state

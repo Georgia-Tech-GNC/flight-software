@@ -1,0 +1,817 @@
+ARM GAS  /tmp/ccKFet4Q.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 1
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"adc.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "../Core/Src/adc.c"
+  19              		.section	.rodata.poll_adcs.str1.4,"aMS",%progbits,1
+  20              		.align	2
+  21              	.LC0:
+  22 0000 4572726F 		.ascii	"Error configuring ADC1 channel\015\012\000"
+  22      7220636F 
+  22      6E666967 
+  22      7572696E 
+  22      67204144 
+  23 0021 000000   		.align	2
+  24              	.LC1:
+  25 0024 4572726F 		.ascii	"Error configuring ADC2 channel\015\012\000"
+  25      7220636F 
+  25      6E666967 
+  25      7572696E 
+  25      67204144 
+  26 0045 000000   		.align	2
+  27              	.LC2:
+  28 0048 4572726F 		.ascii	"Error configuring ADC3 channel\015\012\000"
+  28      7220636F 
+  28      6E666967 
+  28      7572696E 
+  28      67204144 
+  29 0069 000000   		.align	2
+  30              	.LC3:
+  31 006c 53657276 		.ascii	"Servo 1 ADC: %d\015\012\000"
+  31      6F203120 
+  31      4144433A 
+  31      2025640D 
+  31      0A00
+  32              		.section	.text.poll_adcs,"ax",%progbits
+  33              		.align	1
+  34              		.global	poll_adcs
+  35              		.syntax unified
+  36              		.thumb
+  37              		.thumb_func
+  39              	poll_adcs:
+  40              	.LFB398:
+   1:../Core/Src/adc.c **** #include "adc.h"
+   2:../Core/Src/adc.c **** #include "port_config.h"
+ARM GAS  /tmp/ccKFet4Q.s 			page 2
+
+
+   3:../Core/Src/adc.c **** #include "globals.h"
+   4:../Core/Src/adc.c **** #include "stdint.h"
+   5:../Core/Src/adc.c **** #include "string.h"
+   6:../Core/Src/adc.c **** 
+   7:../Core/Src/adc.c **** void poll_adcs() {
+  41              		.loc 1 7 18 view -0
+  42              		.cfi_startproc
+  43              		@ args = 0, pretend = 0, frame = 160
+  44              		@ frame_needed = 0, uses_anonymous_args = 0
+  45 0000 30B5     		push	{r4, r5, lr}
+  46              	.LCFI0:
+  47              		.cfi_def_cfa_offset 12
+  48              		.cfi_offset 4, -12
+  49              		.cfi_offset 5, -8
+  50              		.cfi_offset 14, -4
+  51 0002 A9B0     		sub	sp, sp, #164
+  52              	.LCFI1:
+  53              		.cfi_def_cfa_offset 176
+   8:../Core/Src/adc.c ****     ADC_ChannelConfTypeDef sConfig = {0};
+  54              		.loc 1 8 5 view .LVU1
+  55              		.loc 1 8 28 is_stmt 0 view .LVU2
+  56 0004 2422     		movs	r2, #36
+  57 0006 0021     		movs	r1, #0
+  58 0008 1FA8     		add	r0, sp, #124
+  59 000a FFF7FEFF 		bl	memset
+  60              	.LVL0:
+   9:../Core/Src/adc.c **** 
+  10:../Core/Src/adc.c ****     uint16_t adc_readings[ADC_NUM_CHANNELS] = {0};
+  61              		.loc 1 10 5 is_stmt 1 view .LVU3
+  62              		.loc 1 10 14 is_stmt 0 view .LVU4
+  63 000e 0024     		movs	r4, #0
+  64 0010 1A94     		str	r4, [sp, #104]
+  65 0012 1B94     		str	r4, [sp, #108]
+  66 0014 1C94     		str	r4, [sp, #112]
+  67 0016 1D94     		str	r4, [sp, #116]
+  68 0018 ADF87840 		strh	r4, [sp, #120]	@ movhi
+  11:../Core/Src/adc.c **** #ifdef USE_ADC1
+  12:../Core/Src/adc.c **** 
+  13:../Core/Src/adc.c ****     for (int i = 0; i < ADC1_N_CHANNELS; i ++) {
+  69              		.loc 1 13 5 is_stmt 1 view .LVU5
+  70              	.LBB2:
+  71              		.loc 1 13 10 view .LVU6
+  72              	.LVL1:
+  73              		.loc 1 13 5 is_stmt 0 view .LVU7
+  74 001c 15E0     		b	.L2
+  75              	.LVL2:
+  76              	.L3:
+  14:../Core/Src/adc.c ****         sConfig.Channel = ADC1_CHANNELS[i];
+  15:../Core/Src/adc.c ****         sConfig.Rank = ADC_REGULAR_RANK_1;
+  16:../Core/Src/adc.c ****         sConfig.SamplingTime = ADC_SAMPLETIME_810CYCLES_5;
+  17:../Core/Src/adc.c ****         sConfig.SingleDiff = ADC_SINGLE_ENDED;
+  18:../Core/Src/adc.c ****         sConfig.OffsetNumber = ADC_OFFSET_NONE;
+  19:../Core/Src/adc.c ****         sConfig.Offset = 0;
+  20:../Core/Src/adc.c ****         sConfig.OffsetSignedSaturation = DISABLE;
+  21:../Core/Src/adc.c **** 
+  22:../Core/Src/adc.c ****         if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK){
+  23:../Core/Src/adc.c ****             HAL_UART_Transmit(&debug_uart, (uint8_t *) "Error configuring ADC1 channel\r\n", 32, HA
+ARM GAS  /tmp/ccKFet4Q.s 			page 3
+
+
+  24:../Core/Src/adc.c ****         }
+  25:../Core/Src/adc.c **** 
+  26:../Core/Src/adc.c ****         HAL_ADC_Start(&hadc1);
+  77              		.loc 1 26 9 is_stmt 1 discriminator 2 view .LVU8
+  78 001e 824D     		ldr	r5, .L19+16
+  79 0020 2846     		mov	r0, r5
+  80 0022 FFF7FEFF 		bl	HAL_ADC_Start
+  81              	.LVL3:
+  27:../Core/Src/adc.c ****         HAL_ADC_PollForConversion(&hadc1, 1);
+  82              		.loc 1 27 9 discriminator 2 view .LVU9
+  83 0026 0121     		movs	r1, #1
+  84 0028 2846     		mov	r0, r5
+  85 002a FFF7FEFF 		bl	HAL_ADC_PollForConversion
+  86              	.LVL4:
+  28:../Core/Src/adc.c **** 
+  29:../Core/Src/adc.c ****         adc_readings[ADC1_SEQUENCE[i]] = HAL_ADC_GetValue(&hadc1);
+  87              		.loc 1 29 9 discriminator 2 view .LVU10
+  88              		.loc 1 29 42 is_stmt 0 discriminator 2 view .LVU11
+  89 002e 2846     		mov	r0, r5
+  90 0030 FFF7FEFF 		bl	HAL_ADC_GetValue
+  91              	.LVL5:
+  92              		.loc 1 29 35 discriminator 2 view .LVU12
+  93 0034 7D4B     		ldr	r3, .L19+20
+  94 0036 1B5D     		ldrb	r3, [r3, r4]	@ zero_extendqisi2
+  95              		.loc 1 29 40 discriminator 2 view .LVU13
+  96 0038 28AA     		add	r2, sp, #160
+  97 003a 02EB4303 		add	r3, r2, r3, lsl #1
+  98 003e 23F8380C 		strh	r0, [r3, #-56]	@ movhi
+  30:../Core/Src/adc.c **** 
+  31:../Core/Src/adc.c ****         HAL_ADC_Stop(&hadc1);
+  99              		.loc 1 31 9 is_stmt 1 discriminator 2 view .LVU14
+ 100 0042 2846     		mov	r0, r5
+ 101 0044 FFF7FEFF 		bl	HAL_ADC_Stop
+ 102              	.LVL6:
+  13:../Core/Src/adc.c ****         sConfig.Channel = ADC1_CHANNELS[i];
+ 103              		.loc 1 13 44 discriminator 2 view .LVU15
+ 104 0048 0134     		adds	r4, r4, #1
+ 105              	.LVL7:
+ 106              	.L2:
+  13:../Core/Src/adc.c ****         sConfig.Channel = ADC1_CHANNELS[i];
+ 107              		.loc 1 13 23 discriminator 1 view .LVU16
+ 108 004a 022C     		cmp	r4, #2
+ 109 004c 1EDC     		bgt	.L15
+  14:../Core/Src/adc.c ****         sConfig.Rank = ADC_REGULAR_RANK_1;
+ 110              		.loc 1 14 9 view .LVU17
+  14:../Core/Src/adc.c ****         sConfig.Rank = ADC_REGULAR_RANK_1;
+ 111              		.loc 1 14 40 is_stmt 0 view .LVU18
+ 112 004e 784B     		ldr	r3, .L19+24
+ 113 0050 53F82430 		ldr	r3, [r3, r4, lsl #2]
+  14:../Core/Src/adc.c ****         sConfig.Rank = ADC_REGULAR_RANK_1;
+ 114              		.loc 1 14 25 view .LVU19
+ 115 0054 1F93     		str	r3, [sp, #124]
+  15:../Core/Src/adc.c ****         sConfig.SamplingTime = ADC_SAMPLETIME_810CYCLES_5;
+ 116              		.loc 1 15 9 is_stmt 1 view .LVU20
+  15:../Core/Src/adc.c ****         sConfig.SamplingTime = ADC_SAMPLETIME_810CYCLES_5;
+ 117              		.loc 1 15 22 is_stmt 0 view .LVU21
+ 118 0056 0623     		movs	r3, #6
+ARM GAS  /tmp/ccKFet4Q.s 			page 4
+
+
+ 119 0058 2093     		str	r3, [sp, #128]
+  16:../Core/Src/adc.c ****         sConfig.SingleDiff = ADC_SINGLE_ENDED;
+ 120              		.loc 1 16 9 is_stmt 1 view .LVU22
+  16:../Core/Src/adc.c ****         sConfig.SingleDiff = ADC_SINGLE_ENDED;
+ 121              		.loc 1 16 30 is_stmt 0 view .LVU23
+ 122 005a 0723     		movs	r3, #7
+ 123 005c 2193     		str	r3, [sp, #132]
+  17:../Core/Src/adc.c ****         sConfig.OffsetNumber = ADC_OFFSET_NONE;
+ 124              		.loc 1 17 9 is_stmt 1 view .LVU24
+  17:../Core/Src/adc.c ****         sConfig.OffsetNumber = ADC_OFFSET_NONE;
+ 125              		.loc 1 17 28 is_stmt 0 view .LVU25
+ 126 005e 40F2FF73 		movw	r3, #2047
+ 127 0062 2293     		str	r3, [sp, #136]
+  18:../Core/Src/adc.c ****         sConfig.Offset = 0;
+ 128              		.loc 1 18 9 is_stmt 1 view .LVU26
+  18:../Core/Src/adc.c ****         sConfig.Offset = 0;
+ 129              		.loc 1 18 30 is_stmt 0 view .LVU27
+ 130 0064 0423     		movs	r3, #4
+ 131 0066 2393     		str	r3, [sp, #140]
+  19:../Core/Src/adc.c ****         sConfig.OffsetSignedSaturation = DISABLE;
+ 132              		.loc 1 19 9 is_stmt 1 view .LVU28
+  19:../Core/Src/adc.c ****         sConfig.OffsetSignedSaturation = DISABLE;
+ 133              		.loc 1 19 24 is_stmt 0 view .LVU29
+ 134 0068 0023     		movs	r3, #0
+ 135 006a 2493     		str	r3, [sp, #144]
+  20:../Core/Src/adc.c **** 
+ 136              		.loc 1 20 9 is_stmt 1 view .LVU30
+  20:../Core/Src/adc.c **** 
+ 137              		.loc 1 20 40 is_stmt 0 view .LVU31
+ 138 006c 8DF89D30 		strb	r3, [sp, #157]
+  22:../Core/Src/adc.c ****             HAL_UART_Transmit(&debug_uart, (uint8_t *) "Error configuring ADC1 channel\r\n", 32, HA
+ 139              		.loc 1 22 9 is_stmt 1 view .LVU32
+  22:../Core/Src/adc.c ****             HAL_UART_Transmit(&debug_uart, (uint8_t *) "Error configuring ADC1 channel\r\n", 32, HA
+ 140              		.loc 1 22 13 is_stmt 0 view .LVU33
+ 141 0070 1FA9     		add	r1, sp, #124
+ 142 0072 6D48     		ldr	r0, .L19+16
+ 143 0074 FFF7FEFF 		bl	HAL_ADC_ConfigChannel
+ 144              	.LVL8:
+  22:../Core/Src/adc.c ****             HAL_UART_Transmit(&debug_uart, (uint8_t *) "Error configuring ADC1 channel\r\n", 32, HA
+ 145              		.loc 1 22 12 view .LVU34
+ 146 0078 0028     		cmp	r0, #0
+ 147 007a D0D0     		beq	.L3
+  23:../Core/Src/adc.c ****         }
+ 148              		.loc 1 23 13 is_stmt 1 view .LVU35
+ 149 007c 4FF0FF33 		mov	r3, #-1
+ 150 0080 2022     		movs	r2, #32
+ 151 0082 6C49     		ldr	r1, .L19+28
+ 152 0084 6C48     		ldr	r0, .L19+32
+ 153 0086 FFF7FEFF 		bl	HAL_UART_Transmit
+ 154              	.LVL9:
+ 155 008a C8E7     		b	.L3
+ 156              	.L15:
+ 157              	.LBE2:
+ 158              	.LBB3:
+  32:../Core/Src/adc.c ****     }
+  33:../Core/Src/adc.c **** #endif
+  34:../Core/Src/adc.c **** 
+ARM GAS  /tmp/ccKFet4Q.s 			page 5
+
+
+  35:../Core/Src/adc.c **** #ifdef USE_ADC2
+  36:../Core/Src/adc.c ****     for (int i = 0; i < ADC2_N_CHANNELS; i ++) {
+ 159              		.loc 1 36 14 is_stmt 0 view .LVU36
+ 160 008c 0024     		movs	r4, #0
+ 161              	.LVL10:
+ 162              		.loc 1 36 14 view .LVU37
+ 163 008e 15E0     		b	.L5
+ 164              	.LVL11:
+ 165              	.L6:
+  37:../Core/Src/adc.c ****         sConfig.Channel = ADC2_CHANNELS[i];
+  38:../Core/Src/adc.c ****         sConfig.Rank = ADC_REGULAR_RANK_1;
+  39:../Core/Src/adc.c ****         sConfig.SamplingTime = ADC_SAMPLETIME_810CYCLES_5;
+  40:../Core/Src/adc.c ****         sConfig.SingleDiff = ADC_SINGLE_ENDED;
+  41:../Core/Src/adc.c ****         sConfig.OffsetNumber = ADC_OFFSET_NONE;
+  42:../Core/Src/adc.c ****         sConfig.Offset = 0;
+  43:../Core/Src/adc.c ****         sConfig.OffsetSignedSaturation = DISABLE;
+  44:../Core/Src/adc.c **** 
+  45:../Core/Src/adc.c ****         if (HAL_ADC_ConfigChannel(&hadc2, &sConfig) != HAL_OK){
+  46:../Core/Src/adc.c ****             HAL_UART_Transmit(&debug_uart, (uint8_t *) "Error configuring ADC2 channel\r\n", 32, HA
+  47:../Core/Src/adc.c ****         }
+  48:../Core/Src/adc.c **** 
+  49:../Core/Src/adc.c ****         HAL_ADC_Start(&hadc2);
+ 166              		.loc 1 49 9 is_stmt 1 discriminator 2 view .LVU38
+ 167 0090 6A4D     		ldr	r5, .L19+36
+ 168 0092 2846     		mov	r0, r5
+ 169 0094 FFF7FEFF 		bl	HAL_ADC_Start
+ 170              	.LVL12:
+  50:../Core/Src/adc.c ****         HAL_ADC_PollForConversion(&hadc2, 1);
+ 171              		.loc 1 50 9 discriminator 2 view .LVU39
+ 172 0098 0121     		movs	r1, #1
+ 173 009a 2846     		mov	r0, r5
+ 174 009c FFF7FEFF 		bl	HAL_ADC_PollForConversion
+ 175              	.LVL13:
+  51:../Core/Src/adc.c **** 
+  52:../Core/Src/adc.c ****         adc_readings[ADC2_SEQUENCE[i]] = HAL_ADC_GetValue(&hadc2);
+ 176              		.loc 1 52 9 discriminator 2 view .LVU40
+ 177              		.loc 1 52 42 is_stmt 0 discriminator 2 view .LVU41
+ 178 00a0 2846     		mov	r0, r5
+ 179 00a2 FFF7FEFF 		bl	HAL_ADC_GetValue
+ 180              	.LVL14:
+ 181              		.loc 1 52 35 discriminator 2 view .LVU42
+ 182 00a6 664B     		ldr	r3, .L19+40
+ 183 00a8 1B5D     		ldrb	r3, [r3, r4]	@ zero_extendqisi2
+ 184              		.loc 1 52 40 discriminator 2 view .LVU43
+ 185 00aa 28AA     		add	r2, sp, #160
+ 186 00ac 02EB4303 		add	r3, r2, r3, lsl #1
+ 187 00b0 23F8380C 		strh	r0, [r3, #-56]	@ movhi
+  53:../Core/Src/adc.c ****         
+  54:../Core/Src/adc.c ****         HAL_ADC_Stop(&hadc2);
+ 188              		.loc 1 54 9 is_stmt 1 discriminator 2 view .LVU44
+ 189 00b4 2846     		mov	r0, r5
+ 190 00b6 FFF7FEFF 		bl	HAL_ADC_Stop
+ 191              	.LVL15:
+  36:../Core/Src/adc.c ****         sConfig.Channel = ADC2_CHANNELS[i];
+ 192              		.loc 1 36 44 discriminator 2 view .LVU45
+ 193 00ba 0134     		adds	r4, r4, #1
+ 194              	.LVL16:
+ARM GAS  /tmp/ccKFet4Q.s 			page 6
+
+
+ 195              	.L5:
+  36:../Core/Src/adc.c ****         sConfig.Channel = ADC2_CHANNELS[i];
+ 196              		.loc 1 36 23 discriminator 1 view .LVU46
+ 197 00bc 012C     		cmp	r4, #1
+ 198 00be 1EDC     		bgt	.L16
+  37:../Core/Src/adc.c ****         sConfig.Rank = ADC_REGULAR_RANK_1;
+ 199              		.loc 1 37 9 view .LVU47
+  37:../Core/Src/adc.c ****         sConfig.Rank = ADC_REGULAR_RANK_1;
+ 200              		.loc 1 37 40 is_stmt 0 view .LVU48
+ 201 00c0 604B     		ldr	r3, .L19+44
+ 202 00c2 53F82430 		ldr	r3, [r3, r4, lsl #2]
+  37:../Core/Src/adc.c ****         sConfig.Rank = ADC_REGULAR_RANK_1;
+ 203              		.loc 1 37 25 view .LVU49
+ 204 00c6 1F93     		str	r3, [sp, #124]
+  38:../Core/Src/adc.c ****         sConfig.SamplingTime = ADC_SAMPLETIME_810CYCLES_5;
+ 205              		.loc 1 38 9 is_stmt 1 view .LVU50
+  38:../Core/Src/adc.c ****         sConfig.SamplingTime = ADC_SAMPLETIME_810CYCLES_5;
+ 206              		.loc 1 38 22 is_stmt 0 view .LVU51
+ 207 00c8 0623     		movs	r3, #6
+ 208 00ca 2093     		str	r3, [sp, #128]
+  39:../Core/Src/adc.c ****         sConfig.SingleDiff = ADC_SINGLE_ENDED;
+ 209              		.loc 1 39 9 is_stmt 1 view .LVU52
+  39:../Core/Src/adc.c ****         sConfig.SingleDiff = ADC_SINGLE_ENDED;
+ 210              		.loc 1 39 30 is_stmt 0 view .LVU53
+ 211 00cc 0723     		movs	r3, #7
+ 212 00ce 2193     		str	r3, [sp, #132]
+  40:../Core/Src/adc.c ****         sConfig.OffsetNumber = ADC_OFFSET_NONE;
+ 213              		.loc 1 40 9 is_stmt 1 view .LVU54
+  40:../Core/Src/adc.c ****         sConfig.OffsetNumber = ADC_OFFSET_NONE;
+ 214              		.loc 1 40 28 is_stmt 0 view .LVU55
+ 215 00d0 40F2FF73 		movw	r3, #2047
+ 216 00d4 2293     		str	r3, [sp, #136]
+  41:../Core/Src/adc.c ****         sConfig.Offset = 0;
+ 217              		.loc 1 41 9 is_stmt 1 view .LVU56
+  41:../Core/Src/adc.c ****         sConfig.Offset = 0;
+ 218              		.loc 1 41 30 is_stmt 0 view .LVU57
+ 219 00d6 0423     		movs	r3, #4
+ 220 00d8 2393     		str	r3, [sp, #140]
+  42:../Core/Src/adc.c ****         sConfig.OffsetSignedSaturation = DISABLE;
+ 221              		.loc 1 42 9 is_stmt 1 view .LVU58
+  42:../Core/Src/adc.c ****         sConfig.OffsetSignedSaturation = DISABLE;
+ 222              		.loc 1 42 24 is_stmt 0 view .LVU59
+ 223 00da 0023     		movs	r3, #0
+ 224 00dc 2493     		str	r3, [sp, #144]
+  43:../Core/Src/adc.c **** 
+ 225              		.loc 1 43 9 is_stmt 1 view .LVU60
+  43:../Core/Src/adc.c **** 
+ 226              		.loc 1 43 40 is_stmt 0 view .LVU61
+ 227 00de 8DF89D30 		strb	r3, [sp, #157]
+  45:../Core/Src/adc.c ****             HAL_UART_Transmit(&debug_uart, (uint8_t *) "Error configuring ADC2 channel\r\n", 32, HA
+ 228              		.loc 1 45 9 is_stmt 1 view .LVU62
+  45:../Core/Src/adc.c ****             HAL_UART_Transmit(&debug_uart, (uint8_t *) "Error configuring ADC2 channel\r\n", 32, HA
+ 229              		.loc 1 45 13 is_stmt 0 view .LVU63
+ 230 00e2 1FA9     		add	r1, sp, #124
+ 231 00e4 5548     		ldr	r0, .L19+36
+ 232 00e6 FFF7FEFF 		bl	HAL_ADC_ConfigChannel
+ 233              	.LVL17:
+ARM GAS  /tmp/ccKFet4Q.s 			page 7
+
+
+  45:../Core/Src/adc.c ****             HAL_UART_Transmit(&debug_uart, (uint8_t *) "Error configuring ADC2 channel\r\n", 32, HA
+ 234              		.loc 1 45 12 view .LVU64
+ 235 00ea 0028     		cmp	r0, #0
+ 236 00ec D0D0     		beq	.L6
+  46:../Core/Src/adc.c ****         }
+ 237              		.loc 1 46 13 is_stmt 1 view .LVU65
+ 238 00ee 4FF0FF33 		mov	r3, #-1
+ 239 00f2 2022     		movs	r2, #32
+ 240 00f4 5449     		ldr	r1, .L19+48
+ 241 00f6 5048     		ldr	r0, .L19+32
+ 242 00f8 FFF7FEFF 		bl	HAL_UART_Transmit
+ 243              	.LVL18:
+ 244 00fc C8E7     		b	.L6
+ 245              	.L16:
+ 246              	.LBE3:
+ 247              	.LBB4:
+  55:../Core/Src/adc.c ****     }
+  56:../Core/Src/adc.c **** #endif
+  57:../Core/Src/adc.c **** 
+  58:../Core/Src/adc.c **** #ifdef USE_ADC3
+  59:../Core/Src/adc.c ****     for (int i = 0; i < ADC3_N_CHANNELS; i ++) {
+ 248              		.loc 1 59 14 is_stmt 0 view .LVU66
+ 249 00fe 0024     		movs	r4, #0
+ 250              	.LVL19:
+ 251              		.loc 1 59 14 view .LVU67
+ 252 0100 15E0     		b	.L8
+ 253              	.LVL20:
+ 254              	.L9:
+  60:../Core/Src/adc.c ****         sConfig.Channel = ADC3_CHANNELS[i];
+  61:../Core/Src/adc.c ****         sConfig.Rank = ADC_REGULAR_RANK_1;
+  62:../Core/Src/adc.c ****         sConfig.SamplingTime = ADC_SAMPLETIME_810CYCLES_5;
+  63:../Core/Src/adc.c ****         sConfig.SingleDiff = ADC_SINGLE_ENDED;
+  64:../Core/Src/adc.c ****         sConfig.OffsetNumber = ADC_OFFSET_NONE;
+  65:../Core/Src/adc.c ****         sConfig.Offset = 0;
+  66:../Core/Src/adc.c ****         sConfig.OffsetSignedSaturation = DISABLE;
+  67:../Core/Src/adc.c **** 
+  68:../Core/Src/adc.c ****         if (HAL_ADC_ConfigChannel(&hadc3, &sConfig) != HAL_OK){
+  69:../Core/Src/adc.c ****             HAL_UART_Transmit(&debug_uart, (uint8_t *) "Error configuring ADC3 channel\r\n", 32, HA
+  70:../Core/Src/adc.c ****         }
+  71:../Core/Src/adc.c **** 
+  72:../Core/Src/adc.c ****         HAL_ADC_Start(&hadc3);
+ 255              		.loc 1 72 9 is_stmt 1 discriminator 2 view .LVU68
+ 256 0102 524D     		ldr	r5, .L19+52
+ 257 0104 2846     		mov	r0, r5
+ 258 0106 FFF7FEFF 		bl	HAL_ADC_Start
+ 259              	.LVL21:
+  73:../Core/Src/adc.c ****         HAL_ADC_PollForConversion(&hadc3, 1);
+ 260              		.loc 1 73 9 discriminator 2 view .LVU69
+ 261 010a 0121     		movs	r1, #1
+ 262 010c 2846     		mov	r0, r5
+ 263 010e FFF7FEFF 		bl	HAL_ADC_PollForConversion
+ 264              	.LVL22:
+  74:../Core/Src/adc.c **** 
+  75:../Core/Src/adc.c ****         adc_readings[ADC3_SEQUENCE[i]] = HAL_ADC_GetValue(&hadc3);
+ 265              		.loc 1 75 9 discriminator 2 view .LVU70
+ 266              		.loc 1 75 42 is_stmt 0 discriminator 2 view .LVU71
+ 267 0112 2846     		mov	r0, r5
+ARM GAS  /tmp/ccKFet4Q.s 			page 8
+
+
+ 268 0114 FFF7FEFF 		bl	HAL_ADC_GetValue
+ 269              	.LVL23:
+ 270              		.loc 1 75 35 discriminator 2 view .LVU72
+ 271 0118 4D4B     		ldr	r3, .L19+56
+ 272 011a 1B5D     		ldrb	r3, [r3, r4]	@ zero_extendqisi2
+ 273              		.loc 1 75 40 discriminator 2 view .LVU73
+ 274 011c 28AA     		add	r2, sp, #160
+ 275 011e 02EB4303 		add	r3, r2, r3, lsl #1
+ 276 0122 23F8380C 		strh	r0, [r3, #-56]	@ movhi
+  76:../Core/Src/adc.c ****         
+  77:../Core/Src/adc.c ****         HAL_ADC_Stop(&hadc3);
+ 277              		.loc 1 77 9 is_stmt 1 discriminator 2 view .LVU74
+ 278 0126 2846     		mov	r0, r5
+ 279 0128 FFF7FEFF 		bl	HAL_ADC_Stop
+ 280              	.LVL24:
+  59:../Core/Src/adc.c ****         sConfig.Channel = ADC3_CHANNELS[i];
+ 281              		.loc 1 59 44 discriminator 2 view .LVU75
+ 282 012c 0134     		adds	r4, r4, #1
+ 283              	.LVL25:
+ 284              	.L8:
+  59:../Core/Src/adc.c ****         sConfig.Channel = ADC3_CHANNELS[i];
+ 285              		.loc 1 59 23 discriminator 1 view .LVU76
+ 286 012e 032C     		cmp	r4, #3
+ 287 0130 1EDC     		bgt	.L17
+  60:../Core/Src/adc.c ****         sConfig.Rank = ADC_REGULAR_RANK_1;
+ 288              		.loc 1 60 9 view .LVU77
+  60:../Core/Src/adc.c ****         sConfig.Rank = ADC_REGULAR_RANK_1;
+ 289              		.loc 1 60 40 is_stmt 0 view .LVU78
+ 290 0132 484B     		ldr	r3, .L19+60
+ 291 0134 53F82430 		ldr	r3, [r3, r4, lsl #2]
+  60:../Core/Src/adc.c ****         sConfig.Rank = ADC_REGULAR_RANK_1;
+ 292              		.loc 1 60 25 view .LVU79
+ 293 0138 1F93     		str	r3, [sp, #124]
+  61:../Core/Src/adc.c ****         sConfig.SamplingTime = ADC_SAMPLETIME_810CYCLES_5;
+ 294              		.loc 1 61 9 is_stmt 1 view .LVU80
+  61:../Core/Src/adc.c ****         sConfig.SamplingTime = ADC_SAMPLETIME_810CYCLES_5;
+ 295              		.loc 1 61 22 is_stmt 0 view .LVU81
+ 296 013a 0623     		movs	r3, #6
+ 297 013c 2093     		str	r3, [sp, #128]
+  62:../Core/Src/adc.c ****         sConfig.SingleDiff = ADC_SINGLE_ENDED;
+ 298              		.loc 1 62 9 is_stmt 1 view .LVU82
+  62:../Core/Src/adc.c ****         sConfig.SingleDiff = ADC_SINGLE_ENDED;
+ 299              		.loc 1 62 30 is_stmt 0 view .LVU83
+ 300 013e 0723     		movs	r3, #7
+ 301 0140 2193     		str	r3, [sp, #132]
+  63:../Core/Src/adc.c ****         sConfig.OffsetNumber = ADC_OFFSET_NONE;
+ 302              		.loc 1 63 9 is_stmt 1 view .LVU84
+  63:../Core/Src/adc.c ****         sConfig.OffsetNumber = ADC_OFFSET_NONE;
+ 303              		.loc 1 63 28 is_stmt 0 view .LVU85
+ 304 0142 40F2FF73 		movw	r3, #2047
+ 305 0146 2293     		str	r3, [sp, #136]
+  64:../Core/Src/adc.c ****         sConfig.Offset = 0;
+ 306              		.loc 1 64 9 is_stmt 1 view .LVU86
+  64:../Core/Src/adc.c ****         sConfig.Offset = 0;
+ 307              		.loc 1 64 30 is_stmt 0 view .LVU87
+ 308 0148 0423     		movs	r3, #4
+ 309 014a 2393     		str	r3, [sp, #140]
+ARM GAS  /tmp/ccKFet4Q.s 			page 9
+
+
+  65:../Core/Src/adc.c ****         sConfig.OffsetSignedSaturation = DISABLE;
+ 310              		.loc 1 65 9 is_stmt 1 view .LVU88
+  65:../Core/Src/adc.c ****         sConfig.OffsetSignedSaturation = DISABLE;
+ 311              		.loc 1 65 24 is_stmt 0 view .LVU89
+ 312 014c 0023     		movs	r3, #0
+ 313 014e 2493     		str	r3, [sp, #144]
+  66:../Core/Src/adc.c **** 
+ 314              		.loc 1 66 9 is_stmt 1 view .LVU90
+  66:../Core/Src/adc.c **** 
+ 315              		.loc 1 66 40 is_stmt 0 view .LVU91
+ 316 0150 8DF89D30 		strb	r3, [sp, #157]
+  68:../Core/Src/adc.c ****             HAL_UART_Transmit(&debug_uart, (uint8_t *) "Error configuring ADC3 channel\r\n", 32, HA
+ 317              		.loc 1 68 9 is_stmt 1 view .LVU92
+  68:../Core/Src/adc.c ****             HAL_UART_Transmit(&debug_uart, (uint8_t *) "Error configuring ADC3 channel\r\n", 32, HA
+ 318              		.loc 1 68 13 is_stmt 0 view .LVU93
+ 319 0154 1FA9     		add	r1, sp, #124
+ 320 0156 3D48     		ldr	r0, .L19+52
+ 321 0158 FFF7FEFF 		bl	HAL_ADC_ConfigChannel
+ 322              	.LVL26:
+  68:../Core/Src/adc.c ****             HAL_UART_Transmit(&debug_uart, (uint8_t *) "Error configuring ADC3 channel\r\n", 32, HA
+ 323              		.loc 1 68 12 view .LVU94
+ 324 015c 0028     		cmp	r0, #0
+ 325 015e D0D0     		beq	.L9
+  69:../Core/Src/adc.c ****         }
+ 326              		.loc 1 69 13 is_stmt 1 view .LVU95
+ 327 0160 4FF0FF33 		mov	r3, #-1
+ 328 0164 2022     		movs	r2, #32
+ 329 0166 3C49     		ldr	r1, .L19+64
+ 330 0168 3348     		ldr	r0, .L19+32
+ 331 016a FFF7FEFF 		bl	HAL_UART_Transmit
+ 332              	.LVL27:
+ 333 016e C8E7     		b	.L9
+ 334              	.L17:
+ 335              	.LBE4:
+  78:../Core/Src/adc.c ****     }
+  79:../Core/Src/adc.c **** #endif
+  80:../Core/Src/adc.c ****     
+  81:../Core/Src/adc.c ****     static float servo_1_actual = 0;
+ 336              		.loc 1 81 5 view .LVU96
+  82:../Core/Src/adc.c ****     static float servo_2_actual = 0;
+ 337              		.loc 1 82 5 view .LVU97
+  83:../Core/Src/adc.c ****     static float servo_3_actual = 0;
+ 338              		.loc 1 83 5 view .LVU98
+  84:../Core/Src/adc.c ****     static float servo_4_actual = 0;
+ 339              		.loc 1 84 5 view .LVU99
+  85:../Core/Src/adc.c **** 
+  86:../Core/Src/adc.c ****     if (servo_1_actual == 0) {
+ 340              		.loc 1 86 5 view .LVU100
+ 341              		.loc 1 86 24 is_stmt 0 view .LVU101
+ 342 0170 3A4B     		ldr	r3, .L19+68
+ 343 0172 93ED006A 		vldr.32	s12, [r3]
+ 344              		.loc 1 86 8 view .LVU102
+ 345 0176 B5EE406A 		vcmp.f32	s12, #0
+ 346 017a F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 347 017e 1ED1     		bne	.L11
+  87:../Core/Src/adc.c ****         servo_1_actual = adc_readings[ADC_SERVO_1];
+ 348              		.loc 1 87 9 is_stmt 1 view .LVU103
+ARM GAS  /tmp/ccKFet4Q.s 			page 10
+
+
+ 349              		.loc 1 87 38 is_stmt 0 view .LVU104
+ 350 0180 BDF87230 		ldrh	r3, [sp, #114]
+ 351 0184 07EE903A 		vmov	s15, r3	@ int
+ 352              		.loc 1 87 24 view .LVU105
+ 353 0188 F8EE677A 		vcvt.f32.u32	s15, s15
+ 354 018c 334B     		ldr	r3, .L19+68
+ 355 018e C3ED007A 		vstr.32	s15, [r3]
+ 356              	.L12:
+  88:../Core/Src/adc.c ****     } else {
+  89:../Core/Src/adc.c ****         servo_1_actual = (1 - LOWPASS_ALPHA) * servo_1_actual + LOWPASS_ALPHA * adc_readings[ADC_SE
+  90:../Core/Src/adc.c ****     }
+  91:../Core/Src/adc.c **** 
+  92:../Core/Src/adc.c ****     char buf[100];
+ 357              		.loc 1 92 5 is_stmt 1 view .LVU106
+  93:../Core/Src/adc.c ****     sprintf(buf, "Servo 1 ADC: %d\r\n", (uint16_t) servo_1_actual);
+ 358              		.loc 1 93 5 view .LVU107
+ 359              		.loc 1 93 41 is_stmt 0 view .LVU108
+ 360 0192 324B     		ldr	r3, .L19+68
+ 361 0194 D3ED007A 		vldr.32	s15, [r3]
+ 362 0198 FCEEE77A 		vcvt.u32.f32	s15, s15
+ 363              		.loc 1 93 5 view .LVU109
+ 364 019c 17EE903A 		vmov	r3, s15	@ int
+ 365 01a0 9AB2     		uxth	r2, r3
+ 366 01a2 2F49     		ldr	r1, .L19+72
+ 367 01a4 01A8     		add	r0, sp, #4
+ 368 01a6 FFF7FEFF 		bl	sprintf
+ 369              	.LVL28:
+  94:../Core/Src/adc.c ****     //HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
+  95:../Core/Src/adc.c ****     /*
+  96:../Core/Src/adc.c ****     sprintf(buf, "Servo 2 ADC: %d\r\n", adc_readings[ADC_SERVO_2]);
+  97:../Core/Src/adc.c ****     HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
+  98:../Core/Src/adc.c **** 
+  99:../Core/Src/adc.c ****     sprintf(buf, "Servo 3 ADC: %d\r\n", adc_readings[ADC_SERVO_3]);
+ 100:../Core/Src/adc.c ****     HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
+ 101:../Core/Src/adc.c **** 
+ 102:../Core/Src/adc.c ****     sprintf(buf, "Servo 4 ADC: %d\r\n", adc_readings[ADC_SERVO_4]);
+ 103:../Core/Src/adc.c ****     HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
+ 104:../Core/Src/adc.c ****     */
+ 105:../Core/Src/adc.c ****     if (xSemaphoreTake(g_state_mutex_handle, portMAX_DELAY) == pdTRUE) {
+ 370              		.loc 1 105 5 is_stmt 1 view .LVU110
+ 371              		.loc 1 105 9 is_stmt 0 view .LVU111
+ 372 01aa 4FF0FF31 		mov	r1, #-1
+ 373 01ae 2D4B     		ldr	r3, .L19+76
+ 374 01b0 1868     		ldr	r0, [r3]
+ 375 01b2 FFF7FEFF 		bl	xQueueSemaphoreTake
+ 376              	.LVL29:
+ 377              		.loc 1 105 8 view .LVU112
+ 378 01b6 0128     		cmp	r0, #1
+ 379 01b8 17D0     		beq	.L18
+ 380              	.L1:
+ 106:../Core/Src/adc.c ****         g_current_state.servo_deflections.servo_1_actual = adc_readings[ADC_SERVO_1];
+ 107:../Core/Src/adc.c ****         g_current_state.servo_deflections.servo_2_actual = adc_readings[ADC_SERVO_2];
+ 108:../Core/Src/adc.c ****         g_current_state.servo_deflections.servo_3_actual = adc_readings[ADC_SERVO_3];
+ 109:../Core/Src/adc.c ****         g_current_state.servo_deflections.servo_4_actual = adc_readings[ADC_SERVO_4];
+ 110:../Core/Src/adc.c **** 
+ 111:../Core/Src/adc.c ****         xSemaphoreGive(g_state_mutex_handle);
+ 112:../Core/Src/adc.c ****     }
+ARM GAS  /tmp/ccKFet4Q.s 			page 11
+
+
+ 113:../Core/Src/adc.c **** }...
+ 381              		.loc 1 113 1 view .LVU113
+ 382 01ba 29B0     		add	sp, sp, #164
+ 383              	.LCFI2:
+ 384              		.cfi_remember_state
+ 385              		.cfi_def_cfa_offset 12
+ 386              		@ sp needed
+ 387 01bc 30BD     		pop	{r4, r5, pc}
+ 388              	.LVL30:
+ 389              	.L11:
+ 390              	.LCFI3:
+ 391              		.cfi_restore_state
+  89:../Core/Src/adc.c ****         servo_1_actual = (1 - LOWPASS_ALPHA) * servo_1_actual + LOWPASS_ALPHA * adc_readings[ADC_SE
+ 392              		.loc 1 89 9 is_stmt 1 view .LVU114
+  89:../Core/Src/adc.c ****         servo_1_actual = (1 - LOWPASS_ALPHA) * servo_1_actual + LOWPASS_ALPHA * adc_readings[ADC_SE
+ 393              		.loc 1 89 46 is_stmt 0 view .LVU115
+ 394 01be B7EEC66A 		vcvt.f64.f32	d6, s12
+  89:../Core/Src/adc.c ****         servo_1_actual = (1 - LOWPASS_ALPHA) * servo_1_actual + LOWPASS_ALPHA * adc_readings[ADC_SE
+ 395              		.loc 1 89 93 view .LVU116
+ 396 01c2 BDF87230 		ldrh	r3, [sp, #114]
+ 397 01c6 07EE103A 		vmov	s14, r3	@ int
+  89:../Core/Src/adc.c ****         servo_1_actual = (1 - LOWPASS_ALPHA) * servo_1_actual + LOWPASS_ALPHA * adc_readings[ADC_SE
+ 398              		.loc 1 89 79 view .LVU117
+ 399 01ca B8EEC77B 		vcvt.f64.s32	d7, s14
+ 400 01ce 9FED125B 		vldr.64	d5, .L19
+ 401 01d2 27EE057B 		vmul.f64	d7, d7, d5
+  89:../Core/Src/adc.c ****         servo_1_actual = (1 - LOWPASS_ALPHA) * servo_1_actual + LOWPASS_ALPHA * adc_readings[ADC_SE
+ 402              		.loc 1 89 63 view .LVU118
+ 403 01d6 9FED125B 		vldr.64	d5, .L19+8
+ 404 01da 06EE057B 		vmla.f64	d7, d6, d5
+ 405 01de B7EEC77B 		vcvt.f32.f64	s14, d7
+  89:../Core/Src/adc.c ****         servo_1_actual = (1 - LOWPASS_ALPHA) * servo_1_actual + LOWPASS_ALPHA * adc_readings[ADC_SE
+ 406              		.loc 1 89 24 view .LVU119
+ 407 01e2 1E4B     		ldr	r3, .L19+68
+ 408 01e4 83ED007A 		vstr.32	s14, [r3]
+ 409 01e8 D3E7     		b	.L12
+ 410              	.L18:
+ 106:../Core/Src/adc.c ****         g_current_state.servo_deflections.servo_1_actual = adc_readings[ADC_SERVO_1];
+ 411              		.loc 1 106 9 is_stmt 1 view .LVU120
+ 106:../Core/Src/adc.c ****         g_current_state.servo_deflections.servo_1_actual = adc_readings[ADC_SERVO_1];
+ 412              		.loc 1 106 72 is_stmt 0 view .LVU121
+ 413 01ea BDF87220 		ldrh	r2, [sp, #114]
+ 106:../Core/Src/adc.c ****         g_current_state.servo_deflections.servo_1_actual = adc_readings[ADC_SERVO_1];
+ 414              		.loc 1 106 58 view .LVU122
+ 415 01ee 1E4B     		ldr	r3, .L19+80
+ 416 01f0 5A80     		strh	r2, [r3, #2]	@ movhi
+ 107:../Core/Src/adc.c ****         g_current_state.servo_deflections.servo_2_actual = adc_readings[ADC_SERVO_2];
+ 417              		.loc 1 107 9 is_stmt 1 view .LVU123
+ 107:../Core/Src/adc.c ****         g_current_state.servo_deflections.servo_2_actual = adc_readings[ADC_SERVO_2];
+ 418              		.loc 1 107 72 is_stmt 0 view .LVU124
+ 419 01f2 BDF87420 		ldrh	r2, [sp, #116]
+ 107:../Core/Src/adc.c ****         g_current_state.servo_deflections.servo_2_actual = adc_readings[ADC_SERVO_2];
+ 420              		.loc 1 107 58 view .LVU125
+ 421 01f6 DA80     		strh	r2, [r3, #6]	@ movhi
+ 108:../Core/Src/adc.c ****         g_current_state.servo_deflections.servo_3_actual = adc_readings[ADC_SERVO_3];
+ 422              		.loc 1 108 9 is_stmt 1 view .LVU126
+ 108:../Core/Src/adc.c ****         g_current_state.servo_deflections.servo_3_actual = adc_readings[ADC_SERVO_3];
+ARM GAS  /tmp/ccKFet4Q.s 			page 12
+
+
+ 423              		.loc 1 108 72 is_stmt 0 view .LVU127
+ 424 01f8 BDF87620 		ldrh	r2, [sp, #118]
+ 108:../Core/Src/adc.c ****         g_current_state.servo_deflections.servo_3_actual = adc_readings[ADC_SERVO_3];
+ 425              		.loc 1 108 58 view .LVU128
+ 426 01fc 5A81     		strh	r2, [r3, #10]	@ movhi
+ 109:../Core/Src/adc.c ****         g_current_state.servo_deflections.servo_4_actual = adc_readings[ADC_SERVO_4];
+ 427              		.loc 1 109 9 is_stmt 1 view .LVU129
+ 109:../Core/Src/adc.c ****         g_current_state.servo_deflections.servo_4_actual = adc_readings[ADC_SERVO_4];
+ 428              		.loc 1 109 72 is_stmt 0 view .LVU130
+ 429 01fe BDF87820 		ldrh	r2, [sp, #120]
+ 109:../Core/Src/adc.c ****         g_current_state.servo_deflections.servo_4_actual = adc_readings[ADC_SERVO_4];
+ 430              		.loc 1 109 58 view .LVU131
+ 431 0202 DA81     		strh	r2, [r3, #14]	@ movhi
+ 111:../Core/Src/adc.c ****         xSemaphoreGive(g_state_mutex_handle);
+ 432              		.loc 1 111 9 is_stmt 1 view .LVU132
+ 433 0204 0023     		movs	r3, #0
+ 434 0206 1A46     		mov	r2, r3
+ 435 0208 1946     		mov	r1, r3
+ 436 020a 1648     		ldr	r0, .L19+76
+ 437 020c 0068     		ldr	r0, [r0]
+ 438 020e FFF7FEFF 		bl	xQueueGenericSend
+ 439              	.LVL31:
+ 440              		.loc 1 113 1 is_stmt 0 view .LVU133
+ 441 0212 D2E7     		b	.L1
+ 442              	.L20:
+ 443 0214 AFF30080 		.align	3
+ 444              	.L19:
+ 445 0218 9A999999 		.word	-1717986918
+ 446 021c 9999793F 		.word	1064933785
+ 447 0220 CDCCCCCC 		.word	-858993459
+ 448 0224 CCCCEF3F 		.word	1072680140
+ 449 0228 00000000 		.word	hadc1
+ 450 022c 00000000 		.word	ADC1_SEQUENCE
+ 451 0230 00000000 		.word	ADC1_CHANNELS
+ 452 0234 00000000 		.word	.LC0
+ 453 0238 00000000 		.word	huart2
+ 454 023c 00000000 		.word	hadc2
+ 455 0240 00000000 		.word	ADC2_SEQUENCE
+ 456 0244 00000000 		.word	ADC2_CHANNELS
+ 457 0248 24000000 		.word	.LC1
+ 458 024c 00000000 		.word	hadc3
+ 459 0250 00000000 		.word	ADC3_SEQUENCE
+ 460 0254 00000000 		.word	ADC3_CHANNELS
+ 461 0258 48000000 		.word	.LC2
+ 462 025c 00000000 		.word	servo_1_actual.0
+ 463 0260 6C000000 		.word	.LC3
+ 464 0264 00000000 		.word	g_state_mutex_handle
+ 465 0268 00000000 		.word	g_current_state
+ 466              		.cfi_endproc
+ 467              	.LFE398:
+ 469              		.section	.bss.servo_1_actual.0,"aw",%nobits
+ 470              		.align	2
+ 473              	servo_1_actual.0:
+ 474 0000 00000000 		.space	4
+ 475              		.section	.rodata.ADC3_SEQUENCE,"a"
+ 476              		.align	2
+ 479              	ADC3_SEQUENCE:
+ARM GAS  /tmp/ccKFet4Q.s 			page 13
+
+
+ 480 0000 04       		.byte	4
+ 481 0001 00       		.byte	0
+ 482 0002 01       		.byte	1
+ 483 0003 03       		.byte	3
+ 484              		.section	.rodata.ADC2_SEQUENCE,"a"
+ 485              		.align	2
+ 488              	ADC2_SEQUENCE:
+ 489 0000 05       		.byte	5
+ 490 0001 02       		.byte	2
+ 491              		.section	.rodata.ADC3_CHANNELS,"a"
+ 492              		.align	2
+ 495              	ADC3_CHANNELS:
+ 496 0000 01000000 		.word	1
+ 497 0004 04006008 		.word	140509188
+ 498 0008 40002019 		.word	421527616
+ 499 000c 00018021 		.word	562036992
+ 500              		.section	.rodata.ADC2_CHANNELS,"a"
+ 501              		.align	2
+ 504              	ADC2_CHANNELS:
+ 505 0000 40002019 		.word	421527616
+ 506 0004 0004002A 		.word	704644096
+ 507              		.section	.rodata.ADC1_CHANNELS,"a"
+ 508              		.align	2
+ 511              	ADC1_CHANNELS:
+ 512 0000 04006008 		.word	140509188
+ 513 0004 2000F014 		.word	351272992
+ 514 0008 0002B025 		.word	632291840
+ 515              		.section	.rodata.ADC1_SEQUENCE,"a"
+ 516              		.align	2
+ 519              	ADC1_SEQUENCE:
+ 520 0000 06       		.byte	6
+ 521 0001 07       		.byte	7
+ 522 0002 08       		.byte	8
+ 523              		.text
+ 524              	.Letext0:
+ 525              		.file 2 "../Core/Include/adc.h"
+ 526              		.file 3 "/nix/store/lcj4nx7xv8c36cif7armkfa7b5cmfh74-gcc-arm-embedded-12.3.rel1/arm-none-eabi/incl
+ 527              		.file 4 "/nix/store/lcj4nx7xv8c36cif7armkfa7b5cmfh74-gcc-arm-embedded-12.3.rel1/arm-none-eabi/incl
+ 528              		.file 5 "Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h725xx.h"
+ 529              		.file 6 "Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h7xx.h"
+ 530              		.file 7 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_def.h"
+ 531              		.file 8 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dma.h"
+ 532              		.file 9 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_adc.h"
+ 533              		.file 10 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h"
+ 534              		.file 11 "Core/Inc/port_config.h"
+ 535              		.file 12 "Core/Inc/portmacro.h"
+ 536              		.file 13 "../Core/FreeRTOS-Kernel/include/queue.h"
+ 537              		.file 14 "../Core/FreeRTOS-Kernel/include/semphr.h"
+ 538              		.file 15 "../Core/Include/protocol.h"
+ 539              		.file 16 "../Core/Include/state.h"
+ 540              		.file 17 "../Core/Include/globals.h"
+ 541              		.file 18 "/nix/store/lcj4nx7xv8c36cif7armkfa7b5cmfh74-gcc-arm-embedded-12.3.rel1/arm-none-eabi/inc
+ 542              		.file 19 "<built-in>"
+ARM GAS  /tmp/ccKFet4Q.s 			page 14
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 adc.c
+     /tmp/ccKFet4Q.s:20     .rodata.poll_adcs.str1.4:00000000 $d
+     /tmp/ccKFet4Q.s:33     .text.poll_adcs:00000000 $t
+     /tmp/ccKFet4Q.s:39     .text.poll_adcs:00000000 poll_adcs
+     /tmp/ccKFet4Q.s:445    .text.poll_adcs:00000218 $d
+     /tmp/ccKFet4Q.s:519    .rodata.ADC1_SEQUENCE:00000000 ADC1_SEQUENCE
+     /tmp/ccKFet4Q.s:511    .rodata.ADC1_CHANNELS:00000000 ADC1_CHANNELS
+     /tmp/ccKFet4Q.s:488    .rodata.ADC2_SEQUENCE:00000000 ADC2_SEQUENCE
+     /tmp/ccKFet4Q.s:504    .rodata.ADC2_CHANNELS:00000000 ADC2_CHANNELS
+     /tmp/ccKFet4Q.s:479    .rodata.ADC3_SEQUENCE:00000000 ADC3_SEQUENCE
+     /tmp/ccKFet4Q.s:495    .rodata.ADC3_CHANNELS:00000000 ADC3_CHANNELS
+     /tmp/ccKFet4Q.s:473    .bss.servo_1_actual.0:00000000 servo_1_actual.0
+     /tmp/ccKFet4Q.s:470    .bss.servo_1_actual.0:00000000 $d
+     /tmp/ccKFet4Q.s:476    .rodata.ADC3_SEQUENCE:00000000 $d
+     /tmp/ccKFet4Q.s:485    .rodata.ADC2_SEQUENCE:00000000 $d
+     /tmp/ccKFet4Q.s:492    .rodata.ADC3_CHANNELS:00000000 $d
+     /tmp/ccKFet4Q.s:501    .rodata.ADC2_CHANNELS:00000000 $d
+     /tmp/ccKFet4Q.s:508    .rodata.ADC1_CHANNELS:00000000 $d
+     /tmp/ccKFet4Q.s:516    .rodata.ADC1_SEQUENCE:00000000 $d
+
+UNDEFINED SYMBOLS
+memset
+HAL_ADC_Start
+HAL_ADC_PollForConversion
+HAL_ADC_GetValue
+HAL_ADC_Stop
+HAL_ADC_ConfigChannel
+HAL_UART_Transmit
+sprintf
+xQueueSemaphoreTake
+xQueueGenericSend
+hadc1
+huart2
+hadc2
+hadc3
+g_state_mutex_handle
+g_current_state

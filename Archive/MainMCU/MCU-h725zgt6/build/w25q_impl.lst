@@ -1,0 +1,2820 @@
+ARM GAS  /tmp/cc5A8HOi.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 1
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"w25q_impl.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "../Core/Src/w25q_impl.c"
+  19              		.global	__aeabi_uldivmod
+  20              		.section	.text.w25q_delay,"ax",%progbits
+  21              		.align	1
+  22              		.global	w25q_delay
+  23              		.syntax unified
+  24              		.thumb
+  25              		.thumb_func
+  27              	w25q_delay:
+  28              	.LVL0:
+  29              	.LFB398:
+   1:../Core/Src/w25q_impl.c **** #include "w25q.h"
+   2:../Core/Src/w25q_impl.c **** #include "port_config.h"
+   3:../Core/Src/w25q_impl.c **** #include "globals.h"
+   4:../Core/Src/w25q_impl.c **** 
+   5:../Core/Src/w25q_impl.c **** void w25q_delay(uint32_t ms) { vTaskDelay(pdMS_TO_TICKS(ms)); }
+  30              		.loc 1 5 30 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		.loc 1 5 30 is_stmt 0 view .LVU1
+  35 0000 08B5     		push	{r3, lr}
+  36              	.LCFI0:
+  37              		.cfi_def_cfa_offset 8
+  38              		.cfi_offset 3, -8
+  39              		.cfi_offset 14, -4
+  40              		.loc 1 5 32 is_stmt 1 view .LVU2
+  41              		.loc 1 5 43 is_stmt 0 view .LVU3
+  42 0002 C30E     		lsrs	r3, r0, #27
+  43 0004 4101     		lsls	r1, r0, #5
+  44 0006 091A     		subs	r1, r1, r0
+  45 0008 63F10003 		sbc	r3, r3, #0
+  46 000c 9B00     		lsls	r3, r3, #2
+  47 000e 43EA9173 		orr	r3, r3, r1, lsr #30
+  48 0012 8900     		lsls	r1, r1, #2
+  49 0014 0918     		adds	r1, r1, r0
+  50 0016 43F10003 		adc	r3, r3, #0
+  51 001a 4FEAC30C 		lsl	ip, r3, #3
+  52 001e 4FF47A72 		mov	r2, #1000
+  53 0022 0023     		movs	r3, #0
+ARM GAS  /tmp/cc5A8HOi.s 			page 2
+
+
+  54 0024 C800     		lsls	r0, r1, #3
+  55              	.LVL1:
+  56              		.loc 1 5 43 view .LVU4
+  57 0026 4CEA5171 		orr	r1, ip, r1, lsr #29
+  58 002a FFF7FEFF 		bl	__aeabi_uldivmod
+  59              	.LVL2:
+  60              		.loc 1 5 32 view .LVU5
+  61 002e FFF7FEFF 		bl	vTaskDelay
+  62              	.LVL3:
+  63              		.loc 1 5 63 view .LVU6
+  64 0032 08BD     		pop	{r3, pc}
+  65              		.cfi_endproc
+  66              	.LFE398:
+  68              		.section	.text.w25q_read_id,"ax",%progbits
+  69              		.align	1
+  70              		.global	w25q_read_id
+  71              		.syntax unified
+  72              		.thumb
+  73              		.thumb_func
+  75              	w25q_read_id:
+  76              	.LVL4:
+  77              	.LFB399:
+   6:../Core/Src/w25q_impl.c **** 
+   7:../Core/Src/w25q_impl.c **** enum w25q_err w25q_read_id(struct w25q_device *device, uint8_t *buf) {
+  78              		.loc 1 7 70 is_stmt 1 view -0
+  79              		.cfi_startproc
+  80              		@ args = 0, pretend = 0, frame = 80
+  81              		@ frame_needed = 0, uses_anonymous_args = 0
+  82              		.loc 1 7 70 is_stmt 0 view .LVU8
+  83 0000 10B5     		push	{r4, lr}
+  84              	.LCFI1:
+  85              		.cfi_def_cfa_offset 8
+  86              		.cfi_offset 4, -8
+  87              		.cfi_offset 14, -4
+  88 0002 94B0     		sub	sp, sp, #80
+  89              	.LCFI2:
+  90              		.cfi_def_cfa_offset 88
+  91 0004 0C46     		mov	r4, r1
+   8:../Core/Src/w25q_impl.c ****   OSPI_RegularCmdTypeDef cmd = {0};
+  92              		.loc 1 8 3 is_stmt 1 view .LVU9
+  93              		.loc 1 8 26 is_stmt 0 view .LVU10
+  94 0006 5022     		movs	r2, #80
+  95 0008 0021     		movs	r1, #0
+  96              	.LVL5:
+  97              		.loc 1 8 26 view .LVU11
+  98 000a 6846     		mov	r0, sp
+  99              	.LVL6:
+ 100              		.loc 1 8 26 view .LVU12
+ 101 000c FFF7FEFF 		bl	memset
+ 102              	.LVL7:
+   9:../Core/Src/w25q_impl.c **** 
+  10:../Core/Src/w25q_impl.c ****   cmd.OperationType = HAL_OSPI_OPTYPE_COMMON_CFG;
+ 103              		.loc 1 10 3 is_stmt 1 view .LVU13
+  11:../Core/Src/w25q_impl.c **** 
+  12:../Core/Src/w25q_impl.c ****   cmd.Instruction = W25Q_DEVID;
+ 104              		.loc 1 12 3 view .LVU14
+ 105              		.loc 1 12 19 is_stmt 0 view .LVU15
+ARM GAS  /tmp/cc5A8HOi.s 			page 3
+
+
+ 106 0010 AB23     		movs	r3, #171
+ 107 0012 0293     		str	r3, [sp, #8]
+  13:../Core/Src/w25q_impl.c ****   cmd.InstructionMode = HAL_OSPI_INSTRUCTION_1_LINE;
+ 108              		.loc 1 13 3 is_stmt 1 view .LVU16
+ 109              		.loc 1 13 23 is_stmt 0 view .LVU17
+ 110 0014 0123     		movs	r3, #1
+ 111 0016 0393     		str	r3, [sp, #12]
+  14:../Core/Src/w25q_impl.c ****   cmd.InstructionSize = HAL_OSPI_INSTRUCTION_8_BITS;
+ 112              		.loc 1 14 3 is_stmt 1 view .LVU18
+  15:../Core/Src/w25q_impl.c ****   cmd.InstructionDtrMode = HAL_OSPI_INSTRUCTION_DTR_DISABLE;
+ 113              		.loc 1 15 3 view .LVU19
+  16:../Core/Src/w25q_impl.c **** 
+  17:../Core/Src/w25q_impl.c ****   cmd.Address = 0x00U;
+ 114              		.loc 1 17 3 view .LVU20
+  18:../Core/Src/w25q_impl.c ****   cmd.AddressMode = HAL_OSPI_ADDRESS_1_LINE;
+ 115              		.loc 1 18 3 view .LVU21
+ 116              		.loc 1 18 19 is_stmt 0 view .LVU22
+ 117 0018 4FF48072 		mov	r2, #256
+ 118 001c 0792     		str	r2, [sp, #28]
+  19:../Core/Src/w25q_impl.c ****   cmd.AddressSize = HAL_OSPI_ADDRESS_24_BITS;
+ 119              		.loc 1 19 3 is_stmt 1 view .LVU23
+ 120              		.loc 1 19 19 is_stmt 0 view .LVU24
+ 121 001e 4FF40052 		mov	r2, #8192
+ 122 0022 0892     		str	r2, [sp, #32]
+  20:../Core/Src/w25q_impl.c ****   cmd.AddressDtrMode = HAL_OSPI_ADDRESS_DTR_DISABLE;
+ 123              		.loc 1 20 3 is_stmt 1 view .LVU25
+  21:../Core/Src/w25q_impl.c **** 
+  22:../Core/Src/w25q_impl.c ****   cmd.AlternateBytesMode = HAL_OSPI_ALTERNATE_BYTES_NONE;
+ 124              		.loc 1 22 3 view .LVU26
+  23:../Core/Src/w25q_impl.c **** 
+  24:../Core/Src/w25q_impl.c ****   cmd.DataMode = HAL_OSPI_DATA_1_LINE;
+ 125              		.loc 1 24 3 view .LVU27
+ 126              		.loc 1 24 16 is_stmt 0 view .LVU28
+ 127 0024 4FF08072 		mov	r2, #16777216
+ 128 0028 0E92     		str	r2, [sp, #56]
+  25:../Core/Src/w25q_impl.c ****   cmd.DataDtrMode = HAL_OSPI_DATA_DTR_DISABLE;
+ 129              		.loc 1 25 3 is_stmt 1 view .LVU29
+  26:../Core/Src/w25q_impl.c ****   cmd.NbData = 1;
+ 130              		.loc 1 26 3 view .LVU30
+ 131              		.loc 1 26 14 is_stmt 0 view .LVU31
+ 132 002a 0F93     		str	r3, [sp, #60]
+  27:../Core/Src/w25q_impl.c **** 
+  28:../Core/Src/w25q_impl.c ****   cmd.DummyCycles = 0;
+ 133              		.loc 1 28 3 is_stmt 1 view .LVU32
+  29:../Core/Src/w25q_impl.c ****   cmd.DQSMode = HAL_OSPI_DQS_DISABLE;
+ 134              		.loc 1 29 3 view .LVU33
+  30:../Core/Src/w25q_impl.c ****   cmd.SIOOMode = HAL_OSPI_SIOO_INST_EVERY_CMD;
+ 135              		.loc 1 30 3 view .LVU34
+  31:../Core/Src/w25q_impl.c **** 
+  32:../Core/Src/w25q_impl.c ****   HAL_GPIO_WritePin(FLASH_CS_GPIO_PORT, FLASH_CS_PIN, GPIO_PIN_RESET);
+ 136              		.loc 1 32 3 view .LVU35
+ 137 002c 0022     		movs	r2, #0
+ 138 002e 4021     		movs	r1, #64
+ 139 0030 0E48     		ldr	r0, .L8
+ 140 0032 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 141              	.LVL8:
+  33:../Core/Src/w25q_impl.c **** 
+ARM GAS  /tmp/cc5A8HOi.s 			page 4
+
+
+  34:../Core/Src/w25q_impl.c ****   if (HAL_OSPI_Command(&flash_spi, &cmd, HAL_OSPI_TIMEOUT_DEFAULT_VALUE) !=
+ 142              		.loc 1 34 3 view .LVU36
+ 143              		.loc 1 34 7 is_stmt 0 view .LVU37
+ 144 0036 41F28832 		movw	r2, #5000
+ 145 003a 6946     		mov	r1, sp
+ 146 003c 0C48     		ldr	r0, .L8+4
+ 147 003e FFF7FEFF 		bl	HAL_OSPI_Command
+ 148              	.LVL9:
+ 149              		.loc 1 34 6 view .LVU38
+ 150 0042 78B9     		cbnz	r0, .L5
+  35:../Core/Src/w25q_impl.c ****       HAL_OK) {
+  36:../Core/Src/w25q_impl.c ****     return W25Q_ERR_SPI;
+  37:../Core/Src/w25q_impl.c ****   }
+  38:../Core/Src/w25q_impl.c **** 
+  39:../Core/Src/w25q_impl.c ****   if (HAL_OSPI_Receive(&flash_spi, buf, HAL_OSPI_TIMEOUT_DEFAULT_VALUE) !=
+ 151              		.loc 1 39 3 is_stmt 1 view .LVU39
+ 152              		.loc 1 39 7 is_stmt 0 view .LVU40
+ 153 0044 41F28832 		movw	r2, #5000
+ 154 0048 2146     		mov	r1, r4
+ 155 004a 0948     		ldr	r0, .L8+4
+ 156 004c FFF7FEFF 		bl	HAL_OSPI_Receive
+ 157              	.LVL10:
+ 158              		.loc 1 39 6 view .LVU41
+ 159 0050 0446     		mov	r4, r0
+ 160              	.LVL11:
+ 161              		.loc 1 39 6 view .LVU42
+ 162 0052 48B9     		cbnz	r0, .L6
+  40:../Core/Src/w25q_impl.c ****       HAL_OK) {
+  41:../Core/Src/w25q_impl.c ****     return W25Q_ERR_SPI;
+  42:../Core/Src/w25q_impl.c ****   }
+  43:../Core/Src/w25q_impl.c **** 
+  44:../Core/Src/w25q_impl.c ****   HAL_GPIO_WritePin(FLASH_CS_GPIO_PORT, FLASH_CS_PIN, GPIO_PIN_SET);
+ 163              		.loc 1 44 3 is_stmt 1 view .LVU43
+ 164 0054 0122     		movs	r2, #1
+ 165 0056 4021     		movs	r1, #64
+ 166 0058 0448     		ldr	r0, .L8
+ 167 005a FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 168              	.LVL12:
+  45:../Core/Src/w25q_impl.c **** 
+  46:../Core/Src/w25q_impl.c ****   return W25Q_ERR_OK;
+ 169              		.loc 1 46 3 view .LVU44
+ 170              	.L4:
+  47:../Core/Src/w25q_impl.c **** }
+ 171              		.loc 1 47 1 is_stmt 0 view .LVU45
+ 172 005e 2046     		mov	r0, r4
+ 173 0060 14B0     		add	sp, sp, #80
+ 174              	.LCFI3:
+ 175              		.cfi_remember_state
+ 176              		.cfi_def_cfa_offset 8
+ 177              		@ sp needed
+ 178 0062 10BD     		pop	{r4, pc}
+ 179              	.LVL13:
+ 180              	.L5:
+ 181              	.LCFI4:
+ 182              		.cfi_restore_state
+  36:../Core/Src/w25q_impl.c ****   }
+ 183              		.loc 1 36 12 view .LVU46
+ARM GAS  /tmp/cc5A8HOi.s 			page 5
+
+
+ 184 0064 0424     		movs	r4, #4
+ 185              	.LVL14:
+  36:../Core/Src/w25q_impl.c ****   }
+ 186              		.loc 1 36 12 view .LVU47
+ 187 0066 FAE7     		b	.L4
+ 188              	.L6:
+  41:../Core/Src/w25q_impl.c ****   }
+ 189              		.loc 1 41 12 view .LVU48
+ 190 0068 0424     		movs	r4, #4
+ 191 006a F8E7     		b	.L4
+ 192              	.L9:
+ 193              		.align	2
+ 194              	.L8:
+ 195 006c 00180258 		.word	1476532224
+ 196 0070 00000000 		.word	hospi1
+ 197              		.cfi_endproc
+ 198              	.LFE399:
+ 200              		.section	.text.w25q_write_enable,"ax",%progbits
+ 201              		.align	1
+ 202              		.global	w25q_write_enable
+ 203              		.syntax unified
+ 204              		.thumb
+ 205              		.thumb_func
+ 207              	w25q_write_enable:
+ 208              	.LVL15:
+ 209              	.LFB400:
+  48:../Core/Src/w25q_impl.c **** 
+  49:../Core/Src/w25q_impl.c **** enum w25q_err w25q_write_enable(struct w25q_device *device, bool enable) {
+ 210              		.loc 1 49 74 is_stmt 1 view -0
+ 211              		.cfi_startproc
+ 212              		@ args = 0, pretend = 0, frame = 80
+ 213              		@ frame_needed = 0, uses_anonymous_args = 0
+ 214              		.loc 1 49 74 is_stmt 0 view .LVU50
+ 215 0000 10B5     		push	{r4, lr}
+ 216              	.LCFI5:
+ 217              		.cfi_def_cfa_offset 8
+ 218              		.cfi_offset 4, -8
+ 219              		.cfi_offset 14, -4
+ 220 0002 94B0     		sub	sp, sp, #80
+ 221              	.LCFI6:
+ 222              		.cfi_def_cfa_offset 88
+ 223 0004 0C46     		mov	r4, r1
+  50:../Core/Src/w25q_impl.c ****   OSPI_RegularCmdTypeDef cmd = {0};
+ 224              		.loc 1 50 3 is_stmt 1 view .LVU51
+ 225              		.loc 1 50 26 is_stmt 0 view .LVU52
+ 226 0006 5022     		movs	r2, #80
+ 227 0008 0021     		movs	r1, #0
+ 228              	.LVL16:
+ 229              		.loc 1 50 26 view .LVU53
+ 230 000a 6846     		mov	r0, sp
+ 231              	.LVL17:
+ 232              		.loc 1 50 26 view .LVU54
+ 233 000c FFF7FEFF 		bl	memset
+ 234              	.LVL18:
+  51:../Core/Src/w25q_impl.c **** 
+  52:../Core/Src/w25q_impl.c ****   cmd.OperationType = HAL_OSPI_OPTYPE_COMMON_CFG;
+ 235              		.loc 1 52 3 is_stmt 1 view .LVU55
+ARM GAS  /tmp/cc5A8HOi.s 			page 6
+
+
+  53:../Core/Src/w25q_impl.c **** 
+  54:../Core/Src/w25q_impl.c ****   cmd.Instruction = enable ? W25Q_WRITE_ENABLE : W25Q_WRITE_DISABLE;
+ 236              		.loc 1 54 3 view .LVU56
+ 237              		.loc 1 54 48 is_stmt 0 view .LVU57
+ 238 0010 DCB1     		cbz	r4, .L13
+ 239 0012 0623     		movs	r3, #6
+ 240              	.L11:
+ 241              		.loc 1 54 19 discriminator 4 view .LVU58
+ 242 0014 0293     		str	r3, [sp, #8]
+  55:../Core/Src/w25q_impl.c ****   cmd.InstructionMode = HAL_OSPI_INSTRUCTION_1_LINE;
+ 243              		.loc 1 55 3 is_stmt 1 discriminator 4 view .LVU59
+ 244              		.loc 1 55 23 is_stmt 0 discriminator 4 view .LVU60
+ 245 0016 0123     		movs	r3, #1
+ 246 0018 0393     		str	r3, [sp, #12]
+  56:../Core/Src/w25q_impl.c ****   cmd.InstructionSize = HAL_OSPI_INSTRUCTION_8_BITS;
+ 247              		.loc 1 56 3 is_stmt 1 discriminator 4 view .LVU61
+  57:../Core/Src/w25q_impl.c ****   cmd.InstructionDtrMode = HAL_OSPI_INSTRUCTION_DTR_DISABLE;
+ 248              		.loc 1 57 3 discriminator 4 view .LVU62
+  58:../Core/Src/w25q_impl.c **** 
+  59:../Core/Src/w25q_impl.c ****   cmd.AddressMode = HAL_OSPI_ADDRESS_NONE;
+ 249              		.loc 1 59 3 discriminator 4 view .LVU63
+  60:../Core/Src/w25q_impl.c **** 
+  61:../Core/Src/w25q_impl.c ****   cmd.AlternateBytesMode = HAL_OSPI_ALTERNATE_BYTES_NONE;
+ 250              		.loc 1 61 3 discriminator 4 view .LVU64
+  62:../Core/Src/w25q_impl.c **** 
+  63:../Core/Src/w25q_impl.c ****   cmd.DataMode = HAL_OSPI_DATA_NONE;
+ 251              		.loc 1 63 3 discriminator 4 view .LVU65
+  64:../Core/Src/w25q_impl.c ****   cmd.DataDtrMode = HAL_OSPI_DATA_DTR_DISABLE;
+ 252              		.loc 1 64 3 discriminator 4 view .LVU66
+  65:../Core/Src/w25q_impl.c ****   cmd.NbData = 0;
+ 253              		.loc 1 65 3 discriminator 4 view .LVU67
+  66:../Core/Src/w25q_impl.c **** 
+  67:../Core/Src/w25q_impl.c ****   cmd.DummyCycles = 0;
+ 254              		.loc 1 67 3 discriminator 4 view .LVU68
+  68:../Core/Src/w25q_impl.c ****   cmd.DQSMode = HAL_OSPI_DQS_DISABLE;
+ 255              		.loc 1 68 3 discriminator 4 view .LVU69
+  69:../Core/Src/w25q_impl.c ****   cmd.SIOOMode = HAL_OSPI_SIOO_INST_EVERY_CMD;
+ 256              		.loc 1 69 3 discriminator 4 view .LVU70
+  70:../Core/Src/w25q_impl.c **** 
+  71:../Core/Src/w25q_impl.c ****   HAL_GPIO_WritePin(FLASH_CS_GPIO_PORT, FLASH_CS_PIN, GPIO_PIN_RESET);
+ 257              		.loc 1 71 3 discriminator 4 view .LVU71
+ 258 001a 0022     		movs	r2, #0
+ 259 001c 4021     		movs	r1, #64
+ 260 001e 0D48     		ldr	r0, .L16
+ 261 0020 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 262              	.LVL19:
+  72:../Core/Src/w25q_impl.c **** 
+  73:../Core/Src/w25q_impl.c ****   if (HAL_OSPI_Command(&flash_spi, &cmd, HAL_OSPI_TIMEOUT_DEFAULT_VALUE) !=
+ 263              		.loc 1 73 3 discriminator 4 view .LVU72
+ 264              		.loc 1 73 7 is_stmt 0 discriminator 4 view .LVU73
+ 265 0024 41F28832 		movw	r2, #5000
+ 266 0028 6946     		mov	r1, sp
+ 267 002a 0B48     		ldr	r0, .L16+4
+ 268 002c FFF7FEFF 		bl	HAL_OSPI_Command
+ 269              	.LVL20:
+ 270              		.loc 1 73 6 discriminator 4 view .LVU74
+ 271 0030 0446     		mov	r4, r0
+ARM GAS  /tmp/cc5A8HOi.s 			page 7
+
+
+ 272 0032 60B9     		cbnz	r0, .L14
+  74:../Core/Src/w25q_impl.c ****       HAL_OK) {
+  75:../Core/Src/w25q_impl.c ****     return W25Q_ERR_SPI;
+  76:../Core/Src/w25q_impl.c ****   }
+  77:../Core/Src/w25q_impl.c **** 
+  78:../Core/Src/w25q_impl.c ****   HAL_GPIO_WritePin(FLASH_CS_GPIO_PORT, FLASH_CS_PIN, GPIO_PIN_SET);
+ 273              		.loc 1 78 3 is_stmt 1 view .LVU75
+ 274 0034 0122     		movs	r2, #1
+ 275 0036 4021     		movs	r1, #64
+ 276 0038 0648     		ldr	r0, .L16
+ 277 003a FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 278              	.LVL21:
+  79:../Core/Src/w25q_impl.c **** 
+  80:../Core/Src/w25q_impl.c ****   w25q_delay(1);
+ 279              		.loc 1 80 3 view .LVU76
+ 280 003e 0120     		movs	r0, #1
+ 281 0040 FFF7FEFF 		bl	w25q_delay
+ 282              	.LVL22:
+  81:../Core/Src/w25q_impl.c **** 
+  82:../Core/Src/w25q_impl.c ****   return W25Q_ERR_OK;
+ 283              		.loc 1 82 3 view .LVU77
+ 284              	.L12:
+  83:../Core/Src/w25q_impl.c **** }
+ 285              		.loc 1 83 1 is_stmt 0 view .LVU78
+ 286 0044 2046     		mov	r0, r4
+ 287 0046 14B0     		add	sp, sp, #80
+ 288              	.LCFI7:
+ 289              		.cfi_remember_state
+ 290              		.cfi_def_cfa_offset 8
+ 291              		@ sp needed
+ 292 0048 10BD     		pop	{r4, pc}
+ 293              	.L13:
+ 294              	.LCFI8:
+ 295              		.cfi_restore_state
+  54:../Core/Src/w25q_impl.c ****   cmd.InstructionMode = HAL_OSPI_INSTRUCTION_1_LINE;
+ 296              		.loc 1 54 48 view .LVU79
+ 297 004a 0423     		movs	r3, #4
+ 298 004c E2E7     		b	.L11
+ 299              	.L14:
+  75:../Core/Src/w25q_impl.c ****   }
+ 300              		.loc 1 75 12 view .LVU80
+ 301 004e 0424     		movs	r4, #4
+ 302 0050 F8E7     		b	.L12
+ 303              	.L17:
+ 304 0052 00BF     		.align	2
+ 305              	.L16:
+ 306 0054 00180258 		.word	1476532224
+ 307 0058 00000000 		.word	hospi1
+ 308              		.cfi_endproc
+ 309              	.LFE400:
+ 311              		.section	.text.w25q_enter_4_byte_mode,"ax",%progbits
+ 312              		.align	1
+ 313              		.global	w25q_enter_4_byte_mode
+ 314              		.syntax unified
+ 315              		.thumb
+ 316              		.thumb_func
+ 318              	w25q_enter_4_byte_mode:
+ARM GAS  /tmp/cc5A8HOi.s 			page 8
+
+
+ 319              	.LVL23:
+ 320              	.LFB401:
+  84:../Core/Src/w25q_impl.c **** 
+  85:../Core/Src/w25q_impl.c **** enum w25q_err w25q_enter_4_byte_mode(struct w25q_device *device, bool enable) {
+ 321              		.loc 1 85 79 is_stmt 1 view -0
+ 322              		.cfi_startproc
+ 323              		@ args = 0, pretend = 0, frame = 80
+ 324              		@ frame_needed = 0, uses_anonymous_args = 0
+ 325              		.loc 1 85 79 is_stmt 0 view .LVU82
+ 326 0000 30B5     		push	{r4, r5, lr}
+ 327              	.LCFI9:
+ 328              		.cfi_def_cfa_offset 12
+ 329              		.cfi_offset 4, -12
+ 330              		.cfi_offset 5, -8
+ 331              		.cfi_offset 14, -4
+ 332 0002 95B0     		sub	sp, sp, #84
+ 333              	.LCFI10:
+ 334              		.cfi_def_cfa_offset 96
+ 335 0004 0446     		mov	r4, r0
+ 336 0006 0D46     		mov	r5, r1
+  86:../Core/Src/w25q_impl.c ****   while (w25q_is_busy(device) == W25Q_ERR_BUSY)
+ 337              		.loc 1 86 3 is_stmt 1 view .LVU83
+ 338              	.LVL24:
+ 339              	.L19:
+ 340              		.loc 1 86 31 discriminator 1 view .LVU84
+ 341              		.loc 1 86 10 is_stmt 0 discriminator 1 view .LVU85
+ 342 0008 2046     		mov	r0, r4
+ 343 000a FFF7FEFF 		bl	w25q_is_busy
+ 344              	.LVL25:
+ 345              		.loc 1 86 31 discriminator 1 view .LVU86
+ 346 000e 0128     		cmp	r0, #1
+ 347 0010 FAD0     		beq	.L19
+  87:../Core/Src/w25q_impl.c ****     ;
+  88:../Core/Src/w25q_impl.c **** 
+  89:../Core/Src/w25q_impl.c ****   OSPI_RegularCmdTypeDef cmd = {0};
+ 348              		.loc 1 89 3 is_stmt 1 view .LVU87
+ 349              		.loc 1 89 26 is_stmt 0 view .LVU88
+ 350 0012 5022     		movs	r2, #80
+ 351 0014 0021     		movs	r1, #0
+ 352 0016 6846     		mov	r0, sp
+ 353 0018 FFF7FEFF 		bl	memset
+ 354              	.LVL26:
+  90:../Core/Src/w25q_impl.c **** 
+  91:../Core/Src/w25q_impl.c ****   cmd.OperationType = HAL_OSPI_OPTYPE_COMMON_CFG;
+ 355              		.loc 1 91 3 is_stmt 1 view .LVU89
+  92:../Core/Src/w25q_impl.c **** 
+  93:../Core/Src/w25q_impl.c ****   cmd.Instruction = enable ? W25Q_ENABLE_4B_MODE : W25Q_DISABLE_4B_MODE;
+ 356              		.loc 1 93 3 view .LVU90
+ 357              		.loc 1 93 50 is_stmt 0 view .LVU91
+ 358 001c E5B1     		cbz	r5, .L22
+ 359 001e B723     		movs	r3, #183
+ 360              	.L20:
+ 361              		.loc 1 93 19 discriminator 4 view .LVU92
+ 362 0020 0293     		str	r3, [sp, #8]
+  94:../Core/Src/w25q_impl.c ****   cmd.InstructionMode = HAL_OSPI_INSTRUCTION_1_LINE;
+ 363              		.loc 1 94 3 is_stmt 1 discriminator 4 view .LVU93
+ 364              		.loc 1 94 23 is_stmt 0 discriminator 4 view .LVU94
+ARM GAS  /tmp/cc5A8HOi.s 			page 9
+
+
+ 365 0022 0123     		movs	r3, #1
+ 366 0024 0393     		str	r3, [sp, #12]
+  95:../Core/Src/w25q_impl.c ****   cmd.InstructionSize = HAL_OSPI_INSTRUCTION_8_BITS;
+ 367              		.loc 1 95 3 is_stmt 1 discriminator 4 view .LVU95
+  96:../Core/Src/w25q_impl.c ****   cmd.InstructionDtrMode = HAL_OSPI_INSTRUCTION_DTR_DISABLE;
+ 368              		.loc 1 96 3 discriminator 4 view .LVU96
+  97:../Core/Src/w25q_impl.c **** 
+  98:../Core/Src/w25q_impl.c ****   cmd.AddressMode = HAL_OSPI_ADDRESS_NONE;
+ 369              		.loc 1 98 3 discriminator 4 view .LVU97
+  99:../Core/Src/w25q_impl.c **** 
+ 100:../Core/Src/w25q_impl.c ****   cmd.AlternateBytesMode = HAL_OSPI_ALTERNATE_BYTES_NONE;
+ 370              		.loc 1 100 3 discriminator 4 view .LVU98
+ 101:../Core/Src/w25q_impl.c **** 
+ 102:../Core/Src/w25q_impl.c ****   cmd.DataMode = HAL_OSPI_DATA_NONE;
+ 371              		.loc 1 102 3 discriminator 4 view .LVU99
+ 103:../Core/Src/w25q_impl.c ****   cmd.DataDtrMode = HAL_OSPI_DATA_DTR_DISABLE;
+ 372              		.loc 1 103 3 discriminator 4 view .LVU100
+ 104:../Core/Src/w25q_impl.c ****   cmd.NbData = 0;
+ 373              		.loc 1 104 3 discriminator 4 view .LVU101
+ 105:../Core/Src/w25q_impl.c **** 
+ 106:../Core/Src/w25q_impl.c ****   cmd.DummyCycles = 0;
+ 374              		.loc 1 106 3 discriminator 4 view .LVU102
+ 107:../Core/Src/w25q_impl.c ****   cmd.DQSMode = HAL_OSPI_DQS_DISABLE;
+ 375              		.loc 1 107 3 discriminator 4 view .LVU103
+ 108:../Core/Src/w25q_impl.c ****   cmd.SIOOMode = HAL_OSPI_SIOO_INST_EVERY_CMD;
+ 376              		.loc 1 108 3 discriminator 4 view .LVU104
+ 109:../Core/Src/w25q_impl.c **** 
+ 110:../Core/Src/w25q_impl.c ****   HAL_GPIO_WritePin(FLASH_CS_GPIO_PORT, FLASH_CS_PIN, GPIO_PIN_RESET);
+ 377              		.loc 1 110 3 discriminator 4 view .LVU105
+ 378 0026 0022     		movs	r2, #0
+ 379 0028 4021     		movs	r1, #64
+ 380 002a 0D48     		ldr	r0, .L25
+ 381 002c FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 382              	.LVL27:
+ 111:../Core/Src/w25q_impl.c **** 
+ 112:../Core/Src/w25q_impl.c ****   if (HAL_OSPI_Command(&flash_spi, &cmd, HAL_OSPI_TIMEOUT_DEFAULT_VALUE) !=
+ 383              		.loc 1 112 3 discriminator 4 view .LVU106
+ 384              		.loc 1 112 7 is_stmt 0 discriminator 4 view .LVU107
+ 385 0030 41F28832 		movw	r2, #5000
+ 386 0034 6946     		mov	r1, sp
+ 387 0036 0B48     		ldr	r0, .L25+4
+ 388 0038 FFF7FEFF 		bl	HAL_OSPI_Command
+ 389              	.LVL28:
+ 390              		.loc 1 112 6 discriminator 4 view .LVU108
+ 391 003c 70B9     		cbnz	r0, .L23
+ 113:../Core/Src/w25q_impl.c ****       HAL_OK) {
+ 114:../Core/Src/w25q_impl.c ****     return W25Q_ERR_SPI;
+ 115:../Core/Src/w25q_impl.c ****   }
+ 116:../Core/Src/w25q_impl.c **** 
+ 117:../Core/Src/w25q_impl.c ****   HAL_GPIO_WritePin(FLASH_CS_GPIO_PORT, FLASH_CS_PIN, GPIO_PIN_SET);
+ 392              		.loc 1 117 3 is_stmt 1 view .LVU109
+ 393 003e 0122     		movs	r2, #1
+ 394 0040 4021     		movs	r1, #64
+ 395 0042 0748     		ldr	r0, .L25
+ 396 0044 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 397              	.LVL29:
+ 118:../Core/Src/w25q_impl.c **** 
+ARM GAS  /tmp/cc5A8HOi.s 			page 10
+
+
+ 119:../Core/Src/w25q_impl.c ****   w25q_delay(1);
+ 398              		.loc 1 119 3 view .LVU110
+ 399 0048 0120     		movs	r0, #1
+ 400 004a FFF7FEFF 		bl	w25q_delay
+ 401              	.LVL30:
+ 120:../Core/Src/w25q_impl.c **** 
+ 121:../Core/Src/w25q_impl.c ****   return w25q_update_status_struct(device);
+ 402              		.loc 1 121 3 view .LVU111
+ 403              		.loc 1 121 10 is_stmt 0 view .LVU112
+ 404 004e 2046     		mov	r0, r4
+ 405 0050 FFF7FEFF 		bl	w25q_update_status_struct
+ 406              	.LVL31:
+ 407              	.L21:
+ 122:../Core/Src/w25q_impl.c **** }
+ 408              		.loc 1 122 1 view .LVU113
+ 409 0054 15B0     		add	sp, sp, #84
+ 410              	.LCFI11:
+ 411              		.cfi_remember_state
+ 412              		.cfi_def_cfa_offset 12
+ 413              		@ sp needed
+ 414 0056 30BD     		pop	{r4, r5, pc}
+ 415              	.LVL32:
+ 416              	.L22:
+ 417              	.LCFI12:
+ 418              		.cfi_restore_state
+  93:../Core/Src/w25q_impl.c ****   cmd.InstructionMode = HAL_OSPI_INSTRUCTION_1_LINE;
+ 419              		.loc 1 93 50 view .LVU114
+ 420 0058 E923     		movs	r3, #233
+ 421 005a E1E7     		b	.L20
+ 422              	.L23:
+ 114:../Core/Src/w25q_impl.c ****   }
+ 423              		.loc 1 114 12 view .LVU115
+ 424 005c 0420     		movs	r0, #4
+ 425 005e F9E7     		b	.L21
+ 426              	.L26:
+ 427              		.align	2
+ 428              	.L25:
+ 429 0060 00180258 		.word	1476532224
+ 430 0064 00000000 		.word	hospi1
+ 431              		.cfi_endproc
+ 432              	.LFE401:
+ 434              		.section	.text.w25q_read_status_reg,"ax",%progbits
+ 435              		.align	1
+ 436              		.global	w25q_read_status_reg
+ 437              		.syntax unified
+ 438              		.thumb
+ 439              		.thumb_func
+ 441              	w25q_read_status_reg:
+ 442              	.LVL33:
+ 443              	.LFB402:
+ 123:../Core/Src/w25q_impl.c **** 
+ 124:../Core/Src/w25q_impl.c **** enum w25q_err w25q_read_status_reg(struct w25q_device *device,
+ 125:../Core/Src/w25q_impl.c ****                                    uint8_t *reg_data, uint8_t reg_num) {
+ 444              		.loc 1 125 72 is_stmt 1 view -0
+ 445              		.cfi_startproc
+ 446              		@ args = 0, pretend = 0, frame = 80
+ 447              		@ frame_needed = 0, uses_anonymous_args = 0
+ARM GAS  /tmp/cc5A8HOi.s 			page 11
+
+
+ 448              		.loc 1 125 72 is_stmt 0 view .LVU117
+ 449 0000 30B5     		push	{r4, r5, lr}
+ 450              	.LCFI13:
+ 451              		.cfi_def_cfa_offset 12
+ 452              		.cfi_offset 4, -12
+ 453              		.cfi_offset 5, -8
+ 454              		.cfi_offset 14, -4
+ 455 0002 95B0     		sub	sp, sp, #84
+ 456              	.LCFI14:
+ 457              		.cfi_def_cfa_offset 96
+ 458 0004 0D46     		mov	r5, r1
+ 459 0006 1446     		mov	r4, r2
+ 126:../Core/Src/w25q_impl.c ****   OSPI_RegularCmdTypeDef cmd = {0};
+ 460              		.loc 1 126 3 is_stmt 1 view .LVU118
+ 461              		.loc 1 126 26 is_stmt 0 view .LVU119
+ 462 0008 5022     		movs	r2, #80
+ 463              	.LVL34:
+ 464              		.loc 1 126 26 view .LVU120
+ 465 000a 0021     		movs	r1, #0
+ 466              	.LVL35:
+ 467              		.loc 1 126 26 view .LVU121
+ 468 000c 6846     		mov	r0, sp
+ 469              	.LVL36:
+ 470              		.loc 1 126 26 view .LVU122
+ 471 000e FFF7FEFF 		bl	memset
+ 472              	.LVL37:
+ 127:../Core/Src/w25q_impl.c **** 
+ 128:../Core/Src/w25q_impl.c ****   cmd.OperationType = HAL_OSPI_OPTYPE_COMMON_CFG;
+ 473              		.loc 1 128 3 is_stmt 1 view .LVU123
+ 129:../Core/Src/w25q_impl.c **** 
+ 130:../Core/Src/w25q_impl.c ****   if (reg_num == 1) {
+ 474              		.loc 1 130 3 view .LVU124
+ 475              		.loc 1 130 6 is_stmt 0 view .LVU125
+ 476 0012 012C     		cmp	r4, #1
+ 477 0014 06D0     		beq	.L36
+ 131:../Core/Src/w25q_impl.c ****     cmd.Instruction = W25Q_READ_SR1;
+ 132:../Core/Src/w25q_impl.c ****   } else if (reg_num == 2) {
+ 478              		.loc 1 132 10 is_stmt 1 view .LVU126
+ 479              		.loc 1 132 13 is_stmt 0 view .LVU127
+ 480 0016 022C     		cmp	r4, #2
+ 481 0018 28D0     		beq	.L37
+ 133:../Core/Src/w25q_impl.c ****     cmd.Instruction = W25Q_READ_SR2;
+ 134:../Core/Src/w25q_impl.c ****   } else if (reg_num == 3) {
+ 482              		.loc 1 134 10 is_stmt 1 view .LVU128
+ 483              		.loc 1 134 13 is_stmt 0 view .LVU129
+ 484 001a 032C     		cmp	r4, #3
+ 485 001c 29D1     		bne	.L32
+ 135:../Core/Src/w25q_impl.c ****     cmd.Instruction = W25Q_READ_SR3;
+ 486              		.loc 1 135 5 is_stmt 1 view .LVU130
+ 487              		.loc 1 135 21 is_stmt 0 view .LVU131
+ 488 001e 1523     		movs	r3, #21
+ 489 0020 0293     		str	r3, [sp, #8]
+ 490 0022 01E0     		b	.L29
+ 491              	.L36:
+ 131:../Core/Src/w25q_impl.c ****     cmd.Instruction = W25Q_READ_SR1;
+ 492              		.loc 1 131 5 is_stmt 1 view .LVU132
+ 131:../Core/Src/w25q_impl.c ****     cmd.Instruction = W25Q_READ_SR1;
+ARM GAS  /tmp/cc5A8HOi.s 			page 12
+
+
+ 493              		.loc 1 131 21 is_stmt 0 view .LVU133
+ 494 0024 0523     		movs	r3, #5
+ 495 0026 0293     		str	r3, [sp, #8]
+ 496              	.L29:
+ 136:../Core/Src/w25q_impl.c ****   } else {
+ 137:../Core/Src/w25q_impl.c ****     return W25Q_ERR_PARAM;
+ 138:../Core/Src/w25q_impl.c ****   }
+ 139:../Core/Src/w25q_impl.c **** 
+ 140:../Core/Src/w25q_impl.c ****   cmd.InstructionMode = HAL_OSPI_INSTRUCTION_1_LINE;
+ 497              		.loc 1 140 3 is_stmt 1 view .LVU134
+ 498              		.loc 1 140 23 is_stmt 0 view .LVU135
+ 499 0028 0123     		movs	r3, #1
+ 500 002a 0393     		str	r3, [sp, #12]
+ 141:../Core/Src/w25q_impl.c ****   cmd.InstructionSize = HAL_OSPI_INSTRUCTION_8_BITS;
+ 501              		.loc 1 141 3 is_stmt 1 view .LVU136
+ 142:../Core/Src/w25q_impl.c ****   cmd.InstructionDtrMode = HAL_OSPI_INSTRUCTION_DTR_DISABLE;
+ 502              		.loc 1 142 3 view .LVU137
+ 143:../Core/Src/w25q_impl.c **** 
+ 144:../Core/Src/w25q_impl.c ****   cmd.AddressMode = HAL_OSPI_ADDRESS_NONE;
+ 503              		.loc 1 144 3 view .LVU138
+ 145:../Core/Src/w25q_impl.c **** 
+ 146:../Core/Src/w25q_impl.c ****   cmd.AlternateBytesMode = HAL_OSPI_ALTERNATE_BYTES_NONE;
+ 504              		.loc 1 146 3 view .LVU139
+ 147:../Core/Src/w25q_impl.c **** 
+ 148:../Core/Src/w25q_impl.c ****   cmd.DataMode = HAL_OSPI_DATA_1_LINE;
+ 505              		.loc 1 148 3 view .LVU140
+ 506              		.loc 1 148 16 is_stmt 0 view .LVU141
+ 507 002c 4FF08072 		mov	r2, #16777216
+ 508 0030 0E92     		str	r2, [sp, #56]
+ 149:../Core/Src/w25q_impl.c ****   cmd.DataDtrMode = HAL_OSPI_DATA_DTR_DISABLE;
+ 509              		.loc 1 149 3 is_stmt 1 view .LVU142
+ 150:../Core/Src/w25q_impl.c ****   cmd.NbData = 1;
+ 510              		.loc 1 150 3 view .LVU143
+ 511              		.loc 1 150 14 is_stmt 0 view .LVU144
+ 512 0032 0F93     		str	r3, [sp, #60]
+ 151:../Core/Src/w25q_impl.c **** 
+ 152:../Core/Src/w25q_impl.c ****   cmd.DummyCycles = 0;
+ 513              		.loc 1 152 3 is_stmt 1 view .LVU145
+ 153:../Core/Src/w25q_impl.c ****   cmd.DQSMode = HAL_OSPI_DQS_DISABLE;
+ 514              		.loc 1 153 3 view .LVU146
+ 154:../Core/Src/w25q_impl.c ****   cmd.SIOOMode = HAL_OSPI_SIOO_INST_EVERY_CMD;
+ 515              		.loc 1 154 3 view .LVU147
+ 155:../Core/Src/w25q_impl.c **** 
+ 156:../Core/Src/w25q_impl.c ****   HAL_GPIO_WritePin(FLASH_CS_GPIO_PORT, FLASH_CS_PIN, GPIO_PIN_RESET);
+ 516              		.loc 1 156 3 view .LVU148
+ 517 0034 0022     		movs	r2, #0
+ 518 0036 4021     		movs	r1, #64
+ 519 0038 1148     		ldr	r0, .L38
+ 520 003a FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 521              	.LVL38:
+ 157:../Core/Src/w25q_impl.c **** 
+ 158:../Core/Src/w25q_impl.c ****   if (HAL_OSPI_Command(&flash_spi, &cmd, HAL_OSPI_TIMEOUT_DEFAULT_VALUE) !=
+ 522              		.loc 1 158 3 view .LVU149
+ 523              		.loc 1 158 7 is_stmt 0 view .LVU150
+ 524 003e 41F28832 		movw	r2, #5000
+ 525 0042 6946     		mov	r1, sp
+ 526 0044 0F48     		ldr	r0, .L38+4
+ARM GAS  /tmp/cc5A8HOi.s 			page 13
+
+
+ 527 0046 FFF7FEFF 		bl	HAL_OSPI_Command
+ 528              	.LVL39:
+ 529              		.loc 1 158 6 view .LVU151
+ 530 004a A0B9     		cbnz	r0, .L33
+ 159:../Core/Src/w25q_impl.c ****       HAL_OK) {
+ 160:../Core/Src/w25q_impl.c ****     return W25Q_ERR_SPI;
+ 161:../Core/Src/w25q_impl.c ****   }
+ 162:../Core/Src/w25q_impl.c **** 
+ 163:../Core/Src/w25q_impl.c ****   // cli_transmit(&cli, "KEBAB 2\r\n");
+ 164:../Core/Src/w25q_impl.c ****   if (HAL_OSPI_Receive(&flash_spi, reg_data, HAL_OSPI_TIMEOUT_DEFAULT_VALUE) !=
+ 531              		.loc 1 164 3 is_stmt 1 view .LVU152
+ 532              		.loc 1 164 7 is_stmt 0 view .LVU153
+ 533 004c 41F28832 		movw	r2, #5000
+ 534 0050 2946     		mov	r1, r5
+ 535 0052 0C48     		ldr	r0, .L38+4
+ 536 0054 FFF7FEFF 		bl	HAL_OSPI_Receive
+ 537              	.LVL40:
+ 538              		.loc 1 164 6 view .LVU154
+ 539 0058 0446     		mov	r4, r0
+ 540 005a 70B9     		cbnz	r0, .L34
+ 165:../Core/Src/w25q_impl.c ****       HAL_OK) {
+ 166:../Core/Src/w25q_impl.c ****     return W25Q_ERR_SPI;
+ 167:../Core/Src/w25q_impl.c ****   }
+ 168:../Core/Src/w25q_impl.c **** 
+ 169:../Core/Src/w25q_impl.c ****   HAL_GPIO_WritePin(FLASH_CS_GPIO_PORT, FLASH_CS_PIN, GPIO_PIN_SET);
+ 541              		.loc 1 169 3 is_stmt 1 view .LVU155
+ 542 005c 0122     		movs	r2, #1
+ 543 005e 4021     		movs	r1, #64
+ 544 0060 0748     		ldr	r0, .L38
+ 545 0062 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 546              	.LVL41:
+ 170:../Core/Src/w25q_impl.c **** 
+ 171:../Core/Src/w25q_impl.c ****   return W25Q_ERR_OK;
+ 547              		.loc 1 171 3 view .LVU156
+ 548              	.L31:
+ 172:../Core/Src/w25q_impl.c **** }
+ 549              		.loc 1 172 1 is_stmt 0 view .LVU157
+ 550 0066 2046     		mov	r0, r4
+ 551 0068 15B0     		add	sp, sp, #84
+ 552              	.LCFI15:
+ 553              		.cfi_remember_state
+ 554              		.cfi_def_cfa_offset 12
+ 555              		@ sp needed
+ 556 006a 30BD     		pop	{r4, r5, pc}
+ 557              	.LVL42:
+ 558              	.L37:
+ 559              	.LCFI16:
+ 560              		.cfi_restore_state
+ 133:../Core/Src/w25q_impl.c ****   } else if (reg_num == 3) {
+ 561              		.loc 1 133 5 is_stmt 1 view .LVU158
+ 133:../Core/Src/w25q_impl.c ****   } else if (reg_num == 3) {
+ 562              		.loc 1 133 21 is_stmt 0 view .LVU159
+ 563 006c 3523     		movs	r3, #53
+ 564 006e 0293     		str	r3, [sp, #8]
+ 565 0070 DAE7     		b	.L29
+ 566              	.L32:
+ 137:../Core/Src/w25q_impl.c ****   }
+ARM GAS  /tmp/cc5A8HOi.s 			page 14
+
+
+ 567              		.loc 1 137 12 view .LVU160
+ 568 0072 0224     		movs	r4, #2
+ 569 0074 F7E7     		b	.L31
+ 570              	.L33:
+ 160:../Core/Src/w25q_impl.c ****   }
+ 571              		.loc 1 160 12 view .LVU161
+ 572 0076 0424     		movs	r4, #4
+ 573 0078 F5E7     		b	.L31
+ 574              	.L34:
+ 166:../Core/Src/w25q_impl.c ****   }
+ 575              		.loc 1 166 12 view .LVU162
+ 576 007a 0424     		movs	r4, #4
+ 577 007c F3E7     		b	.L31
+ 578              	.L39:
+ 579 007e 00BF     		.align	2
+ 580              	.L38:
+ 581 0080 00180258 		.word	1476532224
+ 582 0084 00000000 		.word	hospi1
+ 583              		.cfi_endproc
+ 584              	.LFE402:
+ 586              		.section	.text.w25q_write_status_reg,"ax",%progbits
+ 587              		.align	1
+ 588              		.global	w25q_write_status_reg
+ 589              		.syntax unified
+ 590              		.thumb
+ 591              		.thumb_func
+ 593              	w25q_write_status_reg:
+ 594              	.LVL43:
+ 595              	.LFB403:
+ 173:../Core/Src/w25q_impl.c **** 
+ 174:../Core/Src/w25q_impl.c **** enum w25q_err w25q_write_status_reg(struct w25q_device *device,
+ 175:../Core/Src/w25q_impl.c ****                                     uint8_t reg_data, uint8_t reg_num) {
+ 596              		.loc 1 175 72 is_stmt 1 view -0
+ 597              		.cfi_startproc
+ 598              		@ args = 0, pretend = 0, frame = 88
+ 599              		@ frame_needed = 0, uses_anonymous_args = 0
+ 600              		.loc 1 175 72 is_stmt 0 view .LVU164
+ 601 0000 30B5     		push	{r4, r5, lr}
+ 602              	.LCFI17:
+ 603              		.cfi_def_cfa_offset 12
+ 604              		.cfi_offset 4, -12
+ 605              		.cfi_offset 5, -8
+ 606              		.cfi_offset 14, -4
+ 607 0002 97B0     		sub	sp, sp, #92
+ 608              	.LCFI18:
+ 609              		.cfi_def_cfa_offset 104
+ 610 0004 0446     		mov	r4, r0
+ 611 0006 1546     		mov	r5, r2
+ 612 0008 8DF80710 		strb	r1, [sp, #7]
+ 176:../Core/Src/w25q_impl.c ****   while (w25q_is_busy(device) == W25Q_ERR_BUSY)
+ 613              		.loc 1 176 3 is_stmt 1 view .LVU165
+ 614              	.LVL44:
+ 615              	.L41:
+ 616              		.loc 1 176 31 discriminator 1 view .LVU166
+ 617              		.loc 1 176 10 is_stmt 0 discriminator 1 view .LVU167
+ 618 000c 2046     		mov	r0, r4
+ 619 000e FFF7FEFF 		bl	w25q_is_busy
+ARM GAS  /tmp/cc5A8HOi.s 			page 15
+
+
+ 620              	.LVL45:
+ 621              		.loc 1 176 31 discriminator 1 view .LVU168
+ 622 0012 0128     		cmp	r0, #1
+ 623 0014 FAD0     		beq	.L41
+ 177:../Core/Src/w25q_impl.c ****     ;
+ 178:../Core/Src/w25q_impl.c **** 
+ 179:../Core/Src/w25q_impl.c ****   enum w25q_err err = w25q_write_enable(device, 1);
+ 624              		.loc 1 179 3 is_stmt 1 view .LVU169
+ 625              		.loc 1 179 23 is_stmt 0 view .LVU170
+ 626 0016 0121     		movs	r1, #1
+ 627 0018 2046     		mov	r0, r4
+ 628 001a FFF7FEFF 		bl	w25q_write_enable
+ 629              	.LVL46:
+ 180:../Core/Src/w25q_impl.c ****   if (err != W25Q_ERR_OK) {
+ 630              		.loc 1 180 3 is_stmt 1 view .LVU171
+ 631              		.loc 1 180 6 is_stmt 0 view .LVU172
+ 632 001e 0446     		mov	r4, r0
+ 633              	.LVL47:
+ 634              		.loc 1 180 6 view .LVU173
+ 635 0020 78BB     		cbnz	r0, .L42
+ 181:../Core/Src/w25q_impl.c ****     return err;
+ 182:../Core/Src/w25q_impl.c ****   }
+ 183:../Core/Src/w25q_impl.c **** 
+ 184:../Core/Src/w25q_impl.c ****   OSPI_RegularCmdTypeDef cmd = {0};
+ 636              		.loc 1 184 3 is_stmt 1 view .LVU174
+ 637              		.loc 1 184 26 is_stmt 0 view .LVU175
+ 638 0022 5022     		movs	r2, #80
+ 639 0024 0021     		movs	r1, #0
+ 640 0026 02A8     		add	r0, sp, #8
+ 641              	.LVL48:
+ 642              		.loc 1 184 26 view .LVU176
+ 643 0028 FFF7FEFF 		bl	memset
+ 644              	.LVL49:
+ 185:../Core/Src/w25q_impl.c **** 
+ 186:../Core/Src/w25q_impl.c ****   cmd.OperationType = HAL_OSPI_OPTYPE_COMMON_CFG;
+ 645              		.loc 1 186 3 is_stmt 1 view .LVU177
+ 187:../Core/Src/w25q_impl.c **** 
+ 188:../Core/Src/w25q_impl.c ****   if (reg_num == 1) {
+ 646              		.loc 1 188 3 view .LVU178
+ 647              		.loc 1 188 6 is_stmt 0 view .LVU179
+ 648 002c 012D     		cmp	r5, #1
+ 649 002e 06D0     		beq	.L50
+ 189:../Core/Src/w25q_impl.c ****     cmd.Instruction = W25Q_WRITE_SR1;
+ 190:../Core/Src/w25q_impl.c ****   } else if (reg_num == 2) {
+ 650              		.loc 1 190 10 is_stmt 1 view .LVU180
+ 651              		.loc 1 190 13 is_stmt 0 view .LVU181
+ 652 0030 022D     		cmp	r5, #2
+ 653 0032 29D0     		beq	.L51
+ 191:../Core/Src/w25q_impl.c ****     cmd.Instruction = W25Q_WRITE_SR2;
+ 192:../Core/Src/w25q_impl.c ****   } else if (reg_num == 3) {
+ 654              		.loc 1 192 10 is_stmt 1 view .LVU182
+ 655              		.loc 1 192 13 is_stmt 0 view .LVU183
+ 656 0034 032D     		cmp	r5, #3
+ 657 0036 2AD1     		bne	.L46
+ 193:../Core/Src/w25q_impl.c ****     cmd.Instruction = W25Q_WRITE_SR3;
+ 658              		.loc 1 193 5 is_stmt 1 view .LVU184
+ 659              		.loc 1 193 21 is_stmt 0 view .LVU185
+ARM GAS  /tmp/cc5A8HOi.s 			page 16
+
+
+ 660 0038 1123     		movs	r3, #17
+ 661 003a 0493     		str	r3, [sp, #16]
+ 662 003c 01E0     		b	.L44
+ 663              	.L50:
+ 189:../Core/Src/w25q_impl.c ****     cmd.Instruction = W25Q_WRITE_SR1;
+ 664              		.loc 1 189 5 is_stmt 1 view .LVU186
+ 189:../Core/Src/w25q_impl.c ****     cmd.Instruction = W25Q_WRITE_SR1;
+ 665              		.loc 1 189 21 is_stmt 0 view .LVU187
+ 666 003e 0123     		movs	r3, #1
+ 667 0040 0493     		str	r3, [sp, #16]
+ 668              	.L44:
+ 194:../Core/Src/w25q_impl.c ****   } else {
+ 195:../Core/Src/w25q_impl.c ****     return W25Q_ERR_PARAM;
+ 196:../Core/Src/w25q_impl.c ****   }
+ 197:../Core/Src/w25q_impl.c **** 
+ 198:../Core/Src/w25q_impl.c ****   cmd.InstructionMode = HAL_OSPI_INSTRUCTION_1_LINE;
+ 669              		.loc 1 198 3 is_stmt 1 view .LVU188
+ 670              		.loc 1 198 23 is_stmt 0 view .LVU189
+ 671 0042 0123     		movs	r3, #1
+ 672 0044 0593     		str	r3, [sp, #20]
+ 199:../Core/Src/w25q_impl.c ****   cmd.InstructionSize = HAL_OSPI_INSTRUCTION_8_BITS;
+ 673              		.loc 1 199 3 is_stmt 1 view .LVU190
+ 200:../Core/Src/w25q_impl.c ****   cmd.InstructionDtrMode = HAL_OSPI_INSTRUCTION_DTR_DISABLE;
+ 674              		.loc 1 200 3 view .LVU191
+ 201:../Core/Src/w25q_impl.c **** 
+ 202:../Core/Src/w25q_impl.c ****   cmd.AddressMode = HAL_OSPI_ADDRESS_NONE;
+ 675              		.loc 1 202 3 view .LVU192
+ 203:../Core/Src/w25q_impl.c **** 
+ 204:../Core/Src/w25q_impl.c ****   cmd.AlternateBytesMode = HAL_OSPI_ALTERNATE_BYTES_NONE;
+ 676              		.loc 1 204 3 view .LVU193
+ 205:../Core/Src/w25q_impl.c **** 
+ 206:../Core/Src/w25q_impl.c ****   cmd.DataMode = HAL_OSPI_DATA_1_LINE;
+ 677              		.loc 1 206 3 view .LVU194
+ 678              		.loc 1 206 16 is_stmt 0 view .LVU195
+ 679 0046 4FF08072 		mov	r2, #16777216
+ 680 004a 1092     		str	r2, [sp, #64]
+ 207:../Core/Src/w25q_impl.c ****   cmd.DataDtrMode = HAL_OSPI_DATA_DTR_DISABLE;
+ 681              		.loc 1 207 3 is_stmt 1 view .LVU196
+ 208:../Core/Src/w25q_impl.c ****   cmd.NbData = 1;
+ 682              		.loc 1 208 3 view .LVU197
+ 683              		.loc 1 208 14 is_stmt 0 view .LVU198
+ 684 004c 1193     		str	r3, [sp, #68]
+ 209:../Core/Src/w25q_impl.c **** 
+ 210:../Core/Src/w25q_impl.c ****   cmd.DummyCycles = 0;
+ 685              		.loc 1 210 3 is_stmt 1 view .LVU199
+ 211:../Core/Src/w25q_impl.c ****   cmd.DQSMode = HAL_OSPI_DQS_DISABLE;
+ 686              		.loc 1 211 3 view .LVU200
+ 212:../Core/Src/w25q_impl.c ****   cmd.SIOOMode = HAL_OSPI_SIOO_INST_EVERY_CMD;
+ 687              		.loc 1 212 3 view .LVU201
+ 213:../Core/Src/w25q_impl.c **** 
+ 214:../Core/Src/w25q_impl.c ****   HAL_GPIO_WritePin(FLASH_CS_GPIO_PORT, FLASH_CS_PIN, GPIO_PIN_RESET);
+ 688              		.loc 1 214 3 view .LVU202
+ 689 004e 0022     		movs	r2, #0
+ 690 0050 4021     		movs	r1, #64
+ 691 0052 1248     		ldr	r0, .L52
+ 692 0054 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 693              	.LVL50:
+ARM GAS  /tmp/cc5A8HOi.s 			page 17
+
+
+ 215:../Core/Src/w25q_impl.c **** 
+ 216:../Core/Src/w25q_impl.c ****   if (HAL_OSPI_Command(&flash_spi, &cmd, HAL_OSPI_TIMEOUT_DEFAULT_VALUE) !=
+ 694              		.loc 1 216 3 view .LVU203
+ 695              		.loc 1 216 7 is_stmt 0 view .LVU204
+ 696 0058 41F28832 		movw	r2, #5000
+ 697 005c 02A9     		add	r1, sp, #8
+ 698 005e 1048     		ldr	r0, .L52+4
+ 699 0060 FFF7FEFF 		bl	HAL_OSPI_Command
+ 700              	.LVL51:
+ 701              		.loc 1 216 6 view .LVU205
+ 702 0064 A8B9     		cbnz	r0, .L47
+ 217:../Core/Src/w25q_impl.c ****       HAL_OK) {
+ 218:../Core/Src/w25q_impl.c ****     return W25Q_ERR_SPI;
+ 219:../Core/Src/w25q_impl.c ****   }
+ 220:../Core/Src/w25q_impl.c **** 
+ 221:../Core/Src/w25q_impl.c ****   if (HAL_OSPI_Transmit(&flash_spi, &reg_data, HAL_OSPI_TIMEOUT_DEFAULT_VALUE) !=
+ 703              		.loc 1 221 3 is_stmt 1 view .LVU206
+ 704              		.loc 1 221 7 is_stmt 0 view .LVU207
+ 705 0066 41F28832 		movw	r2, #5000
+ 706 006a 0DF10701 		add	r1, sp, #7
+ 707 006e 0C48     		ldr	r0, .L52+4
+ 708 0070 FFF7FEFF 		bl	HAL_OSPI_Transmit
+ 709              	.LVL52:
+ 710              		.loc 1 221 6 view .LVU208
+ 711 0074 0446     		mov	r4, r0
+ 712 0076 70B9     		cbnz	r0, .L48
+ 222:../Core/Src/w25q_impl.c ****       HAL_OK) {
+ 223:../Core/Src/w25q_impl.c ****     return W25Q_ERR_SPI;
+ 224:../Core/Src/w25q_impl.c ****   }
+ 225:../Core/Src/w25q_impl.c **** 
+ 226:../Core/Src/w25q_impl.c ****   HAL_GPIO_WritePin(FLASH_CS_GPIO_PORT, FLASH_CS_PIN, GPIO_PIN_SET);
+ 713              		.loc 1 226 3 is_stmt 1 view .LVU209
+ 714 0078 0122     		movs	r2, #1
+ 715 007a 4021     		movs	r1, #64
+ 716 007c 0748     		ldr	r0, .L52
+ 717 007e FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 718              	.LVL53:
+ 227:../Core/Src/w25q_impl.c **** 
+ 228:../Core/Src/w25q_impl.c ****   return W25Q_ERR_OK;
+ 719              		.loc 1 228 3 view .LVU210
+ 720              	.L42:
+ 229:../Core/Src/w25q_impl.c **** }
+ 721              		.loc 1 229 1 is_stmt 0 view .LVU211
+ 722 0082 2046     		mov	r0, r4
+ 723 0084 17B0     		add	sp, sp, #92
+ 724              	.LCFI19:
+ 725              		.cfi_remember_state
+ 726              		.cfi_def_cfa_offset 12
+ 727              		@ sp needed
+ 728 0086 30BD     		pop	{r4, r5, pc}
+ 729              	.L51:
+ 730              	.LCFI20:
+ 731              		.cfi_restore_state
+ 191:../Core/Src/w25q_impl.c ****   } else if (reg_num == 3) {
+ 732              		.loc 1 191 5 is_stmt 1 view .LVU212
+ 191:../Core/Src/w25q_impl.c ****   } else if (reg_num == 3) {
+ 733              		.loc 1 191 21 is_stmt 0 view .LVU213
+ARM GAS  /tmp/cc5A8HOi.s 			page 18
+
+
+ 734 0088 3123     		movs	r3, #49
+ 735 008a 0493     		str	r3, [sp, #16]
+ 736 008c D9E7     		b	.L44
+ 737              	.L46:
+ 195:../Core/Src/w25q_impl.c ****   }
+ 738              		.loc 1 195 12 view .LVU214
+ 739 008e 0224     		movs	r4, #2
+ 740 0090 F7E7     		b	.L42
+ 741              	.L47:
+ 218:../Core/Src/w25q_impl.c ****   }
+ 742              		.loc 1 218 12 view .LVU215
+ 743 0092 0424     		movs	r4, #4
+ 744 0094 F5E7     		b	.L42
+ 745              	.L48:
+ 223:../Core/Src/w25q_impl.c ****   }
+ 746              		.loc 1 223 12 view .LVU216
+ 747 0096 0424     		movs	r4, #4
+ 748 0098 F3E7     		b	.L42
+ 749              	.L53:
+ 750 009a 00BF     		.align	2
+ 751              	.L52:
+ 752 009c 00180258 		.word	1476532224
+ 753 00a0 00000000 		.word	hospi1
+ 754              		.cfi_endproc
+ 755              	.LFE403:
+ 757              		.section	.text.w25q_read_raw,"ax",%progbits
+ 758              		.align	1
+ 759              		.global	w25q_read_raw
+ 760              		.syntax unified
+ 761              		.thumb
+ 762              		.thumb_func
+ 764              	w25q_read_raw:
+ 765              	.LVL54:
+ 766              	.LFB404:
+ 230:../Core/Src/w25q_impl.c **** 
+ 231:../Core/Src/w25q_impl.c **** // enum w25q_err w25q_read_raw(struct w25q_device *device, uint8_t *buf,
+ 232:../Core/Src/w25q_impl.c **** //                             uint32_t len, uint32_t addr) {
+ 233:../Core/Src/w25q_impl.c **** //   if (len > 256 || len == 0) {
+ 234:../Core/Src/w25q_impl.c **** //     return W25Q_ERR_PARAM;
+ 235:../Core/Src/w25q_impl.c **** //   }
+ 236:../Core/Src/w25q_impl.c **** //
+ 237:../Core/Src/w25q_impl.c **** //   while (w25q_is_busy(device) == W25Q_ERR_BUSY);
+ 238:../Core/Src/w25q_impl.c **** //
+ 239:../Core/Src/w25q_impl.c **** //   OSPI_RegularCmdTypeDef cmd = {0};
+ 240:../Core/Src/w25q_impl.c **** //
+ 241:../Core/Src/w25q_impl.c **** //   cmd.OperationType = HAL_OSPI_OPTYPE_COMMON_CFG;
+ 242:../Core/Src/w25q_impl.c **** //
+ 243:../Core/Src/w25q_impl.c **** // #if W25Q_MEM_FLASH_SIZE > 128U
+ 244:../Core/Src/w25q_impl.c **** //
+ 245:../Core/Src/w25q_impl.c **** //   cmd.Instruction = W25Q_READ_DATA_4B;
+ 246:../Core/Src/w25q_impl.c **** //   cmd.AddressSize = HAL_OSPI_ADDRESS_32_BITS;
+ 247:../Core/Src/w25q_impl.c **** //
+ 248:../Core/Src/w25q_impl.c **** // #else
+ 249:../Core/Src/w25q_impl.c **** //
+ 250:../Core/Src/w25q_impl.c **** //   cmd.Instruction = W25Q_READ_DATA;
+ 251:../Core/Src/w25q_impl.c **** //   cmd.AddressSize = HAL_OSPI_ADDRESS_24_BITS;
+ 252:../Core/Src/w25q_impl.c **** //
+ARM GAS  /tmp/cc5A8HOi.s 			page 19
+
+
+ 253:../Core/Src/w25q_impl.c **** // #endif
+ 254:../Core/Src/w25q_impl.c **** //
+ 255:../Core/Src/w25q_impl.c **** //   cmd.InstructionMode = HAL_OSPI_INSTRUCTION_1_LINE;
+ 256:../Core/Src/w25q_impl.c **** //   cmd.InstructionSize = HAL_OSPI_INSTRUCTION_8_BITS;
+ 257:../Core/Src/w25q_impl.c **** //   cmd.InstructionDtrMode = HAL_OSPI_INSTRUCTION_DTR_DISABLE;
+ 258:../Core/Src/w25q_impl.c **** //
+ 259:../Core/Src/w25q_impl.c **** //   cmd.Address = addr;
+ 260:../Core/Src/w25q_impl.c **** //   cmd.AddressMode = HAL_OSPI_ADDRESS_1_LINE;
+ 261:../Core/Src/w25q_impl.c **** //   cmd.AddressDtrMode = HAL_OSPI_ADDRESS_DTR_DISABLE;
+ 262:../Core/Src/w25q_impl.c **** //
+ 263:../Core/Src/w25q_impl.c **** //   cmd.AlternateBytesMode = HAL_OSPI_ALTERNATE_BYTES_NONE;
+ 264:../Core/Src/w25q_impl.c **** //
+ 265:../Core/Src/w25q_impl.c **** //   cmd.DataMode = HAL_OSPI_DATA_1_LINE;
+ 266:../Core/Src/w25q_impl.c **** //   cmd.DataDtrMode = HAL_OSPI_DATA_DTR_DISABLE;
+ 267:../Core/Src/w25q_impl.c **** //   cmd.NbData = len;
+ 268:../Core/Src/w25q_impl.c **** //
+ 269:../Core/Src/w25q_impl.c **** //   cmd.DummyCycles = 0;
+ 270:../Core/Src/w25q_impl.c **** //   cmd.DQSMode = HAL_OSPI_DQS_DISABLE;
+ 271:../Core/Src/w25q_impl.c **** //   cmd.SIOOMode = HAL_OSPI_SIOO_INST_EVERY_CMD;
+ 272:../Core/Src/w25q_impl.c **** //
+ 273:../Core/Src/w25q_impl.c **** //   if (HAL_OSPI_Command(&flash_spi, &cmd, HAL_OSPI_TIMEOUT_DEFAULT_VALUE) !=
+ 274:../Core/Src/w25q_impl.c **** //       HAL_OK) {
+ 275:../Core/Src/w25q_impl.c **** //     return W25Q_ERR_SPI;
+ 276:../Core/Src/w25q_impl.c **** //   }
+ 277:../Core/Src/w25q_impl.c **** //
+ 278:../Core/Src/w25q_impl.c **** //   if (HAL_OSPI_Receive(&flash_spi, buf, HAL_OSPI_TIMEOUT_DEFAULT_VALUE) !=
+ 279:../Core/Src/w25q_impl.c **** //       HAL_OK) {
+ 280:../Core/Src/w25q_impl.c **** //     return W25Q_ERR_SPI;
+ 281:../Core/Src/w25q_impl.c **** //   }
+ 282:../Core/Src/w25q_impl.c **** //
+ 283:../Core/Src/w25q_impl.c **** //   return W25Q_ERR_OK;
+ 284:../Core/Src/w25q_impl.c **** //
+ 285:../Core/Src/w25q_impl.c **** //
+ 286:../Core/Src/w25q_impl.c **** // }
+ 287:../Core/Src/w25q_impl.c **** 
+ 288:../Core/Src/w25q_impl.c **** enum w25q_err w25q_read_raw(struct w25q_device *device, uint8_t *buf,
+ 289:../Core/Src/w25q_impl.c ****                             uint32_t len, uint32_t addr) {
+ 767              		.loc 1 289 58 is_stmt 1 view -0
+ 768              		.cfi_startproc
+ 769              		@ args = 0, pretend = 0, frame = 80
+ 770              		@ frame_needed = 0, uses_anonymous_args = 0
+ 771              		.loc 1 289 58 is_stmt 0 view .LVU218
+ 772 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+ 773              	.LCFI21:
+ 774              		.cfi_def_cfa_offset 20
+ 775              		.cfi_offset 4, -20
+ 776              		.cfi_offset 5, -16
+ 777              		.cfi_offset 6, -12
+ 778              		.cfi_offset 7, -8
+ 779              		.cfi_offset 14, -4
+ 780 0002 95B0     		sub	sp, sp, #84
+ 781              	.LCFI22:
+ 782              		.cfi_def_cfa_offset 104
+ 783 0004 0446     		mov	r4, r0
+ 784 0006 0F46     		mov	r7, r1
+ 785 0008 1546     		mov	r5, r2
+ 786 000a 1E46     		mov	r6, r3
+ARM GAS  /tmp/cc5A8HOi.s 			page 20
+
+
+ 290:../Core/Src/w25q_impl.c ****   if (len > 256 || len == 0) {
+ 787              		.loc 1 290 3 is_stmt 1 view .LVU219
+ 788              		.loc 1 290 17 is_stmt 0 view .LVU220
+ 789 000c 013A     		subs	r2, r2, #1
+ 790              	.LVL55:
+ 791              		.loc 1 290 6 view .LVU221
+ 792 000e FF2A     		cmp	r2, #255
+ 793 0010 36D8     		bhi	.L57
+ 794              	.LVL56:
+ 795              	.L56:
+ 291:../Core/Src/w25q_impl.c ****     return W25Q_ERR_PARAM;
+ 292:../Core/Src/w25q_impl.c ****   }
+ 293:../Core/Src/w25q_impl.c **** 
+ 294:../Core/Src/w25q_impl.c ****   while (w25q_is_busy(device) == W25Q_ERR_BUSY)
+ 796              		.loc 1 294 31 is_stmt 1 discriminator 1 view .LVU222
+ 797              		.loc 1 294 10 is_stmt 0 discriminator 1 view .LVU223
+ 798 0012 2046     		mov	r0, r4
+ 799 0014 FFF7FEFF 		bl	w25q_is_busy
+ 800              	.LVL57:
+ 801              		.loc 1 294 31 discriminator 1 view .LVU224
+ 802 0018 0128     		cmp	r0, #1
+ 803 001a FAD0     		beq	.L56
+ 295:../Core/Src/w25q_impl.c ****     ;
+ 296:../Core/Src/w25q_impl.c **** 
+ 297:../Core/Src/w25q_impl.c ****   OSPI_RegularCmdTypeDef cmd = {0};
+ 804              		.loc 1 297 3 is_stmt 1 view .LVU225
+ 805              		.loc 1 297 26 is_stmt 0 view .LVU226
+ 806 001c 5022     		movs	r2, #80
+ 807 001e 0021     		movs	r1, #0
+ 808 0020 6846     		mov	r0, sp
+ 809 0022 FFF7FEFF 		bl	memset
+ 810              	.LVL58:
+ 298:../Core/Src/w25q_impl.c **** 
+ 299:../Core/Src/w25q_impl.c ****   cmd.OperationType = HAL_OSPI_OPTYPE_COMMON_CFG;
+ 811              		.loc 1 299 3 is_stmt 1 view .LVU227
+ 300:../Core/Src/w25q_impl.c **** 
+ 301:../Core/Src/w25q_impl.c **** #if W25Q_MEM_FLASH_SIZE > 128U
+ 302:../Core/Src/w25q_impl.c **** 
+ 303:../Core/Src/w25q_impl.c ****   cmd.Instruction = W25Q_FAST_READ_QUAD_IO_4B;
+ 304:../Core/Src/w25q_impl.c ****   cmd.AddressSize = HAL_OSPI_ADDRESS_32_BITS;
+ 305:../Core/Src/w25q_impl.c **** 
+ 306:../Core/Src/w25q_impl.c **** #else
+ 307:../Core/Src/w25q_impl.c **** 
+ 308:../Core/Src/w25q_impl.c ****   cmd.Instruction = W25Q_FAST_READ_QUAD_IO;
+ 812              		.loc 1 308 3 view .LVU228
+ 813              		.loc 1 308 19 is_stmt 0 view .LVU229
+ 814 0026 EB23     		movs	r3, #235
+ 815 0028 0293     		str	r3, [sp, #8]
+ 309:../Core/Src/w25q_impl.c ****   cmd.AddressSize = HAL_OSPI_ADDRESS_24_BITS;
+ 816              		.loc 1 309 3 is_stmt 1 view .LVU230
+ 817              		.loc 1 309 19 is_stmt 0 view .LVU231
+ 818 002a 4FF40053 		mov	r3, #8192
+ 819 002e 0893     		str	r3, [sp, #32]
+ 310:../Core/Src/w25q_impl.c **** 
+ 311:../Core/Src/w25q_impl.c **** #endif
+ 312:../Core/Src/w25q_impl.c **** 
+ 313:../Core/Src/w25q_impl.c ****   cmd.InstructionMode = HAL_OSPI_INSTRUCTION_1_LINE;
+ARM GAS  /tmp/cc5A8HOi.s 			page 21
+
+
+ 820              		.loc 1 313 3 is_stmt 1 view .LVU232
+ 821              		.loc 1 313 23 is_stmt 0 view .LVU233
+ 822 0030 0123     		movs	r3, #1
+ 823 0032 0393     		str	r3, [sp, #12]
+ 314:../Core/Src/w25q_impl.c ****   cmd.InstructionSize = HAL_OSPI_INSTRUCTION_8_BITS;
+ 824              		.loc 1 314 3 is_stmt 1 view .LVU234
+ 315:../Core/Src/w25q_impl.c ****   cmd.InstructionDtrMode = HAL_OSPI_INSTRUCTION_DTR_DISABLE;
+ 825              		.loc 1 315 3 view .LVU235
+ 316:../Core/Src/w25q_impl.c **** 
+ 317:../Core/Src/w25q_impl.c ****   cmd.Address = addr;
+ 826              		.loc 1 317 3 view .LVU236
+ 827              		.loc 1 317 15 is_stmt 0 view .LVU237
+ 828 0034 0696     		str	r6, [sp, #24]
+ 318:../Core/Src/w25q_impl.c ****   cmd.AddressMode = HAL_OSPI_ADDRESS_4_LINES;
+ 829              		.loc 1 318 3 is_stmt 1 view .LVU238
+ 830              		.loc 1 318 19 is_stmt 0 view .LVU239
+ 831 0036 4FF44073 		mov	r3, #768
+ 832 003a 0793     		str	r3, [sp, #28]
+ 319:../Core/Src/w25q_impl.c ****   cmd.AddressDtrMode = HAL_OSPI_ADDRESS_DTR_DISABLE;
+ 833              		.loc 1 319 3 is_stmt 1 view .LVU240
+ 320:../Core/Src/w25q_impl.c **** 
+ 321:../Core/Src/w25q_impl.c ****   cmd.AlternateBytesMode = HAL_OSPI_ALTERNATE_BYTES_NONE;
+ 834              		.loc 1 321 3 view .LVU241
+ 322:../Core/Src/w25q_impl.c **** 
+ 323:../Core/Src/w25q_impl.c ****   cmd.DataMode = HAL_OSPI_DATA_4_LINES;
+ 835              		.loc 1 323 3 view .LVU242
+ 836              		.loc 1 323 16 is_stmt 0 view .LVU243
+ 837 003c 4FF04073 		mov	r3, #50331648
+ 838 0040 0E93     		str	r3, [sp, #56]
+ 324:../Core/Src/w25q_impl.c ****   cmd.DataDtrMode = HAL_OSPI_DATA_DTR_DISABLE;
+ 839              		.loc 1 324 3 is_stmt 1 view .LVU244
+ 325:../Core/Src/w25q_impl.c ****   cmd.NbData = len;
+ 840              		.loc 1 325 3 view .LVU245
+ 841              		.loc 1 325 14 is_stmt 0 view .LVU246
+ 842 0042 0F95     		str	r5, [sp, #60]
+ 326:../Core/Src/w25q_impl.c **** 
+ 327:../Core/Src/w25q_impl.c ****   cmd.DummyCycles = 6;
+ 843              		.loc 1 327 3 is_stmt 1 view .LVU247
+ 844              		.loc 1 327 19 is_stmt 0 view .LVU248
+ 845 0044 0623     		movs	r3, #6
+ 846 0046 1193     		str	r3, [sp, #68]
+ 328:../Core/Src/w25q_impl.c ****   cmd.DQSMode = HAL_OSPI_DQS_DISABLE;
+ 847              		.loc 1 328 3 is_stmt 1 view .LVU249
+ 329:../Core/Src/w25q_impl.c ****   cmd.SIOOMode = HAL_OSPI_SIOO_INST_EVERY_CMD;
+ 848              		.loc 1 329 3 view .LVU250
+ 330:../Core/Src/w25q_impl.c **** 
+ 331:../Core/Src/w25q_impl.c ****   HAL_GPIO_WritePin(FLASH_CS_GPIO_PORT, FLASH_CS_PIN, GPIO_PIN_RESET);
+ 849              		.loc 1 331 3 view .LVU251
+ 850 0048 0022     		movs	r2, #0
+ 851 004a 4021     		movs	r1, #64
+ 852 004c 0F48     		ldr	r0, .L61
+ 853 004e FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 854              	.LVL59:
+ 332:../Core/Src/w25q_impl.c **** 
+ 333:../Core/Src/w25q_impl.c ****   if (HAL_OSPI_Command(&flash_spi, &cmd, HAL_OSPI_TIMEOUT_DEFAULT_VALUE) !=
+ 855              		.loc 1 333 3 view .LVU252
+ 856              		.loc 1 333 7 is_stmt 0 view .LVU253
+ARM GAS  /tmp/cc5A8HOi.s 			page 22
+
+
+ 857 0052 41F28832 		movw	r2, #5000
+ 858 0056 6946     		mov	r1, sp
+ 859 0058 0D48     		ldr	r0, .L61+4
+ 860 005a FFF7FEFF 		bl	HAL_OSPI_Command
+ 861              	.LVL60:
+ 862              		.loc 1 333 6 view .LVU254
+ 863 005e 88B9     		cbnz	r0, .L58
+ 334:../Core/Src/w25q_impl.c ****       HAL_OK) {
+ 335:../Core/Src/w25q_impl.c ****     return W25Q_ERR_SPI;
+ 336:../Core/Src/w25q_impl.c ****   }
+ 337:../Core/Src/w25q_impl.c **** 
+ 338:../Core/Src/w25q_impl.c ****   if (HAL_OSPI_Receive(&flash_spi, buf, HAL_OSPI_TIMEOUT_DEFAULT_VALUE) !=
+ 864              		.loc 1 338 3 is_stmt 1 view .LVU255
+ 865              		.loc 1 338 7 is_stmt 0 view .LVU256
+ 866 0060 41F28832 		movw	r2, #5000
+ 867 0064 3946     		mov	r1, r7
+ 868 0066 0A48     		ldr	r0, .L61+4
+ 869 0068 FFF7FEFF 		bl	HAL_OSPI_Receive
+ 870              	.LVL61:
+ 871              		.loc 1 338 6 view .LVU257
+ 872 006c 0446     		mov	r4, r0
+ 873              	.LVL62:
+ 874              		.loc 1 338 6 view .LVU258
+ 875 006e 58B9     		cbnz	r0, .L59
+ 339:../Core/Src/w25q_impl.c ****       HAL_OK) {
+ 340:../Core/Src/w25q_impl.c ****     return W25Q_ERR_SPI;
+ 341:../Core/Src/w25q_impl.c ****   }
+ 342:../Core/Src/w25q_impl.c **** 
+ 343:../Core/Src/w25q_impl.c ****     HAL_GPIO_WritePin(FLASH_CS_GPIO_PORT, FLASH_CS_PIN, GPIO_PIN_SET);
+ 876              		.loc 1 343 5 is_stmt 1 view .LVU259
+ 877 0070 0122     		movs	r2, #1
+ 878 0072 4021     		movs	r1, #64
+ 879 0074 0548     		ldr	r0, .L61
+ 880 0076 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 881              	.LVL63:
+ 344:../Core/Src/w25q_impl.c **** 
+ 345:../Core/Src/w25q_impl.c ****   return W25Q_ERR_OK;
+ 882              		.loc 1 345 3 view .LVU260
+ 883              	.L55:
+ 346:../Core/Src/w25q_impl.c **** }
+ 884              		.loc 1 346 1 is_stmt 0 view .LVU261
+ 885 007a 2046     		mov	r0, r4
+ 886 007c 15B0     		add	sp, sp, #84
+ 887              	.LCFI23:
+ 888              		.cfi_remember_state
+ 889              		.cfi_def_cfa_offset 20
+ 890              		@ sp needed
+ 891 007e F0BD     		pop	{r4, r5, r6, r7, pc}
+ 892              	.LVL64:
+ 893              	.L57:
+ 894              	.LCFI24:
+ 895              		.cfi_restore_state
+ 291:../Core/Src/w25q_impl.c ****   }
+ 896              		.loc 1 291 12 view .LVU262
+ 897 0080 0224     		movs	r4, #2
+ 898 0082 FAE7     		b	.L55
+ 899              	.LVL65:
+ARM GAS  /tmp/cc5A8HOi.s 			page 23
+
+
+ 900              	.L58:
+ 335:../Core/Src/w25q_impl.c ****   }
+ 901              		.loc 1 335 12 view .LVU263
+ 902 0084 0424     		movs	r4, #4
+ 903              	.LVL66:
+ 335:../Core/Src/w25q_impl.c ****   }
+ 904              		.loc 1 335 12 view .LVU264
+ 905 0086 F8E7     		b	.L55
+ 906              	.L59:
+ 340:../Core/Src/w25q_impl.c ****   }
+ 907              		.loc 1 340 12 view .LVU265
+ 908 0088 0424     		movs	r4, #4
+ 909 008a F6E7     		b	.L55
+ 910              	.L62:
+ 911              		.align	2
+ 912              	.L61:
+ 913 008c 00180258 		.word	1476532224
+ 914 0090 00000000 		.word	hospi1
+ 915              		.cfi_endproc
+ 916              	.LFE404:
+ 918              		.section	.text.w25q_write_raw,"ax",%progbits
+ 919              		.align	1
+ 920              		.global	w25q_write_raw
+ 921              		.syntax unified
+ 922              		.thumb
+ 923              		.thumb_func
+ 925              	w25q_write_raw:
+ 926              	.LVL67:
+ 927              	.LFB405:
+ 347:../Core/Src/w25q_impl.c **** 
+ 348:../Core/Src/w25q_impl.c **** // enum w25q_err w25q_write_raw(struct w25q_device *device, uint8_t *buf,
+ 349:../Core/Src/w25q_impl.c **** //                              uint32_t len, uint32_t addr) {
+ 350:../Core/Src/w25q_impl.c **** //   if (len > 256 || len == 0) {
+ 351:../Core/Src/w25q_impl.c **** //     return W25Q_ERR_PARAM;
+ 352:../Core/Src/w25q_impl.c **** //   }
+ 353:../Core/Src/w25q_impl.c **** //
+ 354:../Core/Src/w25q_impl.c **** //   while (w25q_is_busy(device) == W25Q_ERR_BUSY);
+ 355:../Core/Src/w25q_impl.c **** //
+ 356:../Core/Src/w25q_impl.c **** //   enum w25q_err err = w25q_write_enable(device, 1);
+ 357:../Core/Src/w25q_impl.c **** //   if (err != W25Q_ERR_OK) {
+ 358:../Core/Src/w25q_impl.c **** //     return err;
+ 359:../Core/Src/w25q_impl.c **** //   }
+ 360:../Core/Src/w25q_impl.c **** //
+ 361:../Core/Src/w25q_impl.c **** //   OSPI_RegularCmdTypeDef cmd = {0};
+ 362:../Core/Src/w25q_impl.c **** //
+ 363:../Core/Src/w25q_impl.c **** //   cmd.OperationType = HAL_OSPI_OPTYPE_COMMON_CFG;
+ 364:../Core/Src/w25q_impl.c **** //
+ 365:../Core/Src/w25q_impl.c **** // #if W25Q_MEM_FLASH_SIZE > 128U
+ 366:../Core/Src/w25q_impl.c **** //
+ 367:../Core/Src/w25q_impl.c **** //   cmd.Instruction = W25Q_PAGE_PROGRAM_4B;
+ 368:../Core/Src/w25q_impl.c **** //   cmd.AddressSize = HAL_OSPI_ADDRESS_32_BITS;
+ 369:../Core/Src/w25q_impl.c **** //
+ 370:../Core/Src/w25q_impl.c **** // #else
+ 371:../Core/Src/w25q_impl.c **** //
+ 372:../Core/Src/w25q_impl.c **** //   cmd.Instruction = W25Q_PAGE_PROGRAM;
+ 373:../Core/Src/w25q_impl.c **** //   cmd.AddressSize = HAL_OSPI_ADDRESS_24_BITS;
+ 374:../Core/Src/w25q_impl.c **** //
+ARM GAS  /tmp/cc5A8HOi.s 			page 24
+
+
+ 375:../Core/Src/w25q_impl.c **** // #endif
+ 376:../Core/Src/w25q_impl.c **** //
+ 377:../Core/Src/w25q_impl.c **** //   cmd.InstructionMode = HAL_OSPI_INSTRUCTION_1_LINE;
+ 378:../Core/Src/w25q_impl.c **** //   cmd.InstructionSize = HAL_OSPI_INSTRUCTION_8_BITS;
+ 379:../Core/Src/w25q_impl.c **** //   cmd.InstructionDtrMode = HAL_OSPI_INSTRUCTION_DTR_DISABLE;
+ 380:../Core/Src/w25q_impl.c **** //
+ 381:../Core/Src/w25q_impl.c **** //   cmd.Address = addr;
+ 382:../Core/Src/w25q_impl.c **** //   cmd.AddressMode = HAL_OSPI_ADDRESS_1_LINE;
+ 383:../Core/Src/w25q_impl.c **** //   cmd.AddressDtrMode = HAL_OSPI_ADDRESS_DTR_DISABLE;
+ 384:../Core/Src/w25q_impl.c **** //
+ 385:../Core/Src/w25q_impl.c **** //   cmd.AlternateBytesMode = HAL_OSPI_ALTERNATE_BYTES_NONE;
+ 386:../Core/Src/w25q_impl.c **** //
+ 387:../Core/Src/w25q_impl.c **** //   cmd.DataMode = HAL_OSPI_DATA_1_LINE;
+ 388:../Core/Src/w25q_impl.c **** //   cmd.DataDtrMode = HAL_OSPI_DATA_DTR_DISABLE;
+ 389:../Core/Src/w25q_impl.c **** //   cmd.NbData = len;
+ 390:../Core/Src/w25q_impl.c **** //
+ 391:../Core/Src/w25q_impl.c **** //   cmd.DummyCycles = 0;
+ 392:../Core/Src/w25q_impl.c **** //   cmd.DQSMode = HAL_OSPI_DQS_DISABLE;
+ 393:../Core/Src/w25q_impl.c **** //   cmd.SIOOMode = HAL_OSPI_SIOO_INST_EVERY_CMD;
+ 394:../Core/Src/w25q_impl.c **** //
+ 395:../Core/Src/w25q_impl.c **** //   if (HAL_OSPI_Command(&flash_spi, &cmd, HAL_OSPI_TIMEOUT_DEFAULT_VALUE) !=
+ 396:../Core/Src/w25q_impl.c **** //       HAL_OK) {
+ 397:../Core/Src/w25q_impl.c **** //     return W25Q_ERR_SPI;
+ 398:../Core/Src/w25q_impl.c **** //   }
+ 399:../Core/Src/w25q_impl.c **** //
+ 400:../Core/Src/w25q_impl.c **** //   if (HAL_OSPI_Transmit(&flash_spi, buf, HAL_OSPI_TIMEOUT_DEFAULT_VALUE) !=
+ 401:../Core/Src/w25q_impl.c **** //       HAL_OK) {
+ 402:../Core/Src/w25q_impl.c **** //     return W25Q_ERR_SPI;
+ 403:../Core/Src/w25q_impl.c **** //   }
+ 404:../Core/Src/w25q_impl.c **** //
+ 405:../Core/Src/w25q_impl.c **** //   return W25Q_ERR_OK;
+ 406:../Core/Src/w25q_impl.c **** // }
+ 407:../Core/Src/w25q_impl.c **** 
+ 408:../Core/Src/w25q_impl.c **** enum w25q_err w25q_write_raw(struct w25q_device *device, uint8_t *buf,
+ 409:../Core/Src/w25q_impl.c ****                              uint32_t len, uint32_t addr) {
+ 928              		.loc 1 409 59 is_stmt 1 view -0
+ 929              		.cfi_startproc
+ 930              		@ args = 0, pretend = 0, frame = 80
+ 931              		@ frame_needed = 0, uses_anonymous_args = 0
+ 932              		.loc 1 409 59 is_stmt 0 view .LVU267
+ 933 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+ 934              	.LCFI25:
+ 935              		.cfi_def_cfa_offset 20
+ 936              		.cfi_offset 4, -20
+ 937              		.cfi_offset 5, -16
+ 938              		.cfi_offset 6, -12
+ 939              		.cfi_offset 7, -8
+ 940              		.cfi_offset 14, -4
+ 941 0002 95B0     		sub	sp, sp, #84
+ 942              	.LCFI26:
+ 943              		.cfi_def_cfa_offset 104
+ 944 0004 0446     		mov	r4, r0
+ 945 0006 0E46     		mov	r6, r1
+ 946 0008 1546     		mov	r5, r2
+ 947 000a 1F46     		mov	r7, r3
+ 410:../Core/Src/w25q_impl.c ****   if (len > 256 || len == 0) {
+ 948              		.loc 1 410 3 is_stmt 1 view .LVU268
+ARM GAS  /tmp/cc5A8HOi.s 			page 25
+
+
+ 949              		.loc 1 410 17 is_stmt 0 view .LVU269
+ 950 000c 013A     		subs	r2, r2, #1
+ 951              	.LVL68:
+ 952              		.loc 1 410 6 view .LVU270
+ 953 000e FF2A     		cmp	r2, #255
+ 954 0010 3BD8     		bhi	.L66
+ 955              	.LVL69:
+ 956              	.L65:
+ 411:../Core/Src/w25q_impl.c ****     return W25Q_ERR_PARAM;
+ 412:../Core/Src/w25q_impl.c ****   }
+ 413:../Core/Src/w25q_impl.c **** 
+ 414:../Core/Src/w25q_impl.c ****   while (w25q_is_busy(device) == W25Q_ERR_BUSY)
+ 957              		.loc 1 414 31 is_stmt 1 discriminator 1 view .LVU271
+ 958              		.loc 1 414 10 is_stmt 0 discriminator 1 view .LVU272
+ 959 0012 2046     		mov	r0, r4
+ 960 0014 FFF7FEFF 		bl	w25q_is_busy
+ 961              	.LVL70:
+ 962              		.loc 1 414 31 discriminator 1 view .LVU273
+ 963 0018 0128     		cmp	r0, #1
+ 964 001a FAD0     		beq	.L65
+ 415:../Core/Src/w25q_impl.c ****     ;
+ 416:../Core/Src/w25q_impl.c **** 
+ 417:../Core/Src/w25q_impl.c ****   enum w25q_err err = w25q_write_enable(device, 1);
+ 965              		.loc 1 417 3 is_stmt 1 view .LVU274
+ 966              		.loc 1 417 23 is_stmt 0 view .LVU275
+ 967 001c 0121     		movs	r1, #1
+ 968 001e 2046     		mov	r0, r4
+ 969 0020 FFF7FEFF 		bl	w25q_write_enable
+ 970              	.LVL71:
+ 418:../Core/Src/w25q_impl.c ****   if (err != W25Q_ERR_OK) {
+ 971              		.loc 1 418 3 is_stmt 1 view .LVU276
+ 972              		.loc 1 418 6 is_stmt 0 view .LVU277
+ 973 0024 0446     		mov	r4, r0
+ 974              	.LVL72:
+ 975              		.loc 1 418 6 view .LVU278
+ 976 0026 10B1     		cbz	r0, .L70
+ 977              	.LVL73:
+ 978              	.L64:
+ 419:../Core/Src/w25q_impl.c ****     return err;
+ 420:../Core/Src/w25q_impl.c ****   }
+ 421:../Core/Src/w25q_impl.c **** 
+ 422:../Core/Src/w25q_impl.c ****   OSPI_RegularCmdTypeDef cmd = {0};
+ 423:../Core/Src/w25q_impl.c **** 
+ 424:../Core/Src/w25q_impl.c ****   cmd.OperationType = HAL_OSPI_OPTYPE_COMMON_CFG;
+ 425:../Core/Src/w25q_impl.c **** 
+ 426:../Core/Src/w25q_impl.c **** #if W25Q_MEM_FLASH_SIZE > 128U
+ 427:../Core/Src/w25q_impl.c **** 
+ 428:../Core/Src/w25q_impl.c ****   cmd.Instruction = W25Q_PAGE_PROGRAM_QUAD_INP_4B;
+ 429:../Core/Src/w25q_impl.c ****   cmd.AddressSize = HAL_OSPI_ADDRESS_32_BITS;
+ 430:../Core/Src/w25q_impl.c **** 
+ 431:../Core/Src/w25q_impl.c **** #else
+ 432:../Core/Src/w25q_impl.c **** 
+ 433:../Core/Src/w25q_impl.c ****   cmd.Instruction = W25Q_PAGE_PROGRAM_QUAD_INP;
+ 434:../Core/Src/w25q_impl.c ****   cmd.AddressSize = HAL_OSPI_ADDRESS_24_BITS;
+ 435:../Core/Src/w25q_impl.c **** 
+ 436:../Core/Src/w25q_impl.c **** #endif
+ 437:../Core/Src/w25q_impl.c **** 
+ARM GAS  /tmp/cc5A8HOi.s 			page 26
+
+
+ 438:../Core/Src/w25q_impl.c ****   cmd.InstructionMode = HAL_OSPI_INSTRUCTION_1_LINE;
+ 439:../Core/Src/w25q_impl.c ****   cmd.InstructionSize = HAL_OSPI_INSTRUCTION_8_BITS;
+ 440:../Core/Src/w25q_impl.c ****   cmd.InstructionDtrMode = HAL_OSPI_INSTRUCTION_DTR_DISABLE;
+ 441:../Core/Src/w25q_impl.c **** 
+ 442:../Core/Src/w25q_impl.c ****   cmd.Address = addr;
+ 443:../Core/Src/w25q_impl.c ****   cmd.AddressMode = HAL_OSPI_ADDRESS_1_LINE;
+ 444:../Core/Src/w25q_impl.c ****   cmd.AddressDtrMode = HAL_OSPI_ADDRESS_DTR_DISABLE;
+ 445:../Core/Src/w25q_impl.c **** 
+ 446:../Core/Src/w25q_impl.c ****   cmd.AlternateBytesMode = HAL_OSPI_ALTERNATE_BYTES_NONE;
+ 447:../Core/Src/w25q_impl.c **** 
+ 448:../Core/Src/w25q_impl.c ****   cmd.DataMode = HAL_OSPI_DATA_4_LINES;
+ 449:../Core/Src/w25q_impl.c ****   cmd.DataDtrMode = HAL_OSPI_DATA_DTR_DISABLE;
+ 450:../Core/Src/w25q_impl.c ****   cmd.NbData = len;
+ 451:../Core/Src/w25q_impl.c **** 
+ 452:../Core/Src/w25q_impl.c ****   cmd.DummyCycles = 0;
+ 453:../Core/Src/w25q_impl.c ****   cmd.DQSMode = HAL_OSPI_DQS_DISABLE;
+ 454:../Core/Src/w25q_impl.c ****   cmd.SIOOMode = HAL_OSPI_SIOO_INST_EVERY_CMD;
+ 455:../Core/Src/w25q_impl.c **** 
+ 456:../Core/Src/w25q_impl.c ****   HAL_GPIO_WritePin(FLASH_CS_GPIO_PORT, FLASH_CS_PIN, GPIO_PIN_RESET);
+ 457:../Core/Src/w25q_impl.c **** 
+ 458:../Core/Src/w25q_impl.c ****   if (HAL_OSPI_Command(&flash_spi, &cmd, HAL_OSPI_TIMEOUT_DEFAULT_VALUE) !=
+ 459:../Core/Src/w25q_impl.c ****       HAL_OK) {
+ 460:../Core/Src/w25q_impl.c ****     return W25Q_ERR_SPI;
+ 461:../Core/Src/w25q_impl.c ****   }
+ 462:../Core/Src/w25q_impl.c **** 
+ 463:../Core/Src/w25q_impl.c ****   if (HAL_OSPI_Transmit(&flash_spi, buf, HAL_OSPI_TIMEOUT_DEFAULT_VALUE) !=
+ 464:../Core/Src/w25q_impl.c ****       HAL_OK) {
+ 465:../Core/Src/w25q_impl.c ****     return W25Q_ERR_SPI;
+ 466:../Core/Src/w25q_impl.c ****   }
+ 467:../Core/Src/w25q_impl.c **** 
+ 468:../Core/Src/w25q_impl.c ****   HAL_GPIO_WritePin(FLASH_CS_GPIO_PORT, FLASH_CS_PIN, GPIO_PIN_SET);
+ 469:../Core/Src/w25q_impl.c **** 
+ 470:../Core/Src/w25q_impl.c ****   return W25Q_ERR_OK;
+ 471:../Core/Src/w25q_impl.c **** }
+ 979              		.loc 1 471 1 view .LVU279
+ 980 0028 2046     		mov	r0, r4
+ 981 002a 15B0     		add	sp, sp, #84
+ 982              	.LCFI27:
+ 983              		.cfi_remember_state
+ 984              		.cfi_def_cfa_offset 20
+ 985              		@ sp needed
+ 986 002c F0BD     		pop	{r4, r5, r6, r7, pc}
+ 987              	.LVL74:
+ 988              	.L70:
+ 989              	.LCFI28:
+ 990              		.cfi_restore_state
+ 422:../Core/Src/w25q_impl.c **** 
+ 991              		.loc 1 422 3 is_stmt 1 view .LVU280
+ 422:../Core/Src/w25q_impl.c **** 
+ 992              		.loc 1 422 26 is_stmt 0 view .LVU281
+ 993 002e 5022     		movs	r2, #80
+ 994 0030 0021     		movs	r1, #0
+ 995 0032 6846     		mov	r0, sp
+ 996              	.LVL75:
+ 422:../Core/Src/w25q_impl.c **** 
+ 997              		.loc 1 422 26 view .LVU282
+ 998 0034 FFF7FEFF 		bl	memset
+ARM GAS  /tmp/cc5A8HOi.s 			page 27
+
+
+ 999              	.LVL76:
+ 424:../Core/Src/w25q_impl.c **** 
+ 1000              		.loc 1 424 3 is_stmt 1 view .LVU283
+ 433:../Core/Src/w25q_impl.c ****   cmd.AddressSize = HAL_OSPI_ADDRESS_24_BITS;
+ 1001              		.loc 1 433 3 view .LVU284
+ 433:../Core/Src/w25q_impl.c ****   cmd.AddressSize = HAL_OSPI_ADDRESS_24_BITS;
+ 1002              		.loc 1 433 19 is_stmt 0 view .LVU285
+ 1003 0038 3223     		movs	r3, #50
+ 1004 003a 0293     		str	r3, [sp, #8]
+ 434:../Core/Src/w25q_impl.c **** 
+ 1005              		.loc 1 434 3 is_stmt 1 view .LVU286
+ 434:../Core/Src/w25q_impl.c **** 
+ 1006              		.loc 1 434 19 is_stmt 0 view .LVU287
+ 1007 003c 4FF40053 		mov	r3, #8192
+ 1008 0040 0893     		str	r3, [sp, #32]
+ 438:../Core/Src/w25q_impl.c ****   cmd.InstructionSize = HAL_OSPI_INSTRUCTION_8_BITS;
+ 1009              		.loc 1 438 3 is_stmt 1 view .LVU288
+ 438:../Core/Src/w25q_impl.c ****   cmd.InstructionSize = HAL_OSPI_INSTRUCTION_8_BITS;
+ 1010              		.loc 1 438 23 is_stmt 0 view .LVU289
+ 1011 0042 0123     		movs	r3, #1
+ 1012 0044 0393     		str	r3, [sp, #12]
+ 439:../Core/Src/w25q_impl.c ****   cmd.InstructionDtrMode = HAL_OSPI_INSTRUCTION_DTR_DISABLE;
+ 1013              		.loc 1 439 3 is_stmt 1 view .LVU290
+ 440:../Core/Src/w25q_impl.c **** 
+ 1014              		.loc 1 440 3 view .LVU291
+ 442:../Core/Src/w25q_impl.c ****   cmd.AddressMode = HAL_OSPI_ADDRESS_1_LINE;
+ 1015              		.loc 1 442 3 view .LVU292
+ 442:../Core/Src/w25q_impl.c ****   cmd.AddressMode = HAL_OSPI_ADDRESS_1_LINE;
+ 1016              		.loc 1 442 15 is_stmt 0 view .LVU293
+ 1017 0046 0697     		str	r7, [sp, #24]
+ 443:../Core/Src/w25q_impl.c ****   cmd.AddressDtrMode = HAL_OSPI_ADDRESS_DTR_DISABLE;
+ 1018              		.loc 1 443 3 is_stmt 1 view .LVU294
+ 443:../Core/Src/w25q_impl.c ****   cmd.AddressDtrMode = HAL_OSPI_ADDRESS_DTR_DISABLE;
+ 1019              		.loc 1 443 19 is_stmt 0 view .LVU295
+ 1020 0048 4FF48073 		mov	r3, #256
+ 1021 004c 0793     		str	r3, [sp, #28]
+ 444:../Core/Src/w25q_impl.c **** 
+ 1022              		.loc 1 444 3 is_stmt 1 view .LVU296
+ 446:../Core/Src/w25q_impl.c **** 
+ 1023              		.loc 1 446 3 view .LVU297
+ 448:../Core/Src/w25q_impl.c ****   cmd.DataDtrMode = HAL_OSPI_DATA_DTR_DISABLE;
+ 1024              		.loc 1 448 3 view .LVU298
+ 448:../Core/Src/w25q_impl.c ****   cmd.DataDtrMode = HAL_OSPI_DATA_DTR_DISABLE;
+ 1025              		.loc 1 448 16 is_stmt 0 view .LVU299
+ 1026 004e 4FF04073 		mov	r3, #50331648
+ 1027 0052 0E93     		str	r3, [sp, #56]
+ 449:../Core/Src/w25q_impl.c ****   cmd.NbData = len;
+ 1028              		.loc 1 449 3 is_stmt 1 view .LVU300
+ 450:../Core/Src/w25q_impl.c **** 
+ 1029              		.loc 1 450 3 view .LVU301
+ 450:../Core/Src/w25q_impl.c **** 
+ 1030              		.loc 1 450 14 is_stmt 0 view .LVU302
+ 1031 0054 0F95     		str	r5, [sp, #60]
+ 452:../Core/Src/w25q_impl.c ****   cmd.DQSMode = HAL_OSPI_DQS_DISABLE;
+ 1032              		.loc 1 452 3 is_stmt 1 view .LVU303
+ 453:../Core/Src/w25q_impl.c ****   cmd.SIOOMode = HAL_OSPI_SIOO_INST_EVERY_CMD;
+ 1033              		.loc 1 453 3 view .LVU304
+ARM GAS  /tmp/cc5A8HOi.s 			page 28
+
+
+ 454:../Core/Src/w25q_impl.c **** 
+ 1034              		.loc 1 454 3 view .LVU305
+ 456:../Core/Src/w25q_impl.c **** 
+ 1035              		.loc 1 456 3 view .LVU306
+ 1036 0056 0022     		movs	r2, #0
+ 1037 0058 4021     		movs	r1, #64
+ 1038 005a 0F48     		ldr	r0, .L71
+ 1039 005c FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 1040              	.LVL77:
+ 458:../Core/Src/w25q_impl.c ****       HAL_OK) {
+ 1041              		.loc 1 458 3 view .LVU307
+ 458:../Core/Src/w25q_impl.c ****       HAL_OK) {
+ 1042              		.loc 1 458 7 is_stmt 0 view .LVU308
+ 1043 0060 41F28832 		movw	r2, #5000
+ 1044 0064 6946     		mov	r1, sp
+ 1045 0066 0D48     		ldr	r0, .L71+4
+ 1046 0068 FFF7FEFF 		bl	HAL_OSPI_Command
+ 1047              	.LVL78:
+ 458:../Core/Src/w25q_impl.c ****       HAL_OK) {
+ 1048              		.loc 1 458 6 view .LVU309
+ 1049 006c 78B9     		cbnz	r0, .L67
+ 463:../Core/Src/w25q_impl.c ****       HAL_OK) {
+ 1050              		.loc 1 463 3 is_stmt 1 view .LVU310
+ 463:../Core/Src/w25q_impl.c ****       HAL_OK) {
+ 1051              		.loc 1 463 7 is_stmt 0 view .LVU311
+ 1052 006e 41F28832 		movw	r2, #5000
+ 1053 0072 3146     		mov	r1, r6
+ 1054 0074 0948     		ldr	r0, .L71+4
+ 1055 0076 FFF7FEFF 		bl	HAL_OSPI_Transmit
+ 1056              	.LVL79:
+ 463:../Core/Src/w25q_impl.c ****       HAL_OK) {
+ 1057              		.loc 1 463 6 view .LVU312
+ 1058 007a 0446     		mov	r4, r0
+ 1059 007c 48B9     		cbnz	r0, .L68
+ 468:../Core/Src/w25q_impl.c **** 
+ 1060              		.loc 1 468 3 is_stmt 1 view .LVU313
+ 1061 007e 0122     		movs	r2, #1
+ 1062 0080 4021     		movs	r1, #64
+ 1063 0082 0548     		ldr	r0, .L71
+ 1064 0084 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 1065              	.LVL80:
+ 470:../Core/Src/w25q_impl.c **** }
+ 1066              		.loc 1 470 3 view .LVU314
+ 470:../Core/Src/w25q_impl.c **** }
+ 1067              		.loc 1 470 10 is_stmt 0 view .LVU315
+ 1068 0088 CEE7     		b	.L64
+ 1069              	.LVL81:
+ 1070              	.L66:
+ 411:../Core/Src/w25q_impl.c ****   }
+ 1071              		.loc 1 411 12 view .LVU316
+ 1072 008a 0224     		movs	r4, #2
+ 1073 008c CCE7     		b	.L64
+ 1074              	.LVL82:
+ 1075              	.L67:
+ 460:../Core/Src/w25q_impl.c ****   }
+ 1076              		.loc 1 460 12 view .LVU317
+ 1077 008e 0424     		movs	r4, #4
+ARM GAS  /tmp/cc5A8HOi.s 			page 29
+
+
+ 1078 0090 CAE7     		b	.L64
+ 1079              	.L68:
+ 465:../Core/Src/w25q_impl.c ****   }
+ 1080              		.loc 1 465 12 view .LVU318
+ 1081 0092 0424     		movs	r4, #4
+ 1082 0094 C8E7     		b	.L64
+ 1083              	.L72:
+ 1084 0096 00BF     		.align	2
+ 1085              	.L71:
+ 1086 0098 00180258 		.word	1476532224
+ 1087 009c 00000000 		.word	hospi1
+ 1088              		.cfi_endproc
+ 1089              	.LFE405:
+ 1091              		.section	.text.w25q_erase_sector,"ax",%progbits
+ 1092              		.align	1
+ 1093              		.global	w25q_erase_sector
+ 1094              		.syntax unified
+ 1095              		.thumb
+ 1096              		.thumb_func
+ 1098              	w25q_erase_sector:
+ 1099              	.LVL83:
+ 1100              	.LFB406:
+ 472:../Core/Src/w25q_impl.c **** 
+ 473:../Core/Src/w25q_impl.c **** enum w25q_err w25q_erase_sector(struct w25q_device *device,
+ 474:../Core/Src/w25q_impl.c ****                                 uint32_t sector_addr) {
+ 1101              		.loc 1 474 55 is_stmt 1 view -0
+ 1102              		.cfi_startproc
+ 1103              		@ args = 0, pretend = 0, frame = 80
+ 1104              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1105              		.loc 1 474 55 is_stmt 0 view .LVU320
+ 1106 0000 70B5     		push	{r4, r5, r6, lr}
+ 1107              	.LCFI29:
+ 1108              		.cfi_def_cfa_offset 16
+ 1109              		.cfi_offset 4, -16
+ 1110              		.cfi_offset 5, -12
+ 1111              		.cfi_offset 6, -8
+ 1112              		.cfi_offset 14, -4
+ 1113 0002 94B0     		sub	sp, sp, #80
+ 1114              	.LCFI30:
+ 1115              		.cfi_def_cfa_offset 96
+ 1116 0004 0446     		mov	r4, r0
+ 1117 0006 0D46     		mov	r5, r1
+ 475:../Core/Src/w25q_impl.c ****   if (sector_addr >= W25Q_SECTOR_COUNT) {
+ 1118              		.loc 1 475 3 is_stmt 1 view .LVU321
+ 1119              		.loc 1 475 6 is_stmt 0 view .LVU322
+ 1120 0008 B1F5806F 		cmp	r1, #1024
+ 1121 000c 36D2     		bcs	.L77
+ 1122              	.LVL84:
+ 1123              	.L75:
+ 476:../Core/Src/w25q_impl.c ****     return W25Q_ERR_PARAM;
+ 477:../Core/Src/w25q_impl.c ****   }
+ 478:../Core/Src/w25q_impl.c **** 
+ 479:../Core/Src/w25q_impl.c ****   while (w25q_is_busy(device) == W25Q_ERR_BUSY)
+ 1124              		.loc 1 479 31 is_stmt 1 discriminator 1 view .LVU323
+ 1125              		.loc 1 479 10 is_stmt 0 discriminator 1 view .LVU324
+ 1126 000e 2046     		mov	r0, r4
+ 1127 0010 FFF7FEFF 		bl	w25q_is_busy
+ARM GAS  /tmp/cc5A8HOi.s 			page 30
+
+
+ 1128              	.LVL85:
+ 1129              		.loc 1 479 31 discriminator 1 view .LVU325
+ 1130 0014 0128     		cmp	r0, #1
+ 1131 0016 FAD0     		beq	.L75
+ 480:../Core/Src/w25q_impl.c ****     ;
+ 481:../Core/Src/w25q_impl.c **** 
+ 482:../Core/Src/w25q_impl.c ****   enum w25q_err err = w25q_write_enable(device, 1);
+ 1132              		.loc 1 482 3 is_stmt 1 view .LVU326
+ 1133              		.loc 1 482 23 is_stmt 0 view .LVU327
+ 1134 0018 0121     		movs	r1, #1
+ 1135 001a 2046     		mov	r0, r4
+ 1136 001c FFF7FEFF 		bl	w25q_write_enable
+ 1137              	.LVL86:
+ 483:../Core/Src/w25q_impl.c ****   if (err != W25Q_ERR_OK) {
+ 1138              		.loc 1 483 3 is_stmt 1 view .LVU328
+ 1139              		.loc 1 483 6 is_stmt 0 view .LVU329
+ 1140 0020 0646     		mov	r6, r0
+ 1141 0022 10B1     		cbz	r0, .L80
+ 1142              	.LVL87:
+ 1143              	.L74:
+ 484:../Core/Src/w25q_impl.c ****     return err;
+ 485:../Core/Src/w25q_impl.c ****   }
+ 486:../Core/Src/w25q_impl.c **** 
+ 487:../Core/Src/w25q_impl.c ****   OSPI_RegularCmdTypeDef cmd = {0};
+ 488:../Core/Src/w25q_impl.c **** 
+ 489:../Core/Src/w25q_impl.c ****   cmd.OperationType = HAL_OSPI_OPTYPE_COMMON_CFG;
+ 490:../Core/Src/w25q_impl.c **** 
+ 491:../Core/Src/w25q_impl.c **** #if W25Q_MEM_FLASH_SIZE > 128U
+ 492:../Core/Src/w25q_impl.c **** 
+ 493:../Core/Src/w25q_impl.c ****   cmd.Instruction = W25Q_SECTOR_ERASE_4B;
+ 494:../Core/Src/w25q_impl.c ****   cmd.AddressSize = HAL_OSPI_ADDRESS_32_BITS;
+ 495:../Core/Src/w25q_impl.c **** 
+ 496:../Core/Src/w25q_impl.c **** #else
+ 497:../Core/Src/w25q_impl.c **** 
+ 498:../Core/Src/w25q_impl.c ****   cmd.Instruction = W25Q_SECTOR_ERASE;
+ 499:../Core/Src/w25q_impl.c ****   cmd.AddressSize = HAL_OSPI_ADDRESS_24_BITS;
+ 500:../Core/Src/w25q_impl.c **** 
+ 501:../Core/Src/w25q_impl.c **** #endif
+ 502:../Core/Src/w25q_impl.c **** 
+ 503:../Core/Src/w25q_impl.c ****   cmd.InstructionMode = HAL_OSPI_INSTRUCTION_1_LINE;
+ 504:../Core/Src/w25q_impl.c ****   cmd.InstructionSize = HAL_OSPI_INSTRUCTION_8_BITS;
+ 505:../Core/Src/w25q_impl.c ****   cmd.InstructionDtrMode = HAL_OSPI_INSTRUCTION_DTR_DISABLE;
+ 506:../Core/Src/w25q_impl.c **** 
+ 507:../Core/Src/w25q_impl.c ****   cmd.Address = sector_addr * W25Q_MEM_SECTOR_SIZE << 10;
+ 508:../Core/Src/w25q_impl.c ****   cmd.AddressMode = HAL_OSPI_ADDRESS_1_LINE;
+ 509:../Core/Src/w25q_impl.c ****   cmd.AddressDtrMode = HAL_OSPI_ADDRESS_DTR_DISABLE;
+ 510:../Core/Src/w25q_impl.c **** 
+ 511:../Core/Src/w25q_impl.c ****   cmd.AlternateBytesMode = HAL_OSPI_ALTERNATE_BYTES_NONE;
+ 512:../Core/Src/w25q_impl.c **** 
+ 513:../Core/Src/w25q_impl.c ****   cmd.DataMode = HAL_OSPI_DATA_NONE;
+ 514:../Core/Src/w25q_impl.c ****   cmd.DataDtrMode = HAL_OSPI_DATA_DTR_DISABLE;
+ 515:../Core/Src/w25q_impl.c **** 
+ 516:../Core/Src/w25q_impl.c ****   cmd.DummyCycles = 0;
+ 517:../Core/Src/w25q_impl.c ****   cmd.DQSMode = HAL_OSPI_DQS_DISABLE;
+ 518:../Core/Src/w25q_impl.c ****   cmd.SIOOMode = HAL_OSPI_SIOO_INST_EVERY_CMD;
+ 519:../Core/Src/w25q_impl.c **** 
+ 520:../Core/Src/w25q_impl.c ****   HAL_GPIO_WritePin(FLASH_CS_GPIO_PORT, FLASH_CS_PIN, GPIO_PIN_RESET);
+ARM GAS  /tmp/cc5A8HOi.s 			page 31
+
+
+ 521:../Core/Src/w25q_impl.c **** 
+ 522:../Core/Src/w25q_impl.c ****   if (HAL_OSPI_Command(&flash_spi, &cmd, HAL_OSPI_TIMEOUT_DEFAULT_VALUE) !=
+ 523:../Core/Src/w25q_impl.c ****       HAL_OK) {
+ 524:../Core/Src/w25q_impl.c ****     return W25Q_ERR_SPI;
+ 525:../Core/Src/w25q_impl.c ****   }
+ 526:../Core/Src/w25q_impl.c **** 
+ 527:../Core/Src/w25q_impl.c ****   HAL_GPIO_WritePin(FLASH_CS_GPIO_PORT, FLASH_CS_PIN, GPIO_PIN_SET);
+ 528:../Core/Src/w25q_impl.c **** 
+ 529:../Core/Src/w25q_impl.c ****   while (w25q_is_busy(device) == W25Q_ERR_BUSY)
+ 530:../Core/Src/w25q_impl.c ****     ;
+ 531:../Core/Src/w25q_impl.c **** 
+ 532:../Core/Src/w25q_impl.c ****   return W25Q_ERR_OK;
+ 533:../Core/Src/w25q_impl.c **** }
+ 1144              		.loc 1 533 1 view .LVU330
+ 1145 0024 3046     		mov	r0, r6
+ 1146 0026 14B0     		add	sp, sp, #80
+ 1147              	.LCFI31:
+ 1148              		.cfi_remember_state
+ 1149              		.cfi_def_cfa_offset 16
+ 1150              		@ sp needed
+ 1151 0028 70BD     		pop	{r4, r5, r6, pc}
+ 1152              	.LVL88:
+ 1153              	.L80:
+ 1154              	.LCFI32:
+ 1155              		.cfi_restore_state
+ 487:../Core/Src/w25q_impl.c **** 
+ 1156              		.loc 1 487 3 is_stmt 1 view .LVU331
+ 487:../Core/Src/w25q_impl.c **** 
+ 1157              		.loc 1 487 26 is_stmt 0 view .LVU332
+ 1158 002a 5022     		movs	r2, #80
+ 1159 002c 0021     		movs	r1, #0
+ 1160 002e 6846     		mov	r0, sp
+ 1161              	.LVL89:
+ 487:../Core/Src/w25q_impl.c **** 
+ 1162              		.loc 1 487 26 view .LVU333
+ 1163 0030 FFF7FEFF 		bl	memset
+ 1164              	.LVL90:
+ 489:../Core/Src/w25q_impl.c **** 
+ 1165              		.loc 1 489 3 is_stmt 1 view .LVU334
+ 498:../Core/Src/w25q_impl.c ****   cmd.AddressSize = HAL_OSPI_ADDRESS_24_BITS;
+ 1166              		.loc 1 498 3 view .LVU335
+ 498:../Core/Src/w25q_impl.c ****   cmd.AddressSize = HAL_OSPI_ADDRESS_24_BITS;
+ 1167              		.loc 1 498 19 is_stmt 0 view .LVU336
+ 1168 0034 2023     		movs	r3, #32
+ 1169 0036 0293     		str	r3, [sp, #8]
+ 499:../Core/Src/w25q_impl.c **** 
+ 1170              		.loc 1 499 3 is_stmt 1 view .LVU337
+ 499:../Core/Src/w25q_impl.c **** 
+ 1171              		.loc 1 499 19 is_stmt 0 view .LVU338
+ 1172 0038 4FF40053 		mov	r3, #8192
+ 1173 003c 0893     		str	r3, [sp, #32]
+ 503:../Core/Src/w25q_impl.c ****   cmd.InstructionSize = HAL_OSPI_INSTRUCTION_8_BITS;
+ 1174              		.loc 1 503 3 is_stmt 1 view .LVU339
+ 503:../Core/Src/w25q_impl.c ****   cmd.InstructionSize = HAL_OSPI_INSTRUCTION_8_BITS;
+ 1175              		.loc 1 503 23 is_stmt 0 view .LVU340
+ 1176 003e 0123     		movs	r3, #1
+ 1177 0040 0393     		str	r3, [sp, #12]
+ARM GAS  /tmp/cc5A8HOi.s 			page 32
+
+
+ 504:../Core/Src/w25q_impl.c ****   cmd.InstructionDtrMode = HAL_OSPI_INSTRUCTION_DTR_DISABLE;
+ 1178              		.loc 1 504 3 is_stmt 1 view .LVU341
+ 505:../Core/Src/w25q_impl.c **** 
+ 1179              		.loc 1 505 3 view .LVU342
+ 507:../Core/Src/w25q_impl.c ****   cmd.AddressMode = HAL_OSPI_ADDRESS_1_LINE;
+ 1180              		.loc 1 507 3 view .LVU343
+ 507:../Core/Src/w25q_impl.c ****   cmd.AddressMode = HAL_OSPI_ADDRESS_1_LINE;
+ 1181              		.loc 1 507 52 is_stmt 0 view .LVU344
+ 1182 0042 2D03     		lsls	r5, r5, #12
+ 1183              	.LVL91:
+ 507:../Core/Src/w25q_impl.c ****   cmd.AddressMode = HAL_OSPI_ADDRESS_1_LINE;
+ 1184              		.loc 1 507 15 view .LVU345
+ 1185 0044 0695     		str	r5, [sp, #24]
+ 508:../Core/Src/w25q_impl.c ****   cmd.AddressDtrMode = HAL_OSPI_ADDRESS_DTR_DISABLE;
+ 1186              		.loc 1 508 3 is_stmt 1 view .LVU346
+ 508:../Core/Src/w25q_impl.c ****   cmd.AddressDtrMode = HAL_OSPI_ADDRESS_DTR_DISABLE;
+ 1187              		.loc 1 508 19 is_stmt 0 view .LVU347
+ 1188 0046 4FF48073 		mov	r3, #256
+ 1189 004a 0793     		str	r3, [sp, #28]
+ 509:../Core/Src/w25q_impl.c **** 
+ 1190              		.loc 1 509 3 is_stmt 1 view .LVU348
+ 511:../Core/Src/w25q_impl.c **** 
+ 1191              		.loc 1 511 3 view .LVU349
+ 513:../Core/Src/w25q_impl.c ****   cmd.DataDtrMode = HAL_OSPI_DATA_DTR_DISABLE;
+ 1192              		.loc 1 513 3 view .LVU350
+ 514:../Core/Src/w25q_impl.c **** 
+ 1193              		.loc 1 514 3 view .LVU351
+ 516:../Core/Src/w25q_impl.c ****   cmd.DQSMode = HAL_OSPI_DQS_DISABLE;
+ 1194              		.loc 1 516 3 view .LVU352
+ 517:../Core/Src/w25q_impl.c ****   cmd.SIOOMode = HAL_OSPI_SIOO_INST_EVERY_CMD;
+ 1195              		.loc 1 517 3 view .LVU353
+ 518:../Core/Src/w25q_impl.c **** 
+ 1196              		.loc 1 518 3 view .LVU354
+ 520:../Core/Src/w25q_impl.c **** 
+ 1197              		.loc 1 520 3 view .LVU355
+ 1198 004c 0022     		movs	r2, #0
+ 1199 004e 4021     		movs	r1, #64
+ 1200 0050 0C48     		ldr	r0, .L81
+ 1201 0052 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 1202              	.LVL92:
+ 522:../Core/Src/w25q_impl.c ****       HAL_OK) {
+ 1203              		.loc 1 522 3 view .LVU356
+ 522:../Core/Src/w25q_impl.c ****       HAL_OK) {
+ 1204              		.loc 1 522 7 is_stmt 0 view .LVU357
+ 1205 0056 41F28832 		movw	r2, #5000
+ 1206 005a 6946     		mov	r1, sp
+ 1207 005c 0A48     		ldr	r0, .L81+4
+ 1208 005e FFF7FEFF 		bl	HAL_OSPI_Command
+ 1209              	.LVL93:
+ 522:../Core/Src/w25q_impl.c ****       HAL_OK) {
+ 1210              		.loc 1 522 6 view .LVU358
+ 1211 0062 0646     		mov	r6, r0
+ 1212 0064 60B9     		cbnz	r0, .L78
+ 527:../Core/Src/w25q_impl.c **** 
+ 1213              		.loc 1 527 3 is_stmt 1 view .LVU359
+ 1214 0066 0122     		movs	r2, #1
+ 1215 0068 4021     		movs	r1, #64
+ARM GAS  /tmp/cc5A8HOi.s 			page 33
+
+
+ 1216 006a 0648     		ldr	r0, .L81
+ 1217 006c FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 1218              	.LVL94:
+ 529:../Core/Src/w25q_impl.c ****     ;
+ 1219              		.loc 1 529 3 view .LVU360
+ 1220              	.L76:
+ 529:../Core/Src/w25q_impl.c ****     ;
+ 1221              		.loc 1 529 31 discriminator 1 view .LVU361
+ 529:../Core/Src/w25q_impl.c ****     ;
+ 1222              		.loc 1 529 10 is_stmt 0 discriminator 1 view .LVU362
+ 1223 0070 2046     		mov	r0, r4
+ 1224 0072 FFF7FEFF 		bl	w25q_is_busy
+ 1225              	.LVL95:
+ 529:../Core/Src/w25q_impl.c ****     ;
+ 1226              		.loc 1 529 31 discriminator 1 view .LVU363
+ 1227 0076 0128     		cmp	r0, #1
+ 1228 0078 FAD0     		beq	.L76
+ 1229 007a D3E7     		b	.L74
+ 1230              	.LVL96:
+ 1231              	.L77:
+ 476:../Core/Src/w25q_impl.c ****   }
+ 1232              		.loc 1 476 12 view .LVU364
+ 1233 007c 0226     		movs	r6, #2
+ 1234 007e D1E7     		b	.L74
+ 1235              	.LVL97:
+ 1236              	.L78:
+ 524:../Core/Src/w25q_impl.c ****   }
+ 1237              		.loc 1 524 12 view .LVU365
+ 1238 0080 0426     		movs	r6, #4
+ 1239 0082 CFE7     		b	.L74
+ 1240              	.L82:
+ 1241              		.align	2
+ 1242              	.L81:
+ 1243 0084 00180258 		.word	1476532224
+ 1244 0088 00000000 		.word	hospi1
+ 1245              		.cfi_endproc
+ 1246              	.LFE406:
+ 1248              		.section	.text.w25q_erase_block,"ax",%progbits
+ 1249              		.align	1
+ 1250              		.global	w25q_erase_block
+ 1251              		.syntax unified
+ 1252              		.thumb
+ 1253              		.thumb_func
+ 1255              	w25q_erase_block:
+ 1256              	.LVL98:
+ 1257              	.LFB407:
+ 534:../Core/Src/w25q_impl.c **** 
+ 535:../Core/Src/w25q_impl.c **** enum w25q_err w25q_erase_block(struct w25q_device *device, uint32_t block_addr,
+ 536:../Core/Src/w25q_impl.c ****                                uint8_t size) {
+ 1258              		.loc 1 536 46 is_stmt 1 view -0
+ 1259              		.cfi_startproc
+ 1260              		@ args = 0, pretend = 0, frame = 80
+ 1261              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1262              		.loc 1 536 46 is_stmt 0 view .LVU367
+ 1263 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+ 1264              	.LCFI33:
+ 1265              		.cfi_def_cfa_offset 20
+ARM GAS  /tmp/cc5A8HOi.s 			page 34
+
+
+ 1266              		.cfi_offset 4, -20
+ 1267              		.cfi_offset 5, -16
+ 1268              		.cfi_offset 6, -12
+ 1269              		.cfi_offset 7, -8
+ 1270              		.cfi_offset 14, -4
+ 1271 0002 95B0     		sub	sp, sp, #84
+ 1272              	.LCFI34:
+ 1273              		.cfi_def_cfa_offset 104
+ 537:../Core/Src/w25q_impl.c ****   if ((size != 32) && (size != 64)) {
+ 1274              		.loc 1 537 3 is_stmt 1 view .LVU368
+ 1275              		.loc 1 537 6 is_stmt 0 view .LVU369
+ 1276 0004 202A     		cmp	r2, #32
+ 1277 0006 18BF     		it	ne
+ 1278 0008 402A     		cmpne	r2, #64
+ 1279 000a 57D1     		bne	.L90
+ 1280 000c 0446     		mov	r4, r0
+ 1281 000e 0E46     		mov	r6, r1
+ 1282 0010 1546     		mov	r5, r2
+ 538:../Core/Src/w25q_impl.c ****     return W25Q_ERR_PARAM;
+ 539:../Core/Src/w25q_impl.c ****   }
+ 540:../Core/Src/w25q_impl.c **** 
+ 541:../Core/Src/w25q_impl.c ****   if ((size == 64 && block_addr >= W25Q_BLOCK_COUNT) ||
+ 1283              		.loc 1 541 3 is_stmt 1 view .LVU370
+ 1284              		.loc 1 541 19 is_stmt 0 view .LVU371
+ 1285 0012 402A     		cmp	r2, #64
+ 1286 0014 14BF     		ite	ne
+ 1287 0016 0023     		movne	r3, #0
+ 1288 0018 0123     		moveq	r3, #1
+ 1289 001a 3F29     		cmp	r1, #63
+ 1290 001c 98BF     		it	ls
+ 1291 001e 0023     		movls	r3, #0
+ 1292              		.loc 1 541 6 view .LVU372
+ 1293 0020 002B     		cmp	r3, #0
+ 1294 0022 4FD1     		bne	.L91
+ 542:../Core/Src/w25q_impl.c ****       (size == 32 && block_addr >= W25Q_BLOCK_COUNT * 2)) {
+ 1295              		.loc 1 542 19 discriminator 1 view .LVU373
+ 1296 0024 202A     		cmp	r2, #32
+ 1297 0026 14BF     		ite	ne
+ 1298 0028 0023     		movne	r3, #0
+ 1299 002a 0123     		moveq	r3, #1
+ 1300 002c 7F29     		cmp	r1, #127
+ 1301 002e 98BF     		it	ls
+ 1302 0030 0023     		movls	r3, #0
+ 541:../Core/Src/w25q_impl.c ****       (size == 32 && block_addr >= W25Q_BLOCK_COUNT * 2)) {
+ 1303              		.loc 1 541 54 discriminator 1 view .LVU374
+ 1304 0032 002B     		cmp	r3, #0
+ 1305 0034 48D1     		bne	.L92
+ 1306              	.LVL99:
+ 1307              	.L85:
+ 543:../Core/Src/w25q_impl.c ****     return W25Q_ERR_PARAM;
+ 544:../Core/Src/w25q_impl.c ****   }
+ 545:../Core/Src/w25q_impl.c **** 
+ 546:../Core/Src/w25q_impl.c ****   while (w25q_is_busy(device) == W25Q_ERR_BUSY)
+ 1308              		.loc 1 546 31 is_stmt 1 discriminator 1 view .LVU375
+ 1309              		.loc 1 546 10 is_stmt 0 discriminator 1 view .LVU376
+ 1310 0036 2046     		mov	r0, r4
+ 1311 0038 FFF7FEFF 		bl	w25q_is_busy
+ARM GAS  /tmp/cc5A8HOi.s 			page 35
+
+
+ 1312              	.LVL100:
+ 1313              		.loc 1 546 31 discriminator 1 view .LVU377
+ 1314 003c 0128     		cmp	r0, #1
+ 1315 003e FAD0     		beq	.L85
+ 547:../Core/Src/w25q_impl.c ****     ;
+ 548:../Core/Src/w25q_impl.c **** 
+ 549:../Core/Src/w25q_impl.c ****   uint32_t raw_addr = block_addr * W25Q_MEM_SECTOR_SIZE << 14;
+ 1316              		.loc 1 549 3 is_stmt 1 view .LVU378
+ 1317              		.loc 1 549 12 is_stmt 0 view .LVU379
+ 1318 0040 3604     		lsls	r6, r6, #16
+ 1319              	.LVL101:
+ 550:../Core/Src/w25q_impl.c **** 
+ 551:../Core/Src/w25q_impl.c ****   if (size == 32) {
+ 1320              		.loc 1 551 3 is_stmt 1 view .LVU380
+ 1321              		.loc 1 551 6 is_stmt 0 view .LVU381
+ 1322 0042 202D     		cmp	r5, #32
+ 1323 0044 2CD0     		beq	.L95
+ 1324              	.L86:
+ 552:../Core/Src/w25q_impl.c ****     raw_addr >>= 1;
+ 553:../Core/Src/w25q_impl.c ****   }
+ 554:../Core/Src/w25q_impl.c **** 
+ 555:../Core/Src/w25q_impl.c ****   enum w25q_err err = w25q_write_enable(device, 1);
+ 1325              		.loc 1 555 3 is_stmt 1 view .LVU382
+ 1326              		.loc 1 555 23 is_stmt 0 view .LVU383
+ 1327 0046 0121     		movs	r1, #1
+ 1328 0048 2046     		mov	r0, r4
+ 1329 004a FFF7FEFF 		bl	w25q_write_enable
+ 1330              	.LVL102:
+ 556:../Core/Src/w25q_impl.c ****   if (err != W25Q_ERR_OK) {
+ 1331              		.loc 1 556 3 is_stmt 1 view .LVU384
+ 1332              		.loc 1 556 6 is_stmt 0 view .LVU385
+ 1333 004e 0746     		mov	r7, r0
+ 1334 0050 A8BB     		cbnz	r0, .L84
+ 557:../Core/Src/w25q_impl.c ****     return err;
+ 558:../Core/Src/w25q_impl.c ****   }
+ 559:../Core/Src/w25q_impl.c **** 
+ 560:../Core/Src/w25q_impl.c ****   OSPI_RegularCmdTypeDef cmd = {0};
+ 1335              		.loc 1 560 3 is_stmt 1 view .LVU386
+ 1336              		.loc 1 560 26 is_stmt 0 view .LVU387
+ 1337 0052 5022     		movs	r2, #80
+ 1338 0054 0021     		movs	r1, #0
+ 1339 0056 6846     		mov	r0, sp
+ 1340              	.LVL103:
+ 1341              		.loc 1 560 26 view .LVU388
+ 1342 0058 FFF7FEFF 		bl	memset
+ 1343              	.LVL104:
+ 561:../Core/Src/w25q_impl.c **** 
+ 562:../Core/Src/w25q_impl.c ****   cmd.OperationType = HAL_OSPI_OPTYPE_COMMON_CFG;
+ 1344              		.loc 1 562 3 is_stmt 1 view .LVU389
+ 563:../Core/Src/w25q_impl.c **** 
+ 564:../Core/Src/w25q_impl.c ****   if (size == 32) {
+ 1345              		.loc 1 564 3 view .LVU390
+ 1346              		.loc 1 564 6 is_stmt 0 view .LVU391
+ 1347 005c 202D     		cmp	r5, #32
+ 1348 005e 21D0     		beq	.L96
+ 565:../Core/Src/w25q_impl.c ****     cmd.Instruction = W25Q_32KB_BLOCK_ERASE;
+ 566:../Core/Src/w25q_impl.c **** 
+ARM GAS  /tmp/cc5A8HOi.s 			page 36
+
+
+ 567:../Core/Src/w25q_impl.c **** #if W25Q_MEM_FLASH_SIZE > 128U
+ 568:../Core/Src/w25q_impl.c **** 
+ 569:../Core/Src/w25q_impl.c ****     cmd.AddressSize = HAL_OSPI_ADDRESS_32_BITS;
+ 570:../Core/Src/w25q_impl.c **** 
+ 571:../Core/Src/w25q_impl.c **** #else
+ 572:../Core/Src/w25q_impl.c **** 
+ 573:../Core/Src/w25q_impl.c ****     cmd.AddressSize = HAL_OSPI_ADDRESS_24_BITS;
+ 574:../Core/Src/w25q_impl.c **** 
+ 575:../Core/Src/w25q_impl.c **** #endif
+ 576:../Core/Src/w25q_impl.c **** 
+ 577:../Core/Src/w25q_impl.c ****   } else if (size == 64) {
+ 1349              		.loc 1 577 10 is_stmt 1 view .LVU392
+ 1350              		.loc 1 577 13 is_stmt 0 view .LVU393
+ 1351 0060 402D     		cmp	r5, #64
+ 1352 0062 25D0     		beq	.L97
+ 1353              	.L88:
+ 578:../Core/Src/w25q_impl.c **** 
+ 579:../Core/Src/w25q_impl.c **** #if W25Q_MEM_FLASH_SIZE > 128U
+ 580:../Core/Src/w25q_impl.c **** 
+ 581:../Core/Src/w25q_impl.c ****     cmd.Instruction = W25Q_64KB_BLOCK_ERASE_4B;
+ 582:../Core/Src/w25q_impl.c ****     cmd.AddressSize = HAL_OSPI_ADDRESS_32_BITS;
+ 583:../Core/Src/w25q_impl.c **** 
+ 584:../Core/Src/w25q_impl.c **** #else
+ 585:../Core/Src/w25q_impl.c **** 
+ 586:../Core/Src/w25q_impl.c ****     cmd.Instruction = W25Q_64KB_BLOCK_ERASE;
+ 587:../Core/Src/w25q_impl.c ****     cmd.AddressSize = HAL_OSPI_ADDRESS_24_BITS;
+ 588:../Core/Src/w25q_impl.c **** 
+ 589:../Core/Src/w25q_impl.c **** #endif
+ 590:../Core/Src/w25q_impl.c ****   }
+ 591:../Core/Src/w25q_impl.c **** 
+ 592:../Core/Src/w25q_impl.c ****   cmd.InstructionMode = HAL_OSPI_INSTRUCTION_1_LINE;
+ 1354              		.loc 1 592 3 is_stmt 1 view .LVU394
+ 1355              		.loc 1 592 23 is_stmt 0 view .LVU395
+ 1356 0064 0123     		movs	r3, #1
+ 1357 0066 0393     		str	r3, [sp, #12]
+ 593:../Core/Src/w25q_impl.c ****   cmd.InstructionSize = HAL_OSPI_INSTRUCTION_8_BITS;
+ 1358              		.loc 1 593 3 is_stmt 1 view .LVU396
+ 594:../Core/Src/w25q_impl.c ****   cmd.InstructionDtrMode = HAL_OSPI_INSTRUCTION_DTR_DISABLE;
+ 1359              		.loc 1 594 3 view .LVU397
+ 595:../Core/Src/w25q_impl.c **** 
+ 596:../Core/Src/w25q_impl.c ****   cmd.Address = raw_addr;
+ 1360              		.loc 1 596 3 view .LVU398
+ 1361              		.loc 1 596 15 is_stmt 0 view .LVU399
+ 1362 0068 0696     		str	r6, [sp, #24]
+ 597:../Core/Src/w25q_impl.c ****   cmd.AddressMode = HAL_OSPI_ADDRESS_1_LINE;
+ 1363              		.loc 1 597 3 is_stmt 1 view .LVU400
+ 1364              		.loc 1 597 19 is_stmt 0 view .LVU401
+ 1365 006a 4FF48073 		mov	r3, #256
+ 1366 006e 0793     		str	r3, [sp, #28]
+ 598:../Core/Src/w25q_impl.c ****   cmd.AddressDtrMode = HAL_OSPI_ADDRESS_DTR_DISABLE;
+ 1367              		.loc 1 598 3 is_stmt 1 view .LVU402
+ 599:../Core/Src/w25q_impl.c **** 
+ 600:../Core/Src/w25q_impl.c ****   cmd.AlternateBytesMode = HAL_OSPI_ALTERNATE_BYTES_NONE;
+ 1368              		.loc 1 600 3 view .LVU403
+ 601:../Core/Src/w25q_impl.c **** 
+ 602:../Core/Src/w25q_impl.c ****   cmd.DataMode = HAL_OSPI_DATA_NONE;
+ 1369              		.loc 1 602 3 view .LVU404
+ARM GAS  /tmp/cc5A8HOi.s 			page 37
+
+
+ 603:../Core/Src/w25q_impl.c ****   cmd.DataDtrMode = HAL_OSPI_DATA_DTR_DISABLE;
+ 1370              		.loc 1 603 3 view .LVU405
+ 604:../Core/Src/w25q_impl.c **** 
+ 605:../Core/Src/w25q_impl.c ****   cmd.DummyCycles = 0;
+ 1371              		.loc 1 605 3 view .LVU406
+ 606:../Core/Src/w25q_impl.c ****   cmd.DQSMode = HAL_OSPI_DQS_DISABLE;
+ 1372              		.loc 1 606 3 view .LVU407
+ 607:../Core/Src/w25q_impl.c ****   cmd.SIOOMode = HAL_OSPI_SIOO_INST_EVERY_CMD;
+ 1373              		.loc 1 607 3 view .LVU408
+ 608:../Core/Src/w25q_impl.c **** 
+ 609:../Core/Src/w25q_impl.c ****   HAL_GPIO_WritePin(FLASH_CS_GPIO_PORT, FLASH_CS_PIN, GPIO_PIN_RESET);
+ 1374              		.loc 1 609 3 view .LVU409
+ 1375 0070 0022     		movs	r2, #0
+ 1376 0072 4021     		movs	r1, #64
+ 1377 0074 1648     		ldr	r0, .L98
+ 1378 0076 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 1379              	.LVL105:
+ 610:../Core/Src/w25q_impl.c **** 
+ 611:../Core/Src/w25q_impl.c ****   if (HAL_OSPI_Command(&flash_spi, &cmd, HAL_OSPI_TIMEOUT_DEFAULT_VALUE) !=
+ 1380              		.loc 1 611 3 view .LVU410
+ 1381              		.loc 1 611 7 is_stmt 0 view .LVU411
+ 1382 007a 41F28832 		movw	r2, #5000
+ 1383 007e 6946     		mov	r1, sp
+ 1384 0080 1448     		ldr	r0, .L98+4
+ 1385 0082 FFF7FEFF 		bl	HAL_OSPI_Command
+ 1386              	.LVL106:
+ 1387              		.loc 1 611 6 view .LVU412
+ 1388 0086 0746     		mov	r7, r0
+ 1389 0088 00BB     		cbnz	r0, .L93
+ 612:../Core/Src/w25q_impl.c ****       HAL_OK) {
+ 613:../Core/Src/w25q_impl.c ****     return W25Q_ERR_SPI;
+ 614:../Core/Src/w25q_impl.c ****   }
+ 615:../Core/Src/w25q_impl.c **** 
+ 616:../Core/Src/w25q_impl.c ****   HAL_GPIO_WritePin(FLASH_CS_GPIO_PORT, FLASH_CS_PIN, GPIO_PIN_SET);
+ 1390              		.loc 1 616 3 is_stmt 1 view .LVU413
+ 1391 008a 0122     		movs	r2, #1
+ 1392 008c 4021     		movs	r1, #64
+ 1393 008e 1048     		ldr	r0, .L98
+ 1394 0090 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 1395              	.LVL107:
+ 617:../Core/Src/w25q_impl.c **** 
+ 618:../Core/Src/w25q_impl.c ****   while (w25q_is_busy(device) == W25Q_ERR_BUSY)
+ 1396              		.loc 1 618 3 view .LVU414
+ 1397              	.L89:
+ 1398              		.loc 1 618 31 discriminator 1 view .LVU415
+ 1399              		.loc 1 618 10 is_stmt 0 discriminator 1 view .LVU416
+ 1400 0094 2046     		mov	r0, r4
+ 1401 0096 FFF7FEFF 		bl	w25q_is_busy
+ 1402              	.LVL108:
+ 1403              		.loc 1 618 31 discriminator 1 view .LVU417
+ 1404 009a 0128     		cmp	r0, #1
+ 1405 009c FAD0     		beq	.L89
+ 1406 009e 0EE0     		b	.L84
+ 1407              	.LVL109:
+ 1408              	.L95:
+ 552:../Core/Src/w25q_impl.c ****   }
+ 1409              		.loc 1 552 5 is_stmt 1 view .LVU418
+ARM GAS  /tmp/cc5A8HOi.s 			page 38
+
+
+ 552:../Core/Src/w25q_impl.c ****   }
+ 1410              		.loc 1 552 14 is_stmt 0 view .LVU419
+ 1411 00a0 7608     		lsrs	r6, r6, #1
+ 1412              	.LVL110:
+ 552:../Core/Src/w25q_impl.c ****   }
+ 1413              		.loc 1 552 14 view .LVU420
+ 1414 00a2 D0E7     		b	.L86
+ 1415              	.LVL111:
+ 1416              	.L96:
+ 565:../Core/Src/w25q_impl.c **** 
+ 1417              		.loc 1 565 5 is_stmt 1 view .LVU421
+ 565:../Core/Src/w25q_impl.c **** 
+ 1418              		.loc 1 565 21 is_stmt 0 view .LVU422
+ 1419 00a4 5223     		movs	r3, #82
+ 1420 00a6 0293     		str	r3, [sp, #8]
+ 573:../Core/Src/w25q_impl.c **** 
+ 1421              		.loc 1 573 5 is_stmt 1 view .LVU423
+ 573:../Core/Src/w25q_impl.c **** 
+ 1422              		.loc 1 573 21 is_stmt 0 view .LVU424
+ 1423 00a8 4FF40053 		mov	r3, #8192
+ 1424 00ac 0893     		str	r3, [sp, #32]
+ 1425 00ae D9E7     		b	.L88
+ 1426              	.L97:
+ 586:../Core/Src/w25q_impl.c ****     cmd.AddressSize = HAL_OSPI_ADDRESS_24_BITS;
+ 1427              		.loc 1 586 5 is_stmt 1 view .LVU425
+ 586:../Core/Src/w25q_impl.c ****     cmd.AddressSize = HAL_OSPI_ADDRESS_24_BITS;
+ 1428              		.loc 1 586 21 is_stmt 0 view .LVU426
+ 1429 00b0 D823     		movs	r3, #216
+ 1430 00b2 0293     		str	r3, [sp, #8]
+ 587:../Core/Src/w25q_impl.c **** 
+ 1431              		.loc 1 587 5 is_stmt 1 view .LVU427
+ 587:../Core/Src/w25q_impl.c **** 
+ 1432              		.loc 1 587 21 is_stmt 0 view .LVU428
+ 1433 00b4 4FF40053 		mov	r3, #8192
+ 1434 00b8 0893     		str	r3, [sp, #32]
+ 1435 00ba D3E7     		b	.L88
+ 1436              	.LVL112:
+ 1437              	.L90:
+ 538:../Core/Src/w25q_impl.c ****   }
+ 1438              		.loc 1 538 12 view .LVU429
+ 1439 00bc 0227     		movs	r7, #2
+ 1440              	.LVL113:
+ 1441              	.L84:
+ 619:../Core/Src/w25q_impl.c ****     ;
+ 620:../Core/Src/w25q_impl.c **** 
+ 621:../Core/Src/w25q_impl.c ****   return W25Q_ERR_OK;
+ 622:../Core/Src/w25q_impl.c **** }
+ 1442              		.loc 1 622 1 view .LVU430
+ 1443 00be 3846     		mov	r0, r7
+ 1444 00c0 15B0     		add	sp, sp, #84
+ 1445              	.LCFI35:
+ 1446              		.cfi_remember_state
+ 1447              		.cfi_def_cfa_offset 20
+ 1448              		@ sp needed
+ 1449 00c2 F0BD     		pop	{r4, r5, r6, r7, pc}
+ 1450              	.LVL114:
+ 1451              	.L91:
+ARM GAS  /tmp/cc5A8HOi.s 			page 39
+
+
+ 1452              	.LCFI36:
+ 1453              		.cfi_restore_state
+ 543:../Core/Src/w25q_impl.c ****   }
+ 1454              		.loc 1 543 12 view .LVU431
+ 1455 00c4 0227     		movs	r7, #2
+ 1456 00c6 FAE7     		b	.L84
+ 1457              	.L92:
+ 1458 00c8 0227     		movs	r7, #2
+ 1459 00ca F8E7     		b	.L84
+ 1460              	.LVL115:
+ 1461              	.L93:
+ 613:../Core/Src/w25q_impl.c ****   }
+ 1462              		.loc 1 613 12 view .LVU432
+ 1463 00cc 0427     		movs	r7, #4
+ 1464 00ce F6E7     		b	.L84
+ 1465              	.L99:
+ 1466              		.align	2
+ 1467              	.L98:
+ 1468 00d0 00180258 		.word	1476532224
+ 1469 00d4 00000000 		.word	hospi1
+ 1470              		.cfi_endproc
+ 1471              	.LFE407:
+ 1473              		.section	.text.w25q_erase_chip,"ax",%progbits
+ 1474              		.align	1
+ 1475              		.global	w25q_erase_chip
+ 1476              		.syntax unified
+ 1477              		.thumb
+ 1478              		.thumb_func
+ 1480              	w25q_erase_chip:
+ 1481              	.LVL116:
+ 1482              	.LFB408:
+ 623:../Core/Src/w25q_impl.c **** 
+ 624:../Core/Src/w25q_impl.c **** enum w25q_err w25q_erase_chip(struct w25q_device *device) {
+ 1483              		.loc 1 624 59 is_stmt 1 view -0
+ 1484              		.cfi_startproc
+ 1485              		@ args = 0, pretend = 0, frame = 80
+ 1486              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1487              		.loc 1 624 59 is_stmt 0 view .LVU434
+ 1488 0000 30B5     		push	{r4, r5, lr}
+ 1489              	.LCFI37:
+ 1490              		.cfi_def_cfa_offset 12
+ 1491              		.cfi_offset 4, -12
+ 1492              		.cfi_offset 5, -8
+ 1493              		.cfi_offset 14, -4
+ 1494 0002 95B0     		sub	sp, sp, #84
+ 1495              	.LCFI38:
+ 1496              		.cfi_def_cfa_offset 96
+ 1497 0004 0446     		mov	r4, r0
+ 625:../Core/Src/w25q_impl.c ****   while (w25q_is_busy(device) == W25Q_ERR_BUSY)
+ 1498              		.loc 1 625 3 is_stmt 1 view .LVU435
+ 1499              	.LVL117:
+ 1500              	.L101:
+ 1501              		.loc 1 625 31 discriminator 1 view .LVU436
+ 1502              		.loc 1 625 10 is_stmt 0 discriminator 1 view .LVU437
+ 1503 0006 2046     		mov	r0, r4
+ 1504 0008 FFF7FEFF 		bl	w25q_is_busy
+ 1505              	.LVL118:
+ARM GAS  /tmp/cc5A8HOi.s 			page 40
+
+
+ 1506              		.loc 1 625 31 discriminator 1 view .LVU438
+ 1507 000c 0128     		cmp	r0, #1
+ 1508 000e FAD0     		beq	.L101
+ 626:../Core/Src/w25q_impl.c ****     ;
+ 627:../Core/Src/w25q_impl.c **** 
+ 628:../Core/Src/w25q_impl.c ****   enum w25q_err err = w25q_write_enable(device, 1);
+ 1509              		.loc 1 628 3 is_stmt 1 view .LVU439
+ 1510              		.loc 1 628 23 is_stmt 0 view .LVU440
+ 1511 0010 0121     		movs	r1, #1
+ 1512 0012 2046     		mov	r0, r4
+ 1513 0014 FFF7FEFF 		bl	w25q_write_enable
+ 1514              	.LVL119:
+ 629:../Core/Src/w25q_impl.c ****   if (err != W25Q_ERR_OK) {
+ 1515              		.loc 1 629 3 is_stmt 1 view .LVU441
+ 1516              		.loc 1 629 6 is_stmt 0 view .LVU442
+ 1517 0018 0546     		mov	r5, r0
+ 1518 001a 10B1     		cbz	r0, .L106
+ 1519              	.LVL120:
+ 1520              	.L102:
+ 630:../Core/Src/w25q_impl.c ****     return err;
+ 631:../Core/Src/w25q_impl.c ****   }
+ 632:../Core/Src/w25q_impl.c **** 
+ 633:../Core/Src/w25q_impl.c ****   OSPI_RegularCmdTypeDef cmd = {0};
+ 634:../Core/Src/w25q_impl.c **** 
+ 635:../Core/Src/w25q_impl.c ****   cmd.OperationType = HAL_OSPI_OPTYPE_COMMON_CFG;
+ 636:../Core/Src/w25q_impl.c **** 
+ 637:../Core/Src/w25q_impl.c ****   cmd.Instruction = W25Q_CHIP_ERASE;
+ 638:../Core/Src/w25q_impl.c ****   cmd.InstructionMode = HAL_OSPI_INSTRUCTION_1_LINE;
+ 639:../Core/Src/w25q_impl.c ****   cmd.InstructionSize = HAL_OSPI_INSTRUCTION_8_BITS;
+ 640:../Core/Src/w25q_impl.c ****   cmd.InstructionDtrMode = HAL_OSPI_INSTRUCTION_DTR_DISABLE;
+ 641:../Core/Src/w25q_impl.c **** 
+ 642:../Core/Src/w25q_impl.c ****   cmd.AddressMode = HAL_OSPI_ADDRESS_NONE;
+ 643:../Core/Src/w25q_impl.c ****   cmd.AddressDtrMode = HAL_OSPI_ADDRESS_DTR_DISABLE;
+ 644:../Core/Src/w25q_impl.c **** 
+ 645:../Core/Src/w25q_impl.c ****   cmd.AlternateBytesMode = HAL_OSPI_ALTERNATE_BYTES_NONE;
+ 646:../Core/Src/w25q_impl.c **** 
+ 647:../Core/Src/w25q_impl.c ****   cmd.DataMode = HAL_OSPI_DATA_NONE;
+ 648:../Core/Src/w25q_impl.c ****   cmd.DataDtrMode = HAL_OSPI_DATA_DTR_DISABLE;
+ 649:../Core/Src/w25q_impl.c **** 
+ 650:../Core/Src/w25q_impl.c ****   cmd.DummyCycles = 0;
+ 651:../Core/Src/w25q_impl.c ****   cmd.DQSMode = HAL_OSPI_DQS_DISABLE;
+ 652:../Core/Src/w25q_impl.c ****   cmd.SIOOMode = HAL_OSPI_SIOO_INST_EVERY_CMD;
+ 653:../Core/Src/w25q_impl.c **** 
+ 654:../Core/Src/w25q_impl.c ****   HAL_GPIO_WritePin(FLASH_CS_GPIO_PORT, FLASH_CS_PIN, GPIO_PIN_RESET);
+ 655:../Core/Src/w25q_impl.c **** 
+ 656:../Core/Src/w25q_impl.c ****   if (HAL_OSPI_Command(&flash_spi, &cmd, HAL_OSPI_TIMEOUT_DEFAULT_VALUE) !=
+ 657:../Core/Src/w25q_impl.c ****       HAL_OK) {
+ 658:../Core/Src/w25q_impl.c ****     return W25Q_ERR_SPI;
+ 659:../Core/Src/w25q_impl.c ****   }
+ 660:../Core/Src/w25q_impl.c **** 
+ 661:../Core/Src/w25q_impl.c ****   HAL_GPIO_WritePin(FLASH_CS_GPIO_PORT, FLASH_CS_PIN, GPIO_PIN_SET);
+ 662:../Core/Src/w25q_impl.c **** 
+ 663:../Core/Src/w25q_impl.c ****   while (w25q_is_busy(device) == W25Q_ERR_BUSY)
+ 664:../Core/Src/w25q_impl.c ****     ;
+ 665:../Core/Src/w25q_impl.c **** 
+ 666:../Core/Src/w25q_impl.c **** 
+ 667:../Core/Src/w25q_impl.c ****   return W25Q_ERR_OK;
+ARM GAS  /tmp/cc5A8HOi.s 			page 41
+
+
+ 668:../Core/Src/w25q_impl.c **** }
+ 1521              		.loc 1 668 1 view .LVU443
+ 1522 001c 2846     		mov	r0, r5
+ 1523 001e 15B0     		add	sp, sp, #84
+ 1524              	.LCFI39:
+ 1525              		.cfi_remember_state
+ 1526              		.cfi_def_cfa_offset 12
+ 1527              		@ sp needed
+ 1528 0020 30BD     		pop	{r4, r5, pc}
+ 1529              	.LVL121:
+ 1530              	.L106:
+ 1531              	.LCFI40:
+ 1532              		.cfi_restore_state
+ 633:../Core/Src/w25q_impl.c **** 
+ 1533              		.loc 1 633 3 is_stmt 1 view .LVU444
+ 633:../Core/Src/w25q_impl.c **** 
+ 1534              		.loc 1 633 26 is_stmt 0 view .LVU445
+ 1535 0022 5022     		movs	r2, #80
+ 1536 0024 0021     		movs	r1, #0
+ 1537 0026 6846     		mov	r0, sp
+ 1538              	.LVL122:
+ 633:../Core/Src/w25q_impl.c **** 
+ 1539              		.loc 1 633 26 view .LVU446
+ 1540 0028 FFF7FEFF 		bl	memset
+ 1541              	.LVL123:
+ 635:../Core/Src/w25q_impl.c **** 
+ 1542              		.loc 1 635 3 is_stmt 1 view .LVU447
+ 637:../Core/Src/w25q_impl.c ****   cmd.InstructionMode = HAL_OSPI_INSTRUCTION_1_LINE;
+ 1543              		.loc 1 637 3 view .LVU448
+ 637:../Core/Src/w25q_impl.c ****   cmd.InstructionMode = HAL_OSPI_INSTRUCTION_1_LINE;
+ 1544              		.loc 1 637 19 is_stmt 0 view .LVU449
+ 1545 002c C723     		movs	r3, #199
+ 1546 002e 0293     		str	r3, [sp, #8]
+ 638:../Core/Src/w25q_impl.c ****   cmd.InstructionSize = HAL_OSPI_INSTRUCTION_8_BITS;
+ 1547              		.loc 1 638 3 is_stmt 1 view .LVU450
+ 638:../Core/Src/w25q_impl.c ****   cmd.InstructionSize = HAL_OSPI_INSTRUCTION_8_BITS;
+ 1548              		.loc 1 638 23 is_stmt 0 view .LVU451
+ 1549 0030 0123     		movs	r3, #1
+ 1550 0032 0393     		str	r3, [sp, #12]
+ 639:../Core/Src/w25q_impl.c ****   cmd.InstructionDtrMode = HAL_OSPI_INSTRUCTION_DTR_DISABLE;
+ 1551              		.loc 1 639 3 is_stmt 1 view .LVU452
+ 640:../Core/Src/w25q_impl.c **** 
+ 1552              		.loc 1 640 3 view .LVU453
+ 642:../Core/Src/w25q_impl.c ****   cmd.AddressDtrMode = HAL_OSPI_ADDRESS_DTR_DISABLE;
+ 1553              		.loc 1 642 3 view .LVU454
+ 643:../Core/Src/w25q_impl.c **** 
+ 1554              		.loc 1 643 3 view .LVU455
+ 645:../Core/Src/w25q_impl.c **** 
+ 1555              		.loc 1 645 3 view .LVU456
+ 647:../Core/Src/w25q_impl.c ****   cmd.DataDtrMode = HAL_OSPI_DATA_DTR_DISABLE;
+ 1556              		.loc 1 647 3 view .LVU457
+ 648:../Core/Src/w25q_impl.c **** 
+ 1557              		.loc 1 648 3 view .LVU458
+ 650:../Core/Src/w25q_impl.c ****   cmd.DQSMode = HAL_OSPI_DQS_DISABLE;
+ 1558              		.loc 1 650 3 view .LVU459
+ 651:../Core/Src/w25q_impl.c ****   cmd.SIOOMode = HAL_OSPI_SIOO_INST_EVERY_CMD;
+ 1559              		.loc 1 651 3 view .LVU460
+ARM GAS  /tmp/cc5A8HOi.s 			page 42
+
+
+ 652:../Core/Src/w25q_impl.c **** 
+ 1560              		.loc 1 652 3 view .LVU461
+ 654:../Core/Src/w25q_impl.c **** 
+ 1561              		.loc 1 654 3 view .LVU462
+ 1562 0034 0022     		movs	r2, #0
+ 1563 0036 4021     		movs	r1, #64
+ 1564 0038 0B48     		ldr	r0, .L107
+ 1565 003a FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 1566              	.LVL124:
+ 656:../Core/Src/w25q_impl.c ****       HAL_OK) {
+ 1567              		.loc 1 656 3 view .LVU463
+ 656:../Core/Src/w25q_impl.c ****       HAL_OK) {
+ 1568              		.loc 1 656 7 is_stmt 0 view .LVU464
+ 1569 003e 41F28832 		movw	r2, #5000
+ 1570 0042 6946     		mov	r1, sp
+ 1571 0044 0948     		ldr	r0, .L107+4
+ 1572 0046 FFF7FEFF 		bl	HAL_OSPI_Command
+ 1573              	.LVL125:
+ 656:../Core/Src/w25q_impl.c ****       HAL_OK) {
+ 1574              		.loc 1 656 6 view .LVU465
+ 1575 004a 0546     		mov	r5, r0
+ 1576 004c 50B9     		cbnz	r0, .L104
+ 661:../Core/Src/w25q_impl.c **** 
+ 1577              		.loc 1 661 3 is_stmt 1 view .LVU466
+ 1578 004e 0122     		movs	r2, #1
+ 1579 0050 4021     		movs	r1, #64
+ 1580 0052 0548     		ldr	r0, .L107
+ 1581 0054 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 1582              	.LVL126:
+ 663:../Core/Src/w25q_impl.c ****     ;
+ 1583              		.loc 1 663 3 view .LVU467
+ 1584              	.L103:
+ 663:../Core/Src/w25q_impl.c ****     ;
+ 1585              		.loc 1 663 31 discriminator 1 view .LVU468
+ 663:../Core/Src/w25q_impl.c ****     ;
+ 1586              		.loc 1 663 10 is_stmt 0 discriminator 1 view .LVU469
+ 1587 0058 2046     		mov	r0, r4
+ 1588 005a FFF7FEFF 		bl	w25q_is_busy
+ 1589              	.LVL127:
+ 663:../Core/Src/w25q_impl.c ****     ;
+ 1590              		.loc 1 663 31 discriminator 1 view .LVU470
+ 1591 005e 0128     		cmp	r0, #1
+ 1592 0060 FAD0     		beq	.L103
+ 1593 0062 DBE7     		b	.L102
+ 1594              	.L104:
+ 658:../Core/Src/w25q_impl.c ****   }
+ 1595              		.loc 1 658 12 view .LVU471
+ 1596 0064 0425     		movs	r5, #4
+ 1597 0066 D9E7     		b	.L102
+ 1598              	.L108:
+ 1599              		.align	2
+ 1600              	.L107:
+ 1601 0068 00180258 		.word	1476532224
+ 1602 006c 00000000 		.word	hospi1
+ 1603              		.cfi_endproc
+ 1604              	.LFE408:
+ 1606              		.section	.text.w25q_reset,"ax",%progbits
+ARM GAS  /tmp/cc5A8HOi.s 			page 43
+
+
+ 1607              		.align	1
+ 1608              		.global	w25q_reset
+ 1609              		.syntax unified
+ 1610              		.thumb
+ 1611              		.thumb_func
+ 1613              	w25q_reset:
+ 1614              	.LVL128:
+ 1615              	.LFB409:
+ 669:../Core/Src/w25q_impl.c **** 
+ 670:../Core/Src/w25q_impl.c **** enum w25q_err w25q_reset(struct w25q_device *device) {
+ 1616              		.loc 1 670 54 is_stmt 1 view -0
+ 1617              		.cfi_startproc
+ 1618              		@ args = 0, pretend = 0, frame = 80
+ 1619              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1620              		.loc 1 670 54 is_stmt 0 view .LVU473
+ 1621 0000 30B5     		push	{r4, r5, lr}
+ 1622              	.LCFI41:
+ 1623              		.cfi_def_cfa_offset 12
+ 1624              		.cfi_offset 4, -12
+ 1625              		.cfi_offset 5, -8
+ 1626              		.cfi_offset 14, -4
+ 1627 0002 95B0     		sub	sp, sp, #84
+ 1628              	.LCFI42:
+ 1629              		.cfi_def_cfa_offset 96
+ 1630 0004 0446     		mov	r4, r0
+ 671:../Core/Src/w25q_impl.c ****   enum w25q_err err;
+ 1631              		.loc 1 671 3 is_stmt 1 view .LVU474
+ 672:../Core/Src/w25q_impl.c **** 
+ 673:../Core/Src/w25q_impl.c ****   err = w25q_update_status_struct(device);
+ 1632              		.loc 1 673 3 view .LVU475
+ 1633              		.loc 1 673 9 is_stmt 0 view .LVU476
+ 1634 0006 FFF7FEFF 		bl	w25q_update_status_struct
+ 1635              	.LVL129:
+ 674:../Core/Src/w25q_impl.c ****   if (err != W25Q_ERR_OK) {
+ 1636              		.loc 1 674 3 is_stmt 1 view .LVU477
+ 1637              		.loc 1 674 6 is_stmt 0 view .LVU478
+ 1638 000a 0546     		mov	r5, r0
+ 1639 000c A0BB     		cbnz	r0, .L110
+ 675:../Core/Src/w25q_impl.c ****     return err;
+ 676:../Core/Src/w25q_impl.c ****   }
+ 677:../Core/Src/w25q_impl.c **** 
+ 678:../Core/Src/w25q_impl.c ****   if (device->status.BUSY || device->status.SUS) {
+ 1640              		.loc 1 678 3 is_stmt 1 view .LVU479
+ 1641              		.loc 1 678 27 is_stmt 0 view .LVU480
+ 1642 000e A388     		ldrh	r3, [r4, #4]
+ 1643 0010 23F4FF43 		bic	r3, r3, #32640
+ 1644 0014 23F07E03 		bic	r3, r3, #126
+ 1645 0018 9BB2     		uxth	r3, r3
+ 1646              		.loc 1 678 6 view .LVU481
+ 1647 001a 83BB     		cbnz	r3, .L112
+ 1648              	.LVL130:
+ 1649              	.L111:
+ 679:../Core/Src/w25q_impl.c ****     return W25Q_ERR_CHIP;
+ 680:../Core/Src/w25q_impl.c ****   }
+ 681:../Core/Src/w25q_impl.c **** 
+ 682:../Core/Src/w25q_impl.c ****   while (w25q_is_busy(device) == W25Q_ERR_BUSY)
+ 1650              		.loc 1 682 31 is_stmt 1 discriminator 1 view .LVU482
+ARM GAS  /tmp/cc5A8HOi.s 			page 44
+
+
+ 1651              		.loc 1 682 10 is_stmt 0 discriminator 1 view .LVU483
+ 1652 001c 2046     		mov	r0, r4
+ 1653 001e FFF7FEFF 		bl	w25q_is_busy
+ 1654              	.LVL131:
+ 1655              		.loc 1 682 31 discriminator 1 view .LVU484
+ 1656 0022 0128     		cmp	r0, #1
+ 1657 0024 FAD0     		beq	.L111
+ 683:../Core/Src/w25q_impl.c ****     ;
+ 684:../Core/Src/w25q_impl.c **** 
+ 685:../Core/Src/w25q_impl.c ****   // if (device->status.SUS) {
+ 686:../Core/Src/w25q_impl.c ****   //   w25q_write_resume();
+ 687:../Core/Src/w25q_impl.c ****   // }
+ 688:../Core/Src/w25q_impl.c **** 
+ 689:../Core/Src/w25q_impl.c ****   OSPI_RegularCmdTypeDef cmd = {0};
+ 1658              		.loc 1 689 3 is_stmt 1 view .LVU485
+ 1659              		.loc 1 689 26 is_stmt 0 view .LVU486
+ 1660 0026 5022     		movs	r2, #80
+ 1661 0028 0021     		movs	r1, #0
+ 1662 002a 6846     		mov	r0, sp
+ 1663 002c FFF7FEFF 		bl	memset
+ 1664              	.LVL132:
+ 690:../Core/Src/w25q_impl.c **** 
+ 691:../Core/Src/w25q_impl.c ****   cmd.OperationType = HAL_OSPI_OPTYPE_COMMON_CFG;
+ 1665              		.loc 1 691 3 is_stmt 1 view .LVU487
+ 692:../Core/Src/w25q_impl.c **** 
+ 693:../Core/Src/w25q_impl.c ****   cmd.Instruction = W25Q_ENABLE_RST;
+ 1666              		.loc 1 693 3 view .LVU488
+ 1667              		.loc 1 693 19 is_stmt 0 view .LVU489
+ 1668 0030 6623     		movs	r3, #102
+ 1669 0032 0293     		str	r3, [sp, #8]
+ 694:../Core/Src/w25q_impl.c ****   cmd.InstructionMode = HAL_OSPI_INSTRUCTION_1_LINE;
+ 1670              		.loc 1 694 3 is_stmt 1 view .LVU490
+ 1671              		.loc 1 694 23 is_stmt 0 view .LVU491
+ 1672 0034 0123     		movs	r3, #1
+ 1673 0036 0393     		str	r3, [sp, #12]
+ 695:../Core/Src/w25q_impl.c ****   cmd.InstructionSize = HAL_OSPI_INSTRUCTION_8_BITS;
+ 1674              		.loc 1 695 3 is_stmt 1 view .LVU492
+ 696:../Core/Src/w25q_impl.c ****   cmd.InstructionDtrMode = HAL_OSPI_INSTRUCTION_DTR_DISABLE;
+ 1675              		.loc 1 696 3 view .LVU493
+ 697:../Core/Src/w25q_impl.c **** 
+ 698:../Core/Src/w25q_impl.c ****   cmd.AddressMode = HAL_OSPI_ADDRESS_NONE;
+ 1676              		.loc 1 698 3 view .LVU494
+ 699:../Core/Src/w25q_impl.c ****   cmd.AddressDtrMode = HAL_OSPI_ADDRESS_DTR_DISABLE;
+ 1677              		.loc 1 699 3 view .LVU495
+ 700:../Core/Src/w25q_impl.c **** 
+ 701:../Core/Src/w25q_impl.c ****   cmd.AlternateBytesMode = HAL_OSPI_ALTERNATE_BYTES_NONE;
+ 1678              		.loc 1 701 3 view .LVU496
+ 702:../Core/Src/w25q_impl.c **** 
+ 703:../Core/Src/w25q_impl.c ****   cmd.DataMode = HAL_OSPI_DATA_NONE;
+ 1679              		.loc 1 703 3 view .LVU497
+ 704:../Core/Src/w25q_impl.c ****   cmd.DataDtrMode = HAL_OSPI_DATA_DTR_DISABLE;
+ 1680              		.loc 1 704 3 view .LVU498
+ 705:../Core/Src/w25q_impl.c **** 
+ 706:../Core/Src/w25q_impl.c ****   cmd.DummyCycles = 0;
+ 1681              		.loc 1 706 3 view .LVU499
+ 707:../Core/Src/w25q_impl.c ****   cmd.DQSMode = HAL_OSPI_DQS_DISABLE;
+ 1682              		.loc 1 707 3 view .LVU500
+ARM GAS  /tmp/cc5A8HOi.s 			page 45
+
+
+ 708:../Core/Src/w25q_impl.c ****   cmd.SIOOMode = HAL_OSPI_SIOO_INST_EVERY_CMD;
+ 1683              		.loc 1 708 3 view .LVU501
+ 709:../Core/Src/w25q_impl.c **** 
+ 710:../Core/Src/w25q_impl.c ****   HAL_GPIO_WritePin(FLASH_CS_GPIO_PORT, FLASH_CS_PIN, GPIO_PIN_RESET);
+ 1684              		.loc 1 710 3 view .LVU502
+ 1685 0038 0022     		movs	r2, #0
+ 1686 003a 4021     		movs	r1, #64
+ 1687 003c 1348     		ldr	r0, .L116
+ 1688 003e FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 1689              	.LVL133:
+ 711:../Core/Src/w25q_impl.c **** 
+ 712:../Core/Src/w25q_impl.c ****   if (HAL_OSPI_Command(&flash_spi, &cmd, HAL_OSPI_TIMEOUT_DEFAULT_VALUE) !=
+ 1690              		.loc 1 712 3 view .LVU503
+ 1691              		.loc 1 712 7 is_stmt 0 view .LVU504
+ 1692 0042 41F28832 		movw	r2, #5000
+ 1693 0046 6946     		mov	r1, sp
+ 1694 0048 1148     		ldr	r0, .L116+4
+ 1695 004a FFF7FEFF 		bl	HAL_OSPI_Command
+ 1696              	.LVL134:
+ 1697              		.loc 1 712 6 view .LVU505
+ 1698 004e C0B9     		cbnz	r0, .L113
+ 713:../Core/Src/w25q_impl.c ****       HAL_OK) {
+ 714:../Core/Src/w25q_impl.c ****     return W25Q_ERR_SPI;
+ 715:../Core/Src/w25q_impl.c ****   }
+ 716:../Core/Src/w25q_impl.c **** 
+ 717:../Core/Src/w25q_impl.c ****   w25q_delay(1);
+ 1699              		.loc 1 717 3 is_stmt 1 view .LVU506
+ 1700 0050 0120     		movs	r0, #1
+ 1701 0052 FFF7FEFF 		bl	w25q_delay
+ 1702              	.LVL135:
+ 718:../Core/Src/w25q_impl.c **** 
+ 719:../Core/Src/w25q_impl.c ****   cmd.Instruction = W25Q_RESET;
+ 1703              		.loc 1 719 3 view .LVU507
+ 1704              		.loc 1 719 19 is_stmt 0 view .LVU508
+ 1705 0056 9923     		movs	r3, #153
+ 1706 0058 0293     		str	r3, [sp, #8]
+ 720:../Core/Src/w25q_impl.c **** 
+ 721:../Core/Src/w25q_impl.c ****   if (HAL_OSPI_Command(&flash_spi, &cmd, HAL_OSPI_TIMEOUT_DEFAULT_VALUE) !=
+ 1707              		.loc 1 721 3 is_stmt 1 view .LVU509
+ 1708              		.loc 1 721 7 is_stmt 0 view .LVU510
+ 1709 005a 41F28832 		movw	r2, #5000
+ 1710 005e 6946     		mov	r1, sp
+ 1711 0060 0B48     		ldr	r0, .L116+4
+ 1712 0062 FFF7FEFF 		bl	HAL_OSPI_Command
+ 1713              	.LVL136:
+ 1714              		.loc 1 721 6 view .LVU511
+ 1715 0066 70B9     		cbnz	r0, .L114
+ 722:../Core/Src/w25q_impl.c ****       HAL_OK) {
+ 723:../Core/Src/w25q_impl.c ****     return W25Q_ERR_SPI;
+ 724:../Core/Src/w25q_impl.c ****   }
+ 725:../Core/Src/w25q_impl.c **** 
+ 726:../Core/Src/w25q_impl.c ****   HAL_GPIO_WritePin(FLASH_CS_GPIO_PORT, FLASH_CS_PIN, GPIO_PIN_SET);
+ 1716              		.loc 1 726 3 is_stmt 1 view .LVU512
+ 1717 0068 0122     		movs	r2, #1
+ 1718 006a 4021     		movs	r1, #64
+ 1719 006c 0748     		ldr	r0, .L116
+ 1720 006e FFF7FEFF 		bl	HAL_GPIO_WritePin
+ARM GAS  /tmp/cc5A8HOi.s 			page 46
+
+
+ 1721              	.LVL137:
+ 727:../Core/Src/w25q_impl.c **** 
+ 728:../Core/Src/w25q_impl.c ****   w25q_delay(5);
+ 1722              		.loc 1 728 3 view .LVU513
+ 1723 0072 0520     		movs	r0, #5
+ 1724 0074 FFF7FEFF 		bl	w25q_delay
+ 1725              	.LVL138:
+ 729:../Core/Src/w25q_impl.c **** 
+ 730:../Core/Src/w25q_impl.c ****   return err;
+ 1726              		.loc 1 730 3 view .LVU514
+ 1727              	.L110:
+ 731:../Core/Src/w25q_impl.c **** }...
+ 1728              		.loc 1 731 1 is_stmt 0 view .LVU515
+ 1729 0078 2846     		mov	r0, r5
+ 1730 007a 15B0     		add	sp, sp, #84
+ 1731              	.LCFI43:
+ 1732              		.cfi_remember_state
+ 1733              		.cfi_def_cfa_offset 12
+ 1734              		@ sp needed
+ 1735 007c 30BD     		pop	{r4, r5, pc}
+ 1736              	.LVL139:
+ 1737              	.L112:
+ 1738              	.LCFI44:
+ 1739              		.cfi_restore_state
+ 679:../Core/Src/w25q_impl.c ****     return W25Q_ERR_CHIP;
+ 1740              		.loc 1 679 12 view .LVU516
+ 1741 007e 0325     		movs	r5, #3
+ 1742 0080 FAE7     		b	.L110
+ 1743              	.LVL140:
+ 1744              	.L113:
+ 714:../Core/Src/w25q_impl.c ****     return W25Q_ERR_SPI;
+ 1745              		.loc 1 714 12 view .LVU517
+ 1746 0082 0425     		movs	r5, #4
+ 1747 0084 F8E7     		b	.L110
+ 1748              	.L114:
+ 723:../Core/Src/w25q_impl.c ****     return W25Q_ERR_SPI;
+ 1749              		.loc 1 723 12 view .LVU518
+ 1750 0086 0425     		movs	r5, #4
+ 1751 0088 F6E7     		b	.L110
+ 1752              	.L117:
+ 1753 008a 00BF     		.align	2
+ 1754              	.L116:
+ 1755 008c 00180258 		.word	1476532224
+ 1756 0090 00000000 		.word	hospi1
+ 1757              		.cfi_endproc
+ 1758              	.LFE409:
+ 1760              		.text
+ 1761              	.Letext0:
+ 1762              		.file 2 "/nix/store/lcj4nx7xv8c36cif7armkfa7b5cmfh74-gcc-arm-embedded-12.3.rel1/arm-none-eabi/incl
+ 1763              		.file 3 "/nix/store/lcj4nx7xv8c36cif7armkfa7b5cmfh74-gcc-arm-embedded-12.3.rel1/arm-none-eabi/incl
+ 1764              		.file 4 "Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h725xx.h"
+ 1765              		.file 5 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_def.h"
+ 1766              		.file 6 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_gpio.h"
+ 1767              		.file 7 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_mdma.h"
+ 1768              		.file 8 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_ospi.h"
+ 1769              		.file 9 "../Core/Include/w25q.h"
+ 1770              		.file 10 "../Core/Include/adc.h"
+ARM GAS  /tmp/cc5A8HOi.s 			page 47
+
+
+ 1771              		.file 11 "Core/Inc/port_config.h"
+ 1772              		.file 12 "Core/Inc/portmacro.h"
+ 1773              		.file 13 "../Core/FreeRTOS-Kernel/include/task.h"
+ 1774              		.file 14 "../Core/Include/globals.h"
+ 1775              		.file 15 "<built-in>"
+ARM GAS  /tmp/cc5A8HOi.s 			page 48
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 w25q_impl.c
+     /tmp/cc5A8HOi.s:21     .text.w25q_delay:00000000 $t
+     /tmp/cc5A8HOi.s:27     .text.w25q_delay:00000000 w25q_delay
+     /tmp/cc5A8HOi.s:69     .text.w25q_read_id:00000000 $t
+     /tmp/cc5A8HOi.s:75     .text.w25q_read_id:00000000 w25q_read_id
+     /tmp/cc5A8HOi.s:195    .text.w25q_read_id:0000006c $d
+     /tmp/cc5A8HOi.s:201    .text.w25q_write_enable:00000000 $t
+     /tmp/cc5A8HOi.s:207    .text.w25q_write_enable:00000000 w25q_write_enable
+     /tmp/cc5A8HOi.s:306    .text.w25q_write_enable:00000054 $d
+     /tmp/cc5A8HOi.s:312    .text.w25q_enter_4_byte_mode:00000000 $t
+     /tmp/cc5A8HOi.s:318    .text.w25q_enter_4_byte_mode:00000000 w25q_enter_4_byte_mode
+     /tmp/cc5A8HOi.s:429    .text.w25q_enter_4_byte_mode:00000060 $d
+     /tmp/cc5A8HOi.s:435    .text.w25q_read_status_reg:00000000 $t
+     /tmp/cc5A8HOi.s:441    .text.w25q_read_status_reg:00000000 w25q_read_status_reg
+     /tmp/cc5A8HOi.s:581    .text.w25q_read_status_reg:00000080 $d
+     /tmp/cc5A8HOi.s:587    .text.w25q_write_status_reg:00000000 $t
+     /tmp/cc5A8HOi.s:593    .text.w25q_write_status_reg:00000000 w25q_write_status_reg
+     /tmp/cc5A8HOi.s:752    .text.w25q_write_status_reg:0000009c $d
+     /tmp/cc5A8HOi.s:758    .text.w25q_read_raw:00000000 $t
+     /tmp/cc5A8HOi.s:764    .text.w25q_read_raw:00000000 w25q_read_raw
+     /tmp/cc5A8HOi.s:913    .text.w25q_read_raw:0000008c $d
+     /tmp/cc5A8HOi.s:919    .text.w25q_write_raw:00000000 $t
+     /tmp/cc5A8HOi.s:925    .text.w25q_write_raw:00000000 w25q_write_raw
+     /tmp/cc5A8HOi.s:1086   .text.w25q_write_raw:00000098 $d
+     /tmp/cc5A8HOi.s:1092   .text.w25q_erase_sector:00000000 $t
+     /tmp/cc5A8HOi.s:1098   .text.w25q_erase_sector:00000000 w25q_erase_sector
+     /tmp/cc5A8HOi.s:1243   .text.w25q_erase_sector:00000084 $d
+     /tmp/cc5A8HOi.s:1249   .text.w25q_erase_block:00000000 $t
+     /tmp/cc5A8HOi.s:1255   .text.w25q_erase_block:00000000 w25q_erase_block
+     /tmp/cc5A8HOi.s:1468   .text.w25q_erase_block:000000d0 $d
+     /tmp/cc5A8HOi.s:1474   .text.w25q_erase_chip:00000000 $t
+     /tmp/cc5A8HOi.s:1480   .text.w25q_erase_chip:00000000 w25q_erase_chip
+     /tmp/cc5A8HOi.s:1601   .text.w25q_erase_chip:00000068 $d
+     /tmp/cc5A8HOi.s:1607   .text.w25q_reset:00000000 $t
+     /tmp/cc5A8HOi.s:1613   .text.w25q_reset:00000000 w25q_reset
+     /tmp/cc5A8HOi.s:1755   .text.w25q_reset:0000008c $d
+
+UNDEFINED SYMBOLS
+__aeabi_uldivmod
+vTaskDelay
+memset
+HAL_GPIO_WritePin
+HAL_OSPI_Command
+HAL_OSPI_Receive
+hospi1
+w25q_is_busy
+w25q_update_status_struct
+HAL_OSPI_Transmit

@@ -1,0 +1,2618 @@
+ARM GAS  /tmp/cczMYj0a.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"state_flash.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.rodata.flash_test.str1.4,"aMS",%progbits,1
+  18              		.align	2
+  19              	.LC0:
+  20 0000 4661696C 		.ascii	"Failed to initialize flash block\015\012\000"
+  20      65642074 
+  20      6F20696E 
+  20      69746961 
+  20      6C697A65 
+  21 0023 00       		.align	2
+  22              	.LC1:
+  23 0024 4661696C 		.ascii	"Failed to write to flash\015\012\000"
+  23      65642074 
+  23      6F207772 
+  23      69746520 
+  23      746F2066 
+  24 003f 00       		.align	2
+  25              	.LC2:
+  26 0040 4661696C 		.ascii	"Failed to read from flash\015\012\000"
+  26      65642074 
+  26      6F207265 
+  26      61642066 
+  26      726F6D20 
+  27              		.align	2
+  28              	.LC3:
+  29 005c 4661696C 		.ascii	"Failed to erase flash\015\012\000"
+  29      65642074 
+  29      6F206572 
+  29      61736520 
+  29      666C6173 
+  30              		.section	.text.flash_test,"ax",%progbits
+  31              		.align	1
+  32              		.global	flash_test
+  33              		.arch armv7e-m
+  34              		.syntax unified
+  35              		.thumb
+  36              		.thumb_func
+  37              		.fpu fpv4-sp-d16
+  39              	flash_test:
+  40              	.LFB247:
+  41              		.file 1 "../Core/Src/state_flash.c"
+   1:../Core/Src/state_flash.c **** #include "state_flash.h"
+ARM GAS  /tmp/cczMYj0a.s 			page 2
+
+
+   2:../Core/Src/state_flash.c **** 
+   3:../Core/Src/state_flash.c **** int flash_test(void);
+   4:../Core/Src/state_flash.c **** int sd_test(void);
+   5:../Core/Src/state_flash.c **** 
+   6:../Core/Src/state_flash.c **** void write_to_flash(FlashBlock *flash_block, RocketState *rocket_state, size_t page_index);
+   7:../Core/Src/state_flash.c **** void flash_sd_card(FlashBlock *flash_block, SDFile *sd_file, size_t n_states);
+   8:../Core/Src/state_flash.c **** size_t to_csv_line(RocketState *rocket_state, char *line);
+   9:../Core/Src/state_flash.c **** size_t printf_fixed_float(char *buf, float f);
+  10:../Core/Src/state_flash.c **** 
+  11:../Core/Src/state_flash.c **** void state_flash_task(void *args) {
+  12:../Core/Src/state_flash.c ****     if (!io_init()) {
+  13:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to initialize IO\r\n", 26, HAL_MAX_DELAY
+  14:../Core/Src/state_flash.c ****     } else {
+  15:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "IO initialized\r\n", 17, HAL_MAX_DELAY);
+  16:../Core/Src/state_flash.c ****     }
+  17:../Core/Src/state_flash.c **** 
+  18:../Core/Src/state_flash.c ****     if (flash_test()) {
+  19:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Flash test PASS\r\n", 17, HAL_MAX_DELAY);
+  20:../Core/Src/state_flash.c ****     } else {
+  21:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Flash test FAIL\r\n", 19, HAL_MAX_DELAY);
+  22:../Core/Src/state_flash.c ****     }
+  23:../Core/Src/state_flash.c **** 
+  24:../Core/Src/state_flash.c ****     if (sd_test()) {
+  25:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "SD test PASS\r\n", 14, HAL_MAX_DELAY);
+  26:../Core/Src/state_flash.c ****     } else {
+  27:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "SD test FAIL\r\n", 16, HAL_MAX_DELAY);
+  28:../Core/Src/state_flash.c ****     }
+  29:../Core/Src/state_flash.c **** 
+  30:../Core/Src/state_flash.c ****     uint32_t notification_value = 0;
+  31:../Core/Src/state_flash.c ****     while ((notification_value & BEGIN_STATE_FLASH_NOTIFICATION_BIT) == 0) {
+  32:../Core/Src/state_flash.c ****         xTaskNotifyWait(0, BEGIN_STATE_FLASH_NOTIFICATION_BIT, &notification_value, portMAX_DELAY);
+  33:../Core/Src/state_flash.c ****     }
+  34:../Core/Src/state_flash.c **** 
+  35:../Core/Src/state_flash.c ****     RocketState rocket_state;
+  36:../Core/Src/state_flash.c **** 
+  37:../Core/Src/state_flash.c ****     FlashBlock flash_block;
+  38:../Core/Src/state_flash.c ****     SDFile sd_file;
+  39:../Core/Src/state_flash.c **** 
+  40:../Core/Src/state_flash.c ****     flash_init_block(&flash_block, STATE_FLASH_START_SECTOR, STATE_FLASH_N_SECTORS);
+  41:../Core/Src/state_flash.c ****     sd_init_file(&sd_file, "/data.csv");
+  42:../Core/Src/state_flash.c **** 
+  43:../Core/Src/state_flash.c ****     size_t flash_page_index = 0;
+  44:../Core/Src/state_flash.c **** 
+  45:../Core/Src/state_flash.c ****     while (1) {
+  46:../Core/Src/state_flash.c ****         xTaskNotifyWait(0, FLASH_STATE_NOTIFICATION_BIT | FLASH_SD_CARD_NOTIFICATION_BIT, &notifica
+  47:../Core/Src/state_flash.c **** 
+  48:../Core/Src/state_flash.c ****         if (notification_value & FLASH_SD_CARD_NOTIFICATION_BIT) {
+  49:../Core/Src/state_flash.c ****             HAL_UART_Transmit(&debug_uart, (uint8_t *) "Flashing SD card...\r\n", 20, HAL_MAX_DELAY
+  50:../Core/Src/state_flash.c ****             flash_sd_card(&flash_block, &sd_file, flash_page_index);
+  51:../Core/Src/state_flash.c **** 
+  52:../Core/Src/state_flash.c ****             /* Stop everything */
+  53:../Core/Src/state_flash.c ****             vTaskSuspendAll();
+  54:../Core/Src/state_flash.c **** 
+  55:../Core/Src/state_flash.c ****             /* Tasks aren't allowed to exit, so stall here */
+  56:../Core/Src/state_flash.c ****             vTaskDelay(portMAX_DELAY);
+  57:../Core/Src/state_flash.c ****         }
+  58:../Core/Src/state_flash.c **** 
+ARM GAS  /tmp/cczMYj0a.s 			page 3
+
+
+  59:../Core/Src/state_flash.c ****         if (notification_value & FLASH_STATE_NOTIFICATION_BIT) {
+  60:../Core/Src/state_flash.c ****             if (xSemaphoreTake(g_state_mutex_handle, portMAX_DELAY) == pdTRUE) {
+  61:../Core/Src/state_flash.c ****                 memcpy(&rocket_state, &g_current_state, sizeof(RocketState));
+  62:../Core/Src/state_flash.c ****                 xSemaphoreGive(g_state_mutex_handle);
+  63:../Core/Src/state_flash.c ****             }
+  64:../Core/Src/state_flash.c **** 
+  65:../Core/Src/state_flash.c ****             write_to_flash(&flash_block, &rocket_state, flash_page_index);
+  66:../Core/Src/state_flash.c ****             flash_page_index ++;
+  67:../Core/Src/state_flash.c ****         }
+  68:../Core/Src/state_flash.c ****     }
+  69:../Core/Src/state_flash.c **** }
+  70:../Core/Src/state_flash.c **** 
+  71:../Core/Src/state_flash.c **** 
+  72:../Core/Src/state_flash.c **** int flash_test(void) {
+  42              		.loc 1 72 22 view -0
+  43              		.cfi_startproc
+  44              		@ args = 0, pretend = 0, frame = 4104
+  45              		@ frame_needed = 0, uses_anonymous_args = 0
+  46 0000 30B5     		push	{r4, r5, lr}
+  47              	.LCFI0:
+  48              		.cfi_def_cfa_offset 12
+  49              		.cfi_offset 4, -12
+  50              		.cfi_offset 5, -8
+  51              		.cfi_offset 14, -4
+  52 0002 ADF5805D 		sub	sp, sp, #4096
+  53              	.LCFI1:
+  54              		.cfi_def_cfa_offset 4108
+  55 0006 83B0     		sub	sp, sp, #12
+  56              	.LCFI2:
+  57              		.cfi_def_cfa_offset 4120
+  73:../Core/Src/state_flash.c ****     FlashBlock test_block;
+  58              		.loc 1 73 5 view .LVU1
+  74:../Core/Src/state_flash.c **** 
+  75:../Core/Src/state_flash.c ****     if (!flash_init_block(&test_block, 1, 2)) {
+  59              		.loc 1 75 5 view .LVU2
+  60              		.loc 1 75 10 is_stmt 0 view .LVU3
+  61 0008 0222     		movs	r2, #2
+  62 000a 0121     		movs	r1, #1
+  63 000c 0DF58050 		add	r0, sp, #4096
+  64 0010 0430     		adds	r0, r0, #4
+  65 0012 FFF7FEFF 		bl	flash_init_block
+  66              	.LVL0:
+  67              		.loc 1 75 8 view .LVU4
+  68 0016 30B1     		cbz	r0, .L13
+  76:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to initialize flash block\r\n", 32, HAL_
+  77:../Core/Src/state_flash.c ****         return 0;
+  78:../Core/Src/state_flash.c ****     }
+  79:../Core/Src/state_flash.c **** 
+  80:../Core/Src/state_flash.c ****     uint8_t test_bytes[FLASH_TEST_SIZE];
+  69              		.loc 1 80 5 is_stmt 1 view .LVU5
+  81:../Core/Src/state_flash.c **** 
+  82:../Core/Src/state_flash.c ****     const uint8_t offset = xTaskGetTickCount() % 256;
+  70              		.loc 1 82 5 view .LVU6
+  71              		.loc 1 82 28 is_stmt 0 view .LVU7
+  72 0018 FFF7FEFF 		bl	xTaskGetTickCount
+  73              	.LVL1:
+  74 001c 0446     		mov	r4, r0
+ARM GAS  /tmp/cczMYj0a.s 			page 4
+
+
+  75              		.loc 1 82 19 view .LVU8
+  76 001e 5FFA80FC 		uxtb	ip, r0
+  77              	.LVL2:
+  83:../Core/Src/state_flash.c **** 
+  84:../Core/Src/state_flash.c ****     for (size_t i = 0; i < FLASH_TEST_SIZE; i ++) {
+  78              		.loc 1 84 5 is_stmt 1 view .LVU9
+  79              	.LBB2:
+  80              		.loc 1 84 10 view .LVU10
+  81              		.loc 1 84 17 is_stmt 0 view .LVU11
+  82 0022 0023     		movs	r3, #0
+  83              		.loc 1 84 5 view .LVU12
+  84 0024 13E0     		b	.L4
+  85              	.LVL3:
+  86              	.L13:
+  87              		.loc 1 84 5 view .LVU13
+  88 0026 0546     		mov	r5, r0
+  89              	.LBE2:
+  76:../Core/Src/state_flash.c ****         return 0;
+  90              		.loc 1 76 9 is_stmt 1 view .LVU14
+  91 0028 4FF0FF33 		mov	r3, #-1
+  92 002c 2022     		movs	r2, #32
+  93 002e 3049     		ldr	r1, .L18
+  94 0030 3048     		ldr	r0, .L18+4
+  95 0032 FFF7FEFF 		bl	HAL_UART_Transmit
+  96              	.LVL4:
+  77:../Core/Src/state_flash.c ****     }
+  97              		.loc 1 77 9 view .LVU15
+  98              	.L1:
+  85:../Core/Src/state_flash.c ****         test_bytes[i] = (i + offset) % 256;
+  86:../Core/Src/state_flash.c ****     }
+  87:../Core/Src/state_flash.c **** 
+  88:../Core/Src/state_flash.c ****     if (!flash_write_block(&test_block, 0, test_bytes, FLASH_TEST_SIZE)) {
+  89:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to write to flash\r\n", 26, HAL_MAX_DELA
+  90:../Core/Src/state_flash.c ****         return 0;
+  91:../Core/Src/state_flash.c ****     }
+  92:../Core/Src/state_flash.c **** 
+  93:../Core/Src/state_flash.c ****     memset(test_bytes, 0, FLASH_TEST_SIZE);
+  94:../Core/Src/state_flash.c **** 
+  95:../Core/Src/state_flash.c ****     if (!flash_read_block(&test_block, 0, test_bytes, FLASH_TEST_SIZE)) {
+  96:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to read from flash\r\n", 27, HAL_MAX_DEL
+  97:../Core/Src/state_flash.c ****         return 0;
+  98:../Core/Src/state_flash.c ****     }
+  99:../Core/Src/state_flash.c **** 
+ 100:../Core/Src/state_flash.c ****     for (size_t i = 0; i < FLASH_TEST_SIZE; i ++) {
+ 101:../Core/Src/state_flash.c ****         if (test_bytes[i] != (i + offset) % 256) {
+ 102:../Core/Src/state_flash.c ****             return 0;
+ 103:../Core/Src/state_flash.c ****         }
+ 104:../Core/Src/state_flash.c ****     }
+ 105:../Core/Src/state_flash.c **** 
+ 106:../Core/Src/state_flash.c ****     if (!flash_erase_block(&test_block)) {
+ 107:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to erase flash\r\n", 29, HAL_MAX_DELAY);
+ 108:../Core/Src/state_flash.c ****         return 0;
+ 109:../Core/Src/state_flash.c ****     }
+ 110:../Core/Src/state_flash.c **** 
+ 111:../Core/Src/state_flash.c ****     return 1;
+ 112:../Core/Src/state_flash.c **** }
+  99              		.loc 1 112 1 is_stmt 0 view .LVU16
+ARM GAS  /tmp/cczMYj0a.s 			page 5
+
+
+ 100 0036 2846     		mov	r0, r5
+ 101 0038 0DF5805D 		add	sp, sp, #4096
+ 102 003c 03B0     		add	sp, sp, #12
+ 103              	.LCFI3:
+ 104              		.cfi_remember_state
+ 105              		.cfi_def_cfa_offset 12
+ 106              		@ sp needed
+ 107 003e 30BD     		pop	{r4, r5, pc}
+ 108              	.LVL5:
+ 109              	.L5:
+ 110              	.LCFI4:
+ 111              		.cfi_restore_state
+ 112              	.LBB3:
+  85:../Core/Src/state_flash.c ****         test_bytes[i] = (i + offset) % 256;
+ 113              		.loc 1 85 9 is_stmt 1 discriminator 3 view .LVU17
+  85:../Core/Src/state_flash.c ****         test_bytes[i] = (i + offset) % 256;
+ 114              		.loc 1 85 28 is_stmt 0 discriminator 3 view .LVU18
+ 115 0040 0CEB0301 		add	r1, ip, r3
+  85:../Core/Src/state_flash.c ****         test_bytes[i] = (i + offset) % 256;
+ 116              		.loc 1 85 23 discriminator 3 view .LVU19
+ 117 0044 02AA     		add	r2, sp, #8
+ 118 0046 1A44     		add	r2, r2, r3
+ 119 0048 02F8041C 		strb	r1, [r2, #-4]
+  84:../Core/Src/state_flash.c ****         test_bytes[i] = (i + offset) % 256;
+ 120              		.loc 1 84 45 is_stmt 1 discriminator 3 view .LVU20
+  84:../Core/Src/state_flash.c ****         test_bytes[i] = (i + offset) % 256;
+ 121              		.loc 1 84 47 is_stmt 0 discriminator 3 view .LVU21
+ 122 004c 0133     		adds	r3, r3, #1
+ 123              	.LVL6:
+ 124              	.L4:
+  84:../Core/Src/state_flash.c ****         test_bytes[i] = (i + offset) % 256;
+ 125              		.loc 1 84 24 is_stmt 1 discriminator 1 view .LVU22
+  84:../Core/Src/state_flash.c ****         test_bytes[i] = (i + offset) % 256;
+ 126              		.loc 1 84 5 is_stmt 0 discriminator 1 view .LVU23
+ 127 004e B3F5805F 		cmp	r3, #4096
+ 128 0052 F5D3     		bcc	.L5
+ 129              	.LBE3:
+  88:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to write to flash\r\n", 26, HAL_MAX_DELA
+ 130              		.loc 1 88 5 is_stmt 1 view .LVU24
+  88:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to write to flash\r\n", 26, HAL_MAX_DELA
+ 131              		.loc 1 88 10 is_stmt 0 view .LVU25
+ 132 0054 4FF48053 		mov	r3, #4096
+ 133              	.LVL7:
+  88:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to write to flash\r\n", 26, HAL_MAX_DELA
+ 134              		.loc 1 88 10 view .LVU26
+ 135 0058 01AA     		add	r2, sp, #4
+ 136 005a 0021     		movs	r1, #0
+ 137 005c 0DF58050 		add	r0, sp, #4096
+ 138 0060 0430     		adds	r0, r0, #4
+ 139 0062 FFF7FEFF 		bl	flash_write_block
+ 140              	.LVL8:
+  88:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to write to flash\r\n", 26, HAL_MAX_DELA
+ 141              		.loc 1 88 8 view .LVU27
+ 142 0066 0546     		mov	r5, r0
+ 143 0068 F8B1     		cbz	r0, .L14
+  93:../Core/Src/state_flash.c **** 
+ 144              		.loc 1 93 5 is_stmt 1 view .LVU28
+ARM GAS  /tmp/cczMYj0a.s 			page 6
+
+
+ 145 006a 4FF48055 		mov	r5, #4096
+ 146 006e 2A46     		mov	r2, r5
+ 147 0070 0021     		movs	r1, #0
+ 148 0072 01A8     		add	r0, sp, #4
+ 149 0074 FFF7FEFF 		bl	memset
+ 150              	.LVL9:
+  95:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to read from flash\r\n", 27, HAL_MAX_DEL
+ 151              		.loc 1 95 5 view .LVU29
+  95:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to read from flash\r\n", 27, HAL_MAX_DEL
+ 152              		.loc 1 95 10 is_stmt 0 view .LVU30
+ 153 0078 2B46     		mov	r3, r5
+ 154 007a 01AA     		add	r2, sp, #4
+ 155 007c 0021     		movs	r1, #0
+ 156 007e 0DF58050 		add	r0, sp, #4096
+ 157 0082 0430     		adds	r0, r0, #4
+ 158 0084 FFF7FEFF 		bl	flash_read_block
+ 159              	.LVL10:
+  95:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to read from flash\r\n", 27, HAL_MAX_DEL
+ 160              		.loc 1 95 8 view .LVU31
+ 161 0088 0546     		mov	r5, r0
+ 162 008a B0B1     		cbz	r0, .L15
+ 163              	.LBB4:
+ 100:../Core/Src/state_flash.c ****         if (test_bytes[i] != (i + offset) % 256) {
+ 164              		.loc 1 100 17 view .LVU32
+ 165 008c 0023     		movs	r3, #0
+ 166              	.L7:
+ 167              	.LVL11:
+ 100:../Core/Src/state_flash.c ****         if (test_bytes[i] != (i + offset) % 256) {
+ 168              		.loc 1 100 24 is_stmt 1 discriminator 1 view .LVU33
+ 100:../Core/Src/state_flash.c ****         if (test_bytes[i] != (i + offset) % 256) {
+ 169              		.loc 1 100 5 is_stmt 0 discriminator 1 view .LVU34
+ 170 008e B3F5805F 		cmp	r3, #4096
+ 171 0092 1AD2     		bcs	.L16
+ 101:../Core/Src/state_flash.c ****             return 0;
+ 172              		.loc 1 101 9 is_stmt 1 view .LVU35
+ 101:../Core/Src/state_flash.c ****             return 0;
+ 173              		.loc 1 101 23 is_stmt 0 view .LVU36
+ 174 0094 02AA     		add	r2, sp, #8
+ 175 0096 1A44     		add	r2, r2, r3
+ 176 0098 12F8041C 		ldrb	r1, [r2, #-4]	@ zero_extendqisi2
+ 101:../Core/Src/state_flash.c ****             return 0;
+ 177              		.loc 1 101 33 view .LVU37
+ 178 009c 53FA84F2 		uxtab	r2, r3, r4
+ 101:../Core/Src/state_flash.c ****             return 0;
+ 179              		.loc 1 101 43 view .LVU38
+ 180 00a0 D2B2     		uxtb	r2, r2
+ 101:../Core/Src/state_flash.c ****             return 0;
+ 181              		.loc 1 101 12 view .LVU39
+ 182 00a2 9142     		cmp	r1, r2
+ 183 00a4 22D1     		bne	.L10
+ 100:../Core/Src/state_flash.c ****         if (test_bytes[i] != (i + offset) % 256) {
+ 184              		.loc 1 100 45 is_stmt 1 discriminator 2 view .LVU40
+ 100:../Core/Src/state_flash.c ****         if (test_bytes[i] != (i + offset) % 256) {
+ 185              		.loc 1 100 47 is_stmt 0 discriminator 2 view .LVU41
+ 186 00a6 0133     		adds	r3, r3, #1
+ 187              	.LVL12:
+ 100:../Core/Src/state_flash.c ****         if (test_bytes[i] != (i + offset) % 256) {
+ARM GAS  /tmp/cczMYj0a.s 			page 7
+
+
+ 188              		.loc 1 100 47 discriminator 2 view .LVU42
+ 189 00a8 F1E7     		b	.L7
+ 190              	.LVL13:
+ 191              	.L14:
+ 100:../Core/Src/state_flash.c ****         if (test_bytes[i] != (i + offset) % 256) {
+ 192              		.loc 1 100 47 discriminator 2 view .LVU43
+ 193              	.LBE4:
+  89:../Core/Src/state_flash.c ****         return 0;
+ 194              		.loc 1 89 9 is_stmt 1 view .LVU44
+ 195 00aa 4FF0FF33 		mov	r3, #-1
+ 196 00ae 1A22     		movs	r2, #26
+ 197 00b0 1149     		ldr	r1, .L18+8
+ 198 00b2 1048     		ldr	r0, .L18+4
+ 199 00b4 FFF7FEFF 		bl	HAL_UART_Transmit
+ 200              	.LVL14:
+  90:../Core/Src/state_flash.c ****     }
+ 201              		.loc 1 90 9 view .LVU45
+  90:../Core/Src/state_flash.c ****     }
+ 202              		.loc 1 90 16 is_stmt 0 view .LVU46
+ 203 00b8 BDE7     		b	.L1
+ 204              	.L15:
+  96:../Core/Src/state_flash.c ****         return 0;
+ 205              		.loc 1 96 9 is_stmt 1 view .LVU47
+ 206 00ba 4FF0FF33 		mov	r3, #-1
+ 207 00be 1B22     		movs	r2, #27
+ 208 00c0 0E49     		ldr	r1, .L18+12
+ 209 00c2 0C48     		ldr	r0, .L18+4
+ 210 00c4 FFF7FEFF 		bl	HAL_UART_Transmit
+ 211              	.LVL15:
+  97:../Core/Src/state_flash.c ****     }
+ 212              		.loc 1 97 9 view .LVU48
+  97:../Core/Src/state_flash.c ****     }
+ 213              		.loc 1 97 16 is_stmt 0 view .LVU49
+ 214 00c8 B5E7     		b	.L1
+ 215              	.LVL16:
+ 216              	.L16:
+ 106:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to erase flash\r\n", 29, HAL_MAX_DELAY);
+ 217              		.loc 1 106 5 is_stmt 1 view .LVU50
+ 106:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to erase flash\r\n", 29, HAL_MAX_DELAY);
+ 218              		.loc 1 106 10 is_stmt 0 view .LVU51
+ 219 00ca 0DF58050 		add	r0, sp, #4096
+ 220 00ce 0430     		adds	r0, r0, #4
+ 221 00d0 FFF7FEFF 		bl	flash_erase_block
+ 222              	.LVL17:
+ 106:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to erase flash\r\n", 29, HAL_MAX_DELAY);
+ 223              		.loc 1 106 8 view .LVU52
+ 224 00d4 0546     		mov	r5, r0
+ 225 00d6 08B1     		cbz	r0, .L17
+ 111:../Core/Src/state_flash.c **** }
+ 226              		.loc 1 111 12 view .LVU53
+ 227 00d8 0125     		movs	r5, #1
+ 228 00da ACE7     		b	.L1
+ 229              	.L17:
+ 107:../Core/Src/state_flash.c ****         return 0;
+ 230              		.loc 1 107 9 is_stmt 1 view .LVU54
+ 231 00dc 4FF0FF33 		mov	r3, #-1
+ 232 00e0 1D22     		movs	r2, #29
+ARM GAS  /tmp/cczMYj0a.s 			page 8
+
+
+ 233 00e2 0749     		ldr	r1, .L18+16
+ 234 00e4 0348     		ldr	r0, .L18+4
+ 235 00e6 FFF7FEFF 		bl	HAL_UART_Transmit
+ 236              	.LVL18:
+ 108:../Core/Src/state_flash.c ****     }
+ 237              		.loc 1 108 9 view .LVU55
+ 108:../Core/Src/state_flash.c ****     }
+ 238              		.loc 1 108 16 is_stmt 0 view .LVU56
+ 239 00ea A4E7     		b	.L1
+ 240              	.LVL19:
+ 241              	.L10:
+ 242              	.LBB5:
+ 102:../Core/Src/state_flash.c ****         }
+ 243              		.loc 1 102 20 view .LVU57
+ 244 00ec 0025     		movs	r5, #0
+ 245 00ee A2E7     		b	.L1
+ 246              	.L19:
+ 247              		.align	2
+ 248              	.L18:
+ 249 00f0 00000000 		.word	.LC0
+ 250 00f4 00000000 		.word	huart3
+ 251 00f8 24000000 		.word	.LC1
+ 252 00fc 40000000 		.word	.LC2
+ 253 0100 5C000000 		.word	.LC3
+ 254              	.LBE5:
+ 255              		.cfi_endproc
+ 256              	.LFE247:
+ 258              		.section	.rodata.sd_test.str1.4,"aMS",%progbits,1
+ 259              		.align	2
+ 260              	.LC4:
+ 261 0000 2F746573 		.ascii	"/test.txt\000"
+ 261      742E7478 
+ 261      7400
+ 262 000a 0000     		.align	2
+ 263              	.LC5:
+ 264 000c 4661696C 		.ascii	"Failed to initialize SD card file\015\012\000"
+ 264      65642074 
+ 264      6F20696E 
+ 264      69746961 
+ 264      6C697A65 
+ 265              		.align	2
+ 266              	.LC6:
+ 267 0030 4661696C 		.ascii	"Failed to open SD card file\015\012\000"
+ 267      65642074 
+ 267      6F206F70 
+ 267      656E2053 
+ 267      44206361 
+ 268 004e 0000     		.align	2
+ 269              	.LC7:
+ 270 0050 4661696C 		.ascii	"Failed to write to SD card\015\012\000"
+ 270      65642074 
+ 270      6F207772 
+ 270      69746520 
+ 270      746F2053 
+ 271 006d 000000   		.align	2
+ 272              	.LC8:
+ 273 0070 4661696C 		.ascii	"Failed to read from SD card\015\012\000"
+ARM GAS  /tmp/cczMYj0a.s 			page 9
+
+
+ 273      65642074 
+ 273      6F207265 
+ 273      61642066 
+ 273      726F6D20 
+ 274 008e 0000     		.align	2
+ 275              	.LC9:
+ 276 0090 53442063 		.ascii	"SD card read error\015\012\000"
+ 276      61726420 
+ 276      72656164 
+ 276      20657272 
+ 276      6F720D0A 
+ 277 00a5 000000   		.align	2
+ 278              	.LC10:
+ 279 00a8 4661696C 		.ascii	"Failed to close SD card file\015\012\000"
+ 279      65642074 
+ 279      6F20636C 
+ 279      6F736520 
+ 279      53442063 
+ 280 00c7 00       		.align	2
+ 281              	.LC11:
+ 282 00c8 4661696C 		.ascii	"Failed to delete SD card file\015\012\000"
+ 282      65642074 
+ 282      6F206465 
+ 282      6C657465 
+ 282      20534420 
+ 283              		.section	.text.sd_test,"ax",%progbits
+ 284              		.align	1
+ 285              		.global	sd_test
+ 286              		.syntax unified
+ 287              		.thumb
+ 288              		.thumb_func
+ 289              		.fpu fpv4-sp-d16
+ 291              	sd_test:
+ 292              	.LFB248:
+ 113:../Core/Src/state_flash.c **** 
+ 114:../Core/Src/state_flash.c **** int sd_test(void) {
+ 293              		.loc 1 114 19 is_stmt 1 view -0
+ 294              		.cfi_startproc
+ 295              		@ args = 0, pretend = 0, frame = 6264
+ 296              		@ frame_needed = 0, uses_anonymous_args = 0
+ 297 0000 30B5     		push	{r4, r5, lr}
+ 298              	.LCFI5:
+ 299              		.cfi_def_cfa_offset 12
+ 300              		.cfi_offset 4, -12
+ 301              		.cfi_offset 5, -8
+ 302              		.cfi_offset 14, -4
+ 303 0002 ADF5C35D 		sub	sp, sp, #6240
+ 304              	.LCFI6:
+ 305              		.cfi_def_cfa_offset 6252
+ 306 0006 87B0     		sub	sp, sp, #28
+ 307              	.LCFI7:
+ 308              		.cfi_def_cfa_offset 6280
+ 115:../Core/Src/state_flash.c ****     SDFile test_file;
+ 309              		.loc 1 115 5 view .LVU59
+ 116:../Core/Src/state_flash.c **** 
+ 117:../Core/Src/state_flash.c ****     if (!sd_init_file(&test_file, "/test.txt")) {
+ 310              		.loc 1 117 5 view .LVU60
+ARM GAS  /tmp/cczMYj0a.s 			page 10
+
+
+ 311              		.loc 1 117 10 is_stmt 0 view .LVU61
+ 312 0008 4649     		ldr	r1, .L42
+ 313 000a 0DF60400 		addw	r0, sp, #2052
+ 314 000e FFF7FEFF 		bl	sd_init_file
+ 315              	.LVL20:
+ 316              		.loc 1 117 8 view .LVU62
+ 317 0012 60B1     		cbz	r0, .L34
+ 118:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to initialize SD card file\r\n", 35, HAL
+ 119:../Core/Src/state_flash.c ****         return 0;
+ 120:../Core/Src/state_flash.c ****     }
+ 121:../Core/Src/state_flash.c **** 
+ 122:../Core/Src/state_flash.c ****     if (!sd_open_file(&test_file, FA_READ | FA_WRITE | FA_CREATE_ALWAYS)) {
+ 318              		.loc 1 122 5 is_stmt 1 view .LVU63
+ 319              		.loc 1 122 10 is_stmt 0 view .LVU64
+ 320 0014 0B21     		movs	r1, #11
+ 321 0016 0DF60400 		addw	r0, sp, #2052
+ 322 001a FFF7FEFF 		bl	sd_open_file
+ 323              	.LVL21:
+ 324              		.loc 1 122 8 view .LVU65
+ 325 001e 0546     		mov	r5, r0
+ 326 0020 90B1     		cbz	r0, .L35
+ 123:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to open SD card file\r\n", 28, HAL_MAX_D
+ 124:../Core/Src/state_flash.c ****         return 0;
+ 125:../Core/Src/state_flash.c ****     }
+ 126:../Core/Src/state_flash.c **** 
+ 127:../Core/Src/state_flash.c ****     uint8_t test_bytes[SD_TEST_SIZE + 1];
+ 327              		.loc 1 127 5 is_stmt 1 view .LVU66
+ 128:../Core/Src/state_flash.c **** 
+ 129:../Core/Src/state_flash.c ****     const uint8_t offset = xTaskGetTickCount() % 256;
+ 328              		.loc 1 129 5 view .LVU67
+ 329              		.loc 1 129 28 is_stmt 0 view .LVU68
+ 330 0022 FFF7FEFF 		bl	xTaskGetTickCount
+ 331              	.LVL22:
+ 332 0026 0446     		mov	r4, r0
+ 333              		.loc 1 129 19 view .LVU69
+ 334 0028 C1B2     		uxtb	r1, r0
+ 335              	.LVL23:
+ 130:../Core/Src/state_flash.c **** 
+ 131:../Core/Src/state_flash.c ****     for (size_t i = 0; i < SD_TEST_SIZE; i ++) {
+ 336              		.loc 1 131 5 is_stmt 1 view .LVU70
+ 337              	.LBB6:
+ 338              		.loc 1 131 10 view .LVU71
+ 339              		.loc 1 131 17 is_stmt 0 view .LVU72
+ 340 002a 0023     		movs	r3, #0
+ 341              		.loc 1 131 5 view .LVU73
+ 342 002c 18E0     		b	.L24
+ 343              	.LVL24:
+ 344              	.L34:
+ 345              		.loc 1 131 5 view .LVU74
+ 346 002e 0546     		mov	r5, r0
+ 347              	.LBE6:
+ 118:../Core/Src/state_flash.c ****         return 0;
+ 348              		.loc 1 118 9 is_stmt 1 view .LVU75
+ 349 0030 4FF0FF33 		mov	r3, #-1
+ 350 0034 2322     		movs	r2, #35
+ 351 0036 3C49     		ldr	r1, .L42+4
+ 352 0038 3C48     		ldr	r0, .L42+8
+ARM GAS  /tmp/cczMYj0a.s 			page 11
+
+
+ 353 003a FFF7FEFF 		bl	HAL_UART_Transmit
+ 354              	.LVL25:
+ 119:../Core/Src/state_flash.c ****     }
+ 355              		.loc 1 119 9 view .LVU76
+ 356              	.L20:
+ 132:../Core/Src/state_flash.c ****         test_bytes[i] = (i + offset) % 256;
+ 133:../Core/Src/state_flash.c ****     }
+ 134:../Core/Src/state_flash.c **** 
+ 135:../Core/Src/state_flash.c ****     if (!sd_write_file(&test_file, 0, test_bytes, SD_TEST_SIZE)) {
+ 136:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to write to SD card\r\n", 28, HAL_MAX_DE
+ 137:../Core/Src/state_flash.c ****         return 0;
+ 138:../Core/Src/state_flash.c ****     }
+ 139:../Core/Src/state_flash.c **** 
+ 140:../Core/Src/state_flash.c ****     memset(test_bytes, 0, SD_TEST_SIZE);
+ 141:../Core/Src/state_flash.c **** 
+ 142:../Core/Src/state_flash.c ****     if (!sd_read_file(&test_file, 0, test_bytes, SD_TEST_SIZE)) {
+ 143:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to read from SD card\r\n", 29, HAL_MAX_D
+ 144:../Core/Src/state_flash.c ****         return 0;
+ 145:../Core/Src/state_flash.c ****     }
+ 146:../Core/Src/state_flash.c **** 
+ 147:../Core/Src/state_flash.c ****     for (size_t i = 0; i < SD_TEST_SIZE; i ++) {
+ 148:../Core/Src/state_flash.c ****         if (test_bytes[i] != (i + offset) % 256) {
+ 149:../Core/Src/state_flash.c ****             HAL_UART_Transmit(&debug_uart, (uint8_t *) "SD card read error\r\n", 20, HAL_MAX_DELAY)
+ 150:../Core/Src/state_flash.c ****             return 0;
+ 151:../Core/Src/state_flash.c ****         }
+ 152:../Core/Src/state_flash.c ****     }
+ 153:../Core/Src/state_flash.c **** 
+ 154:../Core/Src/state_flash.c ****     if (!sd_close_file(&test_file)) {
+ 155:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to close SD card file\r\n", 30, HAL_MAX_
+ 156:../Core/Src/state_flash.c ****         return 0;
+ 157:../Core/Src/state_flash.c ****     }
+ 158:../Core/Src/state_flash.c **** 
+ 159:../Core/Src/state_flash.c **** 
+ 160:../Core/Src/state_flash.c ****     if (!sd_delete_file(&test_file)) {
+ 161:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to delete SD card file\r\n", 31, HAL_MAX
+ 162:../Core/Src/state_flash.c ****         return 0;
+ 163:../Core/Src/state_flash.c ****     }
+ 164:../Core/Src/state_flash.c **** 
+ 165:../Core/Src/state_flash.c ****     return 1;
+ 166:../Core/Src/state_flash.c **** }
+ 357              		.loc 1 166 1 is_stmt 0 view .LVU77
+ 358 003e 2846     		mov	r0, r5
+ 359 0040 0DF5C35D 		add	sp, sp, #6240
+ 360 0044 07B0     		add	sp, sp, #28
+ 361              	.LCFI8:
+ 362              		.cfi_remember_state
+ 363              		.cfi_def_cfa_offset 12
+ 364              		@ sp needed
+ 365 0046 30BD     		pop	{r4, r5, pc}
+ 366              	.L35:
+ 367              	.LCFI9:
+ 368              		.cfi_restore_state
+ 123:../Core/Src/state_flash.c ****         return 0;
+ 369              		.loc 1 123 9 is_stmt 1 view .LVU78
+ 370 0048 4FF0FF33 		mov	r3, #-1
+ 371 004c 1C22     		movs	r2, #28
+ 372 004e 3849     		ldr	r1, .L42+12
+ARM GAS  /tmp/cczMYj0a.s 			page 12
+
+
+ 373 0050 3648     		ldr	r0, .L42+8
+ 374 0052 FFF7FEFF 		bl	HAL_UART_Transmit
+ 375              	.LVL26:
+ 124:../Core/Src/state_flash.c ****     }
+ 376              		.loc 1 124 9 view .LVU79
+ 124:../Core/Src/state_flash.c ****     }
+ 377              		.loc 1 124 16 is_stmt 0 view .LVU80
+ 378 0056 F2E7     		b	.L20
+ 379              	.LVL27:
+ 380              	.L25:
+ 381              	.LBB7:
+ 132:../Core/Src/state_flash.c ****         test_bytes[i] = (i + offset) % 256;
+ 382              		.loc 1 132 9 is_stmt 1 discriminator 3 view .LVU81
+ 132:../Core/Src/state_flash.c ****         test_bytes[i] = (i + offset) % 256;
+ 383              		.loc 1 132 28 is_stmt 0 discriminator 3 view .LVU82
+ 384 0058 CA18     		adds	r2, r1, r3
+ 132:../Core/Src/state_flash.c ****         test_bytes[i] = (i + offset) % 256;
+ 385              		.loc 1 132 23 discriminator 3 view .LVU83
+ 386 005a 0DF80320 		strb	r2, [sp, r3]
+ 131:../Core/Src/state_flash.c ****         test_bytes[i] = (i + offset) % 256;
+ 387              		.loc 1 131 42 is_stmt 1 discriminator 3 view .LVU84
+ 131:../Core/Src/state_flash.c ****         test_bytes[i] = (i + offset) % 256;
+ 388              		.loc 1 131 44 is_stmt 0 discriminator 3 view .LVU85
+ 389 005e 0133     		adds	r3, r3, #1
+ 390              	.LVL28:
+ 391              	.L24:
+ 131:../Core/Src/state_flash.c ****         test_bytes[i] = (i + offset) % 256;
+ 392              		.loc 1 131 24 is_stmt 1 discriminator 1 view .LVU86
+ 131:../Core/Src/state_flash.c ****         test_bytes[i] = (i + offset) % 256;
+ 393              		.loc 1 131 5 is_stmt 0 discriminator 1 view .LVU87
+ 394 0060 B3F5006F 		cmp	r3, #2048
+ 395 0064 F8D3     		bcc	.L25
+ 396              	.LBE7:
+ 135:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to write to SD card\r\n", 28, HAL_MAX_DE
+ 397              		.loc 1 135 5 is_stmt 1 view .LVU88
+ 135:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to write to SD card\r\n", 28, HAL_MAX_DE
+ 398              		.loc 1 135 10 is_stmt 0 view .LVU89
+ 399 0066 4FF40063 		mov	r3, #2048
+ 400              	.LVL29:
+ 135:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to write to SD card\r\n", 28, HAL_MAX_DE
+ 401              		.loc 1 135 10 view .LVU90
+ 402 006a 6A46     		mov	r2, sp
+ 403 006c 0021     		movs	r1, #0
+ 404              	.LVL30:
+ 135:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to write to SD card\r\n", 28, HAL_MAX_DE
+ 405              		.loc 1 135 10 view .LVU91
+ 406 006e 0DF60400 		addw	r0, sp, #2052
+ 407              	.LVL31:
+ 135:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to write to SD card\r\n", 28, HAL_MAX_DE
+ 408              		.loc 1 135 10 view .LVU92
+ 409 0072 FFF7FEFF 		bl	sd_write_file
+ 410              	.LVL32:
+ 135:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to write to SD card\r\n", 28, HAL_MAX_DE
+ 411              		.loc 1 135 8 view .LVU93
+ 412 0076 0546     		mov	r5, r0
+ 413 0078 E0B1     		cbz	r0, .L36
+ 140:../Core/Src/state_flash.c **** 
+ARM GAS  /tmp/cczMYj0a.s 			page 13
+
+
+ 414              		.loc 1 140 5 is_stmt 1 view .LVU94
+ 415 007a 4FF40065 		mov	r5, #2048
+ 416 007e 2A46     		mov	r2, r5
+ 417 0080 0021     		movs	r1, #0
+ 418 0082 6846     		mov	r0, sp
+ 419 0084 FFF7FEFF 		bl	memset
+ 420              	.LVL33:
+ 142:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to read from SD card\r\n", 29, HAL_MAX_D
+ 421              		.loc 1 142 5 view .LVU95
+ 142:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to read from SD card\r\n", 29, HAL_MAX_D
+ 422              		.loc 1 142 10 is_stmt 0 view .LVU96
+ 423 0088 2B46     		mov	r3, r5
+ 424 008a 6A46     		mov	r2, sp
+ 425 008c 0021     		movs	r1, #0
+ 426 008e 0DF60400 		addw	r0, sp, #2052
+ 427 0092 FFF7FEFF 		bl	sd_read_file
+ 428              	.LVL34:
+ 142:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to read from SD card\r\n", 29, HAL_MAX_D
+ 429              		.loc 1 142 8 view .LVU97
+ 430 0096 0546     		mov	r5, r0
+ 431 0098 A0B1     		cbz	r0, .L37
+ 432              	.LBB8:
+ 147:../Core/Src/state_flash.c ****         if (test_bytes[i] != (i + offset) % 256) {
+ 433              		.loc 1 147 17 view .LVU98
+ 434 009a 0023     		movs	r3, #0
+ 435              	.L27:
+ 436              	.LVL35:
+ 147:../Core/Src/state_flash.c ****         if (test_bytes[i] != (i + offset) % 256) {
+ 437              		.loc 1 147 24 is_stmt 1 discriminator 1 view .LVU99
+ 147:../Core/Src/state_flash.c ****         if (test_bytes[i] != (i + offset) % 256) {
+ 438              		.loc 1 147 5 is_stmt 0 discriminator 1 view .LVU100
+ 439 009c B3F5006F 		cmp	r3, #2048
+ 440 00a0 21D2     		bcs	.L38
+ 148:../Core/Src/state_flash.c ****             HAL_UART_Transmit(&debug_uart, (uint8_t *) "SD card read error\r\n", 20, HAL_MAX_DELAY)
+ 441              		.loc 1 148 9 is_stmt 1 view .LVU101
+ 148:../Core/Src/state_flash.c ****             HAL_UART_Transmit(&debug_uart, (uint8_t *) "SD card read error\r\n", 20, HAL_MAX_DELAY)
+ 442              		.loc 1 148 23 is_stmt 0 view .LVU102
+ 443 00a2 1DF80310 		ldrb	r1, [sp, r3]	@ zero_extendqisi2
+ 148:../Core/Src/state_flash.c ****             HAL_UART_Transmit(&debug_uart, (uint8_t *) "SD card read error\r\n", 20, HAL_MAX_DELAY)
+ 444              		.loc 1 148 33 view .LVU103
+ 445 00a6 53FA84F2 		uxtab	r2, r3, r4
+ 148:../Core/Src/state_flash.c ****             HAL_UART_Transmit(&debug_uart, (uint8_t *) "SD card read error\r\n", 20, HAL_MAX_DELAY)
+ 446              		.loc 1 148 43 view .LVU104
+ 447 00aa D2B2     		uxtb	r2, r2
+ 148:../Core/Src/state_flash.c ****             HAL_UART_Transmit(&debug_uart, (uint8_t *) "SD card read error\r\n", 20, HAL_MAX_DELAY)
+ 448              		.loc 1 148 12 view .LVU105
+ 449 00ac 9142     		cmp	r1, r2
+ 450 00ae 11D1     		bne	.L39
+ 147:../Core/Src/state_flash.c ****         if (test_bytes[i] != (i + offset) % 256) {
+ 451              		.loc 1 147 42 is_stmt 1 discriminator 2 view .LVU106
+ 147:../Core/Src/state_flash.c ****         if (test_bytes[i] != (i + offset) % 256) {
+ 452              		.loc 1 147 44 is_stmt 0 discriminator 2 view .LVU107
+ 453 00b0 0133     		adds	r3, r3, #1
+ 454              	.LVL36:
+ 147:../Core/Src/state_flash.c ****         if (test_bytes[i] != (i + offset) % 256) {
+ 455              		.loc 1 147 44 discriminator 2 view .LVU108
+ 456 00b2 F3E7     		b	.L27
+ARM GAS  /tmp/cczMYj0a.s 			page 14
+
+
+ 457              	.LVL37:
+ 458              	.L36:
+ 147:../Core/Src/state_flash.c ****         if (test_bytes[i] != (i + offset) % 256) {
+ 459              		.loc 1 147 44 discriminator 2 view .LVU109
+ 460              	.LBE8:
+ 136:../Core/Src/state_flash.c ****         return 0;
+ 461              		.loc 1 136 9 is_stmt 1 view .LVU110
+ 462 00b4 4FF0FF33 		mov	r3, #-1
+ 463 00b8 1C22     		movs	r2, #28
+ 464 00ba 1E49     		ldr	r1, .L42+16
+ 465 00bc 1B48     		ldr	r0, .L42+8
+ 466 00be FFF7FEFF 		bl	HAL_UART_Transmit
+ 467              	.LVL38:
+ 137:../Core/Src/state_flash.c ****     }
+ 468              		.loc 1 137 9 view .LVU111
+ 137:../Core/Src/state_flash.c ****     }
+ 469              		.loc 1 137 16 is_stmt 0 view .LVU112
+ 470 00c2 BCE7     		b	.L20
+ 471              	.L37:
+ 143:../Core/Src/state_flash.c ****         return 0;
+ 472              		.loc 1 143 9 is_stmt 1 view .LVU113
+ 473 00c4 4FF0FF33 		mov	r3, #-1
+ 474 00c8 1D22     		movs	r2, #29
+ 475 00ca 1B49     		ldr	r1, .L42+20
+ 476 00cc 1748     		ldr	r0, .L42+8
+ 477 00ce FFF7FEFF 		bl	HAL_UART_Transmit
+ 478              	.LVL39:
+ 144:../Core/Src/state_flash.c ****     }
+ 479              		.loc 1 144 9 view .LVU114
+ 144:../Core/Src/state_flash.c ****     }
+ 480              		.loc 1 144 16 is_stmt 0 view .LVU115
+ 481 00d2 B4E7     		b	.L20
+ 482              	.LVL40:
+ 483              	.L39:
+ 484              	.LBB9:
+ 149:../Core/Src/state_flash.c ****             return 0;
+ 485              		.loc 1 149 13 is_stmt 1 view .LVU116
+ 486 00d4 4FF0FF33 		mov	r3, #-1
+ 487              	.LVL41:
+ 149:../Core/Src/state_flash.c ****             return 0;
+ 488              		.loc 1 149 13 is_stmt 0 view .LVU117
+ 489 00d8 1422     		movs	r2, #20
+ 490 00da 1849     		ldr	r1, .L42+24
+ 491 00dc 1348     		ldr	r0, .L42+8
+ 492 00de FFF7FEFF 		bl	HAL_UART_Transmit
+ 493              	.LVL42:
+ 150:../Core/Src/state_flash.c ****         }
+ 494              		.loc 1 150 13 is_stmt 1 view .LVU118
+ 150:../Core/Src/state_flash.c ****         }
+ 495              		.loc 1 150 20 is_stmt 0 view .LVU119
+ 496 00e2 0025     		movs	r5, #0
+ 497 00e4 ABE7     		b	.L20
+ 498              	.LVL43:
+ 499              	.L38:
+ 150:../Core/Src/state_flash.c ****         }
+ 500              		.loc 1 150 20 view .LVU120
+ 501              	.LBE9:
+ARM GAS  /tmp/cczMYj0a.s 			page 15
+
+
+ 154:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to close SD card file\r\n", 30, HAL_MAX_
+ 502              		.loc 1 154 5 is_stmt 1 view .LVU121
+ 154:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to close SD card file\r\n", 30, HAL_MAX_
+ 503              		.loc 1 154 10 is_stmt 0 view .LVU122
+ 504 00e6 0DF60400 		addw	r0, sp, #2052
+ 505 00ea FFF7FEFF 		bl	sd_close_file
+ 506              	.LVL44:
+ 154:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to close SD card file\r\n", 30, HAL_MAX_
+ 507              		.loc 1 154 8 view .LVU123
+ 508 00ee 0546     		mov	r5, r0
+ 509 00f0 38B1     		cbz	r0, .L40
+ 160:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to delete SD card file\r\n", 31, HAL_MAX
+ 510              		.loc 1 160 5 is_stmt 1 view .LVU124
+ 160:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to delete SD card file\r\n", 31, HAL_MAX
+ 511              		.loc 1 160 10 is_stmt 0 view .LVU125
+ 512 00f2 0DF60400 		addw	r0, sp, #2052
+ 513 00f6 FFF7FEFF 		bl	sd_delete_file
+ 514              	.LVL45:
+ 160:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to delete SD card file\r\n", 31, HAL_MAX
+ 515              		.loc 1 160 8 view .LVU126
+ 516 00fa 0546     		mov	r5, r0
+ 517 00fc 48B1     		cbz	r0, .L41
+ 165:../Core/Src/state_flash.c **** }
+ 518              		.loc 1 165 12 view .LVU127
+ 519 00fe 0125     		movs	r5, #1
+ 520 0100 9DE7     		b	.L20
+ 521              	.L40:
+ 155:../Core/Src/state_flash.c ****         return 0;
+ 522              		.loc 1 155 9 is_stmt 1 view .LVU128
+ 523 0102 4FF0FF33 		mov	r3, #-1
+ 524 0106 1E22     		movs	r2, #30
+ 525 0108 0D49     		ldr	r1, .L42+28
+ 526 010a 0848     		ldr	r0, .L42+8
+ 527 010c FFF7FEFF 		bl	HAL_UART_Transmit
+ 528              	.LVL46:
+ 156:../Core/Src/state_flash.c ****     }
+ 529              		.loc 1 156 9 view .LVU129
+ 156:../Core/Src/state_flash.c ****     }
+ 530              		.loc 1 156 16 is_stmt 0 view .LVU130
+ 531 0110 95E7     		b	.L20
+ 532              	.L41:
+ 161:../Core/Src/state_flash.c ****         return 0;
+ 533              		.loc 1 161 9 is_stmt 1 view .LVU131
+ 534 0112 4FF0FF33 		mov	r3, #-1
+ 535 0116 1F22     		movs	r2, #31
+ 536 0118 0A49     		ldr	r1, .L42+32
+ 537 011a 0448     		ldr	r0, .L42+8
+ 538 011c FFF7FEFF 		bl	HAL_UART_Transmit
+ 539              	.LVL47:
+ 162:../Core/Src/state_flash.c ****     }
+ 540              		.loc 1 162 9 view .LVU132
+ 162:../Core/Src/state_flash.c ****     }
+ 541              		.loc 1 162 16 is_stmt 0 view .LVU133
+ 542 0120 8DE7     		b	.L20
+ 543              	.L43:
+ 544 0122 00BF     		.align	2
+ 545              	.L42:
+ARM GAS  /tmp/cczMYj0a.s 			page 16
+
+
+ 546 0124 00000000 		.word	.LC4
+ 547 0128 0C000000 		.word	.LC5
+ 548 012c 00000000 		.word	huart3
+ 549 0130 30000000 		.word	.LC6
+ 550 0134 50000000 		.word	.LC7
+ 551 0138 70000000 		.word	.LC8
+ 552 013c 90000000 		.word	.LC9
+ 553 0140 A8000000 		.word	.LC10
+ 554 0144 C8000000 		.word	.LC11
+ 555              		.cfi_endproc
+ 556              	.LFE248:
+ 558              		.section	.text.write_to_flash,"ax",%progbits
+ 559              		.align	1
+ 560              		.global	write_to_flash
+ 561              		.syntax unified
+ 562              		.thumb
+ 563              		.thumb_func
+ 564              		.fpu fpv4-sp-d16
+ 566              	write_to_flash:
+ 567              	.LVL48:
+ 568              	.LFB249:
+ 167:../Core/Src/state_flash.c **** 
+ 168:../Core/Src/state_flash.c **** void write_to_flash(FlashBlock *flash_block, RocketState *rocket_state, size_t page_index) {
+ 569              		.loc 1 168 92 is_stmt 1 view -0
+ 570              		.cfi_startproc
+ 571              		@ args = 0, pretend = 0, frame = 256
+ 572              		@ frame_needed = 0, uses_anonymous_args = 0
+ 573              		.loc 1 168 92 is_stmt 0 view .LVU135
+ 574 0000 30B5     		push	{r4, r5, lr}
+ 575              	.LCFI10:
+ 576              		.cfi_def_cfa_offset 12
+ 577              		.cfi_offset 4, -12
+ 578              		.cfi_offset 5, -8
+ 579              		.cfi_offset 14, -4
+ 580 0002 C1B0     		sub	sp, sp, #260
+ 581              	.LCFI11:
+ 582              		.cfi_def_cfa_offset 272
+ 583 0004 0546     		mov	r5, r0
+ 584 0006 1446     		mov	r4, r2
+ 169:../Core/Src/state_flash.c ****     uint8_t raw_bytes[EXT_FLASH_PAGE_SIZE];
+ 585              		.loc 1 169 5 is_stmt 1 view .LVU136
+ 170:../Core/Src/state_flash.c ****     memcpy(raw_bytes, rocket_state, sizeof(RocketState));
+ 586              		.loc 1 170 5 view .LVU137
+ 587 0008 D822     		movs	r2, #216
+ 588              	.LVL49:
+ 589              		.loc 1 170 5 is_stmt 0 view .LVU138
+ 590 000a 6846     		mov	r0, sp
+ 591              	.LVL50:
+ 592              		.loc 1 170 5 view .LVU139
+ 593 000c FFF7FEFF 		bl	memcpy
+ 594              	.LVL51:
+ 171:../Core/Src/state_flash.c **** 
+ 172:../Core/Src/state_flash.c ****     flash_write_block(flash_block, page_index * EXT_FLASH_PAGE_SIZE, raw_bytes, EXT_FLASH_PAGE_SIZE
+ 595              		.loc 1 172 5 is_stmt 1 view .LVU140
+ 596 0010 2102     		lsls	r1, r4, #8
+ 597 0012 4FF48073 		mov	r3, #256
+ 598 0016 6A46     		mov	r2, sp
+ARM GAS  /tmp/cczMYj0a.s 			page 17
+
+
+ 599 0018 01F47F41 		and	r1, r1, #65280
+ 600 001c 2846     		mov	r0, r5
+ 601 001e FFF7FEFF 		bl	flash_write_block
+ 602              	.LVL52:
+ 173:../Core/Src/state_flash.c **** }
+ 603              		.loc 1 173 1 is_stmt 0 view .LVU141
+ 604 0022 41B0     		add	sp, sp, #260
+ 605              	.LCFI12:
+ 606              		.cfi_def_cfa_offset 12
+ 607              		@ sp needed
+ 608 0024 30BD     		pop	{r4, r5, pc}
+ 609              		.loc 1 173 1 view .LVU142
+ 610              		.cfi_endproc
+ 611              	.LFE249:
+ 613              		.section	.rodata.printf_fixed_float.str1.4,"aMS",%progbits,1
+ 614              		.align	2
+ 615              	.LC12:
+ 616 0000 25642E25 		.ascii	"%d.%03d,\000"
+ 616      3033642C 
+ 616      00
+ 617              		.section	.text.printf_fixed_float,"ax",%progbits
+ 618              		.align	1
+ 619              		.global	printf_fixed_float
+ 620              		.syntax unified
+ 621              		.thumb
+ 622              		.thumb_func
+ 623              		.fpu fpv4-sp-d16
+ 625              	printf_fixed_float:
+ 626              	.LVL53:
+ 627              	.LFB252:
+ 174:../Core/Src/state_flash.c **** 
+ 175:../Core/Src/state_flash.c **** void flash_sd_card(FlashBlock *flash_block, SDFile *sd_file, size_t n_states) {
+ 176:../Core/Src/state_flash.c ****     if (sd_open_file(sd_file, FA_READ | FA_WRITE | FA_CREATE_ALWAYS)) {
+ 177:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Successfully opened SD card file\r\n", 34, HAL_
+ 178:../Core/Src/state_flash.c ****     }
+ 179:../Core/Src/state_flash.c **** 
+ 180:../Core/Src/state_flash.c ****     RocketState rocket_state;
+ 181:../Core/Src/state_flash.c ****     uint8_t data_buffer[EXT_FLASH_PAGE_SIZE];
+ 182:../Core/Src/state_flash.c **** 
+ 183:../Core/Src/state_flash.c ****     char line_buf[2048];
+ 184:../Core/Src/state_flash.c ****     HAL_UART_Transmit(&debug_uart, (uint8_t *) "Writing to SD card...\r\n", 23, HAL_MAX_DELAY);
+ 185:../Core/Src/state_flash.c **** 
+ 186:../Core/Src/state_flash.c ****     size_t sd_bytes_written = 0;
+ 187:../Core/Src/state_flash.c **** 
+ 188:../Core/Src/state_flash.c ****     for (size_t i = 0; i < n_states; i ++) {
+ 189:../Core/Src/state_flash.c ****         char progress[100];
+ 190:../Core/Src/state_flash.c ****         sprintf(progress, "Writing to SD card: %d/%d\r\n", i + 1, n_states);
+ 191:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) progress, strlen(progress), HAL_MAX_DELAY);
+ 192:../Core/Src/state_flash.c **** 
+ 193:../Core/Src/state_flash.c ****         flash_read_block(flash_block, i * EXT_FLASH_PAGE_SIZE, data_buffer, EXT_FLASH_PAGE_SIZE);
+ 194:../Core/Src/state_flash.c **** 
+ 195:../Core/Src/state_flash.c ****         memcpy(&rocket_state, data_buffer, sizeof(RocketState));
+ 196:../Core/Src/state_flash.c **** 
+ 197:../Core/Src/state_flash.c ****         size_t line_len = to_csv_line(&rocket_state, line_buf);
+ 198:../Core/Src/state_flash.c **** 
+ 199:../Core/Src/state_flash.c ****         if (sd_write_file(sd_file, sd_bytes_written, (uint8_t *) line_buf, line_len)) {
+ 200:../Core/Src/state_flash.c ****             HAL_UART_Transmit(&debug_uart, (uint8_t *) "writing to SD card\r\n", 20, HAL_MAX_DELAY)
+ARM GAS  /tmp/cczMYj0a.s 			page 18
+
+
+ 201:../Core/Src/state_flash.c ****         }
+ 202:../Core/Src/state_flash.c ****         sd_bytes_written += line_len;
+ 203:../Core/Src/state_flash.c ****     }
+ 204:../Core/Src/state_flash.c **** 
+ 205:../Core/Src/state_flash.c ****     if (sd_close_file(sd_file)) {
+ 206:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Closed SD card file\r\n", 21, HAL_MAX_DELAY);
+ 207:../Core/Src/state_flash.c ****     }
+ 208:../Core/Src/state_flash.c **** 
+ 209:../Core/Src/state_flash.c ****     HAL_UART_Transmit(&debug_uart, (uint8_t *) "Wrote to SD card\r\n", 18, HAL_MAX_DELAY);
+ 210:../Core/Src/state_flash.c **** }
+ 211:../Core/Src/state_flash.c **** 
+ 212:../Core/Src/state_flash.c **** size_t to_csv_line(RocketState *rocket_state, char *line) {
+ 213:../Core/Src/state_flash.c ****     size_t len = 0;
+ 214:../Core/Src/state_flash.c ****     
+ 215:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%lu,", (uint32_t) rocket_state->launch_timestamp);
+ 216:../Core/Src/state_flash.c **** 
+ 217:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%lu,", (uint32_t) (rocket_state->state_vector.timestamp));
+ 218:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.velocity_x);
+ 219:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.velocity_y);
+ 220:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.velocity_z);
+ 221:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.attitude_w);
+ 222:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.attitude_x);
+ 223:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.attitude_y);
+ 224:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.attitude_z);
+ 225:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.position_x);
+ 226:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.position_y);
+ 227:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.position_z);
+ 228:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.world_x);
+ 229:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.world_y);
+ 230:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.world_z);
+ 231:../Core/Src/state_flash.c **** 
+ 232:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%lu,", (uint32_t) (rocket_state->servo_deflection.timestamp));
+ 233:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->servo_deflection.servo_deflection_1);
+ 234:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->servo_deflection.servo_deflection_2);
+ 235:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->servo_deflection.servo_deflection_3);
+ 236:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->servo_deflection.servo_deflection_4);
+ 237:../Core/Src/state_flash.c **** 
+ 238:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%lu,", (uint32_t) (rocket_state->rocket_state.timestamp));
+ 239:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%d,", rocket_state->rocket_state.rocket_state);
+ 240:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%d,", rocket_state->rocket_state.firing_channel_1);
+ 241:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%d,", rocket_state->rocket_state.firing_channel_2);
+ 242:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%d,", rocket_state->rocket_state.firing_channel_3);
+ 243:../Core/Src/state_flash.c **** 
+ 244:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%lu,", (uint32_t) (rocket_state->ground_ekf.timestamp));
+ 245:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->ground_ekf.pn_matrix_d1);
+ 246:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->ground_ekf.pn_matrix_d2);
+ 247:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->ground_ekf.pn_matrix_d3);
+ 248:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->ground_ekf.pn_matrix_d4);
+ 249:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->ground_ekf.pn_matrix_d5);
+ 250:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->ground_ekf.pn_matrix_d6);
+ 251:../Core/Src/state_flash.c **** 
+ 252:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%lu,", (uint32_t) (rocket_state->sensor_data.timestamp));
+ 253:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->sensor_data.accelerometer_x);
+ 254:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->sensor_data.accelerometer_y);
+ 255:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->sensor_data.accelerometer_z);
+ 256:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->sensor_data.gyro_x);
+ 257:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->sensor_data.gyro_y);
+ARM GAS  /tmp/cczMYj0a.s 			page 19
+
+
+ 258:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->sensor_data.gyro_z);
+ 259:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->sensor_data.gps_x);
+ 260:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->sensor_data.gps_y);
+ 261:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->sensor_data.gps_z);
+ 262:../Core/Src/state_flash.c **** 
+ 263:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%lu,", (uint32_t) (rocket_state->analog_feedback_data.timestamp));
+ 264:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%d,", rocket_state->analog_feedback_data.current_fb_33);
+ 265:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%d,", rocket_state->analog_feedback_data.pyro_0_cont);
+ 266:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%d,", rocket_state->analog_feedback_data.pyro_1_cont);
+ 267:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%d,", rocket_state->analog_feedback_data.pyro_2_cont);
+ 268:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%d", rocket_state->analog_feedback_data.pyro_channel_deploy);
+ 269:../Core/Src/state_flash.c ****     
+ 270:../Core/Src/state_flash.c ****     line[len++] = '\n';
+ 271:../Core/Src/state_flash.c **** 
+ 272:../Core/Src/state_flash.c ****     return len;
+ 273:../Core/Src/state_flash.c **** }
+ 274:../Core/Src/state_flash.c **** 
+ 275:../Core/Src/state_flash.c **** size_t printf_fixed_float(char *buf, float f) {
+ 628              		.loc 1 275 47 is_stmt 1 view -0
+ 629              		.cfi_startproc
+ 630              		@ args = 0, pretend = 0, frame = 0
+ 631              		@ frame_needed = 0, uses_anonymous_args = 0
+ 632              		.loc 1 275 47 is_stmt 0 view .LVU144
+ 633 0000 08B5     		push	{r3, lr}
+ 634              	.LCFI13:
+ 635              		.cfi_def_cfa_offset 8
+ 636              		.cfi_offset 3, -8
+ 637              		.cfi_offset 14, -4
+ 276:../Core/Src/state_flash.c ****     int i = (int) f;
+ 638              		.loc 1 276 5 is_stmt 1 view .LVU145
+ 639              		.loc 1 276 9 is_stmt 0 view .LVU146
+ 640 0002 FDEEC07A 		vcvt.s32.f32	s15, s0
+ 641              	.LVL54:
+ 277:../Core/Src/state_flash.c ****     int d = (int) ((f - i) * 1000);
+ 642              		.loc 1 277 5 is_stmt 1 view .LVU147
+ 643              		.loc 1 277 23 is_stmt 0 view .LVU148
+ 644 0006 B8EEE77A 		vcvt.f32.s32	s14, s15
+ 645 000a 30EE470A 		vsub.f32	s0, s0, s14
+ 646              	.LVL55:
+ 647              		.loc 1 277 28 view .LVU149
+ 648 000e 9FED077A 		vldr.32	s14, .L48
+ 649 0012 20EE070A 		vmul.f32	s0, s0, s14
+ 650              	.LVL56:
+ 278:../Core/Src/state_flash.c ****     return sprintf(buf, "%d.%03d,", i, d);
+ 651              		.loc 1 278 5 is_stmt 1 view .LVU150
+ 652              		.loc 1 278 12 is_stmt 0 view .LVU151
+ 653 0016 BDEEC07A 		vcvt.s32.f32	s14, s0
+ 654              	.LVL57:
+ 655              		.loc 1 278 12 view .LVU152
+ 656 001a 17EE103A 		vmov	r3, s14	@ int
+ 657 001e 17EE902A 		vmov	r2, s15	@ int
+ 658 0022 0349     		ldr	r1, .L48+4
+ 659 0024 FFF7FEFF 		bl	sprintf
+ 660              	.LVL58:
+ 279:../Core/Src/state_flash.c **** }...
+ 661              		.loc 1 279 1 view .LVU153
+ 662 0028 08BD     		pop	{r3, pc}
+ARM GAS  /tmp/cczMYj0a.s 			page 20
+
+
+ 663              	.L49:
+ 664 002a 00BF     		.align	2
+ 665              	.L48:
+ 666 002c 00007A44 		.word	1148846080
+ 667 0030 00000000 		.word	.LC12
+ 668              		.cfi_endproc
+ 669              	.LFE252:
+ 671              		.section	.rodata.to_csv_line.str1.4,"aMS",%progbits,1
+ 672              		.align	2
+ 673              	.LC13:
+ 674 0000 256C752C 		.ascii	"%lu,\000"
+ 674      00
+ 675 0005 000000   		.align	2
+ 676              	.LC14:
+ 677 0008 25642C00 		.ascii	"%d,\000"
+ 678              		.align	2
+ 679              	.LC15:
+ 680 000c 256400   		.ascii	"%d\000"
+ 681              		.section	.text.to_csv_line,"ax",%progbits
+ 682              		.align	1
+ 683              		.global	to_csv_line
+ 684              		.syntax unified
+ 685              		.thumb
+ 686              		.thumb_func
+ 687              		.fpu fpv4-sp-d16
+ 689              	to_csv_line:
+ 690              	.LVL59:
+ 691              	.LFB251:
+ 212:../Core/Src/state_flash.c **** size_t to_csv_line(RocketState *rocket_state, char *line) {
+ 692              		.loc 1 212 59 is_stmt 1 view -0
+ 693              		.cfi_startproc
+ 694              		@ args = 0, pretend = 0, frame = 0
+ 695              		@ frame_needed = 0, uses_anonymous_args = 0
+ 212:../Core/Src/state_flash.c **** size_t to_csv_line(RocketState *rocket_state, char *line) {
+ 696              		.loc 1 212 59 is_stmt 0 view .LVU155
+ 697 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 698              	.LCFI14:
+ 699              		.cfi_def_cfa_offset 24
+ 700              		.cfi_offset 4, -24
+ 701              		.cfi_offset 5, -20
+ 702              		.cfi_offset 6, -16
+ 703              		.cfi_offset 7, -12
+ 704              		.cfi_offset 8, -8
+ 705              		.cfi_offset 14, -4
+ 706 0004 0546     		mov	r5, r0
+ 707 0006 0C46     		mov	r4, r1
+ 213:../Core/Src/state_flash.c ****     size_t len = 0;
+ 708              		.loc 1 213 5 is_stmt 1 view .LVU156
+ 709              	.LVL60:
+ 215:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%lu,", (uint32_t) rocket_state->launch_timestamp);
+ 710              		.loc 1 215 5 view .LVU157
+ 215:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%lu,", (uint32_t) rocket_state->launch_timestamp);
+ 711              		.loc 1 215 12 is_stmt 0 view .LVU158
+ 712 0008 9A4F     		ldr	r7, .L52
+ 713 000a D0F8D020 		ldr	r2, [r0, #208]
+ 714 000e 3946     		mov	r1, r7
+ 715              	.LVL61:
+ARM GAS  /tmp/cczMYj0a.s 			page 21
+
+
+ 215:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%lu,", (uint32_t) rocket_state->launch_timestamp);
+ 716              		.loc 1 215 12 view .LVU159
+ 717 0010 2046     		mov	r0, r4
+ 718              	.LVL62:
+ 215:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%lu,", (uint32_t) rocket_state->launch_timestamp);
+ 719              		.loc 1 215 12 view .LVU160
+ 720 0012 FFF7FEFF 		bl	sprintf
+ 721              	.LVL63:
+ 722 0016 0646     		mov	r6, r0
+ 723              	.LVL64:
+ 217:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%lu,", (uint32_t) (rocket_state->state_vector.timestamp));
+ 724              		.loc 1 217 5 is_stmt 1 view .LVU161
+ 217:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%lu,", (uint32_t) (rocket_state->state_vector.timestamp));
+ 725              		.loc 1 217 12 is_stmt 0 view .LVU162
+ 726 0018 AA6B     		ldr	r2, [r5, #56]
+ 727 001a 3946     		mov	r1, r7
+ 728 001c 2018     		adds	r0, r4, r0
+ 729              	.LVL65:
+ 217:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%lu,", (uint32_t) (rocket_state->state_vector.timestamp));
+ 730              		.loc 1 217 12 view .LVU163
+ 731 001e FFF7FEFF 		bl	sprintf
+ 732              	.LVL66:
+ 217:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%lu,", (uint32_t) (rocket_state->state_vector.timestamp));
+ 733              		.loc 1 217 9 view .LVU164
+ 734 0022 0644     		add	r6, r6, r0
+ 735              	.LVL67:
+ 218:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.velocity_x);
+ 736              		.loc 1 218 5 is_stmt 1 view .LVU165
+ 218:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.velocity_x);
+ 737              		.loc 1 218 12 is_stmt 0 view .LVU166
+ 738 0024 95ED000A 		vldr.32	s0, [r5]
+ 739 0028 A019     		adds	r0, r4, r6
+ 740 002a FFF7FEFF 		bl	printf_fixed_float
+ 741              	.LVL68:
+ 218:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.velocity_x);
+ 742              		.loc 1 218 9 view .LVU167
+ 743 002e 0644     		add	r6, r6, r0
+ 744              	.LVL69:
+ 219:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.velocity_y);
+ 745              		.loc 1 219 5 is_stmt 1 view .LVU168
+ 219:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.velocity_y);
+ 746              		.loc 1 219 12 is_stmt 0 view .LVU169
+ 747 0030 95ED010A 		vldr.32	s0, [r5, #4]
+ 748 0034 A019     		adds	r0, r4, r6
+ 749 0036 FFF7FEFF 		bl	printf_fixed_float
+ 750              	.LVL70:
+ 219:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.velocity_y);
+ 751              		.loc 1 219 9 view .LVU170
+ 752 003a 0644     		add	r6, r6, r0
+ 753              	.LVL71:
+ 220:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.velocity_z);
+ 754              		.loc 1 220 5 is_stmt 1 view .LVU171
+ 220:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.velocity_z);
+ 755              		.loc 1 220 12 is_stmt 0 view .LVU172
+ 756 003c 95ED020A 		vldr.32	s0, [r5, #8]
+ 757 0040 A019     		adds	r0, r4, r6
+ 758 0042 FFF7FEFF 		bl	printf_fixed_float
+ARM GAS  /tmp/cczMYj0a.s 			page 22
+
+
+ 759              	.LVL72:
+ 220:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.velocity_z);
+ 760              		.loc 1 220 9 view .LVU173
+ 761 0046 0644     		add	r6, r6, r0
+ 762              	.LVL73:
+ 221:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.attitude_w);
+ 763              		.loc 1 221 5 is_stmt 1 view .LVU174
+ 221:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.attitude_w);
+ 764              		.loc 1 221 12 is_stmt 0 view .LVU175
+ 765 0048 95ED030A 		vldr.32	s0, [r5, #12]
+ 766 004c A019     		adds	r0, r4, r6
+ 767 004e FFF7FEFF 		bl	printf_fixed_float
+ 768              	.LVL74:
+ 221:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.attitude_w);
+ 769              		.loc 1 221 9 view .LVU176
+ 770 0052 0644     		add	r6, r6, r0
+ 771              	.LVL75:
+ 222:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.attitude_x);
+ 772              		.loc 1 222 5 is_stmt 1 view .LVU177
+ 222:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.attitude_x);
+ 773              		.loc 1 222 12 is_stmt 0 view .LVU178
+ 774 0054 95ED040A 		vldr.32	s0, [r5, #16]
+ 775 0058 A019     		adds	r0, r4, r6
+ 776 005a FFF7FEFF 		bl	printf_fixed_float
+ 777              	.LVL76:
+ 222:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.attitude_x);
+ 778              		.loc 1 222 9 view .LVU179
+ 779 005e 0644     		add	r6, r6, r0
+ 780              	.LVL77:
+ 223:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.attitude_y);
+ 781              		.loc 1 223 5 is_stmt 1 view .LVU180
+ 223:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.attitude_y);
+ 782              		.loc 1 223 12 is_stmt 0 view .LVU181
+ 783 0060 95ED050A 		vldr.32	s0, [r5, #20]
+ 784 0064 A019     		adds	r0, r4, r6
+ 785 0066 FFF7FEFF 		bl	printf_fixed_float
+ 786              	.LVL78:
+ 223:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.attitude_y);
+ 787              		.loc 1 223 9 view .LVU182
+ 788 006a 0644     		add	r6, r6, r0
+ 789              	.LVL79:
+ 224:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.attitude_z);
+ 790              		.loc 1 224 5 is_stmt 1 view .LVU183
+ 224:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.attitude_z);
+ 791              		.loc 1 224 12 is_stmt 0 view .LVU184
+ 792 006c 95ED060A 		vldr.32	s0, [r5, #24]
+ 793 0070 A019     		adds	r0, r4, r6
+ 794 0072 FFF7FEFF 		bl	printf_fixed_float
+ 795              	.LVL80:
+ 224:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.attitude_z);
+ 796              		.loc 1 224 9 view .LVU185
+ 797 0076 0644     		add	r6, r6, r0
+ 798              	.LVL81:
+ 225:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.position_x);
+ 799              		.loc 1 225 5 is_stmt 1 view .LVU186
+ 225:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.position_x);
+ 800              		.loc 1 225 12 is_stmt 0 view .LVU187
+ARM GAS  /tmp/cczMYj0a.s 			page 23
+
+
+ 801 0078 95ED070A 		vldr.32	s0, [r5, #28]
+ 802 007c A019     		adds	r0, r4, r6
+ 803 007e FFF7FEFF 		bl	printf_fixed_float
+ 804              	.LVL82:
+ 225:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.position_x);
+ 805              		.loc 1 225 9 view .LVU188
+ 806 0082 0644     		add	r6, r6, r0
+ 807              	.LVL83:
+ 226:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.position_y);
+ 808              		.loc 1 226 5 is_stmt 1 view .LVU189
+ 226:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.position_y);
+ 809              		.loc 1 226 12 is_stmt 0 view .LVU190
+ 810 0084 95ED080A 		vldr.32	s0, [r5, #32]
+ 811 0088 A019     		adds	r0, r4, r6
+ 812 008a FFF7FEFF 		bl	printf_fixed_float
+ 813              	.LVL84:
+ 226:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.position_y);
+ 814              		.loc 1 226 9 view .LVU191
+ 815 008e 0644     		add	r6, r6, r0
+ 816              	.LVL85:
+ 227:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.position_z);
+ 817              		.loc 1 227 5 is_stmt 1 view .LVU192
+ 227:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.position_z);
+ 818              		.loc 1 227 12 is_stmt 0 view .LVU193
+ 819 0090 95ED090A 		vldr.32	s0, [r5, #36]
+ 820 0094 A019     		adds	r0, r4, r6
+ 821 0096 FFF7FEFF 		bl	printf_fixed_float
+ 822              	.LVL86:
+ 227:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.position_z);
+ 823              		.loc 1 227 9 view .LVU194
+ 824 009a 0644     		add	r6, r6, r0
+ 825              	.LVL87:
+ 228:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.world_x);
+ 826              		.loc 1 228 5 is_stmt 1 view .LVU195
+ 228:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.world_x);
+ 827              		.loc 1 228 12 is_stmt 0 view .LVU196
+ 828 009c 95ED0A0A 		vldr.32	s0, [r5, #40]
+ 829 00a0 A019     		adds	r0, r4, r6
+ 830 00a2 FFF7FEFF 		bl	printf_fixed_float
+ 831              	.LVL88:
+ 228:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.world_x);
+ 832              		.loc 1 228 9 view .LVU197
+ 833 00a6 0644     		add	r6, r6, r0
+ 834              	.LVL89:
+ 229:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.world_y);
+ 835              		.loc 1 229 5 is_stmt 1 view .LVU198
+ 229:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.world_y);
+ 836              		.loc 1 229 12 is_stmt 0 view .LVU199
+ 837 00a8 95ED0B0A 		vldr.32	s0, [r5, #44]
+ 838 00ac A019     		adds	r0, r4, r6
+ 839 00ae FFF7FEFF 		bl	printf_fixed_float
+ 840              	.LVL90:
+ 229:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.world_y);
+ 841              		.loc 1 229 9 view .LVU200
+ 842 00b2 0644     		add	r6, r6, r0
+ 843              	.LVL91:
+ 230:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.world_z);
+ARM GAS  /tmp/cczMYj0a.s 			page 24
+
+
+ 844              		.loc 1 230 5 is_stmt 1 view .LVU201
+ 230:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.world_z);
+ 845              		.loc 1 230 12 is_stmt 0 view .LVU202
+ 846 00b4 95ED0C0A 		vldr.32	s0, [r5, #48]
+ 847 00b8 A019     		adds	r0, r4, r6
+ 848 00ba FFF7FEFF 		bl	printf_fixed_float
+ 849              	.LVL92:
+ 230:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->state_vector.world_z);
+ 850              		.loc 1 230 9 view .LVU203
+ 851 00be 0644     		add	r6, r6, r0
+ 852              	.LVL93:
+ 232:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%lu,", (uint32_t) (rocket_state->servo_deflection.timestamp));
+ 853              		.loc 1 232 5 is_stmt 1 view .LVU204
+ 232:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%lu,", (uint32_t) (rocket_state->servo_deflection.timestamp));
+ 854              		.loc 1 232 12 is_stmt 0 view .LVU205
+ 855 00c0 2A6D     		ldr	r2, [r5, #80]
+ 856 00c2 3946     		mov	r1, r7
+ 857 00c4 A019     		adds	r0, r4, r6
+ 858 00c6 FFF7FEFF 		bl	sprintf
+ 859              	.LVL94:
+ 232:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%lu,", (uint32_t) (rocket_state->servo_deflection.timestamp));
+ 860              		.loc 1 232 9 view .LVU206
+ 861 00ca 0644     		add	r6, r6, r0
+ 862              	.LVL95:
+ 233:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->servo_deflection.servo_deflection_1);
+ 863              		.loc 1 233 5 is_stmt 1 view .LVU207
+ 233:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->servo_deflection.servo_deflection_1);
+ 864              		.loc 1 233 12 is_stmt 0 view .LVU208
+ 865 00cc 95ED100A 		vldr.32	s0, [r5, #64]
+ 866 00d0 A019     		adds	r0, r4, r6
+ 867 00d2 FFF7FEFF 		bl	printf_fixed_float
+ 868              	.LVL96:
+ 233:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->servo_deflection.servo_deflection_1);
+ 869              		.loc 1 233 9 view .LVU209
+ 870 00d6 0644     		add	r6, r6, r0
+ 871              	.LVL97:
+ 234:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->servo_deflection.servo_deflection_2);
+ 872              		.loc 1 234 5 is_stmt 1 view .LVU210
+ 234:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->servo_deflection.servo_deflection_2);
+ 873              		.loc 1 234 12 is_stmt 0 view .LVU211
+ 874 00d8 95ED110A 		vldr.32	s0, [r5, #68]
+ 875 00dc A019     		adds	r0, r4, r6
+ 876 00de FFF7FEFF 		bl	printf_fixed_float
+ 877              	.LVL98:
+ 234:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->servo_deflection.servo_deflection_2);
+ 878              		.loc 1 234 9 view .LVU212
+ 879 00e2 0644     		add	r6, r6, r0
+ 880              	.LVL99:
+ 235:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->servo_deflection.servo_deflection_3);
+ 881              		.loc 1 235 5 is_stmt 1 view .LVU213
+ 235:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->servo_deflection.servo_deflection_3);
+ 882              		.loc 1 235 12 is_stmt 0 view .LVU214
+ 883 00e4 95ED120A 		vldr.32	s0, [r5, #72]
+ 884 00e8 A019     		adds	r0, r4, r6
+ 885 00ea FFF7FEFF 		bl	printf_fixed_float
+ 886              	.LVL100:
+ 235:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->servo_deflection.servo_deflection_3);
+ARM GAS  /tmp/cczMYj0a.s 			page 25
+
+
+ 887              		.loc 1 235 9 view .LVU215
+ 888 00ee 0644     		add	r6, r6, r0
+ 889              	.LVL101:
+ 236:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->servo_deflection.servo_deflection_4);
+ 890              		.loc 1 236 5 is_stmt 1 view .LVU216
+ 236:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->servo_deflection.servo_deflection_4);
+ 891              		.loc 1 236 12 is_stmt 0 view .LVU217
+ 892 00f0 95ED130A 		vldr.32	s0, [r5, #76]
+ 893 00f4 A019     		adds	r0, r4, r6
+ 894 00f6 FFF7FEFF 		bl	printf_fixed_float
+ 895              	.LVL102:
+ 236:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->servo_deflection.servo_deflection_4);
+ 896              		.loc 1 236 9 view .LVU218
+ 897 00fa 0644     		add	r6, r6, r0
+ 898              	.LVL103:
+ 238:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%lu,", (uint32_t) (rocket_state->rocket_state.timestamp));
+ 899              		.loc 1 238 5 is_stmt 1 view .LVU219
+ 238:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%lu,", (uint32_t) (rocket_state->rocket_state.timestamp));
+ 900              		.loc 1 238 12 is_stmt 0 view .LVU220
+ 901 00fc 2A6E     		ldr	r2, [r5, #96]
+ 902 00fe 3946     		mov	r1, r7
+ 903 0100 A019     		adds	r0, r4, r6
+ 904 0102 FFF7FEFF 		bl	sprintf
+ 905              	.LVL104:
+ 238:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%lu,", (uint32_t) (rocket_state->rocket_state.timestamp));
+ 906              		.loc 1 238 9 view .LVU221
+ 907 0106 0644     		add	r6, r6, r0
+ 908              	.LVL105:
+ 239:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%d,", rocket_state->rocket_state.rocket_state);
+ 909              		.loc 1 239 5 is_stmt 1 view .LVU222
+ 239:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%d,", rocket_state->rocket_state.rocket_state);
+ 910              		.loc 1 239 12 is_stmt 0 view .LVU223
+ 911 0108 DFF87081 		ldr	r8, .L52+8
+ 912 010c 95F85820 		ldrb	r2, [r5, #88]	@ zero_extendqisi2
+ 913 0110 4146     		mov	r1, r8
+ 914 0112 A019     		adds	r0, r4, r6
+ 915 0114 FFF7FEFF 		bl	sprintf
+ 916              	.LVL106:
+ 239:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%d,", rocket_state->rocket_state.rocket_state);
+ 917              		.loc 1 239 9 view .LVU224
+ 918 0118 0644     		add	r6, r6, r0
+ 919              	.LVL107:
+ 240:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%d,", rocket_state->rocket_state.firing_channel_1);
+ 920              		.loc 1 240 5 is_stmt 1 view .LVU225
+ 240:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%d,", rocket_state->rocket_state.firing_channel_1);
+ 921              		.loc 1 240 12 is_stmt 0 view .LVU226
+ 922 011a 95F85920 		ldrb	r2, [r5, #89]	@ zero_extendqisi2
+ 923 011e 4146     		mov	r1, r8
+ 924 0120 A019     		adds	r0, r4, r6
+ 925 0122 FFF7FEFF 		bl	sprintf
+ 926              	.LVL108:
+ 240:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%d,", rocket_state->rocket_state.firing_channel_1);
+ 927              		.loc 1 240 9 view .LVU227
+ 928 0126 0644     		add	r6, r6, r0
+ 929              	.LVL109:
+ 241:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%d,", rocket_state->rocket_state.firing_channel_2);
+ 930              		.loc 1 241 5 is_stmt 1 view .LVU228
+ARM GAS  /tmp/cczMYj0a.s 			page 26
+
+
+ 241:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%d,", rocket_state->rocket_state.firing_channel_2);
+ 931              		.loc 1 241 12 is_stmt 0 view .LVU229
+ 932 0128 95F85A20 		ldrb	r2, [r5, #90]	@ zero_extendqisi2
+ 933 012c 4146     		mov	r1, r8
+ 934 012e A019     		adds	r0, r4, r6
+ 935 0130 FFF7FEFF 		bl	sprintf
+ 936              	.LVL110:
+ 241:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%d,", rocket_state->rocket_state.firing_channel_2);
+ 937              		.loc 1 241 9 view .LVU230
+ 938 0134 0644     		add	r6, r6, r0
+ 939              	.LVL111:
+ 242:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%d,", rocket_state->rocket_state.firing_channel_3);
+ 940              		.loc 1 242 5 is_stmt 1 view .LVU231
+ 242:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%d,", rocket_state->rocket_state.firing_channel_3);
+ 941              		.loc 1 242 12 is_stmt 0 view .LVU232
+ 942 0136 95F85B20 		ldrb	r2, [r5, #91]	@ zero_extendqisi2
+ 943 013a 4146     		mov	r1, r8
+ 944 013c A019     		adds	r0, r4, r6
+ 945 013e FFF7FEFF 		bl	sprintf
+ 946              	.LVL112:
+ 242:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%d,", rocket_state->rocket_state.firing_channel_3);
+ 947              		.loc 1 242 9 view .LVU233
+ 948 0142 0644     		add	r6, r6, r0
+ 949              	.LVL113:
+ 244:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%lu,", (uint32_t) (rocket_state->ground_ekf.timestamp));
+ 950              		.loc 1 244 5 is_stmt 1 view .LVU234
+ 244:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%lu,", (uint32_t) (rocket_state->ground_ekf.timestamp));
+ 951              		.loc 1 244 12 is_stmt 0 view .LVU235
+ 952 0144 D5F88020 		ldr	r2, [r5, #128]
+ 953 0148 3946     		mov	r1, r7
+ 954 014a A019     		adds	r0, r4, r6
+ 955 014c FFF7FEFF 		bl	sprintf
+ 956              	.LVL114:
+ 244:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%lu,", (uint32_t) (rocket_state->ground_ekf.timestamp));
+ 957              		.loc 1 244 9 view .LVU236
+ 958 0150 0644     		add	r6, r6, r0
+ 959              	.LVL115:
+ 245:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->ground_ekf.pn_matrix_d1);
+ 960              		.loc 1 245 5 is_stmt 1 view .LVU237
+ 245:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->ground_ekf.pn_matrix_d1);
+ 961              		.loc 1 245 12 is_stmt 0 view .LVU238
+ 962 0152 95ED1A0A 		vldr.32	s0, [r5, #104]
+ 963 0156 A019     		adds	r0, r4, r6
+ 964 0158 FFF7FEFF 		bl	printf_fixed_float
+ 965              	.LVL116:
+ 245:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->ground_ekf.pn_matrix_d1);
+ 966              		.loc 1 245 9 view .LVU239
+ 967 015c 0644     		add	r6, r6, r0
+ 968              	.LVL117:
+ 246:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->ground_ekf.pn_matrix_d2);
+ 969              		.loc 1 246 5 is_stmt 1 view .LVU240
+ 246:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->ground_ekf.pn_matrix_d2);
+ 970              		.loc 1 246 12 is_stmt 0 view .LVU241
+ 971 015e 95ED1B0A 		vldr.32	s0, [r5, #108]
+ 972 0162 A019     		adds	r0, r4, r6
+ 973 0164 FFF7FEFF 		bl	printf_fixed_float
+ 974              	.LVL118:
+ARM GAS  /tmp/cczMYj0a.s 			page 27
+
+
+ 246:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->ground_ekf.pn_matrix_d2);
+ 975              		.loc 1 246 9 view .LVU242
+ 976 0168 0644     		add	r6, r6, r0
+ 977              	.LVL119:
+ 247:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->ground_ekf.pn_matrix_d3);
+ 978              		.loc 1 247 5 is_stmt 1 view .LVU243
+ 247:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->ground_ekf.pn_matrix_d3);
+ 979              		.loc 1 247 12 is_stmt 0 view .LVU244
+ 980 016a 95ED1C0A 		vldr.32	s0, [r5, #112]
+ 981 016e A019     		adds	r0, r4, r6
+ 982 0170 FFF7FEFF 		bl	printf_fixed_float
+ 983              	.LVL120:
+ 247:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->ground_ekf.pn_matrix_d3);
+ 984              		.loc 1 247 9 view .LVU245
+ 985 0174 0644     		add	r6, r6, r0
+ 986              	.LVL121:
+ 248:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->ground_ekf.pn_matrix_d4);
+ 987              		.loc 1 248 5 is_stmt 1 view .LVU246
+ 248:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->ground_ekf.pn_matrix_d4);
+ 988              		.loc 1 248 12 is_stmt 0 view .LVU247
+ 989 0176 95ED1D0A 		vldr.32	s0, [r5, #116]
+ 990 017a A019     		adds	r0, r4, r6
+ 991 017c FFF7FEFF 		bl	printf_fixed_float
+ 992              	.LVL122:
+ 248:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->ground_ekf.pn_matrix_d4);
+ 993              		.loc 1 248 9 view .LVU248
+ 994 0180 0644     		add	r6, r6, r0
+ 995              	.LVL123:
+ 249:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->ground_ekf.pn_matrix_d5);
+ 996              		.loc 1 249 5 is_stmt 1 view .LVU249
+ 249:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->ground_ekf.pn_matrix_d5);
+ 997              		.loc 1 249 12 is_stmt 0 view .LVU250
+ 998 0182 95ED1E0A 		vldr.32	s0, [r5, #120]
+ 999 0186 A019     		adds	r0, r4, r6
+ 1000 0188 FFF7FEFF 		bl	printf_fixed_float
+ 1001              	.LVL124:
+ 249:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->ground_ekf.pn_matrix_d5);
+ 1002              		.loc 1 249 9 view .LVU251
+ 1003 018c 0644     		add	r6, r6, r0
+ 1004              	.LVL125:
+ 250:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->ground_ekf.pn_matrix_d6);
+ 1005              		.loc 1 250 5 is_stmt 1 view .LVU252
+ 250:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->ground_ekf.pn_matrix_d6);
+ 1006              		.loc 1 250 12 is_stmt 0 view .LVU253
+ 1007 018e 95ED1F0A 		vldr.32	s0, [r5, #124]
+ 1008 0192 A019     		adds	r0, r4, r6
+ 1009 0194 FFF7FEFF 		bl	printf_fixed_float
+ 1010              	.LVL126:
+ 250:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->ground_ekf.pn_matrix_d6);
+ 1011              		.loc 1 250 9 view .LVU254
+ 1012 0198 0644     		add	r6, r6, r0
+ 1013              	.LVL127:
+ 252:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%lu,", (uint32_t) (rocket_state->sensor_data.timestamp));
+ 1014              		.loc 1 252 5 is_stmt 1 view .LVU255
+ 252:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%lu,", (uint32_t) (rocket_state->sensor_data.timestamp));
+ 1015              		.loc 1 252 12 is_stmt 0 view .LVU256
+ 1016 019a D5F8B020 		ldr	r2, [r5, #176]
+ARM GAS  /tmp/cczMYj0a.s 			page 28
+
+
+ 1017 019e 3946     		mov	r1, r7
+ 1018 01a0 A019     		adds	r0, r4, r6
+ 1019 01a2 FFF7FEFF 		bl	sprintf
+ 1020              	.LVL128:
+ 252:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%lu,", (uint32_t) (rocket_state->sensor_data.timestamp));
+ 1021              		.loc 1 252 9 view .LVU257
+ 1022 01a6 0644     		add	r6, r6, r0
+ 1023              	.LVL129:
+ 253:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->sensor_data.accelerometer_x);
+ 1024              		.loc 1 253 5 is_stmt 1 view .LVU258
+ 253:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->sensor_data.accelerometer_x);
+ 1025              		.loc 1 253 12 is_stmt 0 view .LVU259
+ 1026 01a8 95ED220A 		vldr.32	s0, [r5, #136]
+ 1027 01ac A019     		adds	r0, r4, r6
+ 1028 01ae FFF7FEFF 		bl	printf_fixed_float
+ 1029              	.LVL130:
+ 253:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->sensor_data.accelerometer_x);
+ 1030              		.loc 1 253 9 view .LVU260
+ 1031 01b2 0644     		add	r6, r6, r0
+ 1032              	.LVL131:
+ 254:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->sensor_data.accelerometer_y);
+ 1033              		.loc 1 254 5 is_stmt 1 view .LVU261
+ 254:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->sensor_data.accelerometer_y);
+ 1034              		.loc 1 254 12 is_stmt 0 view .LVU262
+ 1035 01b4 95ED230A 		vldr.32	s0, [r5, #140]
+ 1036 01b8 A019     		adds	r0, r4, r6
+ 1037 01ba FFF7FEFF 		bl	printf_fixed_float
+ 1038              	.LVL132:
+ 254:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->sensor_data.accelerometer_y);
+ 1039              		.loc 1 254 9 view .LVU263
+ 1040 01be 0644     		add	r6, r6, r0
+ 1041              	.LVL133:
+ 255:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->sensor_data.accelerometer_z);
+ 1042              		.loc 1 255 5 is_stmt 1 view .LVU264
+ 255:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->sensor_data.accelerometer_z);
+ 1043              		.loc 1 255 12 is_stmt 0 view .LVU265
+ 1044 01c0 95ED240A 		vldr.32	s0, [r5, #144]
+ 1045 01c4 A019     		adds	r0, r4, r6
+ 1046 01c6 FFF7FEFF 		bl	printf_fixed_float
+ 1047              	.LVL134:
+ 255:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->sensor_data.accelerometer_z);
+ 1048              		.loc 1 255 9 view .LVU266
+ 1049 01ca 0644     		add	r6, r6, r0
+ 1050              	.LVL135:
+ 256:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->sensor_data.gyro_x);
+ 1051              		.loc 1 256 5 is_stmt 1 view .LVU267
+ 256:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->sensor_data.gyro_x);
+ 1052              		.loc 1 256 12 is_stmt 0 view .LVU268
+ 1053 01cc 95ED250A 		vldr.32	s0, [r5, #148]
+ 1054 01d0 A019     		adds	r0, r4, r6
+ 1055 01d2 FFF7FEFF 		bl	printf_fixed_float
+ 1056              	.LVL136:
+ 256:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->sensor_data.gyro_x);
+ 1057              		.loc 1 256 9 view .LVU269
+ 1058 01d6 0644     		add	r6, r6, r0
+ 1059              	.LVL137:
+ 257:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->sensor_data.gyro_y);
+ARM GAS  /tmp/cczMYj0a.s 			page 29
+
+
+ 1060              		.loc 1 257 5 is_stmt 1 view .LVU270
+ 257:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->sensor_data.gyro_y);
+ 1061              		.loc 1 257 12 is_stmt 0 view .LVU271
+ 1062 01d8 95ED260A 		vldr.32	s0, [r5, #152]
+ 1063 01dc A019     		adds	r0, r4, r6
+ 1064 01de FFF7FEFF 		bl	printf_fixed_float
+ 1065              	.LVL138:
+ 257:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->sensor_data.gyro_y);
+ 1066              		.loc 1 257 9 view .LVU272
+ 1067 01e2 0644     		add	r6, r6, r0
+ 1068              	.LVL139:
+ 258:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->sensor_data.gyro_z);
+ 1069              		.loc 1 258 5 is_stmt 1 view .LVU273
+ 258:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->sensor_data.gyro_z);
+ 1070              		.loc 1 258 12 is_stmt 0 view .LVU274
+ 1071 01e4 95ED270A 		vldr.32	s0, [r5, #156]
+ 1072 01e8 A019     		adds	r0, r4, r6
+ 1073 01ea FFF7FEFF 		bl	printf_fixed_float
+ 1074              	.LVL140:
+ 258:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->sensor_data.gyro_z);
+ 1075              		.loc 1 258 9 view .LVU275
+ 1076 01ee 0644     		add	r6, r6, r0
+ 1077              	.LVL141:
+ 259:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->sensor_data.gps_x);
+ 1078              		.loc 1 259 5 is_stmt 1 view .LVU276
+ 259:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->sensor_data.gps_x);
+ 1079              		.loc 1 259 12 is_stmt 0 view .LVU277
+ 1080 01f0 95ED280A 		vldr.32	s0, [r5, #160]
+ 1081 01f4 A019     		adds	r0, r4, r6
+ 1082 01f6 FFF7FEFF 		bl	printf_fixed_float
+ 1083              	.LVL142:
+ 259:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->sensor_data.gps_x);
+ 1084              		.loc 1 259 9 view .LVU278
+ 1085 01fa 0644     		add	r6, r6, r0
+ 1086              	.LVL143:
+ 260:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->sensor_data.gps_y);
+ 1087              		.loc 1 260 5 is_stmt 1 view .LVU279
+ 260:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->sensor_data.gps_y);
+ 1088              		.loc 1 260 12 is_stmt 0 view .LVU280
+ 1089 01fc 95ED290A 		vldr.32	s0, [r5, #164]
+ 1090 0200 A019     		adds	r0, r4, r6
+ 1091 0202 FFF7FEFF 		bl	printf_fixed_float
+ 1092              	.LVL144:
+ 260:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->sensor_data.gps_y);
+ 1093              		.loc 1 260 9 view .LVU281
+ 1094 0206 0644     		add	r6, r6, r0
+ 1095              	.LVL145:
+ 261:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->sensor_data.gps_z);
+ 1096              		.loc 1 261 5 is_stmt 1 view .LVU282
+ 261:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->sensor_data.gps_z);
+ 1097              		.loc 1 261 12 is_stmt 0 view .LVU283
+ 1098 0208 95ED2A0A 		vldr.32	s0, [r5, #168]
+ 1099 020c A019     		adds	r0, r4, r6
+ 1100 020e FFF7FEFF 		bl	printf_fixed_float
+ 1101              	.LVL146:
+ 261:../Core/Src/state_flash.c ****     len += printf_fixed_float(line + len, rocket_state->sensor_data.gps_z);
+ 1102              		.loc 1 261 9 view .LVU284
+ARM GAS  /tmp/cczMYj0a.s 			page 30
+
+
+ 1103 0212 0644     		add	r6, r6, r0
+ 1104              	.LVL147:
+ 263:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%lu,", (uint32_t) (rocket_state->analog_feedback_data.timestamp));
+ 1105              		.loc 1 263 5 is_stmt 1 view .LVU285
+ 263:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%lu,", (uint32_t) (rocket_state->analog_feedback_data.timestamp));
+ 1106              		.loc 1 263 12 is_stmt 0 view .LVU286
+ 1107 0214 D5F8C820 		ldr	r2, [r5, #200]
+ 1108 0218 3946     		mov	r1, r7
+ 1109 021a A019     		adds	r0, r4, r6
+ 1110 021c FFF7FEFF 		bl	sprintf
+ 1111              	.LVL148:
+ 263:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%lu,", (uint32_t) (rocket_state->analog_feedback_data.timestamp));
+ 1112              		.loc 1 263 9 view .LVU287
+ 1113 0220 0644     		add	r6, r6, r0
+ 1114              	.LVL149:
+ 264:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%d,", rocket_state->analog_feedback_data.current_fb_33);
+ 1115              		.loc 1 264 5 is_stmt 1 view .LVU288
+ 264:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%d,", rocket_state->analog_feedback_data.current_fb_33);
+ 1116              		.loc 1 264 12 is_stmt 0 view .LVU289
+ 1117 0222 B5F8B820 		ldrh	r2, [r5, #184]
+ 1118 0226 4146     		mov	r1, r8
+ 1119 0228 A019     		adds	r0, r4, r6
+ 1120 022a FFF7FEFF 		bl	sprintf
+ 1121              	.LVL150:
+ 264:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%d,", rocket_state->analog_feedback_data.current_fb_33);
+ 1122              		.loc 1 264 9 view .LVU290
+ 1123 022e 0644     		add	r6, r6, r0
+ 1124              	.LVL151:
+ 265:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%d,", rocket_state->analog_feedback_data.pyro_0_cont);
+ 1125              		.loc 1 265 5 is_stmt 1 view .LVU291
+ 265:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%d,", rocket_state->analog_feedback_data.pyro_0_cont);
+ 1126              		.loc 1 265 12 is_stmt 0 view .LVU292
+ 1127 0230 B5F8BA20 		ldrh	r2, [r5, #186]
+ 1128 0234 4146     		mov	r1, r8
+ 1129 0236 A019     		adds	r0, r4, r6
+ 1130 0238 FFF7FEFF 		bl	sprintf
+ 1131              	.LVL152:
+ 265:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%d,", rocket_state->analog_feedback_data.pyro_0_cont);
+ 1132              		.loc 1 265 9 view .LVU293
+ 1133 023c 0644     		add	r6, r6, r0
+ 1134              	.LVL153:
+ 266:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%d,", rocket_state->analog_feedback_data.pyro_1_cont);
+ 1135              		.loc 1 266 5 is_stmt 1 view .LVU294
+ 266:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%d,", rocket_state->analog_feedback_data.pyro_1_cont);
+ 1136              		.loc 1 266 12 is_stmt 0 view .LVU295
+ 1137 023e B5F8BC20 		ldrh	r2, [r5, #188]
+ 1138 0242 4146     		mov	r1, r8
+ 1139 0244 A019     		adds	r0, r4, r6
+ 1140 0246 FFF7FEFF 		bl	sprintf
+ 1141              	.LVL154:
+ 266:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%d,", rocket_state->analog_feedback_data.pyro_1_cont);
+ 1142              		.loc 1 266 9 view .LVU296
+ 1143 024a 0644     		add	r6, r6, r0
+ 1144              	.LVL155:
+ 267:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%d,", rocket_state->analog_feedback_data.pyro_2_cont);
+ 1145              		.loc 1 267 5 is_stmt 1 view .LVU297
+ 267:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%d,", rocket_state->analog_feedback_data.pyro_2_cont);
+ARM GAS  /tmp/cczMYj0a.s 			page 31
+
+
+ 1146              		.loc 1 267 12 is_stmt 0 view .LVU298
+ 1147 024c B5F8BE20 		ldrh	r2, [r5, #190]
+ 1148 0250 4146     		mov	r1, r8
+ 1149 0252 A019     		adds	r0, r4, r6
+ 1150 0254 FFF7FEFF 		bl	sprintf
+ 1151              	.LVL156:
+ 267:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%d,", rocket_state->analog_feedback_data.pyro_2_cont);
+ 1152              		.loc 1 267 9 view .LVU299
+ 1153 0258 0644     		add	r6, r6, r0
+ 1154              	.LVL157:
+ 268:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%d", rocket_state->analog_feedback_data.pyro_channel_deploy);
+ 1155              		.loc 1 268 5 is_stmt 1 view .LVU300
+ 268:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%d", rocket_state->analog_feedback_data.pyro_channel_deploy);
+ 1156              		.loc 1 268 12 is_stmt 0 view .LVU301
+ 1157 025a 95F8C020 		ldrb	r2, [r5, #192]	@ zero_extendqisi2
+ 1158 025e 0649     		ldr	r1, .L52+4
+ 1159 0260 A019     		adds	r0, r4, r6
+ 1160 0262 FFF7FEFF 		bl	sprintf
+ 1161              	.LVL158:
+ 268:../Core/Src/state_flash.c ****     len += sprintf(line + len, "%d", rocket_state->analog_feedback_data.pyro_channel_deploy);
+ 1162              		.loc 1 268 9 view .LVU302
+ 1163 0266 3044     		add	r0, r0, r6
+ 1164              	.LVL159:
+ 270:../Core/Src/state_flash.c ****     line[len++] = '\n';
+ 1165              		.loc 1 270 5 is_stmt 1 view .LVU303
+ 270:../Core/Src/state_flash.c ****     line[len++] = '\n';
+ 1166              		.loc 1 270 17 is_stmt 0 view .LVU304
+ 1167 0268 0A23     		movs	r3, #10
+ 1168 026a 2354     		strb	r3, [r4, r0]
+ 272:../Core/Src/state_flash.c ****     return len;
+ 1169              		.loc 1 272 5 is_stmt 1 view .LVU305
+ 273:../Core/Src/state_flash.c **** }
+ 1170              		.loc 1 273 1 is_stmt 0 view .LVU306
+ 1171 026c 0130     		adds	r0, r0, #1
+ 1172              	.LVL160:
+ 273:../Core/Src/state_flash.c **** }
+ 1173              		.loc 1 273 1 view .LVU307
+ 1174 026e BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 1175              	.LVL161:
+ 1176              	.L53:
+ 273:../Core/Src/state_flash.c **** }
+ 1177              		.loc 1 273 1 view .LVU308
+ 1178 0272 00BF     		.align	2
+ 1179              	.L52:
+ 1180 0274 00000000 		.word	.LC13
+ 1181 0278 0C000000 		.word	.LC15
+ 1182 027c 08000000 		.word	.LC14
+ 1183              		.cfi_endproc
+ 1184              	.LFE251:
+ 1186              		.section	.rodata.flash_sd_card.str1.4,"aMS",%progbits,1
+ 1187              		.align	2
+ 1188              	.LC16:
+ 1189 0000 53756363 		.ascii	"Successfully opened SD card file\015\012\000"
+ 1189      65737366 
+ 1189      756C6C79 
+ 1189      206F7065 
+ 1189      6E656420 
+ARM GAS  /tmp/cczMYj0a.s 			page 32
+
+
+ 1190 0023 00       		.align	2
+ 1191              	.LC17:
+ 1192 0024 57726974 		.ascii	"Writing to SD card...\015\012\000"
+ 1192      696E6720 
+ 1192      746F2053 
+ 1192      44206361 
+ 1192      72642E2E 
+ 1193              		.align	2
+ 1194              	.LC18:
+ 1195 003c 57726974 		.ascii	"Writing to SD card: %d/%d\015\012\000"
+ 1195      696E6720 
+ 1195      746F2053 
+ 1195      44206361 
+ 1195      72643A20 
+ 1196              		.align	2
+ 1197              	.LC19:
+ 1198 0058 77726974 		.ascii	"writing to SD card\015\012\000"
+ 1198      696E6720 
+ 1198      746F2053 
+ 1198      44206361 
+ 1198      72640D0A 
+ 1199 006d 000000   		.align	2
+ 1200              	.LC20:
+ 1201 0070 436C6F73 		.ascii	"Closed SD card file\015\012\000"
+ 1201      65642053 
+ 1201      44206361 
+ 1201      72642066 
+ 1201      696C650D 
+ 1202 0086 0000     		.align	2
+ 1203              	.LC21:
+ 1204 0088 57726F74 		.ascii	"Wrote to SD card\015\012\000"
+ 1204      6520746F 
+ 1204      20534420 
+ 1204      63617264 
+ 1204      0D0A00
+ 1205              		.section	.text.flash_sd_card,"ax",%progbits
+ 1206              		.align	1
+ 1207              		.global	flash_sd_card
+ 1208              		.syntax unified
+ 1209              		.thumb
+ 1210              		.thumb_func
+ 1211              		.fpu fpv4-sp-d16
+ 1213              	flash_sd_card:
+ 1214              	.LVL162:
+ 1215              	.LFB250:
+ 175:../Core/Src/state_flash.c **** void flash_sd_card(FlashBlock *flash_block, SDFile *sd_file, size_t n_states) {
+ 1216              		.loc 1 175 79 is_stmt 1 view -0
+ 1217              		.cfi_startproc
+ 1218              		@ args = 0, pretend = 0, frame = 2624
+ 1219              		@ frame_needed = 0, uses_anonymous_args = 0
+ 175:../Core/Src/state_flash.c **** void flash_sd_card(FlashBlock *flash_block, SDFile *sd_file, size_t n_states) {
+ 1220              		.loc 1 175 79 is_stmt 0 view .LVU310
+ 1221 0000 2DE9F043 		push	{r4, r5, r6, r7, r8, r9, lr}
+ 1222              	.LCFI15:
+ 1223              		.cfi_def_cfa_offset 28
+ 1224              		.cfi_offset 4, -28
+ 1225              		.cfi_offset 5, -24
+ARM GAS  /tmp/cczMYj0a.s 			page 33
+
+
+ 1226              		.cfi_offset 6, -20
+ 1227              		.cfi_offset 7, -16
+ 1228              		.cfi_offset 8, -12
+ 1229              		.cfi_offset 9, -8
+ 1230              		.cfi_offset 14, -4
+ 1231 0004 ADF6442D 		subw	sp, sp, #2628
+ 1232              	.LCFI16:
+ 1233              		.cfi_def_cfa_offset 2656
+ 1234 0008 8146     		mov	r9, r0
+ 1235 000a 8846     		mov	r8, r1
+ 1236 000c 1746     		mov	r7, r2
+ 176:../Core/Src/state_flash.c ****     if (sd_open_file(sd_file, FA_READ | FA_WRITE | FA_CREATE_ALWAYS)) {
+ 1237              		.loc 1 176 5 is_stmt 1 view .LVU311
+ 176:../Core/Src/state_flash.c ****     if (sd_open_file(sd_file, FA_READ | FA_WRITE | FA_CREATE_ALWAYS)) {
+ 1238              		.loc 1 176 9 is_stmt 0 view .LVU312
+ 1239 000e 0B21     		movs	r1, #11
+ 1240              	.LVL163:
+ 176:../Core/Src/state_flash.c ****     if (sd_open_file(sd_file, FA_READ | FA_WRITE | FA_CREATE_ALWAYS)) {
+ 1241              		.loc 1 176 9 view .LVU313
+ 1242 0010 4046     		mov	r0, r8
+ 1243              	.LVL164:
+ 176:../Core/Src/state_flash.c ****     if (sd_open_file(sd_file, FA_READ | FA_WRITE | FA_CREATE_ALWAYS)) {
+ 1244              		.loc 1 176 9 view .LVU314
+ 1245 0012 FFF7FEFF 		bl	sd_open_file
+ 1246              	.LVL165:
+ 176:../Core/Src/state_flash.c ****     if (sd_open_file(sd_file, FA_READ | FA_WRITE | FA_CREATE_ALWAYS)) {
+ 1247              		.loc 1 176 8 view .LVU315
+ 1248 0016 48B9     		cbnz	r0, .L61
+ 1249              	.L55:
+ 180:../Core/Src/state_flash.c ****     RocketState rocket_state;
+ 1250              		.loc 1 180 5 is_stmt 1 view .LVU316
+ 181:../Core/Src/state_flash.c ****     uint8_t data_buffer[EXT_FLASH_PAGE_SIZE];
+ 1251              		.loc 1 181 5 view .LVU317
+ 183:../Core/Src/state_flash.c ****     char line_buf[2048];
+ 1252              		.loc 1 183 5 view .LVU318
+ 184:../Core/Src/state_flash.c ****     HAL_UART_Transmit(&debug_uart, (uint8_t *) "Writing to SD card...\r\n", 23, HAL_MAX_DELAY);
+ 1253              		.loc 1 184 5 view .LVU319
+ 1254 0018 4FF0FF33 		mov	r3, #-1
+ 1255 001c 1722     		movs	r2, #23
+ 1256 001e 3149     		ldr	r1, .L64
+ 1257 0020 3148     		ldr	r0, .L64+4
+ 1258 0022 FFF7FEFF 		bl	HAL_UART_Transmit
+ 1259              	.LVL166:
+ 186:../Core/Src/state_flash.c ****     size_t sd_bytes_written = 0;
+ 1260              		.loc 1 186 5 view .LVU320
+ 188:../Core/Src/state_flash.c ****     for (size_t i = 0; i < n_states; i ++) {
+ 1261              		.loc 1 188 5 view .LVU321
+ 1262              	.LBB10:
+ 188:../Core/Src/state_flash.c ****     for (size_t i = 0; i < n_states; i ++) {
+ 1263              		.loc 1 188 10 view .LVU322
+ 188:../Core/Src/state_flash.c ****     for (size_t i = 0; i < n_states; i ++) {
+ 1264              		.loc 1 188 17 is_stmt 0 view .LVU323
+ 1265 0026 0024     		movs	r4, #0
+ 1266              	.LBE10:
+ 186:../Core/Src/state_flash.c ****     size_t sd_bytes_written = 0;
+ 1267              		.loc 1 186 12 view .LVU324
+ 1268 0028 2546     		mov	r5, r4
+ARM GAS  /tmp/cczMYj0a.s 			page 34
+
+
+ 1269              	.LBB13:
+ 188:../Core/Src/state_flash.c ****     for (size_t i = 0; i < n_states; i ++) {
+ 1270              		.loc 1 188 5 view .LVU325
+ 1271 002a 09E0     		b	.L56
+ 1272              	.LVL167:
+ 1273              	.L61:
+ 188:../Core/Src/state_flash.c ****     for (size_t i = 0; i < n_states; i ++) {
+ 1274              		.loc 1 188 5 view .LVU326
+ 1275              	.LBE13:
+ 177:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Successfully opened SD card file\r\n", 34, HAL_
+ 1276              		.loc 1 177 9 is_stmt 1 view .LVU327
+ 1277 002c 4FF0FF33 		mov	r3, #-1
+ 1278 0030 2222     		movs	r2, #34
+ 1279 0032 2E49     		ldr	r1, .L64+8
+ 1280 0034 2C48     		ldr	r0, .L64+4
+ 1281 0036 FFF7FEFF 		bl	HAL_UART_Transmit
+ 1282              	.LVL168:
+ 1283 003a EDE7     		b	.L55
+ 1284              	.LVL169:
+ 1285              	.L57:
+ 1286              	.LBB14:
+ 1287              	.LBB11:
+ 202:../Core/Src/state_flash.c ****         sd_bytes_written += line_len;
+ 1288              		.loc 1 202 9 discriminator 2 view .LVU328
+ 202:../Core/Src/state_flash.c ****         sd_bytes_written += line_len;
+ 1289              		.loc 1 202 26 is_stmt 0 discriminator 2 view .LVU329
+ 1290 003c 2544     		add	r5, r5, r4
+ 1291              	.LVL170:
+ 202:../Core/Src/state_flash.c ****         sd_bytes_written += line_len;
+ 1292              		.loc 1 202 26 discriminator 2 view .LVU330
+ 1293              	.LBE11:
+ 188:../Core/Src/state_flash.c ****     for (size_t i = 0; i < n_states; i ++) {
+ 1294              		.loc 1 188 38 is_stmt 1 discriminator 2 view .LVU331
+ 188:../Core/Src/state_flash.c ****     for (size_t i = 0; i < n_states; i ++) {
+ 1295              		.loc 1 188 40 is_stmt 0 discriminator 2 view .LVU332
+ 1296 003e 3446     		mov	r4, r6
+ 1297              	.LVL171:
+ 1298              	.L56:
+ 188:../Core/Src/state_flash.c ****     for (size_t i = 0; i < n_states; i ++) {
+ 1299              		.loc 1 188 24 is_stmt 1 discriminator 1 view .LVU333
+ 188:../Core/Src/state_flash.c ****     for (size_t i = 0; i < n_states; i ++) {
+ 1300              		.loc 1 188 5 is_stmt 0 discriminator 1 view .LVU334
+ 1301 0040 BC42     		cmp	r4, r7
+ 1302 0042 37D2     		bcs	.L62
+ 1303              	.LBB12:
+ 189:../Core/Src/state_flash.c ****         char progress[100];
+ 1304              		.loc 1 189 9 is_stmt 1 view .LVU335
+ 190:../Core/Src/state_flash.c ****         sprintf(progress, "Writing to SD card: %d/%d\r\n", i + 1, n_states);
+ 1305              		.loc 1 190 9 view .LVU336
+ 1306 0044 661C     		adds	r6, r4, #1
+ 1307 0046 3B46     		mov	r3, r7
+ 1308 0048 3246     		mov	r2, r6
+ 1309 004a 2949     		ldr	r1, .L64+12
+ 1310 004c 01A8     		add	r0, sp, #4
+ 1311 004e FFF7FEFF 		bl	sprintf
+ 1312              	.LVL172:
+ 191:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) progress, strlen(progress), HAL_MAX_DELAY);
+ARM GAS  /tmp/cczMYj0a.s 			page 35
+
+
+ 1313              		.loc 1 191 9 view .LVU337
+ 191:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) progress, strlen(progress), HAL_MAX_DELAY);
+ 1314              		.loc 1 191 62 is_stmt 0 view .LVU338
+ 1315 0052 01A8     		add	r0, sp, #4
+ 1316 0054 FFF7FEFF 		bl	strlen
+ 1317              	.LVL173:
+ 191:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) progress, strlen(progress), HAL_MAX_DELAY);
+ 1318              		.loc 1 191 9 view .LVU339
+ 1319 0058 4FF0FF33 		mov	r3, #-1
+ 1320 005c 82B2     		uxth	r2, r0
+ 1321 005e 01A9     		add	r1, sp, #4
+ 1322 0060 2148     		ldr	r0, .L64+4
+ 1323 0062 FFF7FEFF 		bl	HAL_UART_Transmit
+ 1324              	.LVL174:
+ 193:../Core/Src/state_flash.c ****         flash_read_block(flash_block, i * EXT_FLASH_PAGE_SIZE, data_buffer, EXT_FLASH_PAGE_SIZE);
+ 1325              		.loc 1 193 9 is_stmt 1 view .LVU340
+ 1326 0066 2102     		lsls	r1, r4, #8
+ 1327 0068 4FF48073 		mov	r3, #256
+ 1328 006c 0DF66802 		addw	r2, sp, #2152
+ 1329 0070 01F47F41 		and	r1, r1, #65280
+ 1330 0074 4846     		mov	r0, r9
+ 1331 0076 FFF7FEFF 		bl	flash_read_block
+ 1332              	.LVL175:
+ 195:../Core/Src/state_flash.c ****         memcpy(&rocket_state, data_buffer, sizeof(RocketState));
+ 1333              		.loc 1 195 9 view .LVU341
+ 1334 007a D822     		movs	r2, #216
+ 1335 007c 0DF66801 		addw	r1, sp, #2152
+ 1336 0080 0DF66810 		addw	r0, sp, #2408
+ 1337 0084 FFF7FEFF 		bl	memcpy
+ 1338              	.LVL176:
+ 197:../Core/Src/state_flash.c ****         size_t line_len = to_csv_line(&rocket_state, line_buf);
+ 1339              		.loc 1 197 9 view .LVU342
+ 197:../Core/Src/state_flash.c ****         size_t line_len = to_csv_line(&rocket_state, line_buf);
+ 1340              		.loc 1 197 27 is_stmt 0 view .LVU343
+ 1341 0088 1AA9     		add	r1, sp, #104
+ 1342 008a 0DF66810 		addw	r0, sp, #2408
+ 1343 008e FFF7FEFF 		bl	to_csv_line
+ 1344              	.LVL177:
+ 1345 0092 0446     		mov	r4, r0
+ 1346              	.LVL178:
+ 199:../Core/Src/state_flash.c ****         if (sd_write_file(sd_file, sd_bytes_written, (uint8_t *) line_buf, line_len)) {
+ 1347              		.loc 1 199 9 is_stmt 1 view .LVU344
+ 199:../Core/Src/state_flash.c ****         if (sd_write_file(sd_file, sd_bytes_written, (uint8_t *) line_buf, line_len)) {
+ 1348              		.loc 1 199 13 is_stmt 0 view .LVU345
+ 1349 0094 0346     		mov	r3, r0
+ 1350 0096 1AAA     		add	r2, sp, #104
+ 1351 0098 A9B2     		uxth	r1, r5
+ 1352 009a 4046     		mov	r0, r8
+ 1353              	.LVL179:
+ 199:../Core/Src/state_flash.c ****         if (sd_write_file(sd_file, sd_bytes_written, (uint8_t *) line_buf, line_len)) {
+ 1354              		.loc 1 199 13 view .LVU346
+ 1355 009c FFF7FEFF 		bl	sd_write_file
+ 1356              	.LVL180:
+ 199:../Core/Src/state_flash.c ****         if (sd_write_file(sd_file, sd_bytes_written, (uint8_t *) line_buf, line_len)) {
+ 1357              		.loc 1 199 12 view .LVU347
+ 1358 00a0 0028     		cmp	r0, #0
+ 1359 00a2 CBD0     		beq	.L57
+ARM GAS  /tmp/cczMYj0a.s 			page 36
+
+
+ 200:../Core/Src/state_flash.c ****             HAL_UART_Transmit(&debug_uart, (uint8_t *) "writing to SD card\r\n", 20, HAL_MAX_DELAY)
+ 1360              		.loc 1 200 13 is_stmt 1 view .LVU348
+ 1361 00a4 4FF0FF33 		mov	r3, #-1
+ 1362 00a8 1422     		movs	r2, #20
+ 1363 00aa 1249     		ldr	r1, .L64+16
+ 1364 00ac 0E48     		ldr	r0, .L64+4
+ 1365 00ae FFF7FEFF 		bl	HAL_UART_Transmit
+ 1366              	.LVL181:
+ 1367 00b2 C3E7     		b	.L57
+ 1368              	.LVL182:
+ 1369              	.L62:
+ 200:../Core/Src/state_flash.c ****             HAL_UART_Transmit(&debug_uart, (uint8_t *) "writing to SD card\r\n", 20, HAL_MAX_DELAY)
+ 1370              		.loc 1 200 13 is_stmt 0 view .LVU349
+ 1371              	.LBE12:
+ 1372              	.LBE14:
+ 205:../Core/Src/state_flash.c ****     if (sd_close_file(sd_file)) {
+ 1373              		.loc 1 205 5 is_stmt 1 view .LVU350
+ 205:../Core/Src/state_flash.c ****     if (sd_close_file(sd_file)) {
+ 1374              		.loc 1 205 9 is_stmt 0 view .LVU351
+ 1375 00b4 4046     		mov	r0, r8
+ 1376 00b6 FFF7FEFF 		bl	sd_close_file
+ 1377              	.LVL183:
+ 205:../Core/Src/state_flash.c ****     if (sd_close_file(sd_file)) {
+ 1378              		.loc 1 205 8 view .LVU352
+ 1379 00ba 50B9     		cbnz	r0, .L63
+ 1380              	.L59:
+ 209:../Core/Src/state_flash.c ****     HAL_UART_Transmit(&debug_uart, (uint8_t *) "Wrote to SD card\r\n", 18, HAL_MAX_DELAY);
+ 1381              		.loc 1 209 5 is_stmt 1 view .LVU353
+ 1382 00bc 4FF0FF33 		mov	r3, #-1
+ 1383 00c0 1222     		movs	r2, #18
+ 1384 00c2 0D49     		ldr	r1, .L64+20
+ 1385 00c4 0848     		ldr	r0, .L64+4
+ 1386 00c6 FFF7FEFF 		bl	HAL_UART_Transmit
+ 1387              	.LVL184:
+ 210:../Core/Src/state_flash.c **** }
+ 1388              		.loc 1 210 1 is_stmt 0 view .LVU354
+ 1389 00ca 0DF6442D 		addw	sp, sp, #2628
+ 1390              	.LCFI17:
+ 1391              		.cfi_remember_state
+ 1392              		.cfi_def_cfa_offset 28
+ 1393              		@ sp needed
+ 1394 00ce BDE8F083 		pop	{r4, r5, r6, r7, r8, r9, pc}
+ 1395              	.LVL185:
+ 1396              	.L63:
+ 1397              	.LCFI18:
+ 1398              		.cfi_restore_state
+ 206:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Closed SD card file\r\n", 21, HAL_MAX_DELAY);
+ 1399              		.loc 1 206 9 is_stmt 1 view .LVU355
+ 1400 00d2 4FF0FF33 		mov	r3, #-1
+ 1401 00d6 1522     		movs	r2, #21
+ 1402 00d8 0849     		ldr	r1, .L64+24
+ 1403 00da 0348     		ldr	r0, .L64+4
+ 1404 00dc FFF7FEFF 		bl	HAL_UART_Transmit
+ 1405              	.LVL186:
+ 1406 00e0 ECE7     		b	.L59
+ 1407              	.L65:
+ 1408 00e2 00BF     		.align	2
+ARM GAS  /tmp/cczMYj0a.s 			page 37
+
+
+ 1409              	.L64:
+ 1410 00e4 24000000 		.word	.LC17
+ 1411 00e8 00000000 		.word	huart3
+ 1412 00ec 00000000 		.word	.LC16
+ 1413 00f0 3C000000 		.word	.LC18
+ 1414 00f4 58000000 		.word	.LC19
+ 1415 00f8 88000000 		.word	.LC21
+ 1416 00fc 70000000 		.word	.LC20
+ 1417              		.cfi_endproc
+ 1418              	.LFE250:
+ 1420              		.section	.rodata.state_flash_task.str1.4,"aMS",%progbits,1
+ 1421              		.align	2
+ 1422              	.LC22:
+ 1423 0000 4661696C 		.ascii	"Failed to initialize IO\015\012\000"
+ 1423      65642074 
+ 1423      6F20696E 
+ 1423      69746961 
+ 1423      6C697A65 
+ 1424 001a 0000     		.align	2
+ 1425              	.LC23:
+ 1426 001c 494F2069 		.ascii	"IO initialized\015\012\000"
+ 1426      6E697469 
+ 1426      616C697A 
+ 1426      65640D0A 
+ 1426      00
+ 1427 002d 000000   		.align	2
+ 1428              	.LC24:
+ 1429 0030 466C6173 		.ascii	"Flash test PASS\015\012\000"
+ 1429      68207465 
+ 1429      73742050 
+ 1429      4153530D 
+ 1429      0A00
+ 1430 0042 0000     		.align	2
+ 1431              	.LC25:
+ 1432 0044 466C6173 		.ascii	"Flash test FAIL\015\012\000"
+ 1432      68207465 
+ 1432      73742046 
+ 1432      41494C0D 
+ 1432      0A00
+ 1433 0056 0000     		.align	2
+ 1434              	.LC26:
+ 1435 0058 53442074 		.ascii	"SD test PASS\015\012\000"
+ 1435      65737420 
+ 1435      50415353 
+ 1435      0D0A00
+ 1436 0067 00       		.align	2
+ 1437              	.LC27:
+ 1438 0068 53442074 		.ascii	"SD test FAIL\015\012\000"
+ 1438      65737420 
+ 1438      4641494C 
+ 1438      0D0A00
+ 1439 0077 00       		.align	2
+ 1440              	.LC28:
+ 1441 0078 2F646174 		.ascii	"/data.csv\000"
+ 1441      612E6373 
+ 1441      7600
+ 1442 0082 0000     		.align	2
+ARM GAS  /tmp/cczMYj0a.s 			page 38
+
+
+ 1443              	.LC29:
+ 1444 0084 466C6173 		.ascii	"Flashing SD card...\015\012\000"
+ 1444      68696E67 
+ 1444      20534420 
+ 1444      63617264 
+ 1444      2E2E2E0D 
+ 1445              		.section	.text.state_flash_task,"ax",%progbits
+ 1446              		.align	1
+ 1447              		.global	state_flash_task
+ 1448              		.syntax unified
+ 1449              		.thumb
+ 1450              		.thumb_func
+ 1451              		.fpu fpv4-sp-d16
+ 1453              	state_flash_task:
+ 1454              	.LVL187:
+ 1455              	.LFB246:
+  11:../Core/Src/state_flash.c **** void state_flash_task(void *args) {
+ 1456              		.loc 1 11 35 view -0
+ 1457              		.cfi_startproc
+ 1458              		@ args = 0, pretend = 0, frame = 4440
+ 1459              		@ frame_needed = 0, uses_anonymous_args = 0
+  11:../Core/Src/state_flash.c **** void state_flash_task(void *args) {
+ 1460              		.loc 1 11 35 is_stmt 0 view .LVU357
+ 1461 0000 10B5     		push	{r4, lr}
+ 1462              	.LCFI19:
+ 1463              		.cfi_def_cfa_offset 8
+ 1464              		.cfi_offset 4, -8
+ 1465              		.cfi_offset 14, -4
+ 1466 0002 ADF58B5D 		sub	sp, sp, #4448
+ 1467              	.LCFI20:
+ 1468              		.cfi_def_cfa_offset 4456
+  12:../Core/Src/state_flash.c ****     if (!io_init()) {
+ 1469              		.loc 1 12 5 is_stmt 1 view .LVU358
+  12:../Core/Src/state_flash.c ****     if (!io_init()) {
+ 1470              		.loc 1 12 10 is_stmt 0 view .LVU359
+ 1471 0006 FFF7FEFF 		bl	io_init
+ 1472              	.LVL188:
+  12:../Core/Src/state_flash.c ****     if (!io_init()) {
+ 1473              		.loc 1 12 8 view .LVU360
+ 1474 000a 00BB     		cbnz	r0, .L67
+  13:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to initialize IO\r\n", 26, HAL_MAX_DELAY
+ 1475              		.loc 1 13 9 is_stmt 1 view .LVU361
+ 1476 000c 4FF0FF33 		mov	r3, #-1
+ 1477 0010 1A22     		movs	r2, #26
+ 1478 0012 5149     		ldr	r1, .L81
+ 1479 0014 5148     		ldr	r0, .L81+4
+ 1480 0016 FFF7FEFF 		bl	HAL_UART_Transmit
+ 1481              	.LVL189:
+ 1482              	.L68:
+  18:../Core/Src/state_flash.c ****     if (flash_test()) {
+ 1483              		.loc 1 18 5 view .LVU362
+  18:../Core/Src/state_flash.c ****     if (flash_test()) {
+ 1484              		.loc 1 18 9 is_stmt 0 view .LVU363
+ 1485 001a FFF7FEFF 		bl	flash_test
+ 1486              	.LVL190:
+  18:../Core/Src/state_flash.c ****     if (flash_test()) {
+ 1487              		.loc 1 18 8 view .LVU364
+ARM GAS  /tmp/cczMYj0a.s 			page 39
+
+
+ 1488 001e F0B1     		cbz	r0, .L69
+  19:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Flash test PASS\r\n", 17, HAL_MAX_DELAY);
+ 1489              		.loc 1 19 9 is_stmt 1 view .LVU365
+ 1490 0020 4FF0FF33 		mov	r3, #-1
+ 1491 0024 1122     		movs	r2, #17
+ 1492 0026 4E49     		ldr	r1, .L81+8
+ 1493 0028 4C48     		ldr	r0, .L81+4
+ 1494 002a FFF7FEFF 		bl	HAL_UART_Transmit
+ 1495              	.LVL191:
+ 1496              	.L70:
+  24:../Core/Src/state_flash.c ****     if (sd_test()) {
+ 1497              		.loc 1 24 5 view .LVU366
+  24:../Core/Src/state_flash.c ****     if (sd_test()) {
+ 1498              		.loc 1 24 9 is_stmt 0 view .LVU367
+ 1499 002e FFF7FEFF 		bl	sd_test
+ 1500              	.LVL192:
+  24:../Core/Src/state_flash.c ****     if (sd_test()) {
+ 1501              		.loc 1 24 8 view .LVU368
+ 1502 0032 E0B1     		cbz	r0, .L71
+  25:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "SD test PASS\r\n", 14, HAL_MAX_DELAY);
+ 1503              		.loc 1 25 9 is_stmt 1 view .LVU369
+ 1504 0034 4FF0FF33 		mov	r3, #-1
+ 1505 0038 0E22     		movs	r2, #14
+ 1506 003a 4A49     		ldr	r1, .L81+12
+ 1507 003c 4748     		ldr	r0, .L81+4
+ 1508 003e FFF7FEFF 		bl	HAL_UART_Transmit
+ 1509              	.LVL193:
+ 1510              	.L72:
+  30:../Core/Src/state_flash.c ****     uint32_t notification_value = 0;
+ 1511              		.loc 1 30 5 view .LVU370
+  30:../Core/Src/state_flash.c ****     uint32_t notification_value = 0;
+ 1512              		.loc 1 30 14 is_stmt 0 view .LVU371
+ 1513 0042 0023     		movs	r3, #0
+ 1514 0044 0DF58A52 		add	r2, sp, #4416
+ 1515 0048 1C32     		adds	r2, r2, #28
+ 1516 004a 1360     		str	r3, [r2]
+  31:../Core/Src/state_flash.c ****     while ((notification_value & BEGIN_STATE_FLASH_NOTIFICATION_BIT) == 0) {
+ 1517              		.loc 1 31 5 is_stmt 1 view .LVU372
+  31:../Core/Src/state_flash.c ****     while ((notification_value & BEGIN_STATE_FLASH_NOTIFICATION_BIT) == 0) {
+ 1518              		.loc 1 31 11 is_stmt 0 view .LVU373
+ 1519 004c 22E0     		b	.L73
+ 1520              	.L67:
+  15:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "IO initialized\r\n", 17, HAL_MAX_DELAY);
+ 1521              		.loc 1 15 9 is_stmt 1 view .LVU374
+ 1522 004e 4FF0FF33 		mov	r3, #-1
+ 1523 0052 1122     		movs	r2, #17
+ 1524 0054 4449     		ldr	r1, .L81+16
+ 1525 0056 4148     		ldr	r0, .L81+4
+ 1526 0058 FFF7FEFF 		bl	HAL_UART_Transmit
+ 1527              	.LVL194:
+ 1528 005c DDE7     		b	.L68
+ 1529              	.L69:
+  21:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Flash test FAIL\r\n", 19, HAL_MAX_DELAY);
+ 1530              		.loc 1 21 9 view .LVU375
+ 1531 005e 4FF0FF33 		mov	r3, #-1
+ 1532 0062 1322     		movs	r2, #19
+ 1533 0064 4149     		ldr	r1, .L81+20
+ARM GAS  /tmp/cczMYj0a.s 			page 40
+
+
+ 1534 0066 3D48     		ldr	r0, .L81+4
+ 1535 0068 FFF7FEFF 		bl	HAL_UART_Transmit
+ 1536              	.LVL195:
+ 1537 006c DFE7     		b	.L70
+ 1538              	.L71:
+  27:../Core/Src/state_flash.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "SD test FAIL\r\n", 16, HAL_MAX_DELAY);
+ 1539              		.loc 1 27 9 view .LVU376
+ 1540 006e 4FF0FF33 		mov	r3, #-1
+ 1541 0072 1022     		movs	r2, #16
+ 1542 0074 3E49     		ldr	r1, .L81+24
+ 1543 0076 3948     		ldr	r0, .L81+4
+ 1544 0078 FFF7FEFF 		bl	HAL_UART_Transmit
+ 1545              	.LVL196:
+ 1546 007c E1E7     		b	.L72
+ 1547              	.L74:
+  32:../Core/Src/state_flash.c ****         xTaskNotifyWait(0, BEGIN_STATE_FLASH_NOTIFICATION_BIT, &notification_value, portMAX_DELAY);
+ 1548              		.loc 1 32 9 view .LVU377
+ 1549 007e 4FF0FF33 		mov	r3, #-1
+ 1550 0082 0093     		str	r3, [sp]
+ 1551 0084 0DF58A53 		add	r3, sp, #4416
+ 1552 0088 1C33     		adds	r3, r3, #28
+ 1553 008a 0122     		movs	r2, #1
+ 1554 008c 0021     		movs	r1, #0
+ 1555 008e 0846     		mov	r0, r1
+ 1556 0090 FFF7FEFF 		bl	xTaskGenericNotifyWait
+ 1557              	.LVL197:
+ 1558              	.L73:
+  31:../Core/Src/state_flash.c ****     while ((notification_value & BEGIN_STATE_FLASH_NOTIFICATION_BIT) == 0) {
+ 1559              		.loc 1 31 11 view .LVU378
+ 1560 0094 0DF58A53 		add	r3, sp, #4416
+ 1561 0098 1C33     		adds	r3, r3, #28
+ 1562 009a 1B68     		ldr	r3, [r3]
+ 1563 009c 13F0010F 		tst	r3, #1
+ 1564 00a0 EDD0     		beq	.L74
+  35:../Core/Src/state_flash.c ****     RocketState rocket_state;
+ 1565              		.loc 1 35 5 view .LVU379
+  37:../Core/Src/state_flash.c ****     FlashBlock flash_block;
+ 1566              		.loc 1 37 5 view .LVU380
+  38:../Core/Src/state_flash.c ****     SDFile sd_file;
+ 1567              		.loc 1 38 5 view .LVU381
+  40:../Core/Src/state_flash.c ****     flash_init_block(&flash_block, STATE_FLASH_START_SECTOR, STATE_FLASH_N_SECTORS);
+ 1568              		.loc 1 40 5 view .LVU382
+ 1569 00a2 1022     		movs	r2, #16
+ 1570 00a4 0021     		movs	r1, #0
+ 1571 00a6 0DF58350 		add	r0, sp, #4192
+ 1572 00aa 1C30     		adds	r0, r0, #28
+ 1573 00ac FFF7FEFF 		bl	flash_init_block
+ 1574              	.LVL198:
+  41:../Core/Src/state_flash.c ****     sd_init_file(&sd_file, "/data.csv");
+ 1575              		.loc 1 41 5 view .LVU383
+ 1576 00b0 3049     		ldr	r1, .L81+28
+ 1577 00b2 02A8     		add	r0, sp, #8
+ 1578 00b4 FFF7FEFF 		bl	sd_init_file
+ 1579              	.LVL199:
+  43:../Core/Src/state_flash.c ****     size_t flash_page_index = 0;
+ 1580              		.loc 1 43 5 view .LVU384
+  43:../Core/Src/state_flash.c ****     size_t flash_page_index = 0;
+ARM GAS  /tmp/cczMYj0a.s 			page 41
+
+
+ 1581              		.loc 1 43 12 is_stmt 0 view .LVU385
+ 1582 00b8 0024     		movs	r4, #0
+ 1583 00ba 06E0     		b	.L76
+ 1584              	.LVL200:
+ 1585              	.L75:
+  59:../Core/Src/state_flash.c ****         if (notification_value & FLASH_STATE_NOTIFICATION_BIT) {
+ 1586              		.loc 1 59 9 is_stmt 1 view .LVU386
+  59:../Core/Src/state_flash.c ****         if (notification_value & FLASH_STATE_NOTIFICATION_BIT) {
+ 1587              		.loc 1 59 12 is_stmt 0 view .LVU387
+ 1588 00bc 0DF58A53 		add	r3, sp, #4416
+ 1589 00c0 1C33     		adds	r3, r3, #28
+ 1590 00c2 1B68     		ldr	r3, [r3]
+ 1591 00c4 13F0010F 		tst	r3, #1
+ 1592 00c8 26D1     		bne	.L80
+ 1593              	.LVL201:
+ 1594              	.L76:
+  45:../Core/Src/state_flash.c ****     while (1) {
+ 1595              		.loc 1 45 5 is_stmt 1 view .LVU388
+  46:../Core/Src/state_flash.c ****         xTaskNotifyWait(0, FLASH_STATE_NOTIFICATION_BIT | FLASH_SD_CARD_NOTIFICATION_BIT, &notifica
+ 1596              		.loc 1 46 9 view .LVU389
+ 1597 00ca 4FF0FF33 		mov	r3, #-1
+ 1598 00ce 0093     		str	r3, [sp]
+ 1599 00d0 0DF58A53 		add	r3, sp, #4416
+ 1600 00d4 1C33     		adds	r3, r3, #28
+ 1601 00d6 0322     		movs	r2, #3
+ 1602 00d8 0021     		movs	r1, #0
+ 1603 00da 0846     		mov	r0, r1
+ 1604 00dc FFF7FEFF 		bl	xTaskGenericNotifyWait
+ 1605              	.LVL202:
+  48:../Core/Src/state_flash.c ****         if (notification_value & FLASH_SD_CARD_NOTIFICATION_BIT) {
+ 1606              		.loc 1 48 9 view .LVU390
+  48:../Core/Src/state_flash.c ****         if (notification_value & FLASH_SD_CARD_NOTIFICATION_BIT) {
+ 1607              		.loc 1 48 12 is_stmt 0 view .LVU391
+ 1608 00e0 0DF58A53 		add	r3, sp, #4416
+ 1609 00e4 1C33     		adds	r3, r3, #28
+ 1610 00e6 1B68     		ldr	r3, [r3]
+ 1611 00e8 13F0020F 		tst	r3, #2
+ 1612 00ec E6D0     		beq	.L75
+  49:../Core/Src/state_flash.c ****             HAL_UART_Transmit(&debug_uart, (uint8_t *) "Flashing SD card...\r\n", 20, HAL_MAX_DELAY
+ 1613              		.loc 1 49 13 is_stmt 1 view .LVU392
+ 1614 00ee 4FF0FF33 		mov	r3, #-1
+ 1615 00f2 1422     		movs	r2, #20
+ 1616 00f4 2049     		ldr	r1, .L81+32
+ 1617 00f6 1948     		ldr	r0, .L81+4
+ 1618 00f8 FFF7FEFF 		bl	HAL_UART_Transmit
+ 1619              	.LVL203:
+  50:../Core/Src/state_flash.c ****             flash_sd_card(&flash_block, &sd_file, flash_page_index);
+ 1620              		.loc 1 50 13 view .LVU393
+ 1621 00fc 2246     		mov	r2, r4
+ 1622 00fe 02A9     		add	r1, sp, #8
+ 1623 0100 0DF58350 		add	r0, sp, #4192
+ 1624 0104 1C30     		adds	r0, r0, #28
+ 1625 0106 FFF7FEFF 		bl	flash_sd_card
+ 1626              	.LVL204:
+  53:../Core/Src/state_flash.c ****             vTaskSuspendAll();
+ 1627              		.loc 1 53 13 view .LVU394
+ 1628 010a FFF7FEFF 		bl	vTaskSuspendAll
+ARM GAS  /tmp/cczMYj0a.s 			page 42
+
+
+ 1629              	.LVL205:
+  56:../Core/Src/state_flash.c ****             vTaskDelay(portMAX_DELAY);
+ 1630              		.loc 1 56 13 view .LVU395
+ 1631 010e 4FF0FF30 		mov	r0, #-1
+ 1632 0112 FFF7FEFF 		bl	vTaskDelay
+ 1633              	.LVL206:
+ 1634 0116 D1E7     		b	.L75
+ 1635              	.L80:
+  60:../Core/Src/state_flash.c ****             if (xSemaphoreTake(g_state_mutex_handle, portMAX_DELAY) == pdTRUE) {
+ 1636              		.loc 1 60 13 view .LVU396
+  60:../Core/Src/state_flash.c ****             if (xSemaphoreTake(g_state_mutex_handle, portMAX_DELAY) == pdTRUE) {
+ 1637              		.loc 1 60 17 is_stmt 0 view .LVU397
+ 1638 0118 4FF0FF31 		mov	r1, #-1
+ 1639 011c 174B     		ldr	r3, .L81+36
+ 1640 011e 1868     		ldr	r0, [r3]
+ 1641 0120 FFF7FEFF 		bl	xQueueSemaphoreTake
+ 1642              	.LVL207:
+  60:../Core/Src/state_flash.c ****             if (xSemaphoreTake(g_state_mutex_handle, portMAX_DELAY) == pdTRUE) {
+ 1643              		.loc 1 60 16 view .LVU398
+ 1644 0124 0128     		cmp	r0, #1
+ 1645 0126 0CD1     		bne	.L77
+  61:../Core/Src/state_flash.c ****                 memcpy(&rocket_state, &g_current_state, sizeof(RocketState));
+ 1646              		.loc 1 61 17 is_stmt 1 view .LVU399
+ 1647 0128 D822     		movs	r2, #216
+ 1648 012a 1549     		ldr	r1, .L81+40
+ 1649 012c 0DF58450 		add	r0, sp, #4224
+ 1650 0130 FFF7FEFF 		bl	memcpy
+ 1651              	.LVL208:
+  62:../Core/Src/state_flash.c ****                 xSemaphoreGive(g_state_mutex_handle);
+ 1652              		.loc 1 62 17 view .LVU400
+ 1653 0134 0023     		movs	r3, #0
+ 1654 0136 1A46     		mov	r2, r3
+ 1655 0138 1946     		mov	r1, r3
+ 1656 013a 1048     		ldr	r0, .L81+36
+ 1657 013c 0068     		ldr	r0, [r0]
+ 1658 013e FFF7FEFF 		bl	xQueueGenericSend
+ 1659              	.LVL209:
+ 1660              	.L77:
+  65:../Core/Src/state_flash.c ****             write_to_flash(&flash_block, &rocket_state, flash_page_index);
+ 1661              		.loc 1 65 13 view .LVU401
+ 1662 0142 2246     		mov	r2, r4
+ 1663 0144 0DF58451 		add	r1, sp, #4224
+ 1664 0148 0DF58350 		add	r0, sp, #4192
+ 1665 014c 1C30     		adds	r0, r0, #28
+ 1666 014e FFF7FEFF 		bl	write_to_flash
+ 1667              	.LVL210:
+  66:../Core/Src/state_flash.c ****             flash_page_index ++;
+ 1668              		.loc 1 66 13 view .LVU402
+  66:../Core/Src/state_flash.c ****             flash_page_index ++;
+ 1669              		.loc 1 66 30 is_stmt 0 view .LVU403
+ 1670 0152 0134     		adds	r4, r4, #1
+ 1671              	.LVL211:
+  66:../Core/Src/state_flash.c ****             flash_page_index ++;
+ 1672              		.loc 1 66 30 view .LVU404
+ 1673 0154 B9E7     		b	.L76
+ 1674              	.L82:
+ 1675 0156 00BF     		.align	2
+ARM GAS  /tmp/cczMYj0a.s 			page 43
+
+
+ 1676              	.L81:
+ 1677 0158 00000000 		.word	.LC22
+ 1678 015c 00000000 		.word	huart3
+ 1679 0160 30000000 		.word	.LC24
+ 1680 0164 58000000 		.word	.LC26
+ 1681 0168 1C000000 		.word	.LC23
+ 1682 016c 44000000 		.word	.LC25
+ 1683 0170 68000000 		.word	.LC27
+ 1684 0174 78000000 		.word	.LC28
+ 1685 0178 84000000 		.word	.LC29
+ 1686 017c 00000000 		.word	g_state_mutex_handle
+ 1687 0180 00000000 		.word	g_current_state
+ 1688              		.cfi_endproc
+ 1689              	.LFE246:
+ 1691              		.text
+ 1692              	.Letext0:
+ 1693              		.file 2 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stdint.h"
+ 1694              		.file 3 "/usr/lib/gcc/arm-none-eabi/10.3.1/include/stddef.h"
+ 1695              		.file 4 "Core/Inc/portmacro.h"
+ 1696              		.file 5 "Middlewares/Third_Party/FatFs/src/integer.h"
+ 1697              		.file 6 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f429xx.h"
+ 1698              		.file 7 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h"
+ 1699              		.file 8 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h"
+ 1700              		.file 9 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h"
+ 1701              		.file 10 "Middlewares/Third_Party/FatFs/src/ff.h"
+ 1702              		.file 11 "../Core/Include/periph_io.h"
+ 1703              		.file 12 "../Core/Include/adc.h"
+ 1704              		.file 13 "Core/Inc/port_config.h"
+ 1705              		.file 14 "../Core/FreeRTOS-Kernel/include/queue.h"
+ 1706              		.file 15 "../Core/FreeRTOS-Kernel/include/semphr.h"
+ 1707              		.file 16 "../Core/Include/protocol.h"
+ 1708              		.file 17 "../Core/Include/state.h"
+ 1709              		.file 18 "../Core/Include/globals.h"
+ 1710              		.file 19 "/usr/include/newlib/stdio.h"
+ 1711              		.file 20 "/usr/include/newlib/string.h"
+ 1712              		.file 21 "../Core/FreeRTOS-Kernel/include/task.h"
+ 1713              		.file 22 "<built-in>"
+ARM GAS  /tmp/cczMYj0a.s 			page 44
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 state_flash.c
+     /tmp/cczMYj0a.s:18     .rodata.flash_test.str1.4:0000000000000000 $d
+     /tmp/cczMYj0a.s:31     .text.flash_test:0000000000000000 $t
+     /tmp/cczMYj0a.s:39     .text.flash_test:0000000000000000 flash_test
+     /tmp/cczMYj0a.s:249    .text.flash_test:00000000000000f0 $d
+     /tmp/cczMYj0a.s:259    .rodata.sd_test.str1.4:0000000000000000 $d
+     /tmp/cczMYj0a.s:284    .text.sd_test:0000000000000000 $t
+     /tmp/cczMYj0a.s:291    .text.sd_test:0000000000000000 sd_test
+     /tmp/cczMYj0a.s:546    .text.sd_test:0000000000000124 $d
+     /tmp/cczMYj0a.s:559    .text.write_to_flash:0000000000000000 $t
+     /tmp/cczMYj0a.s:566    .text.write_to_flash:0000000000000000 write_to_flash
+     /tmp/cczMYj0a.s:614    .rodata.printf_fixed_float.str1.4:0000000000000000 $d
+     /tmp/cczMYj0a.s:618    .text.printf_fixed_float:0000000000000000 $t
+     /tmp/cczMYj0a.s:625    .text.printf_fixed_float:0000000000000000 printf_fixed_float
+     /tmp/cczMYj0a.s:666    .text.printf_fixed_float:000000000000002c $d
+     /tmp/cczMYj0a.s:672    .rodata.to_csv_line.str1.4:0000000000000000 $d
+     /tmp/cczMYj0a.s:682    .text.to_csv_line:0000000000000000 $t
+     /tmp/cczMYj0a.s:689    .text.to_csv_line:0000000000000000 to_csv_line
+     /tmp/cczMYj0a.s:1180   .text.to_csv_line:0000000000000274 $d
+     /tmp/cczMYj0a.s:1187   .rodata.flash_sd_card.str1.4:0000000000000000 $d
+     /tmp/cczMYj0a.s:1206   .text.flash_sd_card:0000000000000000 $t
+     /tmp/cczMYj0a.s:1213   .text.flash_sd_card:0000000000000000 flash_sd_card
+     /tmp/cczMYj0a.s:1410   .text.flash_sd_card:00000000000000e4 $d
+     /tmp/cczMYj0a.s:1421   .rodata.state_flash_task.str1.4:0000000000000000 $d
+     /tmp/cczMYj0a.s:1446   .text.state_flash_task:0000000000000000 $t
+     /tmp/cczMYj0a.s:1453   .text.state_flash_task:0000000000000000 state_flash_task
+     /tmp/cczMYj0a.s:1677   .text.state_flash_task:0000000000000158 $d
+
+UNDEFINED SYMBOLS
+flash_init_block
+xTaskGetTickCount
+HAL_UART_Transmit
+flash_write_block
+memset
+flash_read_block
+flash_erase_block
+huart3
+sd_init_file
+sd_open_file
+sd_write_file
+sd_read_file
+sd_close_file
+sd_delete_file
+memcpy
+sprintf
+strlen
+io_init
+xTaskGenericNotifyWait
+vTaskSuspendAll
+vTaskDelay
+xQueueSemaphoreTake
+xQueueGenericSend
+g_state_mutex_handle
+g_current_state

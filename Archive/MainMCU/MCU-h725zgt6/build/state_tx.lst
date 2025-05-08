@@ -1,0 +1,395 @@
+ARM GAS  /tmp/ccJcI7x3.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 1
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"state_tx.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "../Core/Src/state_tx.c"
+  19              		.global	__aeabi_uldivmod
+  20              		.section	.text.send_state,"ax",%progbits
+  21              		.align	1
+  22              		.global	send_state
+  23              		.syntax unified
+  24              		.thumb
+  25              		.thumb_func
+  27              	send_state:
+  28              	.LVL0:
+  29              	.LFB399:
+   1:../Core/Src/state_tx.c **** #include "state_tx.h"
+   2:../Core/Src/state_tx.c **** 
+   3:../Core/Src/state_tx.c **** void send_state_vector(RocketState *rocket_state, uint8_t *payload_buf);
+   4:../Core/Src/state_tx.c **** void send_servo_deflection(RocketState *rocket_state, uint8_t *payload_buf);
+   5:../Core/Src/state_tx.c **** void send_state(RocketState *rocket_state, uint8_t *payload_buf);
+   6:../Core/Src/state_tx.c **** void send_ground_ekf(RocketState *rocket_state, uint8_t *payload_buf);
+   7:../Core/Src/state_tx.c **** void send_sensor_data(RocketState *rocket_state, uint8_t *payload_buf);
+   8:../Core/Src/state_tx.c **** void send_analog_feedback_data(RocketState *rocket_state, uint8_t *payload_buf);
+   9:../Core/Src/state_tx.c **** 
+  10:../Core/Src/state_tx.c **** #define MULT 1
+  11:../Core/Src/state_tx.c **** 
+  12:../Core/Src/state_tx.c **** /**
+  13:../Core/Src/state_tx.c ****  * @brief Task to handle transmitting state over telemetry
+  14:../Core/Src/state_tx.c ****  * @param args Unused
+  15:../Core/Src/state_tx.c ****  */
+  16:../Core/Src/state_tx.c **** void state_tx_task(void *args) {
+  17:../Core/Src/state_tx.c ****     uint8_t payload_buf[TELEMETRY_MAX_PAYLOAD_SIZE];
+  18:../Core/Src/state_tx.c **** 
+  19:../Core/Src/state_tx.c ****     RocketState rocket_state;
+  20:../Core/Src/state_tx.c **** 
+  21:../Core/Src/state_tx.c ****     /* Wait for start notification */
+  22:../Core/Src/state_tx.c ****     uint32_t notification_value = 0;
+  23:../Core/Src/state_tx.c ****     while ((notification_value & BEGIN_STATE_TX_NOTIFICATION_BIT) == 0) {
+  24:../Core/Src/state_tx.c ****         xTaskNotifyWait(0, BEGIN_STATE_TX_NOTIFICATION_BIT, &notification_value, portMAX_DELAY);
+  25:../Core/Src/state_tx.c ****     }
+  26:../Core/Src/state_tx.c **** 
+  27:../Core/Src/state_tx.c ****     while (1) {
+  28:../Core/Src/state_tx.c ****         uint32_t notification_value = 0;
+  29:../Core/Src/state_tx.c ****         while ((notification_value & SEND_STATE_NOTIFICATION_BIT) == 0) {
+ARM GAS  /tmp/ccJcI7x3.s 			page 2
+
+
+  30:../Core/Src/state_tx.c ****             xTaskNotifyWait(0, SEND_STATE_NOTIFICATION_BIT, &notification_value, portMAX_DELAY);
+  31:../Core/Src/state_tx.c ****         }
+  32:../Core/Src/state_tx.c **** 
+  33:../Core/Src/state_tx.c ****         /* Always use mutex with g_current_state */
+  34:../Core/Src/state_tx.c ****         if (xSemaphoreTake(g_state_mutex_handle, portMAX_DELAY) == pdTRUE) {
+  35:../Core/Src/state_tx.c ****             /* Memcpy data out of global rocket state so we an give back mutex quickly */
+  36:../Core/Src/state_tx.c ****             memcpy(&rocket_state, &g_current_state, sizeof(RocketState));
+  37:../Core/Src/state_tx.c ****             xSemaphoreGive(g_state_mutex_handle);
+  38:../Core/Src/state_tx.c ****         }
+  39:../Core/Src/state_tx.c **** 
+  40:../Core/Src/state_tx.c **** #ifndef STATIC_FIRE
+  41:../Core/Src/state_tx.c ****         send_state_vector(&rocket_state, payload_buf);
+  42:../Core/Src/state_tx.c ****         vTaskDelay(pdMS_TO_TICKS((ROCKETSTATEVECTOR_SIZE + 5) * MULT));
+  43:../Core/Src/state_tx.c ****         send_servo_deflection(&rocket_state, payload_buf);
+  44:../Core/Src/state_tx.c ****         vTaskDelay(pdMS_TO_TICKS((ROCKETSERVODEFLECTION_SIZE + 5) * MULT));
+  45:../Core/Src/state_tx.c **** #endif
+  46:../Core/Src/state_tx.c ****         send_state(&rocket_state, payload_buf);
+  47:../Core/Src/state_tx.c ****         vTaskDelay(pdMS_TO_TICKS((ROCKETSTATE_SIZE + 5) * MULT));
+  48:../Core/Src/state_tx.c **** 
+  49:../Core/Src/state_tx.c **** #ifndef STATIC_FIRE
+  50:../Core/Src/state_tx.c ****         /* Only send ground ekf at state (?) */
+  51:../Core/Src/state_tx.c ****         if (rocket_state.rocket_state.rocket_state == 1) {
+  52:../Core/Src/state_tx.c ****             send_ground_ekf(&rocket_state, payload_buf);
+  53:../Core/Src/state_tx.c ****             vTaskDelay(pdMS_TO_TICKS((ROCKETGROUNDEKF_SIZE + 5) * MULT));
+  54:../Core/Src/state_tx.c ****         }
+  55:../Core/Src/state_tx.c **** 
+  56:../Core/Src/state_tx.c ****         send_sensor_data(&rocket_state, payload_buf);
+  57:../Core/Src/state_tx.c ****         vTaskDelay(pdMS_TO_TICKS((ROCKETSENSORDATA_SIZE + 5) * MULT));
+  58:../Core/Src/state_tx.c ****         send_analog_feedback_data(&rocket_state, payload_buf);
+  59:../Core/Src/state_tx.c ****         vTaskDelay(pdMS_TO_TICKS((ROCKETANALOGFEEDBACKDATA_SIZE + 5) * MULT));
+  60:../Core/Src/state_tx.c **** #endif
+  61:../Core/Src/state_tx.c ****     }
+  62:../Core/Src/state_tx.c **** }
+  63:../Core/Src/state_tx.c **** 
+  64:../Core/Src/state_tx.c **** /**
+  65:../Core/Src/state_tx.c ****  * @brief Send the state vector over telemetry
+  66:../Core/Src/state_tx.c ****  * @param rocket_state RocketState to send
+  67:../Core/Src/state_tx.c ****  * @param payload_buf Buffer to write to
+  68:../Core/Src/state_tx.c ****  */
+  69:../Core/Src/state_tx.c **** #ifndef STATIC_FIRE
+  70:../Core/Src/state_tx.c **** void send_state_vector(RocketState *rocket_state, uint8_t *payload_buf) {
+  71:../Core/Src/state_tx.c ****     struct RocketStateVector *state_vector = &rocket_state->state_vector;
+  72:../Core/Src/state_tx.c ****     state_vector->timestamp = pdTICKS_TO_MS(xTaskGetTickCount());
+  73:../Core/Src/state_tx.c **** 
+  74:../Core/Src/state_tx.c ****     RocketStateVector_encode(state_vector, payload_buf);
+  75:../Core/Src/state_tx.c ****     telemetry_send_message(payload_buf, ROCKETSTATEVECTOR_SIZE, ROCKETSTATEVECTOR_MSG_ID);
+  76:../Core/Src/state_tx.c **** }
+  77:../Core/Src/state_tx.c **** #endif
+  78:../Core/Src/state_tx.c **** 
+  79:../Core/Src/state_tx.c **** /**
+  80:../Core/Src/state_tx.c ****  * @brief Send the servo deflection over telemetry
+  81:../Core/Src/state_tx.c ****  * @param rocket_state RocketState to send
+  82:../Core/Src/state_tx.c ****  * @param payload_buf Buffer to write to
+  83:../Core/Src/state_tx.c ****  */
+  84:../Core/Src/state_tx.c **** #ifndef STATIC_FIRE
+  85:../Core/Src/state_tx.c **** void send_servo_deflection(RocketState *rocket_state, uint8_t *payload_buf) {
+  86:../Core/Src/state_tx.c ****     struct RocketServoDeflection *servo_deflection = &rocket_state->servo_deflection;
+ARM GAS  /tmp/ccJcI7x3.s 			page 3
+
+
+  87:../Core/Src/state_tx.c ****     servo_deflection->timestamp = pdTICKS_TO_MS(xTaskGetTickCount());
+  88:../Core/Src/state_tx.c **** 
+  89:../Core/Src/state_tx.c ****     RocketServoDeflection_encode(servo_deflection, payload_buf);
+  90:../Core/Src/state_tx.c ****     telemetry_send_message(payload_buf, ROCKETSERVODEFLECTION_SIZE, ROCKETSERVODEFLECTION_MSG_ID);
+  91:../Core/Src/state_tx.c **** }
+  92:../Core/Src/state_tx.c **** #endif
+  93:../Core/Src/state_tx.c **** 
+  94:../Core/Src/state_tx.c **** /**
+  95:../Core/Src/state_tx.c ****  * @brief Send the rocket state over telemetry
+  96:../Core/Src/state_tx.c ****  * @param rocket_state RocketState to send
+  97:../Core/Src/state_tx.c ****  * @param payload_buf Buffer to write to
+  98:../Core/Src/state_tx.c ****  */
+  99:../Core/Src/state_tx.c **** void send_state(RocketState *rocket_state, uint8_t *payload_buf) {
+  30              		.loc 1 99 66 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		.loc 1 99 66 is_stmt 0 view .LVU1
+  35 0000 70B5     		push	{r4, r5, r6, lr}
+  36              	.LCFI0:
+  37              		.cfi_def_cfa_offset 16
+  38              		.cfi_offset 4, -16
+  39              		.cfi_offset 5, -12
+  40              		.cfi_offset 6, -8
+  41              		.cfi_offset 14, -4
+  42 0002 0446     		mov	r4, r0
+  43 0004 0D46     		mov	r5, r1
+ 100:../Core/Src/state_tx.c ****     struct RocketState *_rocket_state = &rocket_state->rocket_state;
+  44              		.loc 1 100 5 is_stmt 1 view .LVU2
+  45              		.loc 1 100 25 is_stmt 0 view .LVU3
+  46 0006 00F11806 		add	r6, r0, #24
+  47              	.LVL1:
+ 101:../Core/Src/state_tx.c ****     _rocket_state->timestamp = pdTICKS_TO_MS(xTaskGetTickCount());
+  48              		.loc 1 101 5 is_stmt 1 view .LVU4
+  49              		.loc 1 101 32 is_stmt 0 view .LVU5
+  50 000a FFF7FEFF 		bl	xTaskGetTickCount
+  51              	.LVL2:
+  52              		.loc 1 101 32 view .LVU6
+  53 000e C20E     		lsrs	r2, r0, #27
+  54 0010 4301     		lsls	r3, r0, #5
+  55 0012 1B1A     		subs	r3, r3, r0
+  56 0014 62F10002 		sbc	r2, r2, #0
+  57 0018 9200     		lsls	r2, r2, #2
+  58 001a 42EA9372 		orr	r2, r2, r3, lsr #30
+  59 001e 9B00     		lsls	r3, r3, #2
+  60 0020 13EB000C 		adds	ip, r3, r0
+  61 0024 42F10001 		adc	r1, r2, #0
+  62 0028 C900     		lsls	r1, r1, #3
+  63 002a 4FF47A72 		mov	r2, #1000
+  64 002e 0023     		movs	r3, #0
+  65 0030 4FEACC00 		lsl	r0, ip, #3
+  66 0034 41EA5C71 		orr	r1, r1, ip, lsr #29
+  67 0038 FFF7FEFF 		bl	__aeabi_uldivmod
+  68              	.LVL3:
+  69              		.loc 1 101 30 view .LVU7
+  70 003c 2062     		str	r0, [r4, #32]
+  71 003e 0023     		movs	r3, #0
+ARM GAS  /tmp/ccJcI7x3.s 			page 4
+
+
+  72 0040 6362     		str	r3, [r4, #36]
+ 102:../Core/Src/state_tx.c **** 
+ 103:../Core/Src/state_tx.c ****     RocketState_encode(_rocket_state, payload_buf);
+  73              		.loc 1 103 5 is_stmt 1 view .LVU8
+  74 0042 2946     		mov	r1, r5
+  75 0044 3046     		mov	r0, r6
+  76 0046 FFF7FEFF 		bl	RocketState_encode
+  77              	.LVL4:
+ 104:../Core/Src/state_tx.c ****     telemetry_send_message(payload_buf, ROCKETSTATE_SIZE, ROCKETSTATE_MSG_ID);
+  78              		.loc 1 104 5 view .LVU9
+  79 004a 0A22     		movs	r2, #10
+  80 004c 0921     		movs	r1, #9
+  81 004e 2846     		mov	r0, r5
+  82 0050 FFF7FEFF 		bl	telemetry_send_message
+  83              	.LVL5:
+ 105:../Core/Src/state_tx.c **** }
+  84              		.loc 1 105 1 is_stmt 0 view .LVU10
+  85 0054 70BD     		pop	{r4, r5, r6, pc}
+  86              		.loc 1 105 1 view .LVU11
+  87              		.cfi_endproc
+  88              	.LFE399:
+  90              		.section	.text.state_tx_task,"ax",%progbits
+  91              		.align	1
+  92              		.global	state_tx_task
+  93              		.syntax unified
+  94              		.thumb
+  95              		.thumb_func
+  97              	state_tx_task:
+  98              	.LVL6:
+  99              	.LFB398:
+  16:../Core/Src/state_tx.c ****     uint8_t payload_buf[TELEMETRY_MAX_PAYLOAD_SIZE];
+ 100              		.loc 1 16 32 is_stmt 1 view -0
+ 101              		.cfi_startproc
+ 102              		@ Volatile: function does not return.
+ 103              		@ args = 0, pretend = 0, frame = 120
+ 104              		@ frame_needed = 0, uses_anonymous_args = 0
+  16:../Core/Src/state_tx.c ****     uint8_t payload_buf[TELEMETRY_MAX_PAYLOAD_SIZE];
+ 105              		.loc 1 16 32 is_stmt 0 view .LVU13
+ 106 0000 00B5     		push	{lr}
+ 107              	.LCFI1:
+ 108              		.cfi_def_cfa_offset 4
+ 109              		.cfi_offset 14, -4
+ 110 0002 A1B0     		sub	sp, sp, #132
+ 111              	.LCFI2:
+ 112              		.cfi_def_cfa_offset 136
+  17:../Core/Src/state_tx.c **** 
+ 113              		.loc 1 17 5 is_stmt 1 view .LVU14
+  19:../Core/Src/state_tx.c **** 
+ 114              		.loc 1 19 5 view .LVU15
+  22:../Core/Src/state_tx.c ****     while ((notification_value & BEGIN_STATE_TX_NOTIFICATION_BIT) == 0) {
+ 115              		.loc 1 22 5 view .LVU16
+  22:../Core/Src/state_tx.c ****     while ((notification_value & BEGIN_STATE_TX_NOTIFICATION_BIT) == 0) {
+ 116              		.loc 1 22 14 is_stmt 0 view .LVU17
+ 117 0004 0023     		movs	r3, #0
+ 118 0006 0393     		str	r3, [sp, #12]
+  23:../Core/Src/state_tx.c ****         xTaskNotifyWait(0, BEGIN_STATE_TX_NOTIFICATION_BIT, &notification_value, portMAX_DELAY);
+ 119              		.loc 1 23 5 is_stmt 1 view .LVU18
+ARM GAS  /tmp/ccJcI7x3.s 			page 5
+
+
+  23:../Core/Src/state_tx.c ****         xTaskNotifyWait(0, BEGIN_STATE_TX_NOTIFICATION_BIT, &notification_value, portMAX_DELAY);
+ 120              		.loc 1 23 11 is_stmt 0 view .LVU19
+ 121 0008 08E0     		b	.L4
+ 122              	.LVL7:
+ 123              	.L5:
+  24:../Core/Src/state_tx.c ****     }
+ 124              		.loc 1 24 9 is_stmt 1 view .LVU20
+ 125 000a 4FF0FF33 		mov	r3, #-1
+ 126 000e 0093     		str	r3, [sp]
+ 127 0010 03AB     		add	r3, sp, #12
+ 128 0012 0122     		movs	r2, #1
+ 129 0014 0021     		movs	r1, #0
+ 130 0016 0846     		mov	r0, r1
+ 131 0018 FFF7FEFF 		bl	xTaskGenericNotifyWait
+ 132              	.LVL8:
+ 133              	.L4:
+  23:../Core/Src/state_tx.c ****         xTaskNotifyWait(0, BEGIN_STATE_TX_NOTIFICATION_BIT, &notification_value, portMAX_DELAY);
+ 134              		.loc 1 23 67 view .LVU21
+ 135 001c 039B     		ldr	r3, [sp, #12]
+ 136 001e 13F0010F 		tst	r3, #1
+ 137 0022 F2D0     		beq	.L5
+ 138 0024 2FE0     		b	.L9
+ 139              	.L7:
+ 140              	.LBB2:
+  30:../Core/Src/state_tx.c ****         }
+ 141              		.loc 1 30 13 view .LVU22
+ 142 0026 4FF0FF33 		mov	r3, #-1
+ 143 002a 0093     		str	r3, [sp]
+ 144 002c 02AB     		add	r3, sp, #8
+ 145 002e 0122     		movs	r2, #1
+ 146 0030 0021     		movs	r1, #0
+ 147 0032 0846     		mov	r0, r1
+ 148 0034 FFF7FEFF 		bl	xTaskGenericNotifyWait
+ 149              	.LVL9:
+ 150              	.L6:
+  29:../Core/Src/state_tx.c ****             xTaskNotifyWait(0, SEND_STATE_NOTIFICATION_BIT, &notification_value, portMAX_DELAY);
+ 151              		.loc 1 29 67 view .LVU23
+ 152 0038 029B     		ldr	r3, [sp, #8]
+ 153 003a 13F0010F 		tst	r3, #1
+ 154 003e F2D0     		beq	.L7
+  34:../Core/Src/state_tx.c ****             /* Memcpy data out of global rocket state so we an give back mutex quickly */
+ 155              		.loc 1 34 9 view .LVU24
+  34:../Core/Src/state_tx.c ****             /* Memcpy data out of global rocket state so we an give back mutex quickly */
+ 156              		.loc 1 34 13 is_stmt 0 view .LVU25
+ 157 0040 4FF0FF31 		mov	r1, #-1
+ 158 0044 114B     		ldr	r3, .L11
+ 159 0046 1868     		ldr	r0, [r3]
+ 160 0048 FFF7FEFF 		bl	xQueueSemaphoreTake
+ 161              	.LVL10:
+  34:../Core/Src/state_tx.c ****             /* Memcpy data out of global rocket state so we an give back mutex quickly */
+ 162              		.loc 1 34 12 view .LVU26
+ 163 004c 0128     		cmp	r0, #1
+ 164 004e 13D1     		bne	.L8
+  36:../Core/Src/state_tx.c ****             xSemaphoreGive(g_state_mutex_handle);
+ 165              		.loc 1 36 13 is_stmt 1 view .LVU27
+ 166 0050 0DF1100C 		add	ip, sp, #16
+ 167 0054 0E4C     		ldr	r4, .L11+4
+ARM GAS  /tmp/ccJcI7x3.s 			page 6
+
+
+ 168 0056 0FCC     		ldmia	r4!, {r0, r1, r2, r3}
+ 169 0058 ACE80F00 		stmia	ip!, {r0, r1, r2, r3}
+ 170 005c 0FCC     		ldmia	r4!, {r0, r1, r2, r3}
+ 171 005e ACE80F00 		stmia	ip!, {r0, r1, r2, r3}
+ 172 0062 94E80F00 		ldm	r4, {r0, r1, r2, r3}
+ 173 0066 8CE80F00 		stm	ip, {r0, r1, r2, r3}
+  37:../Core/Src/state_tx.c ****         }
+ 174              		.loc 1 37 13 view .LVU28
+ 175 006a 0023     		movs	r3, #0
+ 176 006c 1A46     		mov	r2, r3
+ 177 006e 1946     		mov	r1, r3
+ 178 0070 0648     		ldr	r0, .L11
+ 179 0072 0068     		ldr	r0, [r0]
+ 180 0074 FFF7FEFF 		bl	xQueueGenericSend
+ 181              	.LVL11:
+ 182              	.L8:
+  46:../Core/Src/state_tx.c ****         vTaskDelay(pdMS_TO_TICKS((ROCKETSTATE_SIZE + 5) * MULT));
+ 183              		.loc 1 46 9 view .LVU29
+ 184 0078 10A9     		add	r1, sp, #64
+ 185 007a 04A8     		add	r0, sp, #16
+ 186 007c FFF7FEFF 		bl	send_state
+ 187              	.LVL12:
+  47:../Core/Src/state_tx.c **** 
+ 188              		.loc 1 47 9 view .LVU30
+ 189 0080 0E20     		movs	r0, #14
+ 190 0082 FFF7FEFF 		bl	vTaskDelay
+ 191              	.LVL13:
+ 192              	.LBE2:
+  27:../Core/Src/state_tx.c ****         uint32_t notification_value = 0;
+ 193              		.loc 1 27 11 view .LVU31
+ 194              	.L9:
+  27:../Core/Src/state_tx.c ****         uint32_t notification_value = 0;
+ 195              		.loc 1 27 5 view .LVU32
+ 196              	.LBB3:
+  28:../Core/Src/state_tx.c ****         while ((notification_value & SEND_STATE_NOTIFICATION_BIT) == 0) {
+ 197              		.loc 1 28 9 view .LVU33
+  28:../Core/Src/state_tx.c ****         while ((notification_value & SEND_STATE_NOTIFICATION_BIT) == 0) {
+ 198              		.loc 1 28 18 is_stmt 0 view .LVU34
+ 199 0086 0023     		movs	r3, #0
+ 200 0088 0293     		str	r3, [sp, #8]
+  29:../Core/Src/state_tx.c ****             xTaskNotifyWait(0, SEND_STATE_NOTIFICATION_BIT, &notification_value, portMAX_DELAY);
+ 201              		.loc 1 29 9 is_stmt 1 view .LVU35
+  29:../Core/Src/state_tx.c ****             xTaskNotifyWait(0, SEND_STATE_NOTIFICATION_BIT, &notification_value, portMAX_DELAY);
+ 202              		.loc 1 29 15 is_stmt 0 view .LVU36
+ 203 008a D5E7     		b	.L6
+ 204              	.L12:
+ 205              		.align	2
+ 206              	.L11:
+ 207 008c 00000000 		.word	g_state_mutex_handle
+ 208 0090 00000000 		.word	g_current_state
+ 209              	.LBE3:
+ 210              		.cfi_endproc
+ 211              	.LFE398:
+ 213              		.text
+ 214              	.Letext0:
+ 215              		.file 2 "/nix/store/lcj4nx7xv8c36cif7armkfa7b5cmfh74-gcc-arm-embedded-12.3.rel1/arm-none-eabi/incl
+ 216              		.file 3 "/nix/store/lcj4nx7xv8c36cif7armkfa7b5cmfh74-gcc-arm-embedded-12.3.rel1/arm-none-eabi/incl
+ARM GAS  /tmp/ccJcI7x3.s 			page 7
+
+
+ 217              		.file 4 "Core/Inc/portmacro.h"
+ 218              		.file 5 "../Core/Include/protocol.h"
+ 219              		.file 6 "../Core/Include/adc.h"
+ 220              		.file 7 "Core/Inc/port_config.h"
+ 221              		.file 8 "../Core/FreeRTOS-Kernel/include/queue.h"
+ 222              		.file 9 "../Core/FreeRTOS-Kernel/include/semphr.h"
+ 223              		.file 10 "../Core/Include/state.h"
+ 224              		.file 11 "../Core/Include/globals.h"
+ 225              		.file 12 "../Core/FreeRTOS-Kernel/include/task.h"
+ 226              		.file 13 "../Core/Include/telemetry.h"
+ARM GAS  /tmp/ccJcI7x3.s 			page 8
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 state_tx.c
+     /tmp/ccJcI7x3.s:21     .text.send_state:00000000 $t
+     /tmp/ccJcI7x3.s:27     .text.send_state:00000000 send_state
+     /tmp/ccJcI7x3.s:91     .text.state_tx_task:00000000 $t
+     /tmp/ccJcI7x3.s:97     .text.state_tx_task:00000000 state_tx_task
+     /tmp/ccJcI7x3.s:207    .text.state_tx_task:0000008c $d
+
+UNDEFINED SYMBOLS
+__aeabi_uldivmod
+xTaskGetTickCount
+RocketState_encode
+telemetry_send_message
+xTaskGenericNotifyWait
+xQueueSemaphoreTake
+xQueueGenericSend
+vTaskDelay
+g_state_mutex_handle
+g_current_state

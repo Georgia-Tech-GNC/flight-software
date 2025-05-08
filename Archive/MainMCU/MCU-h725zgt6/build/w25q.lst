@@ -1,0 +1,985 @@
+ARM GAS  /tmp/cc0ziooa.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 1
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"w25q.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "../Core/Src/w25q.c"
+  19              		.section	.text.w25q_delay,"ax",%progbits
+  20              		.align	1
+  21              		.weak	w25q_delay
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	w25q_delay:
+  27              	.LVL0:
+  28              	.LFB402:
+   1:../Core/Src/w25q.c **** #include "w25q.h"
+   2:../Core/Src/w25q.c **** 
+   3:../Core/Src/w25q.c **** #include <string.h>
+   4:../Core/Src/w25q.c **** #include "globals.h"
+   5:../Core/Src/w25q.c **** 
+   6:../Core/Src/w25q.c **** enum w25q_err w25q_init(struct w25q_device *device) {
+   7:../Core/Src/w25q.c ****   enum w25q_err err;
+   8:../Core/Src/w25q.c **** 
+   9:../Core/Src/w25q.c ****   uint8_t id;
+  10:../Core/Src/w25q.c ****   err = w25q_read_id(device, &id);
+  11:../Core/Src/w25q.c ****   if (err != W25Q_ERR_OK) {
+  12:../Core/Src/w25q.c ****     return err;
+  13:../Core/Src/w25q.c ****   }
+  14:../Core/Src/w25q.c **** 
+  15:../Core/Src/w25q.c ****   if (id != 0x15) {
+  16:../Core/Src/w25q.c ****     return W25Q_ERR_INVALID_ID;
+  17:../Core/Src/w25q.c ****   }
+  18:../Core/Src/w25q.c **** 
+  19:../Core/Src/w25q.c ****   err = w25q_update_status_struct(device);
+  20:../Core/Src/w25q.c ****   if (err != W25Q_ERR_OK) {
+  21:../Core/Src/w25q.c ****     return err;
+  22:../Core/Src/w25q.c ****   }
+  23:../Core/Src/w25q.c **** 
+  24:../Core/Src/w25q.c **** #if W25Q_MEM_FLASH_SIZE > 128
+  25:../Core/Src/w25q.c **** 
+  26:../Core/Src/w25q.c ****   if (!device->status.ADP) {
+  27:../Core/Src/w25q.c ****     uint8_t reg;
+  28:../Core/Src/w25q.c ****     err = w25q_read_status_reg(device, &reg, 3);
+  29:../Core/Src/w25q.c ****     if (err != W25Q_ERR_OK) {
+  30:../Core/Src/w25q.c ****       return err;
+ARM GAS  /tmp/cc0ziooa.s 			page 2
+
+
+  31:../Core/Src/w25q.c ****     }
+  32:../Core/Src/w25q.c ****     reg |= 0x02;
+  33:../Core/Src/w25q.c ****     err = w25q_write_status_reg(device, reg, 3);
+  34:../Core/Src/w25q.c ****     if (err != W25Q_ERR_OK) {
+  35:../Core/Src/w25q.c ****       return err;
+  36:../Core/Src/w25q.c ****     }
+  37:../Core/Src/w25q.c ****   }
+  38:../Core/Src/w25q.c **** 
+  39:../Core/Src/w25q.c ****   if (!device->status.ADS) {
+  40:../Core/Src/w25q.c ****     err = w25q_enter_4_byte_mode(device, 1);
+  41:../Core/Src/w25q.c ****     if (err != W25Q_ERR_OK) {
+  42:../Core/Src/w25q.c ****       return err;
+  43:../Core/Src/w25q.c ****     }
+  44:../Core/Src/w25q.c ****   }
+  45:../Core/Src/w25q.c **** 
+  46:../Core/Src/w25q.c **** #endif
+  47:../Core/Src/w25q.c **** 
+  48:../Core/Src/w25q.c ****   if (!device->status.QE) {
+  49:../Core/Src/w25q.c ****     uint8_t reg;
+  50:../Core/Src/w25q.c **** 
+  51:../Core/Src/w25q.c ****     err = w25q_read_status_reg(device, &reg, 2);
+  52:../Core/Src/w25q.c ****     if (err != W25Q_ERR_OK) {
+  53:../Core/Src/w25q.c ****       return err;
+  54:../Core/Src/w25q.c ****     }
+  55:../Core/Src/w25q.c **** 
+  56:../Core/Src/w25q.c ****     reg |= 0x02;
+  57:../Core/Src/w25q.c ****     err = w25q_write_status_reg(device, reg, 2);
+  58:../Core/Src/w25q.c ****     if (err != W25Q_ERR_OK) {
+  59:../Core/Src/w25q.c ****       return err;
+  60:../Core/Src/w25q.c ****     }
+  61:../Core/Src/w25q.c **** 
+  62:../Core/Src/w25q.c ****   }
+  63:../Core/Src/w25q.c **** 
+  64:../Core/Src/w25q.c ****   err = w25q_update_status_struct(device);
+  65:../Core/Src/w25q.c **** 
+  66:../Core/Src/w25q.c ****   return err;
+  67:../Core/Src/w25q.c **** }
+  68:../Core/Src/w25q.c **** 
+  69:../Core/Src/w25q.c **** enum w25q_err w25q_update_status_struct(struct w25q_device *device) {
+  70:../Core/Src/w25q.c ****   enum w25q_err err;
+  71:../Core/Src/w25q.c **** 
+  72:../Core/Src/w25q.c ****   uint8_t sr[3];
+  73:../Core/Src/w25q.c **** 
+  74:../Core/Src/w25q.c ****   err = w25q_read_status_reg(device, &sr[0], 1);
+  75:../Core/Src/w25q.c ****   if (err != W25Q_ERR_OK) {
+  76:../Core/Src/w25q.c ****     return err;
+  77:../Core/Src/w25q.c ****   }
+  78:../Core/Src/w25q.c **** 
+  79:../Core/Src/w25q.c ****   err = w25q_read_status_reg(device, &sr[1], 2);
+  80:../Core/Src/w25q.c ****   if (err != W25Q_ERR_OK) {
+  81:../Core/Src/w25q.c ****     return err;
+  82:../Core/Src/w25q.c ****   }
+  83:../Core/Src/w25q.c **** 
+  84:../Core/Src/w25q.c ****   err = w25q_read_status_reg(device, &sr[2], 3);
+  85:../Core/Src/w25q.c ****   if (err != W25Q_ERR_OK) {
+  86:../Core/Src/w25q.c ****     return err;
+  87:../Core/Src/w25q.c ****   }
+ARM GAS  /tmp/cc0ziooa.s 			page 3
+
+
+  88:../Core/Src/w25q.c **** 
+  89:../Core/Src/w25q.c ****   memcpy(&(device->status), sr, 3);
+  90:../Core/Src/w25q.c **** 
+  91:../Core/Src/w25q.c ****   return err;
+  92:../Core/Src/w25q.c **** }
+  93:../Core/Src/w25q.c **** 
+  94:../Core/Src/w25q.c **** enum w25q_err w25q_is_busy(struct w25q_device *device) {
+  95:../Core/Src/w25q.c ****   enum w25q_err err;
+  96:../Core/Src/w25q.c ****   uint8_t sr;
+  97:../Core/Src/w25q.c **** 
+  98:../Core/Src/w25q.c ****   err = w25q_read_status_reg(device, &sr, 1);
+  99:../Core/Src/w25q.c ****   if (err != W25Q_ERR_OK) {
+ 100:../Core/Src/w25q.c ****     return err;
+ 101:../Core/Src/w25q.c ****   }
+ 102:../Core/Src/w25q.c **** 
+ 103:../Core/Src/w25q.c ****   device->status.BUSY = sr & 1;
+ 104:../Core/Src/w25q.c **** 
+ 105:../Core/Src/w25q.c ****   return device->status.BUSY ? W25Q_ERR_BUSY : W25Q_ERR_OK;
+ 106:../Core/Src/w25q.c **** }
+ 107:../Core/Src/w25q.c **** 
+ 108:../Core/Src/w25q.c **** enum w25q_err w25q_read_data(struct w25q_device *device, uint8_t *buf,
+ 109:../Core/Src/w25q.c ****                              uint32_t len, uint8_t page_offset,
+ 110:../Core/Src/w25q.c ****                              uint32_t page_num) {
+ 111:../Core/Src/w25q.c ****   if (page_num >= W25Q_PAGE_COUNT || len == 0 || len > 256 ||
+ 112:../Core/Src/w25q.c ****       page_offset > 256 - len) {
+ 113:../Core/Src/w25q.c ****     return W25Q_ERR_PARAM;
+ 114:../Core/Src/w25q.c ****   }
+ 115:../Core/Src/w25q.c **** 
+ 116:../Core/Src/w25q.c ****   uint32_t raw_addr = page_num * W25Q_MEM_PAGE_SIZE + page_offset;
+ 117:../Core/Src/w25q.c ****   return w25q_read_raw(device, buf, len, raw_addr);
+ 118:../Core/Src/w25q.c **** }
+ 119:../Core/Src/w25q.c **** 
+ 120:../Core/Src/w25q.c **** __attribute__((weak)) void w25q_delay(uint32_t ms) { return; }
+  29              		.loc 1 120 52 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              		@ link register save eliminated.
+  34              		.loc 1 120 54 view .LVU1
+  35              		.loc 1 120 62 is_stmt 0 view .LVU2
+  36 0000 7047     		bx	lr
+  37              		.cfi_endproc
+  38              	.LFE402:
+  40              		.section	.text.w25q_read_id,"ax",%progbits
+  41              		.align	1
+  42              		.weak	w25q_read_id
+  43              		.syntax unified
+  44              		.thumb
+  45              		.thumb_func
+  47              	w25q_read_id:
+  48              	.LVL1:
+  49              	.LFB403:
+ 121:../Core/Src/w25q.c **** 
+ 122:../Core/Src/w25q.c **** __attribute__((weak)) enum w25q_err w25q_read_id(struct w25q_device *device,
+ 123:../Core/Src/w25q.c ****                                                  uint8_t *buf) {
+  50              		.loc 1 123 64 is_stmt 1 view -0
+  51              		.cfi_startproc
+ARM GAS  /tmp/cc0ziooa.s 			page 4
+
+
+  52              		@ args = 0, pretend = 0, frame = 0
+  53              		@ frame_needed = 0, uses_anonymous_args = 0
+  54              		@ link register save eliminated.
+ 124:../Core/Src/w25q.c ****   return W25Q_ERR_OK;
+  55              		.loc 1 124 3 view .LVU4
+ 125:../Core/Src/w25q.c **** }
+  56              		.loc 1 125 1 is_stmt 0 view .LVU5
+  57 0000 0020     		movs	r0, #0
+  58              	.LVL2:
+  59              		.loc 1 125 1 view .LVU6
+  60 0002 7047     		bx	lr
+  61              		.cfi_endproc
+  62              	.LFE403:
+  64              		.section	.text.w25q_write_enable,"ax",%progbits
+  65              		.align	1
+  66              		.weak	w25q_write_enable
+  67              		.syntax unified
+  68              		.thumb
+  69              		.thumb_func
+  71              	w25q_write_enable:
+  72              	.LVL3:
+  73              	.LFB404:
+ 126:../Core/Src/w25q.c **** 
+ 127:../Core/Src/w25q.c **** __attribute__((weak)) enum w25q_err
+ 128:../Core/Src/w25q.c **** w25q_write_enable(struct w25q_device *device, bool enable) {
+  74              		.loc 1 128 60 is_stmt 1 view -0
+  75              		.cfi_startproc
+  76              		@ args = 0, pretend = 0, frame = 0
+  77              		@ frame_needed = 0, uses_anonymous_args = 0
+  78              		@ link register save eliminated.
+ 129:../Core/Src/w25q.c ****   return W25Q_ERR_OK;
+  79              		.loc 1 129 3 view .LVU8
+ 130:../Core/Src/w25q.c **** }
+  80              		.loc 1 130 1 is_stmt 0 view .LVU9
+  81 0000 0020     		movs	r0, #0
+  82              	.LVL4:
+  83              		.loc 1 130 1 view .LVU10
+  84 0002 7047     		bx	lr
+  85              		.cfi_endproc
+  86              	.LFE404:
+  88              		.section	.text.w25q_enter_4_byte_mode,"ax",%progbits
+  89              		.align	1
+  90              		.weak	w25q_enter_4_byte_mode
+  91              		.syntax unified
+  92              		.thumb
+  93              		.thumb_func
+  95              	w25q_enter_4_byte_mode:
+  96              	.LVL5:
+  97              	.LFB405:
+ 131:../Core/Src/w25q.c **** 
+ 132:../Core/Src/w25q.c **** __attribute__((weak)) enum w25q_err
+ 133:../Core/Src/w25q.c **** w25q_enter_4_byte_mode(struct w25q_device *device, bool enable) {
+  98              		.loc 1 133 65 is_stmt 1 view -0
+  99              		.cfi_startproc
+ 100              		@ args = 0, pretend = 0, frame = 0
+ 101              		@ frame_needed = 0, uses_anonymous_args = 0
+ 102              		@ link register save eliminated.
+ARM GAS  /tmp/cc0ziooa.s 			page 5
+
+
+ 134:../Core/Src/w25q.c ****   return W25Q_ERR_OK;
+ 103              		.loc 1 134 3 view .LVU12
+ 135:../Core/Src/w25q.c **** }
+ 104              		.loc 1 135 1 is_stmt 0 view .LVU13
+ 105 0000 0020     		movs	r0, #0
+ 106              	.LVL6:
+ 107              		.loc 1 135 1 view .LVU14
+ 108 0002 7047     		bx	lr
+ 109              		.cfi_endproc
+ 110              	.LFE405:
+ 112              		.section	.text.w25q_read_status_reg,"ax",%progbits
+ 113              		.align	1
+ 114              		.weak	w25q_read_status_reg
+ 115              		.syntax unified
+ 116              		.thumb
+ 117              		.thumb_func
+ 119              	w25q_read_status_reg:
+ 120              	.LVL7:
+ 121              	.LFB406:
+ 136:../Core/Src/w25q.c **** 
+ 137:../Core/Src/w25q.c **** __attribute__((weak)) enum w25q_err
+ 138:../Core/Src/w25q.c **** w25q_read_status_reg(struct w25q_device *device, uint8_t *reg_data,
+ 139:../Core/Src/w25q.c ****                      uint8_t reg_num) {
+ 122              		.loc 1 139 39 is_stmt 1 view -0
+ 123              		.cfi_startproc
+ 124              		@ args = 0, pretend = 0, frame = 0
+ 125              		@ frame_needed = 0, uses_anonymous_args = 0
+ 126              		@ link register save eliminated.
+ 140:../Core/Src/w25q.c ****   return W25Q_ERR_OK;
+ 127              		.loc 1 140 3 view .LVU16
+ 141:../Core/Src/w25q.c **** }
+ 128              		.loc 1 141 1 is_stmt 0 view .LVU17
+ 129 0000 0020     		movs	r0, #0
+ 130              	.LVL8:
+ 131              		.loc 1 141 1 view .LVU18
+ 132 0002 7047     		bx	lr
+ 133              		.cfi_endproc
+ 134              	.LFE406:
+ 136              		.section	.text.w25q_update_status_struct,"ax",%progbits
+ 137              		.align	1
+ 138              		.global	w25q_update_status_struct
+ 139              		.syntax unified
+ 140              		.thumb
+ 141              		.thumb_func
+ 143              	w25q_update_status_struct:
+ 144              	.LVL9:
+ 145              	.LFB399:
+  69:../Core/Src/w25q.c ****   enum w25q_err err;
+ 146              		.loc 1 69 69 is_stmt 1 view -0
+ 147              		.cfi_startproc
+ 148              		@ args = 0, pretend = 0, frame = 8
+ 149              		@ frame_needed = 0, uses_anonymous_args = 0
+  69:../Core/Src/w25q.c ****   enum w25q_err err;
+ 150              		.loc 1 69 69 is_stmt 0 view .LVU20
+ 151 0000 10B5     		push	{r4, lr}
+ 152              	.LCFI0:
+ 153              		.cfi_def_cfa_offset 8
+ARM GAS  /tmp/cc0ziooa.s 			page 6
+
+
+ 154              		.cfi_offset 4, -8
+ 155              		.cfi_offset 14, -4
+ 156 0002 82B0     		sub	sp, sp, #8
+ 157              	.LCFI1:
+ 158              		.cfi_def_cfa_offset 16
+ 159 0004 0446     		mov	r4, r0
+  70:../Core/Src/w25q.c **** 
+ 160              		.loc 1 70 3 is_stmt 1 view .LVU21
+  72:../Core/Src/w25q.c **** 
+ 161              		.loc 1 72 3 view .LVU22
+  74:../Core/Src/w25q.c ****   if (err != W25Q_ERR_OK) {
+ 162              		.loc 1 74 3 view .LVU23
+  74:../Core/Src/w25q.c ****   if (err != W25Q_ERR_OK) {
+ 163              		.loc 1 74 9 is_stmt 0 view .LVU24
+ 164 0006 0122     		movs	r2, #1
+ 165 0008 01A9     		add	r1, sp, #4
+ 166 000a FFF7FEFF 		bl	w25q_read_status_reg
+ 167              	.LVL10:
+  75:../Core/Src/w25q.c ****     return err;
+ 168              		.loc 1 75 3 is_stmt 1 view .LVU25
+  75:../Core/Src/w25q.c ****     return err;
+ 169              		.loc 1 75 6 is_stmt 0 view .LVU26
+ 170 000e 08B1     		cbz	r0, .L9
+ 171              	.L7:
+  92:../Core/Src/w25q.c **** 
+ 172              		.loc 1 92 1 view .LVU27
+ 173 0010 02B0     		add	sp, sp, #8
+ 174              	.LCFI2:
+ 175              		.cfi_remember_state
+ 176              		.cfi_def_cfa_offset 8
+ 177              		@ sp needed
+ 178 0012 10BD     		pop	{r4, pc}
+ 179              	.LVL11:
+ 180              	.L9:
+ 181              	.LCFI3:
+ 182              		.cfi_restore_state
+  79:../Core/Src/w25q.c ****   if (err != W25Q_ERR_OK) {
+ 183              		.loc 1 79 3 is_stmt 1 view .LVU28
+  79:../Core/Src/w25q.c ****   if (err != W25Q_ERR_OK) {
+ 184              		.loc 1 79 9 is_stmt 0 view .LVU29
+ 185 0014 0222     		movs	r2, #2
+ 186 0016 0DF10501 		add	r1, sp, #5
+ 187 001a 2046     		mov	r0, r4
+ 188 001c FFF7FEFF 		bl	w25q_read_status_reg
+ 189              	.LVL12:
+  80:../Core/Src/w25q.c ****     return err;
+ 190              		.loc 1 80 3 is_stmt 1 view .LVU30
+  80:../Core/Src/w25q.c ****     return err;
+ 191              		.loc 1 80 6 is_stmt 0 view .LVU31
+ 192 0020 0028     		cmp	r0, #0
+ 193 0022 F5D1     		bne	.L7
+  84:../Core/Src/w25q.c ****   if (err != W25Q_ERR_OK) {
+ 194              		.loc 1 84 3 is_stmt 1 view .LVU32
+  84:../Core/Src/w25q.c ****   if (err != W25Q_ERR_OK) {
+ 195              		.loc 1 84 9 is_stmt 0 view .LVU33
+ 196 0024 0322     		movs	r2, #3
+ 197 0026 0DF10601 		add	r1, sp, #6
+ARM GAS  /tmp/cc0ziooa.s 			page 7
+
+
+ 198 002a 2046     		mov	r0, r4
+ 199              	.LVL13:
+  84:../Core/Src/w25q.c ****   if (err != W25Q_ERR_OK) {
+ 200              		.loc 1 84 9 view .LVU34
+ 201 002c FFF7FEFF 		bl	w25q_read_status_reg
+ 202              	.LVL14:
+  85:../Core/Src/w25q.c ****     return err;
+ 203              		.loc 1 85 3 is_stmt 1 view .LVU35
+  85:../Core/Src/w25q.c ****     return err;
+ 204              		.loc 1 85 6 is_stmt 0 view .LVU36
+ 205 0030 0028     		cmp	r0, #0
+ 206 0032 EDD1     		bne	.L7
+  89:../Core/Src/w25q.c **** 
+ 207              		.loc 1 89 3 is_stmt 1 view .LVU37
+ 208 0034 BDF80420 		ldrh	r2, [sp, #4]	@ unaligned
+ 209 0038 9DF80630 		ldrb	r3, [sp, #6]	@ zero_extendqisi2
+ 210 003c A280     		strh	r2, [r4, #4]	@ unaligned
+ 211 003e A371     		strb	r3, [r4, #6]
+  91:../Core/Src/w25q.c **** }
+ 212              		.loc 1 91 3 view .LVU38
+  91:../Core/Src/w25q.c **** }
+ 213              		.loc 1 91 10 is_stmt 0 view .LVU39
+ 214 0040 E6E7     		b	.L7
+ 215              		.cfi_endproc
+ 216              	.LFE399:
+ 218              		.section	.text.w25q_is_busy,"ax",%progbits
+ 219              		.align	1
+ 220              		.global	w25q_is_busy
+ 221              		.syntax unified
+ 222              		.thumb
+ 223              		.thumb_func
+ 225              	w25q_is_busy:
+ 226              	.LVL15:
+ 227              	.LFB400:
+  94:../Core/Src/w25q.c ****   enum w25q_err err;
+ 228              		.loc 1 94 56 is_stmt 1 view -0
+ 229              		.cfi_startproc
+ 230              		@ args = 0, pretend = 0, frame = 8
+ 231              		@ frame_needed = 0, uses_anonymous_args = 0
+  94:../Core/Src/w25q.c ****   enum w25q_err err;
+ 232              		.loc 1 94 56 is_stmt 0 view .LVU41
+ 233 0000 10B5     		push	{r4, lr}
+ 234              	.LCFI4:
+ 235              		.cfi_def_cfa_offset 8
+ 236              		.cfi_offset 4, -8
+ 237              		.cfi_offset 14, -4
+ 238 0002 82B0     		sub	sp, sp, #8
+ 239              	.LCFI5:
+ 240              		.cfi_def_cfa_offset 16
+ 241 0004 0446     		mov	r4, r0
+  95:../Core/Src/w25q.c ****   uint8_t sr;
+ 242              		.loc 1 95 3 is_stmt 1 view .LVU42
+  96:../Core/Src/w25q.c **** 
+ 243              		.loc 1 96 3 view .LVU43
+  98:../Core/Src/w25q.c ****   if (err != W25Q_ERR_OK) {
+ 244              		.loc 1 98 3 view .LVU44
+  98:../Core/Src/w25q.c ****   if (err != W25Q_ERR_OK) {
+ARM GAS  /tmp/cc0ziooa.s 			page 8
+
+
+ 245              		.loc 1 98 9 is_stmt 0 view .LVU45
+ 246 0006 0122     		movs	r2, #1
+ 247 0008 0DF10701 		add	r1, sp, #7
+ 248 000c FFF7FEFF 		bl	w25q_read_status_reg
+ 249              	.LVL16:
+  99:../Core/Src/w25q.c ****     return err;
+ 250              		.loc 1 99 3 is_stmt 1 view .LVU46
+  99:../Core/Src/w25q.c ****     return err;
+ 251              		.loc 1 99 6 is_stmt 0 view .LVU47
+ 252 0010 0346     		mov	r3, r0
+ 253 0012 40B9     		cbnz	r0, .L11
+ 103:../Core/Src/w25q.c **** 
+ 254              		.loc 1 103 3 is_stmt 1 view .LVU48
+ 103:../Core/Src/w25q.c **** 
+ 255              		.loc 1 103 28 is_stmt 0 view .LVU49
+ 256 0014 9DF80720 		ldrb	r2, [sp, #7]	@ zero_extendqisi2
+ 103:../Core/Src/w25q.c **** 
+ 257              		.loc 1 103 23 view .LVU50
+ 258 0018 2379     		ldrb	r3, [r4, #4]	@ zero_extendqisi2
+ 259 001a 62F30003 		bfi	r3, r2, #0, #1
+ 260 001e 2371     		strb	r3, [r4, #4]
+ 105:../Core/Src/w25q.c **** }
+ 261              		.loc 1 105 3 is_stmt 1 view .LVU51
+ 105:../Core/Src/w25q.c **** }
+ 262              		.loc 1 105 30 is_stmt 0 view .LVU52
+ 263 0020 DBB2     		uxtb	r3, r3
+ 105:../Core/Src/w25q.c **** }
+ 264              		.loc 1 105 46 view .LVU53
+ 265 0022 03F00103 		and	r3, r3, #1
+ 266              	.L11:
+ 106:../Core/Src/w25q.c **** 
+ 267              		.loc 1 106 1 view .LVU54
+ 268 0026 1846     		mov	r0, r3
+ 269              	.LVL17:
+ 106:../Core/Src/w25q.c **** 
+ 270              		.loc 1 106 1 view .LVU55
+ 271 0028 02B0     		add	sp, sp, #8
+ 272              	.LCFI6:
+ 273              		.cfi_def_cfa_offset 8
+ 274              		@ sp needed
+ 275 002a 10BD     		pop	{r4, pc}
+ 106:../Core/Src/w25q.c **** 
+ 276              		.loc 1 106 1 view .LVU56
+ 277              		.cfi_endproc
+ 278              	.LFE400:
+ 280              		.section	.text.w25q_write_status_reg,"ax",%progbits
+ 281              		.align	1
+ 282              		.weak	w25q_write_status_reg
+ 283              		.syntax unified
+ 284              		.thumb
+ 285              		.thumb_func
+ 287              	w25q_write_status_reg:
+ 288              	.LVL18:
+ 289              	.LFB407:
+ 142:../Core/Src/w25q.c **** 
+ 143:../Core/Src/w25q.c **** __attribute__((weak)) enum w25q_err
+ 144:../Core/Src/w25q.c **** w25q_write_status_reg(struct w25q_device *device, uint8_t reg_data,
+ARM GAS  /tmp/cc0ziooa.s 			page 9
+
+
+ 145:../Core/Src/w25q.c ****                       uint8_t reg_num) {
+ 290              		.loc 1 145 40 is_stmt 1 view -0
+ 291              		.cfi_startproc
+ 292              		@ args = 0, pretend = 0, frame = 0
+ 293              		@ frame_needed = 0, uses_anonymous_args = 0
+ 294              		@ link register save eliminated.
+ 146:../Core/Src/w25q.c ****   return W25Q_ERR_OK;
+ 295              		.loc 1 146 3 view .LVU58
+ 147:../Core/Src/w25q.c **** }
+ 296              		.loc 1 147 1 is_stmt 0 view .LVU59
+ 297 0000 0020     		movs	r0, #0
+ 298              	.LVL19:
+ 299              		.loc 1 147 1 view .LVU60
+ 300 0002 7047     		bx	lr
+ 301              		.cfi_endproc
+ 302              	.LFE407:
+ 304              		.section	.text.w25q_init,"ax",%progbits
+ 305              		.align	1
+ 306              		.global	w25q_init
+ 307              		.syntax unified
+ 308              		.thumb
+ 309              		.thumb_func
+ 311              	w25q_init:
+ 312              	.LVL20:
+ 313              	.LFB398:
+   6:../Core/Src/w25q.c ****   enum w25q_err err;
+ 314              		.loc 1 6 53 is_stmt 1 view -0
+ 315              		.cfi_startproc
+ 316              		@ args = 0, pretend = 0, frame = 8
+ 317              		@ frame_needed = 0, uses_anonymous_args = 0
+   6:../Core/Src/w25q.c ****   enum w25q_err err;
+ 318              		.loc 1 6 53 is_stmt 0 view .LVU62
+ 319 0000 10B5     		push	{r4, lr}
+ 320              	.LCFI7:
+ 321              		.cfi_def_cfa_offset 8
+ 322              		.cfi_offset 4, -8
+ 323              		.cfi_offset 14, -4
+ 324 0002 82B0     		sub	sp, sp, #8
+ 325              	.LCFI8:
+ 326              		.cfi_def_cfa_offset 16
+ 327 0004 0446     		mov	r4, r0
+   7:../Core/Src/w25q.c **** 
+ 328              		.loc 1 7 3 is_stmt 1 view .LVU63
+   9:../Core/Src/w25q.c ****   err = w25q_read_id(device, &id);
+ 329              		.loc 1 9 3 view .LVU64
+  10:../Core/Src/w25q.c ****   if (err != W25Q_ERR_OK) {
+ 330              		.loc 1 10 3 view .LVU65
+  10:../Core/Src/w25q.c ****   if (err != W25Q_ERR_OK) {
+ 331              		.loc 1 10 9 is_stmt 0 view .LVU66
+ 332 0006 0DF10701 		add	r1, sp, #7
+ 333 000a FFF7FEFF 		bl	w25q_read_id
+ 334              	.LVL21:
+  11:../Core/Src/w25q.c ****     return err;
+ 335              		.loc 1 11 3 is_stmt 1 view .LVU67
+  11:../Core/Src/w25q.c ****     return err;
+ 336              		.loc 1 11 6 is_stmt 0 view .LVU68
+ 337 000e 0346     		mov	r3, r0
+ARM GAS  /tmp/cc0ziooa.s 			page 10
+
+
+ 338 0010 20B9     		cbnz	r0, .L15
+  15:../Core/Src/w25q.c ****     return W25Q_ERR_INVALID_ID;
+ 339              		.loc 1 15 3 is_stmt 1 view .LVU69
+  15:../Core/Src/w25q.c ****     return W25Q_ERR_INVALID_ID;
+ 340              		.loc 1 15 10 is_stmt 0 view .LVU70
+ 341 0012 9DF80730 		ldrb	r3, [sp, #7]	@ zero_extendqisi2
+  15:../Core/Src/w25q.c ****     return W25Q_ERR_INVALID_ID;
+ 342              		.loc 1 15 6 view .LVU71
+ 343 0016 152B     		cmp	r3, #21
+ 344 0018 03D0     		beq	.L20
+  16:../Core/Src/w25q.c ****   }
+ 345              		.loc 1 16 12 view .LVU72
+ 346 001a 0623     		movs	r3, #6
+ 347              	.LVL22:
+ 348              	.L15:
+  67:../Core/Src/w25q.c **** 
+ 349              		.loc 1 67 1 view .LVU73
+ 350 001c 1846     		mov	r0, r3
+ 351 001e 02B0     		add	sp, sp, #8
+ 352              	.LCFI9:
+ 353              		.cfi_remember_state
+ 354              		.cfi_def_cfa_offset 8
+ 355              		@ sp needed
+ 356 0020 10BD     		pop	{r4, pc}
+ 357              	.LVL23:
+ 358              	.L20:
+ 359              	.LCFI10:
+ 360              		.cfi_restore_state
+  19:../Core/Src/w25q.c ****   if (err != W25Q_ERR_OK) {
+ 361              		.loc 1 19 3 is_stmt 1 view .LVU74
+  19:../Core/Src/w25q.c ****   if (err != W25Q_ERR_OK) {
+ 362              		.loc 1 19 9 is_stmt 0 view .LVU75
+ 363 0022 2046     		mov	r0, r4
+ 364              	.LVL24:
+  19:../Core/Src/w25q.c ****   if (err != W25Q_ERR_OK) {
+ 365              		.loc 1 19 9 view .LVU76
+ 366 0024 FFF7FEFF 		bl	w25q_update_status_struct
+ 367              	.LVL25:
+  20:../Core/Src/w25q.c ****     return err;
+ 368              		.loc 1 20 3 is_stmt 1 view .LVU77
+  20:../Core/Src/w25q.c ****     return err;
+ 369              		.loc 1 20 6 is_stmt 0 view .LVU78
+ 370 0028 0346     		mov	r3, r0
+ 371 002a 0028     		cmp	r0, #0
+ 372 002c F6D1     		bne	.L15
+  48:../Core/Src/w25q.c ****     uint8_t reg;
+ 373              		.loc 1 48 3 is_stmt 1 view .LVU79
+  48:../Core/Src/w25q.c ****     uint8_t reg;
+ 374              		.loc 1 48 7 is_stmt 0 view .LVU80
+ 375 002e 6379     		ldrb	r3, [r4, #5]	@ zero_extendqisi2
+  48:../Core/Src/w25q.c ****     uint8_t reg;
+ 376              		.loc 1 48 6 view .LVU81
+ 377 0030 13F0020F 		tst	r3, #2
+ 378 0034 15D1     		bne	.L16
+ 379              	.LBB2:
+  49:../Core/Src/w25q.c **** 
+ 380              		.loc 1 49 5 is_stmt 1 view .LVU82
+ARM GAS  /tmp/cc0ziooa.s 			page 11
+
+
+  51:../Core/Src/w25q.c ****     if (err != W25Q_ERR_OK) {
+ 381              		.loc 1 51 5 view .LVU83
+  51:../Core/Src/w25q.c ****     if (err != W25Q_ERR_OK) {
+ 382              		.loc 1 51 11 is_stmt 0 view .LVU84
+ 383 0036 0222     		movs	r2, #2
+ 384 0038 0DF10601 		add	r1, sp, #6
+ 385 003c 2046     		mov	r0, r4
+ 386              	.LVL26:
+  51:../Core/Src/w25q.c ****     if (err != W25Q_ERR_OK) {
+ 387              		.loc 1 51 11 view .LVU85
+ 388 003e FFF7FEFF 		bl	w25q_read_status_reg
+ 389              	.LVL27:
+  52:../Core/Src/w25q.c ****       return err;
+ 390              		.loc 1 52 5 is_stmt 1 view .LVU86
+  52:../Core/Src/w25q.c ****       return err;
+ 391              		.loc 1 52 8 is_stmt 0 view .LVU87
+ 392 0042 0346     		mov	r3, r0
+ 393 0044 0028     		cmp	r0, #0
+ 394 0046 E9D1     		bne	.L15
+  56:../Core/Src/w25q.c ****     err = w25q_write_status_reg(device, reg, 2);
+ 395              		.loc 1 56 5 is_stmt 1 view .LVU88
+  56:../Core/Src/w25q.c ****     err = w25q_write_status_reg(device, reg, 2);
+ 396              		.loc 1 56 9 is_stmt 0 view .LVU89
+ 397 0048 9DF80610 		ldrb	r1, [sp, #6]	@ zero_extendqisi2
+ 398 004c 41F00201 		orr	r1, r1, #2
+ 399 0050 8DF80610 		strb	r1, [sp, #6]
+  57:../Core/Src/w25q.c ****     if (err != W25Q_ERR_OK) {
+ 400              		.loc 1 57 5 is_stmt 1 view .LVU90
+  57:../Core/Src/w25q.c ****     if (err != W25Q_ERR_OK) {
+ 401              		.loc 1 57 11 is_stmt 0 view .LVU91
+ 402 0054 0222     		movs	r2, #2
+ 403 0056 2046     		mov	r0, r4
+ 404              	.LVL28:
+  57:../Core/Src/w25q.c ****     if (err != W25Q_ERR_OK) {
+ 405              		.loc 1 57 11 view .LVU92
+ 406 0058 FFF7FEFF 		bl	w25q_write_status_reg
+ 407              	.LVL29:
+  58:../Core/Src/w25q.c ****       return err;
+ 408              		.loc 1 58 5 is_stmt 1 view .LVU93
+  58:../Core/Src/w25q.c ****       return err;
+ 409              		.loc 1 58 8 is_stmt 0 view .LVU94
+ 410 005c 0346     		mov	r3, r0
+ 411 005e 0028     		cmp	r0, #0
+ 412 0060 DCD1     		bne	.L15
+ 413              	.L16:
+  58:../Core/Src/w25q.c ****       return err;
+ 414              		.loc 1 58 8 view .LVU95
+ 415              	.LBE2:
+  64:../Core/Src/w25q.c **** 
+ 416              		.loc 1 64 3 is_stmt 1 view .LVU96
+  64:../Core/Src/w25q.c **** 
+ 417              		.loc 1 64 9 is_stmt 0 view .LVU97
+ 418 0062 2046     		mov	r0, r4
+ 419              	.LVL30:
+  64:../Core/Src/w25q.c **** 
+ 420              		.loc 1 64 9 view .LVU98
+ 421 0064 FFF7FEFF 		bl	w25q_update_status_struct
+ARM GAS  /tmp/cc0ziooa.s 			page 12
+
+
+ 422              	.LVL31:
+ 423 0068 0346     		mov	r3, r0
+ 424              	.LVL32:
+  66:../Core/Src/w25q.c **** }
+ 425              		.loc 1 66 3 is_stmt 1 view .LVU99
+  66:../Core/Src/w25q.c **** }
+ 426              		.loc 1 66 10 is_stmt 0 view .LVU100
+ 427 006a D7E7     		b	.L15
+ 428              		.cfi_endproc
+ 429              	.LFE398:
+ 431              		.section	.text.w25q_read_raw,"ax",%progbits
+ 432              		.align	1
+ 433              		.weak	w25q_read_raw
+ 434              		.syntax unified
+ 435              		.thumb
+ 436              		.thumb_func
+ 438              	w25q_read_raw:
+ 439              	.LVL33:
+ 440              	.LFB408:
+ 148:../Core/Src/w25q.c **** 
+ 149:../Core/Src/w25q.c **** __attribute__((weak)) enum w25q_err w25q_read_raw(struct w25q_device *device,
+ 150:../Core/Src/w25q.c ****                                                   uint8_t *buf, uint32_t len,
+ 151:../Core/Src/w25q.c ****                                                   uint32_t addr) {
+ 441              		.loc 1 151 66 is_stmt 1 view -0
+ 442              		.cfi_startproc
+ 443              		@ args = 0, pretend = 0, frame = 0
+ 444              		@ frame_needed = 0, uses_anonymous_args = 0
+ 445              		@ link register save eliminated.
+ 152:../Core/Src/w25q.c ****   return W25Q_ERR_OK;
+ 446              		.loc 1 152 3 view .LVU102
+ 153:../Core/Src/w25q.c **** }
+ 447              		.loc 1 153 1 is_stmt 0 view .LVU103
+ 448 0000 0020     		movs	r0, #0
+ 449              	.LVL34:
+ 450              		.loc 1 153 1 view .LVU104
+ 451 0002 7047     		bx	lr
+ 452              		.cfi_endproc
+ 453              	.LFE408:
+ 455              		.section	.text.w25q_read_data,"ax",%progbits
+ 456              		.align	1
+ 457              		.global	w25q_read_data
+ 458              		.syntax unified
+ 459              		.thumb
+ 460              		.thumb_func
+ 462              	w25q_read_data:
+ 463              	.LVL35:
+ 464              	.LFB401:
+ 110:../Core/Src/w25q.c ****   if (page_num >= W25Q_PAGE_COUNT || len == 0 || len > 256 ||
+ 465              		.loc 1 110 49 is_stmt 1 view -0
+ 466              		.cfi_startproc
+ 467              		@ args = 4, pretend = 0, frame = 0
+ 468              		@ frame_needed = 0, uses_anonymous_args = 0
+ 110:../Core/Src/w25q.c ****   if (page_num >= W25Q_PAGE_COUNT || len == 0 || len > 256 ||
+ 469              		.loc 1 110 49 is_stmt 0 view .LVU106
+ 470 0000 10B5     		push	{r4, lr}
+ 471              	.LCFI11:
+ 472              		.cfi_def_cfa_offset 8
+ARM GAS  /tmp/cc0ziooa.s 			page 13
+
+
+ 473              		.cfi_offset 4, -8
+ 474              		.cfi_offset 14, -4
+ 475 0002 029C     		ldr	r4, [sp, #8]
+ 111:../Core/Src/w25q.c ****       page_offset > 256 - len) {
+ 476              		.loc 1 111 3 is_stmt 1 view .LVU107
+ 111:../Core/Src/w25q.c ****       page_offset > 256 - len) {
+ 477              		.loc 1 111 6 is_stmt 0 view .LVU108
+ 478 0004 002A     		cmp	r2, #0
+ 479 0006 18BF     		it	ne
+ 480 0008 B4F5804F 		cmpne	r4, #16384
+ 481 000c 0DD2     		bcs	.L24
+ 482 000e 9446     		mov	ip, r2
+ 111:../Core/Src/w25q.c ****       page_offset > 256 - len) {
+ 483              		.loc 1 111 47 discriminator 1 view .LVU109
+ 484 0010 B2F5807F 		cmp	r2, #256
+ 485 0014 0BD8     		bhi	.L25
+ 112:../Core/Src/w25q.c ****     return W25Q_ERR_PARAM;
+ 486              		.loc 1 112 25 discriminator 2 view .LVU110
+ 487 0016 C2F58072 		rsb	r2, r2, #256
+ 488              	.LVL36:
+ 111:../Core/Src/w25q.c ****       page_offset > 256 - len) {
+ 489              		.loc 1 111 60 discriminator 2 view .LVU111
+ 490 001a 9342     		cmp	r3, r2
+ 491 001c 09D8     		bhi	.L26
+ 116:../Core/Src/w25q.c ****   return w25q_read_raw(device, buf, len, raw_addr);
+ 492              		.loc 1 116 3 is_stmt 1 view .LVU112
+ 493              	.LVL37:
+ 117:../Core/Src/w25q.c **** }
+ 494              		.loc 1 117 3 view .LVU113
+ 117:../Core/Src/w25q.c **** }
+ 495              		.loc 1 117 10 is_stmt 0 view .LVU114
+ 496 001e 03EB0423 		add	r3, r3, r4, lsl #8
+ 497              	.LVL38:
+ 117:../Core/Src/w25q.c **** }
+ 498              		.loc 1 117 10 view .LVU115
+ 499 0022 6246     		mov	r2, ip
+ 500 0024 FFF7FEFF 		bl	w25q_read_raw
+ 501              	.LVL39:
+ 502              	.L23:
+ 118:../Core/Src/w25q.c **** 
+ 503              		.loc 1 118 1 view .LVU116
+ 504 0028 10BD     		pop	{r4, pc}
+ 505              	.LVL40:
+ 506              	.L24:
+ 113:../Core/Src/w25q.c ****   }
+ 507              		.loc 1 113 12 view .LVU117
+ 508 002a 0220     		movs	r0, #2
+ 509              	.LVL41:
+ 113:../Core/Src/w25q.c ****   }
+ 510              		.loc 1 113 12 view .LVU118
+ 511 002c FCE7     		b	.L23
+ 512              	.LVL42:
+ 513              	.L25:
+ 113:../Core/Src/w25q.c ****   }
+ 514              		.loc 1 113 12 view .LVU119
+ 515 002e 0220     		movs	r0, #2
+ 516              	.LVL43:
+ARM GAS  /tmp/cc0ziooa.s 			page 14
+
+
+ 113:../Core/Src/w25q.c ****   }
+ 517              		.loc 1 113 12 view .LVU120
+ 518 0030 FAE7     		b	.L23
+ 519              	.LVL44:
+ 520              	.L26:
+ 113:../Core/Src/w25q.c ****   }
+ 521              		.loc 1 113 12 view .LVU121
+ 522 0032 0220     		movs	r0, #2
+ 523              	.LVL45:
+ 113:../Core/Src/w25q.c ****   }
+ 524              		.loc 1 113 12 view .LVU122
+ 525 0034 F8E7     		b	.L23
+ 526              		.cfi_endproc
+ 527              	.LFE401:
+ 529              		.section	.text.w25q_write_raw,"ax",%progbits
+ 530              		.align	1
+ 531              		.weak	w25q_write_raw
+ 532              		.syntax unified
+ 533              		.thumb
+ 534              		.thumb_func
+ 536              	w25q_write_raw:
+ 537              	.LVL46:
+ 538              	.LFB409:
+ 154:../Core/Src/w25q.c **** 
+ 155:../Core/Src/w25q.c **** __attribute__((weak)) enum w25q_err w25q_write_raw(struct w25q_device *device,
+ 156:../Core/Src/w25q.c ****                                                    uint8_t *buf, uint32_t len,
+ 157:../Core/Src/w25q.c ****                                                    uint32_t addr) {
+ 539              		.loc 1 157 67 is_stmt 1 view -0
+ 540              		.cfi_startproc
+ 541              		@ args = 0, pretend = 0, frame = 0
+ 542              		@ frame_needed = 0, uses_anonymous_args = 0
+ 543              		@ link register save eliminated.
+ 158:../Core/Src/w25q.c ****   return W25Q_ERR_OK;
+ 544              		.loc 1 158 3 view .LVU124
+ 159:../Core/Src/w25q.c **** }
+ 545              		.loc 1 159 1 is_stmt 0 view .LVU125
+ 546 0000 0020     		movs	r0, #0
+ 547              	.LVL47:
+ 548              		.loc 1 159 1 view .LVU126
+ 549 0002 7047     		bx	lr
+ 550              		.cfi_endproc
+ 551              	.LFE409:
+ 553              		.section	.text.w25q_erase_sector,"ax",%progbits
+ 554              		.align	1
+ 555              		.weak	w25q_erase_sector
+ 556              		.syntax unified
+ 557              		.thumb
+ 558              		.thumb_func
+ 560              	w25q_erase_sector:
+ 561              	.LVL48:
+ 562              	.LFB410:
+ 160:../Core/Src/w25q.c **** 
+ 161:../Core/Src/w25q.c **** __attribute__((weak)) enum w25q_err
+ 162:../Core/Src/w25q.c **** w25q_erase_sector(struct w25q_device *device, uint32_t sector_addr) {
+ 563              		.loc 1 162 69 is_stmt 1 view -0
+ 564              		.cfi_startproc
+ 565              		@ args = 0, pretend = 0, frame = 0
+ARM GAS  /tmp/cc0ziooa.s 			page 15
+
+
+ 566              		@ frame_needed = 0, uses_anonymous_args = 0
+ 567              		@ link register save eliminated.
+ 163:../Core/Src/w25q.c ****   return W25Q_ERR_OK;
+ 568              		.loc 1 163 3 view .LVU128
+ 164:../Core/Src/w25q.c **** }
+ 569              		.loc 1 164 1 is_stmt 0 view .LVU129
+ 570 0000 0020     		movs	r0, #0
+ 571              	.LVL49:
+ 572              		.loc 1 164 1 view .LVU130
+ 573 0002 7047     		bx	lr
+ 574              		.cfi_endproc
+ 575              	.LFE410:
+ 577              		.section	.text.w25q_erase_block,"ax",%progbits
+ 578              		.align	1
+ 579              		.weak	w25q_erase_block
+ 580              		.syntax unified
+ 581              		.thumb
+ 582              		.thumb_func
+ 584              	w25q_erase_block:
+ 585              	.LVL50:
+ 586              	.LFB411:
+ 165:../Core/Src/w25q.c **** 
+ 166:../Core/Src/w25q.c **** __attribute__((weak)) enum w25q_err w25q_erase_block(struct w25q_device *device,
+ 167:../Core/Src/w25q.c ****                                                      uint32_t block_addr,
+ 168:../Core/Src/w25q.c ****                                                      uint8_t size) {
+ 587              		.loc 1 168 68 is_stmt 1 view -0
+ 588              		.cfi_startproc
+ 589              		@ args = 0, pretend = 0, frame = 0
+ 590              		@ frame_needed = 0, uses_anonymous_args = 0
+ 591              		@ link register save eliminated.
+ 169:../Core/Src/w25q.c ****   return W25Q_ERR_OK;
+ 592              		.loc 1 169 3 view .LVU132
+ 170:../Core/Src/w25q.c **** }
+ 593              		.loc 1 170 1 is_stmt 0 view .LVU133
+ 594 0000 0020     		movs	r0, #0
+ 595              	.LVL51:
+ 596              		.loc 1 170 1 view .LVU134
+ 597 0002 7047     		bx	lr
+ 598              		.cfi_endproc
+ 599              	.LFE411:
+ 601              		.section	.text.w25q_erase_chip,"ax",%progbits
+ 602              		.align	1
+ 603              		.weak	w25q_erase_chip
+ 604              		.syntax unified
+ 605              		.thumb
+ 606              		.thumb_func
+ 608              	w25q_erase_chip:
+ 609              	.LVL52:
+ 610              	.LFB412:
+ 171:../Core/Src/w25q.c **** 
+ 172:../Core/Src/w25q.c **** __attribute__((weak)) enum w25q_err
+ 173:../Core/Src/w25q.c **** w25q_erase_chip(struct w25q_device *device) {
+ 611              		.loc 1 173 45 is_stmt 1 view -0
+ 612              		.cfi_startproc
+ 613              		@ args = 0, pretend = 0, frame = 0
+ 614              		@ frame_needed = 0, uses_anonymous_args = 0
+ 615              		@ link register save eliminated.
+ARM GAS  /tmp/cc0ziooa.s 			page 16
+
+
+ 174:../Core/Src/w25q.c ****   return W25Q_ERR_OK;
+ 616              		.loc 1 174 3 view .LVU136
+ 175:../Core/Src/w25q.c **** }
+ 617              		.loc 1 175 1 is_stmt 0 view .LVU137
+ 618 0000 0020     		movs	r0, #0
+ 619              	.LVL53:
+ 620              		.loc 1 175 1 view .LVU138
+ 621 0002 7047     		bx	lr
+ 622              		.cfi_endproc
+ 623              	.LFE412:
+ 625              		.section	.text.w25q_reset,"ax",%progbits
+ 626              		.align	1
+ 627              		.weak	w25q_reset
+ 628              		.syntax unified
+ 629              		.thumb
+ 630              		.thumb_func
+ 632              	w25q_reset:
+ 633              	.LVL54:
+ 634              	.LFB413:
+ 176:../Core/Src/w25q.c **** 
+ 177:../Core/Src/w25q.c **** __attribute__((weak)) enum w25q_err w25q_reset(struct w25q_device *device) {
+ 635              		.loc 1 177 76 is_stmt 1 view -0
+ 636              		.cfi_startproc
+ 637              		@ args = 0, pretend = 0, frame = 0
+ 638              		@ frame_needed = 0, uses_anonymous_args = 0
+ 639              		@ link register save eliminated.
+ 178:../Core/Src/w25q.c ****   return W25Q_ERR_OK;
+ 640              		.loc 1 178 3 view .LVU140
+ 179:../Core/Src/w25q.c **** }...
+ 641              		.loc 1 179 1 is_stmt 0 view .LVU141
+ 642 0000 0020     		movs	r0, #0
+ 643              	.LVL55:
+ 644              		.loc 1 179 1 view .LVU142
+ 645 0002 7047     		bx	lr
+ 646              		.cfi_endproc
+ 647              	.LFE413:
+ 649              		.text
+ 650              	.Letext0:
+ 651              		.file 2 "/nix/store/lcj4nx7xv8c36cif7armkfa7b5cmfh74-gcc-arm-embedded-12.3.rel1/arm-none-eabi/incl
+ 652              		.file 3 "/nix/store/lcj4nx7xv8c36cif7armkfa7b5cmfh74-gcc-arm-embedded-12.3.rel1/arm-none-eabi/incl
+ 653              		.file 4 "../Core/Include/w25q.h"
+ 654              		.file 5 "../Core/Include/adc.h"
+ 655              		.file 6 "Core/Inc/port_config.h"
+ARM GAS  /tmp/cc0ziooa.s 			page 17
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 w25q.c
+     /tmp/cc0ziooa.s:20     .text.w25q_delay:00000000 $t
+     /tmp/cc0ziooa.s:26     .text.w25q_delay:00000000 w25q_delay
+     /tmp/cc0ziooa.s:41     .text.w25q_read_id:00000000 $t
+     /tmp/cc0ziooa.s:47     .text.w25q_read_id:00000000 w25q_read_id
+     /tmp/cc0ziooa.s:65     .text.w25q_write_enable:00000000 $t
+     /tmp/cc0ziooa.s:71     .text.w25q_write_enable:00000000 w25q_write_enable
+     /tmp/cc0ziooa.s:89     .text.w25q_enter_4_byte_mode:00000000 $t
+     /tmp/cc0ziooa.s:95     .text.w25q_enter_4_byte_mode:00000000 w25q_enter_4_byte_mode
+     /tmp/cc0ziooa.s:113    .text.w25q_read_status_reg:00000000 $t
+     /tmp/cc0ziooa.s:119    .text.w25q_read_status_reg:00000000 w25q_read_status_reg
+     /tmp/cc0ziooa.s:137    .text.w25q_update_status_struct:00000000 $t
+     /tmp/cc0ziooa.s:143    .text.w25q_update_status_struct:00000000 w25q_update_status_struct
+     /tmp/cc0ziooa.s:219    .text.w25q_is_busy:00000000 $t
+     /tmp/cc0ziooa.s:225    .text.w25q_is_busy:00000000 w25q_is_busy
+     /tmp/cc0ziooa.s:281    .text.w25q_write_status_reg:00000000 $t
+     /tmp/cc0ziooa.s:287    .text.w25q_write_status_reg:00000000 w25q_write_status_reg
+     /tmp/cc0ziooa.s:305    .text.w25q_init:00000000 $t
+     /tmp/cc0ziooa.s:311    .text.w25q_init:00000000 w25q_init
+     /tmp/cc0ziooa.s:432    .text.w25q_read_raw:00000000 $t
+     /tmp/cc0ziooa.s:438    .text.w25q_read_raw:00000000 w25q_read_raw
+     /tmp/cc0ziooa.s:456    .text.w25q_read_data:00000000 $t
+     /tmp/cc0ziooa.s:462    .text.w25q_read_data:00000000 w25q_read_data
+     /tmp/cc0ziooa.s:530    .text.w25q_write_raw:00000000 $t
+     /tmp/cc0ziooa.s:536    .text.w25q_write_raw:00000000 w25q_write_raw
+     /tmp/cc0ziooa.s:554    .text.w25q_erase_sector:00000000 $t
+     /tmp/cc0ziooa.s:560    .text.w25q_erase_sector:00000000 w25q_erase_sector
+     /tmp/cc0ziooa.s:578    .text.w25q_erase_block:00000000 $t
+     /tmp/cc0ziooa.s:584    .text.w25q_erase_block:00000000 w25q_erase_block
+     /tmp/cc0ziooa.s:602    .text.w25q_erase_chip:00000000 $t
+     /tmp/cc0ziooa.s:608    .text.w25q_erase_chip:00000000 w25q_erase_chip
+     /tmp/cc0ziooa.s:626    .text.w25q_reset:00000000 $t
+     /tmp/cc0ziooa.s:632    .text.w25q_reset:00000000 w25q_reset
+
+NO UNDEFINED SYMBOLS

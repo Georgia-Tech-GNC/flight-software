@@ -1,0 +1,4040 @@
+ARM GAS  /tmp/cc9wWjjg.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"controls.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.global	__aeabi_f2d
+  18              		.global	__aeabi_d2iz
+  19              		.global	__aeabi_d2f
+  20              		.section	.text.LQR_gain_selector,"ax",%progbits
+  21              		.align	1
+  22              		.global	LQR_gain_selector
+  23              		.arch armv7e-m
+  24              		.syntax unified
+  25              		.thumb
+  26              		.thumb_func
+  27              		.fpu fpv4-sp-d16
+  29              	LQR_gain_selector:
+  30              	.LVL0:
+  31              	.LFB142:
+  32              		.file 1 "../Core/Src/controls.c"
+   1:../Core/Src/controls.c **** /**
+   2:../Core/Src/controls.c ****  * @file controls.c
+   3:../Core/Src/controls.c ****  * @author Patrick Barry, Karsten Caillet
+   4:../Core/Src/controls.c ****  * @brief Source file for in-flight control algorithm of the jet vanes rocket
+   5:../Core/Src/controls.c ****  *  
+   6:../Core/Src/controls.c ****  * Copyright 2024 Georgia Tech. All rights reserved.
+   7:../Core/Src/controls.c ****  * Copyrighted materials may not be further disseminated.
+   8:../Core/Src/controls.c ****  * This file must not be made publicly available anywhere.
+   9:../Core/Src/controls.c **** */
+  10:../Core/Src/controls.c **** 
+  11:../Core/Src/controls.c **** #include "controls.h"
+  12:../Core/Src/controls.c **** #include "reference_data.h"
+  13:../Core/Src/controls.c **** #include <math.h>
+  14:../Core/Src/controls.c **** #include <stdio.h>
+  15:../Core/Src/controls.c **** 
+  16:../Core/Src/controls.c **** /**
+  17:../Core/Src/controls.c ****  * @brief Takes into account current state estimate and time since launch and returns closest match
+  18:../Core/Src/controls.c ****  * @param ctrl Takes controller struct, but uses current state and time
+  19:../Core/Src/controls.c ****  * @return closest matching LQR gain
+  20:../Core/Src/controls.c ****  * @note
+  21:../Core/Src/controls.c **** */
+  22:../Core/Src/controls.c **** void LQR_gain_selector(controller *ctrl){
+  33              		.loc 1 22 41 view -0
+  34              		.cfi_startproc
+  35              		@ args = 0, pretend = 0, frame = 0
+  36              		@ frame_needed = 0, uses_anonymous_args = 0
+ARM GAS  /tmp/cc9wWjjg.s 			page 2
+
+
+  37              		.loc 1 22 41 is_stmt 0 view .LVU1
+  38 0000 10B5     		push	{r4, lr}
+  39              	.LCFI0:
+  40              		.cfi_def_cfa_offset 8
+  41              		.cfi_offset 4, -8
+  42              		.cfi_offset 14, -4
+  43 0002 2DED028B 		vpush.64	{d8}
+  44              	.LCFI1:
+  45              		.cfi_def_cfa_offset 16
+  46              		.cfi_offset 80, -16
+  47              		.cfi_offset 81, -12
+  48 0006 0446     		mov	r4, r0
+  23:../Core/Src/controls.c ****     int t = (int)round(ctrl->time_since_launch);
+  49              		.loc 1 23 5 is_stmt 1 view .LVU2
+  50              		.loc 1 23 18 is_stmt 0 view .LVU3
+  51 0008 0068     		ldr	r0, [r0]	@ float
+  52              	.LVL1:
+  53              		.loc 1 23 18 view .LVU4
+  54 000a FFF7FEFF 		bl	__aeabi_f2d
+  55              	.LVL2:
+  56 000e 41EC100B 		vmov	d0, r0, r1
+  57 0012 FFF7FEFF 		bl	round
+  58              	.LVL3:
+  59 0016 51EC100B 		vmov	r0, r1, d0
+  60              		.loc 1 23 9 view .LVU5
+  61 001a FFF7FEFF 		bl	__aeabi_d2iz
+  62              	.LVL4:
+  63 001e 08EE100A 		vmov	s16, r0	@ int
+  64              	.LVL5:
+  24:../Core/Src/controls.c ****     float q3 = ctrl->x[8];
+  65              		.loc 1 24 5 is_stmt 1 view .LVU6
+  66              		.loc 1 24 11 is_stmt 0 view .LVU7
+  67 0022 D4ED098A 		vldr.32	s17, [r4, #36]
+  68              	.LVL6:
+  25:../Core/Src/controls.c ****     float airspeed = sqrt(ctrl->x[0] * ctrl->x[0] + ctrl->x[1] * ctrl->x[1] + ctrl->x[2] * ctrl->x[
+  69              		.loc 1 25 5 is_stmt 1 view .LVU8
+  70              		.loc 1 25 34 is_stmt 0 view .LVU9
+  71 0026 D4ED017A 		vldr.32	s15, [r4, #4]
+  72              		.loc 1 25 38 view .LVU10
+  73 002a 67EEA77A 		vmul.f32	s15, s15, s15
+  74              		.loc 1 25 60 view .LVU11
+  75 002e 94ED027A 		vldr.32	s14, [r4, #8]
+  76              		.loc 1 25 64 view .LVU12
+  77 0032 27EE077A 		vmul.f32	s14, s14, s14
+  78              		.loc 1 25 51 view .LVU13
+  79 0036 77EE877A 		vadd.f32	s15, s15, s14
+  80              		.loc 1 25 86 view .LVU14
+  81 003a 94ED037A 		vldr.32	s14, [r4, #12]
+  82              		.loc 1 25 90 view .LVU15
+  83 003e 27EE077A 		vmul.f32	s14, s14, s14
+  84              		.loc 1 25 22 view .LVU16
+  85 0042 77EE877A 		vadd.f32	s15, s15, s14
+  86 0046 17EE900A 		vmov	r0, s15
+  87              	.LVL7:
+  88              		.loc 1 25 22 view .LVU17
+  89 004a FFF7FEFF 		bl	__aeabi_f2d
+  90              	.LVL8:
+ARM GAS  /tmp/cc9wWjjg.s 			page 3
+
+
+  91 004e 41EC100B 		vmov	d0, r0, r1
+  92 0052 FFF7FEFF 		bl	sqrt
+  93              	.LVL9:
+  94 0056 51EC100B 		vmov	r0, r1, d0
+  95              		.loc 1 25 11 view .LVU18
+  96 005a FFF7FEFF 		bl	__aeabi_d2f
+  97              	.LVL10:
+  26:../Core/Src/controls.c ****     float min_distance = 1e9;
+  98              		.loc 1 26 5 is_stmt 1 view .LVU19
+  27:../Core/Src/controls.c ****     float distance = 0.0;
+  99              		.loc 1 27 5 view .LVU20
+  28:../Core/Src/controls.c ****     int best_index = -1;
+ 100              		.loc 1 28 5 view .LVU21
+  29:../Core/Src/controls.c **** 
+  30:../Core/Src/controls.c ****     if (t < 1 || t > 12) {
+ 101              		.loc 1 30 5 view .LVU22
+ 102              		.loc 1 30 15 is_stmt 0 view .LVU23
+ 103 005e 18EE103A 		vmov	r3, s16	@ int
+ 104 0062 013B     		subs	r3, r3, #1
+ 105              		.loc 1 30 8 view .LVU24
+ 106 0064 0B2B     		cmp	r3, #11
+ 107 0066 11D8     		bhi	.L13
+ 108 0068 06EE900A 		vmov	s13, r0
+ 109              	.LBB2:
+  31:../Core/Src/controls.c ****         for (int i = 0; i < 36; i++) {
+  32:../Core/Src/controls.c ****             ctrl->K[i] = 0.0;
+  33:../Core/Src/controls.c ****         }
+  34:../Core/Src/controls.c ****     } else {
+  35:../Core/Src/controls.c ****         for (int i = 0; i < num_lqr_entries; i++) {
+ 110              		.loc 1 35 18 view .LVU25
+ 111 006c 0023     		movs	r3, #0
+ 112              	.LBE2:
+  28:../Core/Src/controls.c **** 
+ 113              		.loc 1 28 9 view .LVU26
+ 114 006e 4FF0FF30 		mov	r0, #-1
+ 115              	.LVL11:
+  26:../Core/Src/controls.c ****     float distance = 0.0;
+ 116              		.loc 1 26 11 view .LVU27
+ 117 0072 9FED2D6A 		vldr.32	s12, .L21
+ 118 0076 13E0     		b	.L3
+ 119              	.LVL12:
+ 120              	.L4:
+ 121              	.LBB3:
+  32:../Core/Src/controls.c ****         }
+ 122              		.loc 1 32 13 is_stmt 1 discriminator 3 view .LVU28
+  32:../Core/Src/controls.c ****         }
+ 123              		.loc 1 32 24 is_stmt 0 discriminator 3 view .LVU29
+ 124 0078 03F11202 		add	r2, r3, #18
+ 125 007c 04EB8202 		add	r2, r4, r2, lsl #2
+ 126 0080 0021     		movs	r1, #0
+ 127 0082 5160     		str	r1, [r2, #4]	@ float
+  31:../Core/Src/controls.c ****             ctrl->K[i] = 0.0;
+ 128              		.loc 1 31 33 is_stmt 1 discriminator 3 view .LVU30
+  31:../Core/Src/controls.c ****             ctrl->K[i] = 0.0;
+ 129              		.loc 1 31 34 is_stmt 0 discriminator 3 view .LVU31
+ 130 0084 0133     		adds	r3, r3, #1
+ 131              	.LVL13:
+ARM GAS  /tmp/cc9wWjjg.s 			page 4
+
+
+ 132              	.L2:
+  31:../Core/Src/controls.c ****             ctrl->K[i] = 0.0;
+ 133              		.loc 1 31 25 is_stmt 1 discriminator 1 view .LVU32
+  31:../Core/Src/controls.c ****             ctrl->K[i] = 0.0;
+ 134              		.loc 1 31 9 is_stmt 0 discriminator 1 view .LVU33
+ 135 0086 232B     		cmp	r3, #35
+ 136 0088 F6DD     		ble	.L4
+ 137 008a 48E0     		b	.L1
+ 138              	.LVL14:
+ 139              	.L13:
+  31:../Core/Src/controls.c ****             ctrl->K[i] = 0.0;
+ 140              		.loc 1 31 18 view .LVU34
+ 141 008c 0023     		movs	r3, #0
+ 142 008e FAE7     		b	.L2
+ 143              	.LVL15:
+ 144              	.L20:
+  31:../Core/Src/controls.c ****             ctrl->K[i] = 0.0;
+ 145              		.loc 1 31 18 view .LVU35
+ 146              	.LBE3:
+ 147              	.LBB4:
+  36:../Core/Src/controls.c ****             if (t == lqr_data[i].time) {
+  37:../Core/Src/controls.c ****                 if (best_index == -1) {
+  38:../Core/Src/controls.c ****                     best_index = i;
+ 148              		.loc 1 38 32 view .LVU36
+ 149 0090 1846     		mov	r0, r3
+ 150              	.LVL16:
+ 151              		.loc 1 38 32 view .LVU37
+ 152 0092 17E0     		b	.L7
+ 153              	.LVL17:
+ 154              	.L6:
+  39:../Core/Src/controls.c ****                 }
+  40:../Core/Src/controls.c ****                 distance = fabs(airspeed - lqr_data[i].state[0]) + fabs(q3 - lqr_data[i].state[1]);
+  41:../Core/Src/controls.c ****                 if (distance < min_distance) {
+  42:../Core/Src/controls.c ****                     min_distance = distance;
+  43:../Core/Src/controls.c ****                     best_index = i;
+  44:../Core/Src/controls.c ****                 }
+  45:../Core/Src/controls.c ****             } else if (lqr_data[i].time > t) {
+ 155              		.loc 1 45 20 is_stmt 1 view .LVU38
+ 156              		.loc 1 45 23 is_stmt 0 view .LVU39
+ 157 0094 B4EEE77A 		vcmpe.f32	s14, s15
+ 158 0098 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 159 009c 42D4     		bmi	.L18
+ 160              	.LVL18:
+ 161              	.L8:
+  35:../Core/Src/controls.c ****             if (t == lqr_data[i].time) {
+ 162              		.loc 1 35 46 is_stmt 1 discriminator 2 view .LVU40
+  35:../Core/Src/controls.c ****             if (t == lqr_data[i].time) {
+ 163              		.loc 1 35 47 is_stmt 0 discriminator 2 view .LVU41
+ 164 009e 0133     		adds	r3, r3, #1
+ 165              	.LVL19:
+ 166              	.L3:
+  35:../Core/Src/controls.c ****             if (t == lqr_data[i].time) {
+ 167              		.loc 1 35 25 is_stmt 1 discriminator 1 view .LVU42
+  35:../Core/Src/controls.c ****             if (t == lqr_data[i].time) {
+ 168              		.loc 1 35 9 is_stmt 0 discriminator 1 view .LVU43
+ 169 00a0 292B     		cmp	r3, #41
+ 170 00a2 2ADC     		bgt	.L19
+ARM GAS  /tmp/cc9wWjjg.s 			page 5
+
+
+  36:../Core/Src/controls.c ****             if (t == lqr_data[i].time) {
+ 171              		.loc 1 36 13 is_stmt 1 view .LVU44
+  36:../Core/Src/controls.c ****             if (t == lqr_data[i].time) {
+ 172              		.loc 1 36 19 is_stmt 0 view .LVU45
+ 173 00a4 B8EEC87A 		vcvt.f32.s32	s14, s16
+  36:../Core/Src/controls.c ****             if (t == lqr_data[i].time) {
+ 174              		.loc 1 36 33 view .LVU46
+ 175 00a8 204A     		ldr	r2, .L21+4
+ 176 00aa B821     		movs	r1, #184
+ 177 00ac 01FB0322 		mla	r2, r1, r3, r2
+ 178 00b0 D2ED007A 		vldr.32	s15, [r2]
+  36:../Core/Src/controls.c ****             if (t == lqr_data[i].time) {
+ 179              		.loc 1 36 16 view .LVU47
+ 180 00b4 B4EE677A 		vcmp.f32	s14, s15
+ 181 00b8 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 182 00bc EAD1     		bne	.L6
+  37:../Core/Src/controls.c ****                     best_index = i;
+ 183              		.loc 1 37 17 is_stmt 1 view .LVU48
+  37:../Core/Src/controls.c ****                     best_index = i;
+ 184              		.loc 1 37 20 is_stmt 0 view .LVU49
+ 185 00be B0F1FF3F 		cmp	r0, #-1
+ 186 00c2 E5D0     		beq	.L20
+ 187              	.LVL20:
+ 188              	.L7:
+  40:../Core/Src/controls.c ****                 if (distance < min_distance) {
+ 189              		.loc 1 40 17 is_stmt 1 view .LVU50
+  40:../Core/Src/controls.c ****                 if (distance < min_distance) {
+ 190              		.loc 1 40 61 is_stmt 0 view .LVU51
+ 191 00c4 194A     		ldr	r2, .L21+4
+ 192 00c6 B821     		movs	r1, #184
+ 193 00c8 01FB0322 		mla	r2, r1, r3, r2
+ 194 00cc D2ED017A 		vldr.32	s15, [r2, #4]
+  40:../Core/Src/controls.c ****                 if (distance < min_distance) {
+ 195              		.loc 1 40 42 view .LVU52
+ 196 00d0 76EEE77A 		vsub.f32	s15, s13, s15
+  40:../Core/Src/controls.c ****                 if (distance < min_distance) {
+ 197              		.loc 1 40 28 view .LVU53
+ 198 00d4 F0EEE77A 		vabs.f32	s15, s15
+  40:../Core/Src/controls.c ****                 if (distance < min_distance) {
+ 199              		.loc 1 40 95 view .LVU54
+ 200 00d8 92ED027A 		vldr.32	s14, [r2, #8]
+  40:../Core/Src/controls.c ****                 if (distance < min_distance) {
+ 201              		.loc 1 40 76 view .LVU55
+ 202 00dc 38EEC77A 		vsub.f32	s14, s17, s14
+  40:../Core/Src/controls.c ****                 if (distance < min_distance) {
+ 203              		.loc 1 40 68 view .LVU56
+ 204 00e0 B0EEC77A 		vabs.f32	s14, s14
+  40:../Core/Src/controls.c ****                 if (distance < min_distance) {
+ 205              		.loc 1 40 26 view .LVU57
+ 206 00e4 77EE877A 		vadd.f32	s15, s15, s14
+ 207              	.LVL21:
+  41:../Core/Src/controls.c ****                     min_distance = distance;
+ 208              		.loc 1 41 17 is_stmt 1 view .LVU58
+  41:../Core/Src/controls.c ****                     min_distance = distance;
+ 209              		.loc 1 41 20 is_stmt 0 view .LVU59
+ 210 00e8 B4EEE76A 		vcmpe.f32	s12, s15
+ 211 00ec F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ARM GAS  /tmp/cc9wWjjg.s 			page 6
+
+
+ 212 00f0 D5DD     		ble	.L8
+  43:../Core/Src/controls.c ****                 }
+ 213              		.loc 1 43 32 view .LVU60
+ 214 00f2 1846     		mov	r0, r3
+ 215              	.LVL22:
+  42:../Core/Src/controls.c ****                     best_index = i;
+ 216              		.loc 1 42 34 view .LVU61
+ 217 00f4 B0EE676A 		vmov.f32	s12, s15
+ 218              	.LVL23:
+  42:../Core/Src/controls.c ****                     best_index = i;
+ 219              		.loc 1 42 34 view .LVU62
+ 220 00f8 D1E7     		b	.L8
+ 221              	.LVL24:
+ 222              	.L19:
+  42:../Core/Src/controls.c ****                     best_index = i;
+ 223              		.loc 1 42 34 view .LVU63
+ 224 00fa 0022     		movs	r2, #0
+ 225 00fc 0DE0     		b	.L11
+ 226              	.LVL25:
+ 227              	.L12:
+  42:../Core/Src/controls.c ****                     best_index = i;
+ 228              		.loc 1 42 34 view .LVU64
+ 229              	.LBE4:
+ 230              	.LBB5:
+  46:../Core/Src/controls.c ****                 break;
+  47:../Core/Src/controls.c ****             }  
+  48:../Core/Src/controls.c ****         }
+  49:../Core/Src/controls.c ****         for (int i = 0; i < 36; i++) {
+  50:../Core/Src/controls.c ****             ctrl->K[i] = lqr_data[best_index].gains[i];
+ 231              		.loc 1 50 13 is_stmt 1 discriminator 3 view .LVU65
+ 232              		.loc 1 50 52 is_stmt 0 discriminator 3 view .LVU66
+ 233 00fe 2E23     		movs	r3, #46
+ 234 0100 03FB0023 		mla	r3, r3, r0, r2
+ 235 0104 0A33     		adds	r3, r3, #10
+ 236 0106 0949     		ldr	r1, .L21+4
+ 237 0108 01EB8303 		add	r3, r1, r3, lsl #2
+ 238 010c 1968     		ldr	r1, [r3]	@ float
+ 239              		.loc 1 50 24 discriminator 3 view .LVU67
+ 240 010e 02F11203 		add	r3, r2, #18
+ 241 0112 04EB8303 		add	r3, r4, r3, lsl #2
+ 242 0116 5960     		str	r1, [r3, #4]	@ float
+  49:../Core/Src/controls.c ****             ctrl->K[i] = lqr_data[best_index].gains[i];
+ 243              		.loc 1 49 33 is_stmt 1 discriminator 3 view .LVU68
+  49:../Core/Src/controls.c ****             ctrl->K[i] = lqr_data[best_index].gains[i];
+ 244              		.loc 1 49 34 is_stmt 0 discriminator 3 view .LVU69
+ 245 0118 0132     		adds	r2, r2, #1
+ 246              	.LVL26:
+ 247              	.L11:
+  49:../Core/Src/controls.c ****             ctrl->K[i] = lqr_data[best_index].gains[i];
+ 248              		.loc 1 49 25 is_stmt 1 discriminator 1 view .LVU70
+  49:../Core/Src/controls.c ****             ctrl->K[i] = lqr_data[best_index].gains[i];
+ 249              		.loc 1 49 9 is_stmt 0 discriminator 1 view .LVU71
+ 250 011a 232A     		cmp	r2, #35
+ 251 011c EFDD     		ble	.L12
+ 252              	.LVL27:
+ 253              	.L1:
+  49:../Core/Src/controls.c ****             ctrl->K[i] = lqr_data[best_index].gains[i];
+ARM GAS  /tmp/cc9wWjjg.s 			page 7
+
+
+ 254              		.loc 1 49 9 discriminator 1 view .LVU72
+ 255              	.LBE5:
+  51:../Core/Src/controls.c ****         }
+  52:../Core/Src/controls.c ****     }
+  53:../Core/Src/controls.c **** }
+ 256              		.loc 1 53 1 view .LVU73
+ 257 011e BDEC028B 		vldm	sp!, {d8}
+ 258              	.LCFI2:
+ 259              		.cfi_remember_state
+ 260              		.cfi_restore 80
+ 261              		.cfi_restore 81
+ 262              		.cfi_def_cfa_offset 8
+ 263              	.LVL28:
+ 264              		.loc 1 53 1 view .LVU74
+ 265 0122 10BD     		pop	{r4, pc}
+ 266              	.LVL29:
+ 267              	.L18:
+ 268              	.LCFI3:
+ 269              		.cfi_restore_state
+ 270              	.LBB6:
+ 271              		.loc 1 53 1 view .LVU75
+ 272 0124 0022     		movs	r2, #0
+ 273 0126 F8E7     		b	.L11
+ 274              	.L22:
+ 275              		.align	2
+ 276              	.L21:
+ 277 0128 286B6E4E 		.word	1315859240
+ 278 012c 00000000 		.word	lqr_data
+ 279              	.LBE6:
+ 280              		.cfi_endproc
+ 281              	.LFE142:
+ 283              		.section	.text.reference_selector,"ax",%progbits
+ 284              		.align	1
+ 285              		.global	reference_selector
+ 286              		.syntax unified
+ 287              		.thumb
+ 288              		.thumb_func
+ 289              		.fpu fpv4-sp-d16
+ 291              	reference_selector:
+ 292              	.LVL30:
+ 293              	.LFB143:
+  54:../Core/Src/controls.c **** 
+  55:../Core/Src/controls.c **** /**
+  56:../Core/Src/controls.c ****  * @brief Takes in account current state estiate and time since launch and returns reference state
+  57:../Core/Src/controls.c ****  * @param ctrl Takes controller struct, but uses current state and time
+  58:../Core/Src/controls.c ****  * @return correct reference state
+  59:../Core/Src/controls.c ****  * @note
+  60:../Core/Src/controls.c **** */
+  61:../Core/Src/controls.c **** void reference_selector(controller *ctrl){
+ 294              		.loc 1 61 42 is_stmt 1 view -0
+ 295              		.cfi_startproc
+ 296              		@ args = 0, pretend = 0, frame = 40
+ 297              		@ frame_needed = 0, uses_anonymous_args = 0
+ 298              		.loc 1 61 42 is_stmt 0 view .LVU77
+ 299 0000 30B5     		push	{r4, r5, lr}
+ 300              	.LCFI4:
+ 301              		.cfi_def_cfa_offset 12
+ARM GAS  /tmp/cc9wWjjg.s 			page 8
+
+
+ 302              		.cfi_offset 4, -12
+ 303              		.cfi_offset 5, -8
+ 304              		.cfi_offset 14, -4
+ 305 0002 8BB0     		sub	sp, sp, #44
+ 306              	.LCFI5:
+ 307              		.cfi_def_cfa_offset 56
+ 308 0004 0446     		mov	r4, r0
+  62:../Core/Src/controls.c ****     int t = (int)round(ctrl->time_since_launch);
+ 309              		.loc 1 62 5 is_stmt 1 view .LVU78
+ 310              		.loc 1 62 18 is_stmt 0 view .LVU79
+ 311 0006 0068     		ldr	r0, [r0]	@ float
+ 312              	.LVL31:
+ 313              		.loc 1 62 18 view .LVU80
+ 314 0008 FFF7FEFF 		bl	__aeabi_f2d
+ 315              	.LVL32:
+ 316 000c 41EC100B 		vmov	d0, r0, r1
+ 317 0010 FFF7FEFF 		bl	round
+ 318              	.LVL33:
+ 319 0014 51EC100B 		vmov	r0, r1, d0
+ 320              		.loc 1 62 9 view .LVU81
+ 321 0018 FFF7FEFF 		bl	__aeabi_d2iz
+ 322              	.LVL34:
+ 323 001c 0546     		mov	r5, r0
+ 324              	.LVL35:
+  63:../Core/Src/controls.c ****     float base_x0[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+ 325              		.loc 1 63 5 is_stmt 1 view .LVU82
+ 326              		.loc 1 63 11 is_stmt 0 view .LVU83
+ 327 001e 2422     		movs	r2, #36
+ 328 0020 0021     		movs	r1, #0
+ 329 0022 01A8     		add	r0, sp, #4
+ 330              	.LVL36:
+ 331              		.loc 1 63 11 view .LVU84
+ 332 0024 FFF7FEFF 		bl	memset
+ 333              	.LVL37:
+  64:../Core/Src/controls.c **** 
+  65:../Core/Src/controls.c ****     if (t > 13) {
+ 334              		.loc 1 65 5 is_stmt 1 view .LVU85
+ 335              		.loc 1 65 8 is_stmt 0 view .LVU86
+ 336 0028 0D2D     		cmp	r5, #13
+ 337 002a 0CDC     		bgt	.L29
+ 338              	.LBB7:
+  66:../Core/Src/controls.c ****         for (int i = 0; i < 9; i++) {
+  67:../Core/Src/controls.c ****             ctrl->x0[i] = base_x0[i];
+  68:../Core/Src/controls.c ****         }
+  69:../Core/Src/controls.c ****     } else {
+  70:../Core/Src/controls.c ****         for (int i = 0; i < 9; i++) {
+ 339              		.loc 1 70 18 view .LVU87
+ 340 002c 0022     		movs	r2, #0
+ 341 002e 1BE0     		b	.L25
+ 342              	.LVL38:
+ 343              	.L26:
+ 344              		.loc 1 70 18 view .LVU88
+ 345              	.LBE7:
+ 346              	.LBB8:
+  67:../Core/Src/controls.c ****         }
+ 347              		.loc 1 67 13 is_stmt 1 discriminator 3 view .LVU89
+  67:../Core/Src/controls.c ****         }
+ARM GAS  /tmp/cc9wWjjg.s 			page 9
+
+
+ 348              		.loc 1 67 25 is_stmt 0 discriminator 3 view .LVU90
+ 349 0030 03F10A02 		add	r2, r3, #10
+ 350 0034 04EB8202 		add	r2, r4, r2, lsl #2
+ 351 0038 0021     		movs	r1, #0
+ 352 003a 1160     		str	r1, [r2]	@ float
+  66:../Core/Src/controls.c ****         for (int i = 0; i < 9; i++) {
+ 353              		.loc 1 66 32 is_stmt 1 discriminator 3 view .LVU91
+  66:../Core/Src/controls.c ****         for (int i = 0; i < 9; i++) {
+ 354              		.loc 1 66 33 is_stmt 0 discriminator 3 view .LVU92
+ 355 003c 0133     		adds	r3, r3, #1
+ 356              	.LVL39:
+ 357              	.L24:
+  66:../Core/Src/controls.c ****         for (int i = 0; i < 9; i++) {
+ 358              		.loc 1 66 25 is_stmt 1 discriminator 1 view .LVU93
+  66:../Core/Src/controls.c ****         for (int i = 0; i < 9; i++) {
+ 359              		.loc 1 66 9 is_stmt 0 discriminator 1 view .LVU94
+ 360 003e 082B     		cmp	r3, #8
+ 361 0040 F6DD     		ble	.L26
+ 362              	.LVL40:
+ 363              	.L23:
+  66:../Core/Src/controls.c ****         for (int i = 0; i < 9; i++) {
+ 364              		.loc 1 66 9 discriminator 1 view .LVU95
+ 365              	.LBE8:
+  71:../Core/Src/controls.c ****             ctrl->x0[i] = ref_state_data[t].state[i]; // time corresponds 1:1 to index
+  72:../Core/Src/controls.c ****         }
+  73:../Core/Src/controls.c ****     } 
+  74:../Core/Src/controls.c **** }
+ 366              		.loc 1 74 1 view .LVU96
+ 367 0042 0BB0     		add	sp, sp, #44
+ 368              	.LCFI6:
+ 369              		.cfi_remember_state
+ 370              		.cfi_def_cfa_offset 12
+ 371              		@ sp needed
+ 372 0044 30BD     		pop	{r4, r5, pc}
+ 373              	.LVL41:
+ 374              	.L29:
+ 375              	.LCFI7:
+ 376              		.cfi_restore_state
+ 377              	.LBB9:
+  66:../Core/Src/controls.c ****             ctrl->x0[i] = base_x0[i];
+ 378              		.loc 1 66 18 view .LVU97
+ 379 0046 0023     		movs	r3, #0
+ 380 0048 F9E7     		b	.L24
+ 381              	.LVL42:
+ 382              	.L28:
+  66:../Core/Src/controls.c ****             ctrl->x0[i] = base_x0[i];
+ 383              		.loc 1 66 18 view .LVU98
+ 384              	.LBE9:
+ 385              	.LBB10:
+  71:../Core/Src/controls.c ****             ctrl->x0[i] = ref_state_data[t].state[i]; // time corresponds 1:1 to index
+ 386              		.loc 1 71 13 is_stmt 1 discriminator 3 view .LVU99
+  71:../Core/Src/controls.c ****             ctrl->x0[i] = ref_state_data[t].state[i]; // time corresponds 1:1 to index
+ 387              		.loc 1 71 50 is_stmt 0 discriminator 3 view .LVU100
+ 388 004a 05EB8503 		add	r3, r5, r5, lsl #2
+ 389 004e 05EB4303 		add	r3, r5, r3, lsl #1
+ 390 0052 1344     		add	r3, r3, r2
+ 391 0054 0649     		ldr	r1, .L31
+ARM GAS  /tmp/cc9wWjjg.s 			page 10
+
+
+ 392 0056 01EB8303 		add	r3, r1, r3, lsl #2
+ 393 005a 5968     		ldr	r1, [r3, #4]	@ float
+  71:../Core/Src/controls.c ****             ctrl->x0[i] = ref_state_data[t].state[i]; // time corresponds 1:1 to index
+ 394              		.loc 1 71 25 discriminator 3 view .LVU101
+ 395 005c 02F10A03 		add	r3, r2, #10
+ 396 0060 04EB8303 		add	r3, r4, r3, lsl #2
+ 397 0064 1960     		str	r1, [r3]	@ float
+  70:../Core/Src/controls.c ****             ctrl->x0[i] = ref_state_data[t].state[i]; // time corresponds 1:1 to index
+ 398              		.loc 1 70 32 is_stmt 1 discriminator 3 view .LVU102
+  70:../Core/Src/controls.c ****             ctrl->x0[i] = ref_state_data[t].state[i]; // time corresponds 1:1 to index
+ 399              		.loc 1 70 33 is_stmt 0 discriminator 3 view .LVU103
+ 400 0066 0132     		adds	r2, r2, #1
+ 401              	.LVL43:
+ 402              	.L25:
+  70:../Core/Src/controls.c ****             ctrl->x0[i] = ref_state_data[t].state[i]; // time corresponds 1:1 to index
+ 403              		.loc 1 70 25 is_stmt 1 discriminator 1 view .LVU104
+  70:../Core/Src/controls.c ****             ctrl->x0[i] = ref_state_data[t].state[i]; // time corresponds 1:1 to index
+ 404              		.loc 1 70 9 is_stmt 0 discriminator 1 view .LVU105
+ 405 0068 082A     		cmp	r2, #8
+ 406 006a EEDD     		ble	.L28
+ 407 006c E9E7     		b	.L23
+ 408              	.L32:
+ 409 006e 00BF     		.align	2
+ 410              	.L31:
+ 411 0070 00000000 		.word	.LANCHOR0
+ 412              	.LBE10:
+ 413              		.cfi_endproc
+ 414              	.LFE143:
+ 416              		.section	.text.initialize_controls,"ax",%progbits
+ 417              		.align	1
+ 418              		.global	initialize_controls
+ 419              		.syntax unified
+ 420              		.thumb
+ 421              		.thumb_func
+ 422              		.fpu fpv4-sp-d16
+ 424              	initialize_controls:
+ 425              	.LVL44:
+ 426              	.LFB144:
+  75:../Core/Src/controls.c **** 
+  76:../Core/Src/controls.c **** /**
+  77:../Core/Src/controls.c ****  * @brief Initializes the control struct with all default values
+  78:../Core/Src/controls.c ****  * @param ctrl Takes controller struct, but uses all variables in the struct
+  79:../Core/Src/controls.c ****  * @return Initializes all variables in the controller struct
+  80:../Core/Src/controls.c ****  * @note 
+  81:../Core/Src/controls.c **** */
+  82:../Core/Src/controls.c **** void initialize_controls(controller *ctrl) {
+ 427              		.loc 1 82 44 is_stmt 1 view -0
+ 428              		.cfi_startproc
+ 429              		@ args = 0, pretend = 0, frame = 64
+ 430              		@ frame_needed = 0, uses_anonymous_args = 0
+ 431              		.loc 1 82 44 is_stmt 0 view .LVU107
+ 432 0000 10B5     		push	{r4, lr}
+ 433              	.LCFI8:
+ 434              		.cfi_def_cfa_offset 8
+ 435              		.cfi_offset 4, -8
+ 436              		.cfi_offset 14, -4
+ 437 0002 90B0     		sub	sp, sp, #64
+ARM GAS  /tmp/cc9wWjjg.s 			page 11
+
+
+ 438              	.LCFI9:
+ 439              		.cfi_def_cfa_offset 72
+ 440 0004 8446     		mov	ip, r0
+  83:../Core/Src/controls.c ****     for (int i = 0; i < 9; i++) {
+ 441              		.loc 1 83 5 is_stmt 1 view .LVU108
+ 442              	.LBB11:
+ 443              		.loc 1 83 10 view .LVU109
+ 444              	.LVL45:
+ 445              		.loc 1 83 14 is_stmt 0 view .LVU110
+ 446 0006 0023     		movs	r3, #0
+ 447              		.loc 1 83 5 view .LVU111
+ 448 0008 09E0     		b	.L34
+ 449              	.LVL46:
+ 450              	.L35:
+  84:../Core/Src/controls.c ****         ctrl->x[i] = 0.0;
+ 451              		.loc 1 84 9 is_stmt 1 discriminator 3 view .LVU112
+ 452              		.loc 1 84 20 is_stmt 0 discriminator 3 view .LVU113
+ 453 000a 0CEB8302 		add	r2, ip, r3, lsl #2
+ 454 000e 0021     		movs	r1, #0
+ 455 0010 5160     		str	r1, [r2, #4]	@ float
+  85:../Core/Src/controls.c ****         ctrl->x0[i] = 0.0;
+ 456              		.loc 1 85 9 is_stmt 1 discriminator 3 view .LVU114
+ 457              		.loc 1 85 21 is_stmt 0 discriminator 3 view .LVU115
+ 458 0012 03F10A02 		add	r2, r3, #10
+ 459 0016 0CEB8202 		add	r2, ip, r2, lsl #2
+ 460 001a 1160     		str	r1, [r2]	@ float
+  83:../Core/Src/controls.c ****     for (int i = 0; i < 9; i++) {
+ 461              		.loc 1 83 28 is_stmt 1 discriminator 3 view .LVU116
+  83:../Core/Src/controls.c ****     for (int i = 0; i < 9; i++) {
+ 462              		.loc 1 83 29 is_stmt 0 discriminator 3 view .LVU117
+ 463 001c 0133     		adds	r3, r3, #1
+ 464              	.LVL47:
+ 465              	.L34:
+  83:../Core/Src/controls.c ****     for (int i = 0; i < 9; i++) {
+ 466              		.loc 1 83 21 is_stmt 1 discriminator 1 view .LVU118
+  83:../Core/Src/controls.c ****     for (int i = 0; i < 9; i++) {
+ 467              		.loc 1 83 5 is_stmt 0 discriminator 1 view .LVU119
+ 468 001e 082B     		cmp	r3, #8
+ 469 0020 F3DD     		ble	.L35
+ 470              	.LBE11:
+ 471              	.LBB12:
+  86:../Core/Src/controls.c ****     }
+  87:../Core/Src/controls.c **** 
+  88:../Core/Src/controls.c ****     for (int i = 0; i < 36; i++) {
+ 472              		.loc 1 88 14 view .LVU120
+ 473 0022 0023     		movs	r3, #0
+ 474              	.LVL48:
+ 475              		.loc 1 88 14 view .LVU121
+ 476 0024 06E0     		b	.L36
+ 477              	.LVL49:
+ 478              	.L37:
+  89:../Core/Src/controls.c ****         ctrl->K[i] = 0.0;
+ 479              		.loc 1 89 9 is_stmt 1 discriminator 3 view .LVU122
+ 480              		.loc 1 89 20 is_stmt 0 discriminator 3 view .LVU123
+ 481 0026 03F11202 		add	r2, r3, #18
+ 482 002a 0CEB8202 		add	r2, ip, r2, lsl #2
+ 483 002e 0021     		movs	r1, #0
+ARM GAS  /tmp/cc9wWjjg.s 			page 12
+
+
+ 484 0030 5160     		str	r1, [r2, #4]	@ float
+  88:../Core/Src/controls.c ****         ctrl->K[i] = 0.0;
+ 485              		.loc 1 88 29 is_stmt 1 discriminator 3 view .LVU124
+  88:../Core/Src/controls.c ****         ctrl->K[i] = 0.0;
+ 486              		.loc 1 88 30 is_stmt 0 discriminator 3 view .LVU125
+ 487 0032 0133     		adds	r3, r3, #1
+ 488              	.LVL50:
+ 489              	.L36:
+  88:../Core/Src/controls.c ****         ctrl->K[i] = 0.0;
+ 490              		.loc 1 88 21 is_stmt 1 discriminator 1 view .LVU126
+  88:../Core/Src/controls.c ****         ctrl->K[i] = 0.0;
+ 491              		.loc 1 88 5 is_stmt 0 discriminator 1 view .LVU127
+ 492 0034 232B     		cmp	r3, #35
+ 493 0036 F6DD     		ble	.L37
+ 494              	.LBE12:
+  90:../Core/Src/controls.c ****     }
+  91:../Core/Src/controls.c **** 
+  92:../Core/Src/controls.c ****     ctrl->M_roll = 0.0;
+ 495              		.loc 1 92 5 is_stmt 1 view .LVU128
+ 496              		.loc 1 92 18 is_stmt 0 view .LVU129
+ 497 0038 0023     		movs	r3, #0
+ 498              	.LVL51:
+ 499              		.loc 1 92 18 view .LVU130
+ 500 003a CCF8DC30 		str	r3, [ip, #220]	@ float
+  93:../Core/Src/controls.c ****     ctrl->M_pitch = 0.0;
+ 501              		.loc 1 93 5 is_stmt 1 view .LVU131
+ 502              		.loc 1 93 19 is_stmt 0 view .LVU132
+ 503 003e CCF8E030 		str	r3, [ip, #224]	@ float
+  94:../Core/Src/controls.c ****     ctrl->M_yaw = 0.0;
+ 504              		.loc 1 94 5 is_stmt 1 view .LVU133
+ 505              		.loc 1 94 17 is_stmt 0 view .LVU134
+ 506 0042 CCF8E430 		str	r3, [ip, #228]	@ float
+  95:../Core/Src/controls.c ****     ctrl->T = 0.0;
+ 507              		.loc 1 95 5 is_stmt 1 view .LVU135
+ 508              		.loc 1 95 13 is_stmt 0 view .LVU136
+ 509 0046 CCF8E830 		str	r3, [ip, #232]	@ float
+  96:../Core/Src/controls.c **** 
+  97:../Core/Src/controls.c ****     ctrl->yaw_moment_arm = 0.967;
+ 510              		.loc 1 97 5 is_stmt 1 view .LVU137
+ 511              		.loc 1 97 26 is_stmt 0 view .LVU138
+ 512 004a 204A     		ldr	r2, .L41
+ 513 004c CCF8EC20 		str	r2, [ip, #236]	@ float
+  98:../Core/Src/controls.c ****     ctrl->roll_moment_arm = 0.1;
+ 514              		.loc 1 98 5 is_stmt 1 view .LVU139
+ 515              		.loc 1 98 27 is_stmt 0 view .LVU140
+ 516 0050 1F4A     		ldr	r2, .L41+4
+ 517 0052 CCF8F020 		str	r2, [ip, #240]	@ float
+  99:../Core/Src/controls.c **** 
+ 100:../Core/Src/controls.c ****     ctrl->forces[0] = 0.0;
+ 518              		.loc 1 100 5 is_stmt 1 view .LVU141
+ 519              		.loc 1 100 21 is_stmt 0 view .LVU142
+ 520 0056 CCF8F430 		str	r3, [ip, #244]	@ float
+ 101:../Core/Src/controls.c ****     ctrl->forces[1] = 0.0;
+ 521              		.loc 1 101 5 is_stmt 1 view .LVU143
+ 522              		.loc 1 101 21 is_stmt 0 view .LVU144
+ 523 005a CCF8F830 		str	r3, [ip, #248]	@ float
+ 102:../Core/Src/controls.c **** 
+ARM GAS  /tmp/cc9wWjjg.s 			page 13
+
+
+ 103:../Core/Src/controls.c ****     ctrl->vane_deflections[0] = 0.0;
+ 524              		.loc 1 103 5 is_stmt 1 view .LVU145
+ 525              		.loc 1 103 31 is_stmt 0 view .LVU146
+ 526 005e CCF8FC30 		str	r3, [ip, #252]	@ float
+ 104:../Core/Src/controls.c ****     ctrl->vane_deflections[1] = 0.0;
+ 527              		.loc 1 104 5 is_stmt 1 view .LVU147
+ 528              		.loc 1 104 31 is_stmt 0 view .LVU148
+ 529 0062 CCF80031 		str	r3, [ip, #256]	@ float
+ 105:../Core/Src/controls.c ****     ctrl->vane_deflections[2] = 0.0;
+ 530              		.loc 1 105 5 is_stmt 1 view .LVU149
+ 531              		.loc 1 105 31 is_stmt 0 view .LVU150
+ 532 0066 CCF80431 		str	r3, [ip, #260]	@ float
+ 106:../Core/Src/controls.c ****     ctrl->vane_deflections[3] = 0.0;
+ 533              		.loc 1 106 5 is_stmt 1 view .LVU151
+ 534              		.loc 1 106 31 is_stmt 0 view .LVU152
+ 535 006a CCF80831 		str	r3, [ip, #264]	@ float
+ 107:../Core/Src/controls.c **** 
+ 108:../Core/Src/controls.c ****     ctrl->servo_deflections[0] = 0.0;
+ 536              		.loc 1 108 5 is_stmt 1 view .LVU153
+ 537              		.loc 1 108 32 is_stmt 0 view .LVU154
+ 538 006e CCF80C31 		str	r3, [ip, #268]	@ float
+ 109:../Core/Src/controls.c ****     ctrl->servo_deflections[1] = 0.0;
+ 539              		.loc 1 109 5 is_stmt 1 view .LVU155
+ 540              		.loc 1 109 32 is_stmt 0 view .LVU156
+ 541 0072 CCF81031 		str	r3, [ip, #272]	@ float
+ 110:../Core/Src/controls.c ****     ctrl->servo_deflections[2] = 0.0;
+ 542              		.loc 1 110 5 is_stmt 1 view .LVU157
+ 543              		.loc 1 110 32 is_stmt 0 view .LVU158
+ 544 0076 CCF81431 		str	r3, [ip, #276]	@ float
+ 111:../Core/Src/controls.c ****     ctrl->servo_deflections[3] = 0.0;
+ 545              		.loc 1 111 5 is_stmt 1 view .LVU159
+ 546              		.loc 1 111 32 is_stmt 0 view .LVU160
+ 547 007a CCF81831 		str	r3, [ip, #280]	@ float
+ 112:../Core/Src/controls.c **** 
+ 113:../Core/Src/controls.c ****     ctrl->current_thrust = 0.0;
+ 548              		.loc 1 113 5 is_stmt 1 view .LVU161
+ 549              		.loc 1 113 26 is_stmt 0 view .LVU162
+ 550 007e CCF85831 		str	r3, [ip, #344]	@ float
+ 114:../Core/Src/controls.c **** 
+ 115:../Core/Src/controls.c ****     float32_t thrust_curve[15] = {2125.0, 1650.0, 1530.0, 1520.0, 1490.0, 1350.0, 1285.0, 1150.0, 9
+ 551              		.loc 1 115 5 is_stmt 1 view .LVU163
+ 552              		.loc 1 115 15 is_stmt 0 view .LVU164
+ 553 0082 0DF1040E 		add	lr, sp, #4
+ 554 0086 134C     		ldr	r4, .L41+8
+ 555 0088 0FCC     		ldmia	r4!, {r0, r1, r2, r3}
+ 556              	.LVL52:
+ 557              		.loc 1 115 15 view .LVU165
+ 558 008a AEE80F00 		stmia	lr!, {r0, r1, r2, r3}
+ 559 008e 0FCC     		ldmia	r4!, {r0, r1, r2, r3}
+ 560 0090 AEE80F00 		stmia	lr!, {r0, r1, r2, r3}
+ 561 0094 0FCC     		ldmia	r4!, {r0, r1, r2, r3}
+ 562 0096 AEE80F00 		stmia	lr!, {r0, r1, r2, r3}
+ 563 009a 94E80700 		ldm	r4, {r0, r1, r2}
+ 564 009e 8EE80700 		stm	lr, {r0, r1, r2}
+ 116:../Core/Src/controls.c ****     for (int i = 0; i < 15; i++) {
+ 565              		.loc 1 116 5 is_stmt 1 view .LVU166
+ 566              	.LBB13:
+ARM GAS  /tmp/cc9wWjjg.s 			page 14
+
+
+ 567              		.loc 1 116 10 view .LVU167
+ 568              	.LVL53:
+ 569              		.loc 1 116 14 is_stmt 0 view .LVU168
+ 570 00a2 0023     		movs	r3, #0
+ 571              		.loc 1 116 5 view .LVU169
+ 572 00a4 0AE0     		b	.L38
+ 573              	.LVL54:
+ 574              	.L39:
+ 117:../Core/Src/controls.c ****         ctrl->thrust_curve[i] = thrust_curve[i];
+ 575              		.loc 1 117 9 is_stmt 1 discriminator 3 view .LVU170
+ 576              		.loc 1 117 45 is_stmt 0 discriminator 3 view .LVU171
+ 577 00a6 10AA     		add	r2, sp, #64
+ 578 00a8 02EB8302 		add	r2, r2, r3, lsl #2
+ 579 00ac 52F83C1C 		ldr	r1, [r2, #-60]	@ float
+ 580              		.loc 1 117 31 discriminator 3 view .LVU172
+ 581 00b0 03F14602 		add	r2, r3, #70
+ 582 00b4 0CEB8202 		add	r2, ip, r2, lsl #2
+ 583 00b8 5160     		str	r1, [r2, #4]	@ float
+ 116:../Core/Src/controls.c ****     for (int i = 0; i < 15; i++) {
+ 584              		.loc 1 116 29 is_stmt 1 discriminator 3 view .LVU173
+ 116:../Core/Src/controls.c ****     for (int i = 0; i < 15; i++) {
+ 585              		.loc 1 116 30 is_stmt 0 discriminator 3 view .LVU174
+ 586 00ba 0133     		adds	r3, r3, #1
+ 587              	.LVL55:
+ 588              	.L38:
+ 116:../Core/Src/controls.c ****     for (int i = 0; i < 15; i++) {
+ 589              		.loc 1 116 21 is_stmt 1 discriminator 1 view .LVU175
+ 116:../Core/Src/controls.c ****     for (int i = 0; i < 15; i++) {
+ 590              		.loc 1 116 5 is_stmt 0 discriminator 1 view .LVU176
+ 591 00bc 0E2B     		cmp	r3, #14
+ 592 00be F2DD     		ble	.L39
+ 593              	.LBE13:
+ 118:../Core/Src/controls.c ****     }
+ 119:../Core/Src/controls.c **** 
+ 120:../Core/Src/controls.c ****     ctrl->time_since_launch = 0.0;
+ 594              		.loc 1 120 5 is_stmt 1 view .LVU177
+ 595              		.loc 1 120 29 is_stmt 0 view .LVU178
+ 596 00c0 0023     		movs	r3, #0
+ 597              	.LVL56:
+ 598              		.loc 1 120 29 view .LVU179
+ 599 00c2 CCF80030 		str	r3, [ip]	@ float
+ 121:../Core/Src/controls.c **** }
+ 600              		.loc 1 121 1 view .LVU180
+ 601 00c6 10B0     		add	sp, sp, #64
+ 602              	.LCFI10:
+ 603              		.cfi_def_cfa_offset 8
+ 604              		@ sp needed
+ 605 00c8 10BD     		pop	{r4, pc}
+ 606              	.L42:
+ 607 00ca 00BF     		.align	2
+ 608              	.L41:
+ 609 00cc 508D773F 		.word	1064799568
+ 610 00d0 CDCCCC3D 		.word	1036831949
+ 611 00d4 00000000 		.word	.LANCHOR1
+ 612              		.cfi_endproc
+ 613              	.LFE144:
+ 615              		.section	.text.compute_controls,"ax",%progbits
+ARM GAS  /tmp/cc9wWjjg.s 			page 15
+
+
+ 616              		.align	1
+ 617              		.global	compute_controls
+ 618              		.syntax unified
+ 619              		.thumb
+ 620              		.thumb_func
+ 621              		.fpu fpv4-sp-d16
+ 623              	compute_controls:
+ 624              	.LVL57:
+ 625              	.LFB145:
+ 122:../Core/Src/controls.c **** 
+ 123:../Core/Src/controls.c **** /**
+ 124:../Core/Src/controls.c ****  * @brief Computes the control moments based on the LQR gain matrix and the difference between the 
+ 125:../Core/Src/controls.c ****  * @param ctrl Takes controller struct, but uses LQR gain matrix and current state
+ 126:../Core/Src/controls.c ****  * @return Updates the control moments in the controller struct
+ 127:../Core/Src/controls.c ****  * @note 
+ 128:../Core/Src/controls.c **** */
+ 129:../Core/Src/controls.c **** void compute_controls(controller *ctrl) {
+ 626              		.loc 1 129 41 is_stmt 1 view -0
+ 627              		.cfi_startproc
+ 628              		@ args = 0, pretend = 0, frame = 40
+ 629              		@ frame_needed = 0, uses_anonymous_args = 0
+ 630              		.loc 1 129 41 is_stmt 0 view .LVU182
+ 631 0000 10B5     		push	{r4, lr}
+ 632              	.LCFI11:
+ 633              		.cfi_def_cfa_offset 8
+ 634              		.cfi_offset 4, -8
+ 635              		.cfi_offset 14, -4
+ 636 0002 8AB0     		sub	sp, sp, #40
+ 637              	.LCFI12:
+ 638              		.cfi_def_cfa_offset 48
+ 639 0004 0446     		mov	r4, r0
+ 130:../Core/Src/controls.c ****     float del_x[9] = {0};
+ 640              		.loc 1 130 5 is_stmt 1 view .LVU183
+ 641              		.loc 1 130 11 is_stmt 0 view .LVU184
+ 642 0006 2422     		movs	r2, #36
+ 643 0008 0021     		movs	r1, #0
+ 644 000a 01A8     		add	r0, sp, #4
+ 645              	.LVL58:
+ 646              		.loc 1 130 11 view .LVU185
+ 647 000c FFF7FEFF 		bl	memset
+ 648              	.LVL59:
+ 131:../Core/Src/controls.c ****     float roll = 0.0;
+ 649              		.loc 1 131 5 is_stmt 1 view .LVU186
+ 132:../Core/Src/controls.c ****     float pitch = 0.0;
+ 650              		.loc 1 132 5 view .LVU187
+ 133:../Core/Src/controls.c ****     float yaw = 0.0;
+ 651              		.loc 1 133 5 view .LVU188
+ 134:../Core/Src/controls.c ****     float thrust = 0.0;
+ 652              		.loc 1 134 5 view .LVU189
+ 135:../Core/Src/controls.c **** 
+ 136:../Core/Src/controls.c ****     for (int i = 0; i < 9; i++) {
+ 653              		.loc 1 136 5 view .LVU190
+ 654              	.LBB14:
+ 655              		.loc 1 136 10 view .LVU191
+ 656              		.loc 1 136 14 is_stmt 0 view .LVU192
+ 657 0010 0023     		movs	r3, #0
+ 658              		.loc 1 136 5 view .LVU193
+ARM GAS  /tmp/cc9wWjjg.s 			page 16
+
+
+ 659 0012 11E0     		b	.L44
+ 660              	.LVL60:
+ 661              	.L45:
+ 137:../Core/Src/controls.c ****         del_x[i] = ctrl->x[i] - ctrl->x0[i];
+ 662              		.loc 1 137 9 is_stmt 1 discriminator 3 view .LVU194
+ 663              		.loc 1 137 27 is_stmt 0 discriminator 3 view .LVU195
+ 664 0014 04EB8302 		add	r2, r4, r3, lsl #2
+ 665 0018 D2ED017A 		vldr.32	s15, [r2, #4]
+ 666              		.loc 1 137 41 discriminator 3 view .LVU196
+ 667 001c 03F10A02 		add	r2, r3, #10
+ 668 0020 04EB8202 		add	r2, r4, r2, lsl #2
+ 669 0024 92ED007A 		vldr.32	s14, [r2]
+ 670              		.loc 1 137 31 discriminator 3 view .LVU197
+ 671 0028 77EEC77A 		vsub.f32	s15, s15, s14
+ 672              		.loc 1 137 18 discriminator 3 view .LVU198
+ 673 002c 0AAA     		add	r2, sp, #40
+ 674 002e 02EB8302 		add	r2, r2, r3, lsl #2
+ 675 0032 42ED097A 		vstr.32	s15, [r2, #-36]
+ 136:../Core/Src/controls.c ****         del_x[i] = ctrl->x[i] - ctrl->x0[i];
+ 676              		.loc 1 136 28 is_stmt 1 discriminator 3 view .LVU199
+ 136:../Core/Src/controls.c ****         del_x[i] = ctrl->x[i] - ctrl->x0[i];
+ 677              		.loc 1 136 29 is_stmt 0 discriminator 3 view .LVU200
+ 678 0036 0133     		adds	r3, r3, #1
+ 679              	.LVL61:
+ 680              	.L44:
+ 136:../Core/Src/controls.c ****         del_x[i] = ctrl->x[i] - ctrl->x0[i];
+ 681              		.loc 1 136 21 is_stmt 1 discriminator 1 view .LVU201
+ 136:../Core/Src/controls.c ****         del_x[i] = ctrl->x[i] - ctrl->x0[i];
+ 682              		.loc 1 136 5 is_stmt 0 discriminator 1 view .LVU202
+ 683 0038 082B     		cmp	r3, #8
+ 684 003a EBDD     		ble	.L45
+ 685              	.LBE14:
+ 686              	.LBB15:
+ 138:../Core/Src/controls.c ****     }
+ 139:../Core/Src/controls.c **** 
+ 140:../Core/Src/controls.c ****     for (int j = 0; j < 4; j++) {
+ 687              		.loc 1 140 14 view .LVU203
+ 688 003c 0023     		movs	r3, #0
+ 689              	.LVL62:
+ 690              		.loc 1 140 14 view .LVU204
+ 691              	.LBE15:
+ 134:../Core/Src/controls.c **** 
+ 692              		.loc 1 134 11 view .LVU205
+ 693 003e 9FED3C6A 		vldr.32	s12, .L72
+ 133:../Core/Src/controls.c ****     float thrust = 0.0;
+ 694              		.loc 1 133 11 view .LVU206
+ 695 0042 B0EE465A 		vmov.f32	s10, s12
+ 132:../Core/Src/controls.c ****     float yaw = 0.0;
+ 696              		.loc 1 132 11 view .LVU207
+ 697 0046 F0EE465A 		vmov.f32	s11, s12
+ 131:../Core/Src/controls.c ****     float pitch = 0.0;
+ 698              		.loc 1 131 11 view .LVU208
+ 699 004a B0EE467A 		vmov.f32	s14, s12
+ 700 004e 14E0     		b	.L46
+ 701              	.LVL63:
+ 702              	.L49:
+ 703              	.LBB22:
+ARM GAS  /tmp/cc9wWjjg.s 			page 17
+
+
+ 704              	.LBB16:
+ 141:../Core/Src/controls.c ****         if (j == 0) {
+ 142:../Core/Src/controls.c ****             for (int i = 0; i < 9; i++) {
+ 143:../Core/Src/controls.c ****                 roll += ctrl->K[j*9 + i] * del_x[i];
+ 705              		.loc 1 143 17 is_stmt 1 discriminator 3 view .LVU209
+ 706              		.loc 1 143 34 is_stmt 0 discriminator 3 view .LVU210
+ 707 0050 03EBC302 		add	r2, r3, r3, lsl #3
+ 708              		.loc 1 143 37 discriminator 3 view .LVU211
+ 709 0054 0A44     		add	r2, r2, r1
+ 710              		.loc 1 143 32 discriminator 3 view .LVU212
+ 711 0056 1232     		adds	r2, r2, #18
+ 712 0058 04EB8202 		add	r2, r4, r2, lsl #2
+ 713 005c D2ED017A 		vldr.32	s15, [r2, #4]
+ 714              		.loc 1 143 49 discriminator 3 view .LVU213
+ 715 0060 0AAA     		add	r2, sp, #40
+ 716 0062 02EB8102 		add	r2, r2, r1, lsl #2
+ 717 0066 52ED096A 		vldr.32	s13, [r2, #-36]
+ 718              		.loc 1 143 42 discriminator 3 view .LVU214
+ 719 006a 67EEA67A 		vmul.f32	s15, s15, s13
+ 720              		.loc 1 143 22 discriminator 3 view .LVU215
+ 721 006e 37EE277A 		vadd.f32	s14, s14, s15
+ 722              	.LVL64:
+ 142:../Core/Src/controls.c ****                 roll += ctrl->K[j*9 + i] * del_x[i];
+ 723              		.loc 1 142 36 is_stmt 1 discriminator 3 view .LVU216
+ 142:../Core/Src/controls.c ****                 roll += ctrl->K[j*9 + i] * del_x[i];
+ 724              		.loc 1 142 37 is_stmt 0 discriminator 3 view .LVU217
+ 725 0072 0131     		adds	r1, r1, #1
+ 726              	.LVL65:
+ 727              	.L47:
+ 142:../Core/Src/controls.c ****                 roll += ctrl->K[j*9 + i] * del_x[i];
+ 728              		.loc 1 142 29 is_stmt 1 discriminator 1 view .LVU218
+ 142:../Core/Src/controls.c ****                 roll += ctrl->K[j*9 + i] * del_x[i];
+ 729              		.loc 1 142 13 is_stmt 0 discriminator 1 view .LVU219
+ 730 0074 0829     		cmp	r1, #8
+ 731 0076 EBDD     		ble	.L49
+ 732              	.LVL66:
+ 733              	.L50:
+ 142:../Core/Src/controls.c ****                 roll += ctrl->K[j*9 + i] * del_x[i];
+ 734              		.loc 1 142 13 discriminator 1 view .LVU220
+ 735              	.LBE16:
+ 140:../Core/Src/controls.c ****         if (j == 0) {
+ 736              		.loc 1 140 28 is_stmt 1 discriminator 2 view .LVU221
+ 140:../Core/Src/controls.c ****         if (j == 0) {
+ 737              		.loc 1 140 29 is_stmt 0 discriminator 2 view .LVU222
+ 738 0078 0133     		adds	r3, r3, #1
+ 739              	.LVL67:
+ 740              	.L46:
+ 140:../Core/Src/controls.c ****         if (j == 0) {
+ 741              		.loc 1 140 21 is_stmt 1 discriminator 1 view .LVU223
+ 140:../Core/Src/controls.c ****         if (j == 0) {
+ 742              		.loc 1 140 5 is_stmt 0 discriminator 1 view .LVU224
+ 743 007a 032B     		cmp	r3, #3
+ 744 007c 4DDC     		bgt	.L68
+ 141:../Core/Src/controls.c ****         if (j == 0) {
+ 745              		.loc 1 141 9 is_stmt 1 view .LVU225
+ 141:../Core/Src/controls.c ****         if (j == 0) {
+ 746              		.loc 1 141 12 is_stmt 0 view .LVU226
+ARM GAS  /tmp/cc9wWjjg.s 			page 18
+
+
+ 747 007e 3BB1     		cbz	r3, .L69
+ 144:../Core/Src/controls.c ****             }
+ 145:../Core/Src/controls.c ****         } else if (j == 1) {
+ 748              		.loc 1 145 16 is_stmt 1 view .LVU227
+ 749              		.loc 1 145 19 is_stmt 0 view .LVU228
+ 750 0080 012B     		cmp	r3, #1
+ 751 0082 1CD0     		beq	.L70
+ 146:../Core/Src/controls.c ****             for (int i = 0; i < 9; i++) {
+ 147:../Core/Src/controls.c ****                 pitch += ctrl->K[j*9 + i] * del_x[i];
+ 148:../Core/Src/controls.c ****             }
+ 149:../Core/Src/controls.c ****         } else if (j == 2) {
+ 752              		.loc 1 149 16 is_stmt 1 view .LVU229
+ 753              		.loc 1 149 19 is_stmt 0 view .LVU230
+ 754 0084 022B     		cmp	r3, #2
+ 755 0086 31D0     		beq	.L71
+ 150:../Core/Src/controls.c ****             for (int i = 0; i < 9; i++) {
+ 151:../Core/Src/controls.c ****                 yaw += ctrl->K[j*9 + i] * del_x[i];
+ 152:../Core/Src/controls.c ****             }
+ 153:../Core/Src/controls.c ****         } else if (j == 3) {
+ 756              		.loc 1 153 16 is_stmt 1 view .LVU231
+ 757              		.loc 1 153 19 is_stmt 0 view .LVU232
+ 758 0088 032B     		cmp	r3, #3
+ 759 008a F5D1     		bne	.L50
+ 760              	.LBB17:
+ 154:../Core/Src/controls.c ****             for (int i = 0; i < 9; i++) {
+ 761              		.loc 1 154 22 view .LVU233
+ 762 008c 0021     		movs	r1, #0
+ 763 008e 41E0     		b	.L57
+ 764              	.L69:
+ 765              	.LBE17:
+ 766              	.LBB18:
+ 142:../Core/Src/controls.c ****                 roll += ctrl->K[j*9 + i] * del_x[i];
+ 767              		.loc 1 142 22 view .LVU234
+ 768 0090 1946     		mov	r1, r3
+ 769 0092 EFE7     		b	.L47
+ 770              	.LVL68:
+ 771              	.L53:
+ 142:../Core/Src/controls.c ****                 roll += ctrl->K[j*9 + i] * del_x[i];
+ 772              		.loc 1 142 22 view .LVU235
+ 773              	.LBE18:
+ 774              	.LBB19:
+ 147:../Core/Src/controls.c ****             }
+ 775              		.loc 1 147 17 is_stmt 1 discriminator 3 view .LVU236
+ 147:../Core/Src/controls.c ****             }
+ 776              		.loc 1 147 35 is_stmt 0 discriminator 3 view .LVU237
+ 777 0094 03EBC302 		add	r2, r3, r3, lsl #3
+ 147:../Core/Src/controls.c ****             }
+ 778              		.loc 1 147 38 discriminator 3 view .LVU238
+ 779 0098 0A44     		add	r2, r2, r1
+ 147:../Core/Src/controls.c ****             }
+ 780              		.loc 1 147 33 discriminator 3 view .LVU239
+ 781 009a 1232     		adds	r2, r2, #18
+ 782 009c 04EB8202 		add	r2, r4, r2, lsl #2
+ 783 00a0 D2ED017A 		vldr.32	s15, [r2, #4]
+ 147:../Core/Src/controls.c ****             }
+ 784              		.loc 1 147 50 discriminator 3 view .LVU240
+ 785 00a4 0AAA     		add	r2, sp, #40
+ARM GAS  /tmp/cc9wWjjg.s 			page 19
+
+
+ 786 00a6 02EB8102 		add	r2, r2, r1, lsl #2
+ 787 00aa 52ED096A 		vldr.32	s13, [r2, #-36]
+ 147:../Core/Src/controls.c ****             }
+ 788              		.loc 1 147 43 discriminator 3 view .LVU241
+ 789 00ae 67EEA67A 		vmul.f32	s15, s15, s13
+ 147:../Core/Src/controls.c ****             }
+ 790              		.loc 1 147 23 discriminator 3 view .LVU242
+ 791 00b2 75EEA75A 		vadd.f32	s11, s11, s15
+ 792              	.LVL69:
+ 146:../Core/Src/controls.c ****                 pitch += ctrl->K[j*9 + i] * del_x[i];
+ 793              		.loc 1 146 36 is_stmt 1 discriminator 3 view .LVU243
+ 146:../Core/Src/controls.c ****                 pitch += ctrl->K[j*9 + i] * del_x[i];
+ 794              		.loc 1 146 37 is_stmt 0 discriminator 3 view .LVU244
+ 795 00b6 0131     		adds	r1, r1, #1
+ 796              	.LVL70:
+ 797              	.L51:
+ 146:../Core/Src/controls.c ****                 pitch += ctrl->K[j*9 + i] * del_x[i];
+ 798              		.loc 1 146 29 is_stmt 1 discriminator 1 view .LVU245
+ 146:../Core/Src/controls.c ****                 pitch += ctrl->K[j*9 + i] * del_x[i];
+ 799              		.loc 1 146 13 is_stmt 0 discriminator 1 view .LVU246
+ 800 00b8 0829     		cmp	r1, #8
+ 801 00ba EBDD     		ble	.L53
+ 146:../Core/Src/controls.c ****                 pitch += ctrl->K[j*9 + i] * del_x[i];
+ 802              		.loc 1 146 13 discriminator 1 view .LVU247
+ 803 00bc DCE7     		b	.L50
+ 804              	.LVL71:
+ 805              	.L70:
+ 146:../Core/Src/controls.c ****                 pitch += ctrl->K[j*9 + i] * del_x[i];
+ 806              		.loc 1 146 22 view .LVU248
+ 807 00be 0021     		movs	r1, #0
+ 808 00c0 FAE7     		b	.L51
+ 809              	.LVL72:
+ 810              	.L56:
+ 146:../Core/Src/controls.c ****                 pitch += ctrl->K[j*9 + i] * del_x[i];
+ 811              		.loc 1 146 22 view .LVU249
+ 812              	.LBE19:
+ 813              	.LBB20:
+ 151:../Core/Src/controls.c ****             }
+ 814              		.loc 1 151 17 is_stmt 1 discriminator 3 view .LVU250
+ 151:../Core/Src/controls.c ****             }
+ 815              		.loc 1 151 33 is_stmt 0 discriminator 3 view .LVU251
+ 816 00c2 03EBC302 		add	r2, r3, r3, lsl #3
+ 151:../Core/Src/controls.c ****             }
+ 817              		.loc 1 151 36 discriminator 3 view .LVU252
+ 818 00c6 0A44     		add	r2, r2, r1
+ 151:../Core/Src/controls.c ****             }
+ 819              		.loc 1 151 31 discriminator 3 view .LVU253
+ 820 00c8 1232     		adds	r2, r2, #18
+ 821 00ca 04EB8202 		add	r2, r4, r2, lsl #2
+ 822 00ce D2ED017A 		vldr.32	s15, [r2, #4]
+ 151:../Core/Src/controls.c ****             }
+ 823              		.loc 1 151 48 discriminator 3 view .LVU254
+ 824 00d2 0AAA     		add	r2, sp, #40
+ 825 00d4 02EB8102 		add	r2, r2, r1, lsl #2
+ 826 00d8 52ED096A 		vldr.32	s13, [r2, #-36]
+ 151:../Core/Src/controls.c ****             }
+ 827              		.loc 1 151 41 discriminator 3 view .LVU255
+ARM GAS  /tmp/cc9wWjjg.s 			page 20
+
+
+ 828 00dc 67EEA67A 		vmul.f32	s15, s15, s13
+ 151:../Core/Src/controls.c ****             }
+ 829              		.loc 1 151 21 discriminator 3 view .LVU256
+ 830 00e0 35EE275A 		vadd.f32	s10, s10, s15
+ 831              	.LVL73:
+ 150:../Core/Src/controls.c ****                 yaw += ctrl->K[j*9 + i] * del_x[i];
+ 832              		.loc 1 150 36 is_stmt 1 discriminator 3 view .LVU257
+ 150:../Core/Src/controls.c ****                 yaw += ctrl->K[j*9 + i] * del_x[i];
+ 833              		.loc 1 150 37 is_stmt 0 discriminator 3 view .LVU258
+ 834 00e4 0131     		adds	r1, r1, #1
+ 835              	.LVL74:
+ 836              	.L54:
+ 150:../Core/Src/controls.c ****                 yaw += ctrl->K[j*9 + i] * del_x[i];
+ 837              		.loc 1 150 29 is_stmt 1 discriminator 1 view .LVU259
+ 150:../Core/Src/controls.c ****                 yaw += ctrl->K[j*9 + i] * del_x[i];
+ 838              		.loc 1 150 13 is_stmt 0 discriminator 1 view .LVU260
+ 839 00e6 0829     		cmp	r1, #8
+ 840 00e8 EBDD     		ble	.L56
+ 150:../Core/Src/controls.c ****                 yaw += ctrl->K[j*9 + i] * del_x[i];
+ 841              		.loc 1 150 13 discriminator 1 view .LVU261
+ 842 00ea C5E7     		b	.L50
+ 843              	.LVL75:
+ 844              	.L71:
+ 150:../Core/Src/controls.c ****                 yaw += ctrl->K[j*9 + i] * del_x[i];
+ 845              		.loc 1 150 22 view .LVU262
+ 846 00ec 0021     		movs	r1, #0
+ 847 00ee FAE7     		b	.L54
+ 848              	.LVL76:
+ 849              	.L58:
+ 150:../Core/Src/controls.c ****                 yaw += ctrl->K[j*9 + i] * del_x[i];
+ 850              		.loc 1 150 22 view .LVU263
+ 851              	.LBE20:
+ 852              	.LBB21:
+ 155:../Core/Src/controls.c ****                 thrust += ctrl->K[j*9 + i] * del_x[i];
+ 853              		.loc 1 155 17 is_stmt 1 discriminator 3 view .LVU264
+ 854              		.loc 1 155 36 is_stmt 0 discriminator 3 view .LVU265
+ 855 00f0 03EBC302 		add	r2, r3, r3, lsl #3
+ 856              		.loc 1 155 39 discriminator 3 view .LVU266
+ 857 00f4 0A44     		add	r2, r2, r1
+ 858              		.loc 1 155 34 discriminator 3 view .LVU267
+ 859 00f6 1232     		adds	r2, r2, #18
+ 860 00f8 04EB8202 		add	r2, r4, r2, lsl #2
+ 861 00fc D2ED017A 		vldr.32	s15, [r2, #4]
+ 862              		.loc 1 155 51 discriminator 3 view .LVU268
+ 863 0100 0AAA     		add	r2, sp, #40
+ 864 0102 02EB8102 		add	r2, r2, r1, lsl #2
+ 865 0106 52ED096A 		vldr.32	s13, [r2, #-36]
+ 866              		.loc 1 155 44 discriminator 3 view .LVU269
+ 867 010a 67EEA67A 		vmul.f32	s15, s15, s13
+ 868              		.loc 1 155 24 discriminator 3 view .LVU270
+ 869 010e 36EE276A 		vadd.f32	s12, s12, s15
+ 870              	.LVL77:
+ 154:../Core/Src/controls.c ****                 thrust += ctrl->K[j*9 + i] * del_x[i];
+ 871              		.loc 1 154 36 is_stmt 1 discriminator 3 view .LVU271
+ 154:../Core/Src/controls.c ****                 thrust += ctrl->K[j*9 + i] * del_x[i];
+ 872              		.loc 1 154 37 is_stmt 0 discriminator 3 view .LVU272
+ 873 0112 0131     		adds	r1, r1, #1
+ARM GAS  /tmp/cc9wWjjg.s 			page 21
+
+
+ 874              	.LVL78:
+ 875              	.L57:
+ 154:../Core/Src/controls.c ****                 thrust += ctrl->K[j*9 + i] * del_x[i];
+ 876              		.loc 1 154 29 is_stmt 1 discriminator 1 view .LVU273
+ 154:../Core/Src/controls.c ****                 thrust += ctrl->K[j*9 + i] * del_x[i];
+ 877              		.loc 1 154 13 is_stmt 0 discriminator 1 view .LVU274
+ 878 0114 0829     		cmp	r1, #8
+ 879 0116 EBDD     		ble	.L58
+ 154:../Core/Src/controls.c ****                 thrust += ctrl->K[j*9 + i] * del_x[i];
+ 880              		.loc 1 154 13 discriminator 1 view .LVU275
+ 881 0118 AEE7     		b	.L50
+ 882              	.LVL79:
+ 883              	.L68:
+ 154:../Core/Src/controls.c ****                 thrust += ctrl->K[j*9 + i] * del_x[i];
+ 884              		.loc 1 154 13 discriminator 1 view .LVU276
+ 885              	.LBE21:
+ 886              	.LBE22:
+ 156:../Core/Src/controls.c ****             }
+ 157:../Core/Src/controls.c ****         }
+ 158:../Core/Src/controls.c ****     }
+ 159:../Core/Src/controls.c **** 
+ 160:../Core/Src/controls.c ****     ctrl->M_roll = roll;
+ 887              		.loc 1 160 5 is_stmt 1 view .LVU277
+ 888              		.loc 1 160 18 is_stmt 0 view .LVU278
+ 889 011a 84ED377A 		vstr.32	s14, [r4, #220]
+ 161:../Core/Src/controls.c ****     ctrl->M_pitch = pitch;
+ 890              		.loc 1 161 5 is_stmt 1 view .LVU279
+ 891              		.loc 1 161 19 is_stmt 0 view .LVU280
+ 892 011e C4ED385A 		vstr.32	s11, [r4, #224]
+ 162:../Core/Src/controls.c ****     ctrl->M_yaw = yaw;
+ 893              		.loc 1 162 5 is_stmt 1 view .LVU281
+ 894              		.loc 1 162 17 is_stmt 0 view .LVU282
+ 895 0122 84ED395A 		vstr.32	s10, [r4, #228]
+ 163:../Core/Src/controls.c ****     ctrl->T = thrust;
+ 896              		.loc 1 163 5 is_stmt 1 view .LVU283
+ 897              		.loc 1 163 13 is_stmt 0 view .LVU284
+ 898 0126 84ED3A6A 		vstr.32	s12, [r4, #232]
+ 164:../Core/Src/controls.c **** } 
+ 899              		.loc 1 164 1 view .LVU285
+ 900 012a 0AB0     		add	sp, sp, #40
+ 901              	.LCFI13:
+ 902              		.cfi_def_cfa_offset 8
+ 903              		@ sp needed
+ 904 012c 10BD     		pop	{r4, pc}
+ 905              	.LVL80:
+ 906              	.L73:
+ 907              		.loc 1 164 1 view .LVU286
+ 908 012e 00BF     		.align	2
+ 909              	.L72:
+ 910 0130 00000000 		.word	0
+ 911              		.cfi_endproc
+ 912              	.LFE145:
+ 914              		.section	.text.update_yaw_moment_arm,"ax",%progbits
+ 915              		.align	1
+ 916              		.global	update_yaw_moment_arm
+ 917              		.syntax unified
+ 918              		.thumb
+ARM GAS  /tmp/cc9wWjjg.s 			page 22
+
+
+ 919              		.thumb_func
+ 920              		.fpu fpv4-sp-d16
+ 922              	update_yaw_moment_arm:
+ 923              	.LVL81:
+ 924              	.LFB146:
+ 165:../Core/Src/controls.c **** 
+ 166:../Core/Src/controls.c **** /**
+ 167:../Core/Src/controls.c ****  * @brief Function that updates the yaw moment arm in the struct since it shifts due to propellant 
+ 168:../Core/Src/controls.c ****  * @param ctrl Takes controller struct, but uses initial and final moment arms plus burn time
+ 169:../Core/Src/controls.c ****  * @return Updates yaw_moment_arm variable in controller struct
+ 170:../Core/Src/controls.c ****  * @note Uses linear interpolation
+ 171:../Core/Src/controls.c **** */
+ 172:../Core/Src/controls.c **** void update_yaw_moment_arm(controller *ctrl){
+ 925              		.loc 1 172 45 is_stmt 1 view -0
+ 926              		.cfi_startproc
+ 927              		@ args = 0, pretend = 0, frame = 0
+ 928              		@ frame_needed = 0, uses_anonymous_args = 0
+ 929              		@ link register save eliminated.
+ 173:../Core/Src/controls.c ****     float yaw_moment_arm_0 = 0.967; //initial yaw moment arm, m
+ 930              		.loc 1 173 5 view .LVU288
+ 174:../Core/Src/controls.c ****     float yaw_moment_arm_f = 1.06; //final yaw moment arm, m
+ 931              		.loc 1 174 5 view .LVU289
+ 175:../Core/Src/controls.c ****     
+ 176:../Core/Src/controls.c ****     float burn_time = 13.1;
+ 932              		.loc 1 176 5 view .LVU290
+ 177:../Core/Src/controls.c **** 
+ 178:../Core/Src/controls.c ****     ctrl->yaw_moment_arm = yaw_moment_arm_0 - ((yaw_moment_arm_0 - yaw_moment_arm_f)/burn_time)*ctr
+ 933              		.loc 1 178 5 view .LVU291
+ 934              		.loc 1 178 101 is_stmt 0 view .LVU292
+ 935 0000 D0ED007A 		vldr.32	s15, [r0]
+ 936              		.loc 1 178 96 view .LVU293
+ 937 0004 9FED057A 		vldr.32	s14, .L75
+ 938 0008 27EE877A 		vmul.f32	s14, s15, s14
+ 939              		.loc 1 178 45 view .LVU294
+ 940 000c DFED047A 		vldr.32	s15, .L75+4
+ 941 0010 77EEC77A 		vsub.f32	s15, s15, s14
+ 942              		.loc 1 178 26 view .LVU295
+ 943 0014 C0ED3B7A 		vstr.32	s15, [r0, #236]
+ 179:../Core/Src/controls.c **** }
+ 944              		.loc 1 179 1 view .LVU296
+ 945 0018 7047     		bx	lr
+ 946              	.L76:
+ 947 001a 00BF     		.align	2
+ 948              	.L75:
+ 949 001c ACA0E8BB 		.word	-1142382420
+ 950 0020 508D773F 		.word	1064799568
+ 951              		.cfi_endproc
+ 952              	.LFE146:
+ 954              		.section	.text.moment_to_sideforce,"ax",%progbits
+ 955              		.align	1
+ 956              		.global	moment_to_sideforce
+ 957              		.syntax unified
+ 958              		.thumb
+ 959              		.thumb_func
+ 960              		.fpu fpv4-sp-d16
+ 962              	moment_to_sideforce:
+ 963              	.LVL82:
+ARM GAS  /tmp/cc9wWjjg.s 			page 23
+
+
+ 964              	.LFB147:
+ 180:../Core/Src/controls.c **** 
+ 181:../Core/Src/controls.c **** 
+ 182:../Core/Src/controls.c **** /**
+ 183:../Core/Src/controls.c ****  * @brief Converts desired control moments of roll and yaw into desired roll and yaw forces
+ 184:../Core/Src/controls.c ****  * @param ctrl Takes controller struct, uses desired roll and yaw moments, and current roll and yaw
+ 185:../Core/Src/controls.c ****  * @return Updates values of forces 1-D array, forces = [F_roll, F_pitch]
+ 186:../Core/Src/controls.c ****  * @note Uses the fact that M = F*d
+ 187:../Core/Src/controls.c **** */
+ 188:../Core/Src/controls.c **** void moment_to_sideforce(controller *ctrl){
+ 965              		.loc 1 188 43 is_stmt 1 view -0
+ 966              		.cfi_startproc
+ 967              		@ args = 0, pretend = 0, frame = 0
+ 968              		@ frame_needed = 0, uses_anonymous_args = 0
+ 969              		@ link register save eliminated.
+ 189:../Core/Src/controls.c ****     ctrl->forces[0] = ctrl->M_roll/ctrl->roll_moment_arm;
+ 970              		.loc 1 189 5 view .LVU298
+ 971              		.loc 1 189 27 is_stmt 0 view .LVU299
+ 972 0000 D0ED376A 		vldr.32	s13, [r0, #220]
+ 973              		.loc 1 189 40 view .LVU300
+ 974 0004 90ED3C7A 		vldr.32	s14, [r0, #240]
+ 975              		.loc 1 189 35 view .LVU301
+ 976 0008 C6EE877A 		vdiv.f32	s15, s13, s14
+ 977              		.loc 1 189 21 view .LVU302
+ 978 000c C0ED3D7A 		vstr.32	s15, [r0, #244]
+ 190:../Core/Src/controls.c ****     ctrl->forces[1] = ctrl->M_yaw/ctrl->yaw_moment_arm;
+ 979              		.loc 1 190 5 is_stmt 1 view .LVU303
+ 980              		.loc 1 190 27 is_stmt 0 view .LVU304
+ 981 0010 D0ED396A 		vldr.32	s13, [r0, #228]
+ 982              		.loc 1 190 39 view .LVU305
+ 983 0014 90ED3B7A 		vldr.32	s14, [r0, #236]
+ 984              		.loc 1 190 34 view .LVU306
+ 985 0018 C6EE877A 		vdiv.f32	s15, s13, s14
+ 986              		.loc 1 190 21 view .LVU307
+ 987 001c C0ED3E7A 		vstr.32	s15, [r0, #248]
+ 191:../Core/Src/controls.c **** }
+ 988              		.loc 1 191 1 view .LVU308
+ 989 0020 7047     		bx	lr
+ 990              		.cfi_endproc
+ 991              	.LFE147:
+ 993              		.global	__aeabi_dcmpge
+ 994              		.global	__aeabi_dsub
+ 995              		.global	__aeabi_dmul
+ 996              		.global	__aeabi_dadd
+ 997              		.section	.text.sideforce_to_vane_angle,"ax",%progbits
+ 998              		.align	1
+ 999              		.global	sideforce_to_vane_angle
+ 1000              		.syntax unified
+ 1001              		.thumb
+ 1002              		.thumb_func
+ 1003              		.fpu fpv4-sp-d16
+ 1005              	sideforce_to_vane_angle:
+ 1006              	.LVL83:
+ 1007              	.LFB148:
+ 192:../Core/Src/controls.c **** 
+ 193:../Core/Src/controls.c **** 
+ 194:../Core/Src/controls.c **** /**
+ARM GAS  /tmp/cc9wWjjg.s 			page 24
+
+
+ 195:../Core/Src/controls.c ****  * @brief Finds current thrust value, computes max sideforce for that thrust, and then computes van
+ 196:../Core/Src/controls.c ****  * @param ctrl Takes controller struct, but uses thrust curve, time since launch, and forces 1-D ar
+ 197:../Core/Src/controls.c ****  * @return Updates vane_deflections 1-D array [roll1, roll2, yaw1, yaw2]
+ 198:../Core/Src/controls.c ****  * @note Sign conventions for vanes are important here!
+ 199:../Core/Src/controls.c **** */
+ 200:../Core/Src/controls.c **** void sideforce_to_vane_angle(controller *ctrl){ //TODO: UPDATE BASED ON ACTUAL SIDEFORCE MODEL
+ 1008              		.loc 1 200 47 is_stmt 1 view -0
+ 1009              		.cfi_startproc
+ 1010              		@ args = 0, pretend = 0, frame = 0
+ 1011              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1012              		.loc 1 200 47 is_stmt 0 view .LVU310
+ 1013 0000 2DE9F84F 		push	{r3, r4, r5, r6, r7, r8, r9, r10, fp, lr}
+ 1014              	.LCFI14:
+ 1015              		.cfi_def_cfa_offset 40
+ 1016              		.cfi_offset 3, -40
+ 1017              		.cfi_offset 4, -36
+ 1018              		.cfi_offset 5, -32
+ 1019              		.cfi_offset 6, -28
+ 1020              		.cfi_offset 7, -24
+ 1021              		.cfi_offset 8, -20
+ 1022              		.cfi_offset 9, -16
+ 1023              		.cfi_offset 10, -12
+ 1024              		.cfi_offset 11, -8
+ 1025              		.cfi_offset 14, -4
+ 1026 0004 2DED028B 		vpush.64	{d8}
+ 1027              	.LCFI15:
+ 1028              		.cfi_def_cfa_offset 48
+ 1029              		.cfi_offset 80, -48
+ 1030              		.cfi_offset 81, -44
+ 1031 0008 0446     		mov	r4, r0
+ 201:../Core/Src/controls.c ****     int rounded_down_second = (int)floor(ctrl->time_since_launch);
+ 1032              		.loc 1 201 5 is_stmt 1 view .LVU311
+ 1033              		.loc 1 201 36 is_stmt 0 view .LVU312
+ 1034 000a 0068     		ldr	r0, [r0]	@ float
+ 1035              	.LVL84:
+ 1036              		.loc 1 201 36 view .LVU313
+ 1037 000c FFF7FEFF 		bl	__aeabi_f2d
+ 1038              	.LVL85:
+ 1039 0010 8246     		mov	r10, r0
+ 1040 0012 8B46     		mov	fp, r1
+ 1041 0014 4BEC10AB 		vmov	d0, r10, fp
+ 1042 0018 FFF7FEFF 		bl	floor
+ 1043              	.LVL86:
+ 1044 001c 57EC106B 		vmov	r6, r7, d0
+ 1045              		.loc 1 201 9 view .LVU314
+ 1046 0020 10EE100A 		vmov	r0, s0	@ int
+ 1047 0024 3946     		mov	r1, r7
+ 1048 0026 FFF7FEFF 		bl	__aeabi_d2iz
+ 1049              	.LVL87:
+ 1050 002a 0546     		mov	r5, r0
+ 1051              	.LVL88:
+ 202:../Core/Src/controls.c **** 
+ 203:../Core/Src/controls.c ****     if (ctrl->time_since_launch >= 13.8){ //If more than 13.8 seconds has passed since launch, assu
+ 1052              		.loc 1 203 5 is_stmt 1 view .LVU315
+ 1053              		.loc 1 203 8 is_stmt 0 view .LVU316
+ 1054 002c 3CA3     		adr	r3, .L89
+ 1055 002e D3E90023 		ldrd	r2, [r3]
+ARM GAS  /tmp/cc9wWjjg.s 			page 25
+
+
+ 1056 0032 5046     		mov	r0, r10
+ 1057              	.LVL89:
+ 1058              		.loc 1 203 8 view .LVU317
+ 1059 0034 5946     		mov	r1, fp
+ 1060 0036 FFF7FEFF 		bl	__aeabi_dcmpge
+ 1061              	.LVL90:
+ 1062 003a E8B3     		cbz	r0, .L87
+ 204:../Core/Src/controls.c ****         ctrl->current_thrust = 0;
+ 1063              		.loc 1 204 9 is_stmt 1 view .LVU318
+ 1064              		.loc 1 204 30 is_stmt 0 view .LVU319
+ 1065 003c 0023     		movs	r3, #0
+ 1066 003e C4F85831 		str	r3, [r4, #344]	@ float
+ 1067              	.LVL91:
+ 1068              	.L81:
+ 205:../Core/Src/controls.c ****     } else { //Use linear interpolation with thrust curve
+ 206:../Core/Src/controls.c ****         float T_1 = ctrl->thrust_curve[rounded_down_second];
+ 207:../Core/Src/controls.c ****         float T_2 = ctrl->thrust_curve[rounded_down_second + 1];
+ 208:../Core/Src/controls.c **** 
+ 209:../Core/Src/controls.c ****         ctrl->current_thrust = T_1 + (T_2 - T_1)*(ctrl->time_since_launch - floor(ctrl->time_since_
+ 210:../Core/Src/controls.c ****     } //Current thrust has been obtained
+ 211:../Core/Src/controls.c **** 
+ 212:../Core/Src/controls.c ****     float max_sideforce = 0.05*ctrl->current_thrust; //max sideforce per vane
+ 1069              		.loc 1 212 5 is_stmt 1 view .LVU320
+ 1070              		.loc 1 212 36 is_stmt 0 view .LVU321
+ 1071 0042 D4F85801 		ldr	r0, [r4, #344]	@ float
+ 1072 0046 FFF7FEFF 		bl	__aeabi_f2d
+ 1073              	.LVL92:
+ 1074              		.loc 1 212 31 view .LVU322
+ 1075 004a 37A3     		adr	r3, .L89+8
+ 1076 004c D3E90023 		ldrd	r2, [r3]
+ 1077 0050 FFF7FEFF 		bl	__aeabi_dmul
+ 1078              	.LVL93:
+ 1079              		.loc 1 212 11 view .LVU323
+ 1080 0054 FFF7FEFF 		bl	__aeabi_d2f
+ 1081              	.LVL94:
+ 1082 0058 07EE100A 		vmov	s14, r0
+ 1083              	.LVL95:
+ 213:../Core/Src/controls.c **** 
+ 214:../Core/Src/controls.c ****     float yaw_force_per_vane = ctrl->forces[0]/2.0;
+ 1084              		.loc 1 214 5 is_stmt 1 view .LVU324
+ 1085              		.loc 1 214 44 is_stmt 0 view .LVU325
+ 1086 005c 94ED3D6A 		vldr.32	s12, [r4, #244]
+ 1087              		.loc 1 214 11 view .LVU326
+ 1088 0060 F6EE007A 		vmov.f32	s15, #5.0e-1
+ 1089 0064 26EE276A 		vmul.f32	s12, s12, s15
+ 1090              	.LVL96:
+ 215:../Core/Src/controls.c ****     float roll_force_per_vane = ctrl->forces[1]/2.0;
+ 1091              		.loc 1 215 5 is_stmt 1 view .LVU327
+ 1092              		.loc 1 215 45 is_stmt 0 view .LVU328
+ 1093 0068 D4ED3E6A 		vldr.32	s13, [r4, #248]
+ 1094              		.loc 1 215 11 view .LVU329
+ 1095 006c 66EEA76A 		vmul.f32	s13, s13, s15
+ 1096              	.LVL97:
+ 216:../Core/Src/controls.c **** 
+ 217:../Core/Src/controls.c ****     float yaw_vane_angle; //degrees
+ 1097              		.loc 1 217 5 is_stmt 1 view .LVU330
+ 218:../Core/Src/controls.c ****     float roll_vane_angle; //degrees
+ARM GAS  /tmp/cc9wWjjg.s 			page 26
+
+
+ 1098              		.loc 1 218 5 view .LVU331
+ 219:../Core/Src/controls.c **** 
+ 220:../Core/Src/controls.c ****     //Find vane angle for yaw
+ 221:../Core/Src/controls.c ****     if (yaw_force_per_vane >= max_sideforce){
+ 1099              		.loc 1 221 5 view .LVU332
+ 1100              		.loc 1 221 8 is_stmt 0 view .LVU333
+ 1101 0070 B4EEC67A 		vcmpe.f32	s14, s12
+ 1102 0074 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 1103 0078 4CD9     		bls	.L84
+ 222:../Core/Src/controls.c ****         yaw_vane_angle = 30.0; //degrees
+ 223:../Core/Src/controls.c ****     } else {
+ 224:../Core/Src/controls.c ****         yaw_vane_angle = (yaw_force_per_vane/max_sideforce)*30.0;
+ 1104              		.loc 1 224 9 is_stmt 1 view .LVU334
+ 1105              		.loc 1 224 45 is_stmt 0 view .LVU335
+ 1106 007a C6EE077A 		vdiv.f32	s15, s12, s14
+ 1107              		.loc 1 224 24 view .LVU336
+ 1108 007e B3EE0E6A 		vmov.f32	s12, #3.0e+1
+ 1109              	.LVL98:
+ 1110              		.loc 1 224 24 view .LVU337
+ 1111 0082 67EE867A 		vmul.f32	s15, s15, s12
+ 1112              	.LVL99:
+ 1113              	.L82:
+ 225:../Core/Src/controls.c ****     }
+ 226:../Core/Src/controls.c **** 
+ 227:../Core/Src/controls.c ****     //Find vane angle to roll
+ 228:../Core/Src/controls.c ****     if (roll_force_per_vane >= max_sideforce){
+ 1114              		.loc 1 228 5 is_stmt 1 view .LVU338
+ 1115              		.loc 1 228 8 is_stmt 0 view .LVU339
+ 1116 0086 B4EEE67A 		vcmpe.f32	s14, s13
+ 1117 008a F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 1118 008e 44D9     		bls	.L85
+ 229:../Core/Src/controls.c ****         roll_vane_angle = 30.0; //degrees - 30 degrees is the maximum deflection
+ 230:../Core/Src/controls.c ****     } else {
+ 231:../Core/Src/controls.c ****         roll_vane_angle = (roll_force_per_vane/max_sideforce)*30.0;
+ 1119              		.loc 1 231 9 is_stmt 1 view .LVU340
+ 1120              		.loc 1 231 47 is_stmt 0 view .LVU341
+ 1121 0090 86EE876A 		vdiv.f32	s12, s13, s14
+ 1122              		.loc 1 231 25 view .LVU342
+ 1123 0094 B3EE0E7A 		vmov.f32	s14, #3.0e+1
+ 1124 0098 26EE077A 		vmul.f32	s14, s12, s14
+ 1125              	.LVL100:
+ 1126              	.L83:
+ 232:../Core/Src/controls.c ****     }
+ 233:../Core/Src/controls.c **** 
+ 234:../Core/Src/controls.c ****     ctrl->vane_deflections[0] = roll_vane_angle;
+ 1127              		.loc 1 234 5 is_stmt 1 view .LVU343
+ 1128              		.loc 1 234 31 is_stmt 0 view .LVU344
+ 1129 009c 84ED3F7A 		vstr.32	s14, [r4, #252]
+ 235:../Core/Src/controls.c ****     ctrl->vane_deflections[1] = roll_vane_angle; //Rolling vanes turn in same direction
+ 1130              		.loc 1 235 5 is_stmt 1 view .LVU345
+ 1131              		.loc 1 235 31 is_stmt 0 view .LVU346
+ 1132 00a0 84ED407A 		vstr.32	s14, [r4, #256]
+ 236:../Core/Src/controls.c ****     ctrl->vane_deflections[2] = yaw_vane_angle;
+ 1133              		.loc 1 236 5 is_stmt 1 view .LVU347
+ 1134              		.loc 1 236 31 is_stmt 0 view .LVU348
+ 1135 00a4 C4ED417A 		vstr.32	s15, [r4, #260]
+ 237:../Core/Src/controls.c ****     ctrl->vane_deflections[3] = -yaw_vane_angle; //Because the yawing vanes turn in opposite direct
+ARM GAS  /tmp/cc9wWjjg.s 			page 27
+
+
+ 1136              		.loc 1 237 5 is_stmt 1 view .LVU349
+ 1137              		.loc 1 237 33 is_stmt 0 view .LVU350
+ 1138 00a8 F1EE677A 		vneg.f32	s15, s15
+ 1139              	.LVL101:
+ 1140              		.loc 1 237 31 view .LVU351
+ 1141 00ac C4ED427A 		vstr.32	s15, [r4, #264]
+ 238:../Core/Src/controls.c **** }
+ 1142              		.loc 1 238 1 view .LVU352
+ 1143 00b0 BDEC028B 		vldm	sp!, {d8}
+ 1144              	.LCFI16:
+ 1145              		.cfi_remember_state
+ 1146              		.cfi_restore 80
+ 1147              		.cfi_restore 81
+ 1148              		.cfi_def_cfa_offset 40
+ 1149 00b4 BDE8F88F 		pop	{r3, r4, r5, r6, r7, r8, r9, r10, fp, pc}
+ 1150              	.LVL102:
+ 1151              	.L87:
+ 1152              	.LCFI17:
+ 1153              		.cfi_restore_state
+ 1154              	.LBB23:
+ 206:../Core/Src/controls.c ****         float T_2 = ctrl->thrust_curve[rounded_down_second + 1];
+ 1155              		.loc 1 206 9 is_stmt 1 view .LVU353
+ 206:../Core/Src/controls.c ****         float T_2 = ctrl->thrust_curve[rounded_down_second + 1];
+ 1156              		.loc 1 206 15 is_stmt 0 view .LVU354
+ 1157 00b8 05F14603 		add	r3, r5, #70
+ 1158 00bc 04EB8303 		add	r3, r4, r3, lsl #2
+ 1159 00c0 93ED018A 		vldr.32	s16, [r3, #4]
+ 1160              	.LVL103:
+ 207:../Core/Src/controls.c **** 
+ 1161              		.loc 1 207 9 is_stmt 1 view .LVU355
+ 207:../Core/Src/controls.c **** 
+ 1162              		.loc 1 207 15 is_stmt 0 view .LVU356
+ 1163 00c4 4735     		adds	r5, r5, #71
+ 1164              	.LVL104:
+ 207:../Core/Src/controls.c **** 
+ 1165              		.loc 1 207 15 view .LVU357
+ 1166 00c6 04EB8505 		add	r5, r4, r5, lsl #2
+ 1167              	.LVL105:
+ 207:../Core/Src/controls.c **** 
+ 1168              		.loc 1 207 15 view .LVU358
+ 1169 00ca D5ED017A 		vldr.32	s15, [r5, #4]
+ 1170              	.LVL106:
+ 209:../Core/Src/controls.c ****     } //Current thrust has been obtained
+ 1171              		.loc 1 209 9 is_stmt 1 view .LVU359
+ 209:../Core/Src/controls.c ****     } //Current thrust has been obtained
+ 1172              		.loc 1 209 43 is_stmt 0 view .LVU360
+ 1173 00ce 77EEC87A 		vsub.f32	s15, s15, s16
+ 1174              	.LVL107:
+ 209:../Core/Src/controls.c ****     } //Current thrust has been obtained
+ 1175              		.loc 1 209 43 view .LVU361
+ 1176 00d2 17EE900A 		vmov	r0, s15
+ 1177 00d6 FFF7FEFF 		bl	__aeabi_f2d
+ 1178              	.LVL108:
+ 209:../Core/Src/controls.c ****     } //Current thrust has been obtained
+ 1179              		.loc 1 209 43 view .LVU362
+ 1180 00da 8046     		mov	r8, r0
+ 1181 00dc 8946     		mov	r9, r1
+ARM GAS  /tmp/cc9wWjjg.s 			page 28
+
+
+ 209:../Core/Src/controls.c ****     } //Current thrust has been obtained
+ 1182              		.loc 1 209 75 view .LVU363
+ 1183 00de 3246     		mov	r2, r6
+ 1184 00e0 3B46     		mov	r3, r7
+ 1185 00e2 5046     		mov	r0, r10
+ 1186 00e4 5946     		mov	r1, fp
+ 1187 00e6 FFF7FEFF 		bl	__aeabi_dsub
+ 1188              	.LVL109:
+ 1189 00ea 0246     		mov	r2, r0
+ 1190 00ec 0B46     		mov	r3, r1
+ 209:../Core/Src/controls.c ****     } //Current thrust has been obtained
+ 1191              		.loc 1 209 49 view .LVU364
+ 1192 00ee 4046     		mov	r0, r8
+ 1193 00f0 4946     		mov	r1, r9
+ 1194 00f2 FFF7FEFF 		bl	__aeabi_dmul
+ 1195              	.LVL110:
+ 1196 00f6 0646     		mov	r6, r0
+ 1197 00f8 0F46     		mov	r7, r1
+ 209:../Core/Src/controls.c ****     } //Current thrust has been obtained
+ 1198              		.loc 1 209 36 view .LVU365
+ 1199 00fa 18EE100A 		vmov	r0, s16
+ 1200 00fe FFF7FEFF 		bl	__aeabi_f2d
+ 1201              	.LVL111:
+ 1202 0102 3246     		mov	r2, r6
+ 1203 0104 3B46     		mov	r3, r7
+ 1204 0106 FFF7FEFF 		bl	__aeabi_dadd
+ 1205              	.LVL112:
+ 1206 010a FFF7FEFF 		bl	__aeabi_d2f
+ 1207              	.LVL113:
+ 209:../Core/Src/controls.c ****     } //Current thrust has been obtained
+ 1208              		.loc 1 209 30 view .LVU366
+ 1209 010e C4F85801 		str	r0, [r4, #344]	@ float
+ 1210 0112 96E7     		b	.L81
+ 1211              	.LVL114:
+ 1212              	.L84:
+ 209:../Core/Src/controls.c ****     } //Current thrust has been obtained
+ 1213              		.loc 1 209 30 view .LVU367
+ 1214              	.LBE23:
+ 222:../Core/Src/controls.c ****     } else {
+ 1215              		.loc 1 222 24 view .LVU368
+ 1216 0114 F3EE0E7A 		vmov.f32	s15, #3.0e+1
+ 1217 0118 B5E7     		b	.L82
+ 1218              	.LVL115:
+ 1219              	.L85:
+ 229:../Core/Src/controls.c ****     } else {
+ 1220              		.loc 1 229 25 view .LVU369
+ 1221 011a B3EE0E7A 		vmov.f32	s14, #3.0e+1
+ 1222 011e BDE7     		b	.L83
+ 1223              	.L90:
+ 1224              		.align	3
+ 1225              	.L89:
+ 1226 0120 9A999999 		.word	-1717986918
+ 1227 0124 99992B40 		.word	1076599193
+ 1228 0128 9A999999 		.word	-1717986918
+ 1229 012c 9999A93F 		.word	1068079513
+ 1230              		.cfi_endproc
+ 1231              	.LFE148:
+ARM GAS  /tmp/cc9wWjjg.s 			page 29
+
+
+ 1233              		.section	.text.vane_angle_to_servo_angle,"ax",%progbits
+ 1234              		.align	1
+ 1235              		.global	vane_angle_to_servo_angle
+ 1236              		.syntax unified
+ 1237              		.thumb
+ 1238              		.thumb_func
+ 1239              		.fpu fpv4-sp-d16
+ 1241              	vane_angle_to_servo_angle:
+ 1242              	.LVL116:
+ 1243              	.LFB149:
+ 239:../Core/Src/controls.c **** 
+ 240:../Core/Src/controls.c **** 
+ 241:../Core/Src/controls.c **** /**
+ 242:../Core/Src/controls.c ****  * @brief Turns vane angles until
+ 243:../Core/Src/controls.c ****  * @param ctrl Takes the controller struct, but uses the vane deflections 1-D array
+ 244:../Core/Src/controls.c ****  * @return Updates the servo_deflections 1-D array
+ 245:../Core/Src/controls.c ****  * @note Turn a vane by x degrees --> Turn the servo by (8/5)*x degrees according to the gear ratio
+ 246:../Core/Src/controls.c **** */
+ 247:../Core/Src/controls.c **** void vane_angle_to_servo_angle(controller *ctrl){
+ 1244              		.loc 1 247 49 is_stmt 1 view -0
+ 1245              		.cfi_startproc
+ 1246              		@ args = 0, pretend = 0, frame = 0
+ 1247              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1248              		.loc 1 247 49 is_stmt 0 view .LVU371
+ 1249 0000 10B5     		push	{r4, lr}
+ 1250              	.LCFI18:
+ 1251              		.cfi_def_cfa_offset 8
+ 1252              		.cfi_offset 4, -8
+ 1253              		.cfi_offset 14, -4
+ 1254 0002 0446     		mov	r4, r0
+ 248:../Core/Src/controls.c **** 
+ 249:../Core/Src/controls.c ****     ctrl->servo_deflections[0] = ctrl->vane_deflections[0]*(8.0/5.0); //roll servo 1
+ 1255              		.loc 1 249 5 is_stmt 1 view .LVU372
+ 1256              		.loc 1 249 56 is_stmt 0 view .LVU373
+ 1257 0004 D0F8FC00 		ldr	r0, [r0, #252]	@ float
+ 1258              	.LVL117:
+ 1259              		.loc 1 249 56 view .LVU374
+ 1260 0008 FFF7FEFF 		bl	__aeabi_f2d
+ 1261              	.LVL118:
+ 1262              		.loc 1 249 59 view .LVU375
+ 1263 000c 18A3     		adr	r3, .L93
+ 1264 000e D3E90023 		ldrd	r2, [r3]
+ 1265 0012 FFF7FEFF 		bl	__aeabi_dmul
+ 1266              	.LVL119:
+ 1267 0016 FFF7FEFF 		bl	__aeabi_d2f
+ 1268              	.LVL120:
+ 1269              		.loc 1 249 32 view .LVU376
+ 1270 001a C4F80C01 		str	r0, [r4, #268]	@ float
+ 250:../Core/Src/controls.c ****     ctrl->servo_deflections[1] = ctrl->vane_deflections[1]*(8.0/5.0); //roll servo 2
+ 1271              		.loc 1 250 5 is_stmt 1 view .LVU377
+ 1272              		.loc 1 250 56 is_stmt 0 view .LVU378
+ 1273 001e D4F80001 		ldr	r0, [r4, #256]	@ float
+ 1274 0022 FFF7FEFF 		bl	__aeabi_f2d
+ 1275              	.LVL121:
+ 1276              		.loc 1 250 59 view .LVU379
+ 1277 0026 12A3     		adr	r3, .L93
+ 1278 0028 D3E90023 		ldrd	r2, [r3]
+ARM GAS  /tmp/cc9wWjjg.s 			page 30
+
+
+ 1279 002c FFF7FEFF 		bl	__aeabi_dmul
+ 1280              	.LVL122:
+ 1281 0030 FFF7FEFF 		bl	__aeabi_d2f
+ 1282              	.LVL123:
+ 1283              		.loc 1 250 32 view .LVU380
+ 1284 0034 C4F81001 		str	r0, [r4, #272]	@ float
+ 251:../Core/Src/controls.c ****     ctrl->servo_deflections[2] = ctrl->vane_deflections[2]*(8.0/5.0); //yaw servo 1
+ 1285              		.loc 1 251 5 is_stmt 1 view .LVU381
+ 1286              		.loc 1 251 56 is_stmt 0 view .LVU382
+ 1287 0038 D4F80401 		ldr	r0, [r4, #260]	@ float
+ 1288 003c FFF7FEFF 		bl	__aeabi_f2d
+ 1289              	.LVL124:
+ 1290              		.loc 1 251 59 view .LVU383
+ 1291 0040 0BA3     		adr	r3, .L93
+ 1292 0042 D3E90023 		ldrd	r2, [r3]
+ 1293 0046 FFF7FEFF 		bl	__aeabi_dmul
+ 1294              	.LVL125:
+ 1295 004a FFF7FEFF 		bl	__aeabi_d2f
+ 1296              	.LVL126:
+ 1297              		.loc 1 251 32 view .LVU384
+ 1298 004e C4F81401 		str	r0, [r4, #276]	@ float
+ 252:../Core/Src/controls.c ****     ctrl->servo_deflections[3] = ctrl->vane_deflections[3]*(8.0/5.0); //yaw servo 2
+ 1299              		.loc 1 252 5 is_stmt 1 view .LVU385
+ 1300              		.loc 1 252 56 is_stmt 0 view .LVU386
+ 1301 0052 D4F80801 		ldr	r0, [r4, #264]	@ float
+ 1302 0056 FFF7FEFF 		bl	__aeabi_f2d
+ 1303              	.LVL127:
+ 1304              		.loc 1 252 59 view .LVU387
+ 1305 005a 05A3     		adr	r3, .L93
+ 1306 005c D3E90023 		ldrd	r2, [r3]
+ 1307 0060 FFF7FEFF 		bl	__aeabi_dmul
+ 1308              	.LVL128:
+ 1309 0064 FFF7FEFF 		bl	__aeabi_d2f
+ 1310              	.LVL129:
+ 1311              		.loc 1 252 32 view .LVU388
+ 1312 0068 C4F81801 		str	r0, [r4, #280]	@ float
+ 253:../Core/Src/controls.c **** }
+ 1313              		.loc 1 253 1 view .LVU389
+ 1314 006c 10BD     		pop	{r4, pc}
+ 1315              	.LVL130:
+ 1316              	.L94:
+ 1317              		.loc 1 253 1 view .LVU390
+ 1318 006e 00BF     		.align	3
+ 1319              	.L93:
+ 1320 0070 9A999999 		.word	-1717986918
+ 1321 0074 9999F93F 		.word	1073322393
+ 1322              		.cfi_endproc
+ 1323              	.LFE149:
+ 1325              		.section	.text.run_controls,"ax",%progbits
+ 1326              		.align	1
+ 1327              		.global	run_controls
+ 1328              		.syntax unified
+ 1329              		.thumb
+ 1330              		.thumb_func
+ 1331              		.fpu fpv4-sp-d16
+ 1333              	run_controls:
+ 1334              	.LVL131:
+ARM GAS  /tmp/cc9wWjjg.s 			page 31
+
+
+ 1335              	.LFB150:
+ 254:../Core/Src/controls.c **** 
+ 255:../Core/Src/controls.c **** /**
+ 256:../Core/Src/controls.c ****  * @brief Runs the control algorithm for the jet vanes rocket for a given time step
+ 257:../Core/Src/controls.c ****  * @param ctrl Takes the controller struct, the current state estimate, and the elapsed time since 
+ 258:../Core/Src/controls.c ****  * @param state 1-D array of current state estimate
+ 259:../Core/Src/controls.c ****  * @param elapsed_time Time since launch
+ 260:../Core/Src/controls.c ****  * @return
+ 261:../Core/Src/controls.c ****  * @note
+ 262:../Core/Src/controls.c **** */
+ 263:../Core/Src/controls.c **** void run_controls(controller *ctrl, float *state, float elapsed_time){
+ 1336              		.loc 1 263 70 is_stmt 1 view -0
+ 1337              		.cfi_startproc
+ 1338              		@ args = 0, pretend = 0, frame = 0
+ 1339              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1340              		.loc 1 263 70 is_stmt 0 view .LVU392
+ 1341 0000 10B5     		push	{r4, lr}
+ 1342              	.LCFI19:
+ 1343              		.cfi_def_cfa_offset 8
+ 1344              		.cfi_offset 4, -8
+ 1345              		.cfi_offset 14, -4
+ 1346 0002 0446     		mov	r4, r0
+ 264:../Core/Src/controls.c ****     // Update time since launch
+ 265:../Core/Src/controls.c ****     ctrl->time_since_launch = elapsed_time;
+ 1347              		.loc 1 265 5 is_stmt 1 view .LVU393
+ 1348              		.loc 1 265 29 is_stmt 0 view .LVU394
+ 1349 0004 80ED000A 		vstr.32	s0, [r0]
+ 266:../Core/Src/controls.c **** 
+ 267:../Core/Src/controls.c ****     // Update state estimate
+ 268:../Core/Src/controls.c ****     for (int i = 0; i < 9; i++) {
+ 1350              		.loc 1 268 5 is_stmt 1 view .LVU395
+ 1351              	.LBB24:
+ 1352              		.loc 1 268 10 view .LVU396
+ 1353              	.LVL132:
+ 1354              		.loc 1 268 14 is_stmt 0 view .LVU397
+ 1355 0008 0023     		movs	r3, #0
+ 1356              		.loc 1 268 5 view .LVU398
+ 1357 000a 06E0     		b	.L96
+ 1358              	.LVL133:
+ 1359              	.L97:
+ 269:../Core/Src/controls.c ****         ctrl->x[i] = state[i];
+ 1360              		.loc 1 269 9 is_stmt 1 discriminator 3 view .LVU399
+ 1361              		.loc 1 269 27 is_stmt 0 discriminator 3 view .LVU400
+ 1362 000c 01EB8302 		add	r2, r1, r3, lsl #2
+ 1363 0010 1068     		ldr	r0, [r2]	@ float
+ 1364              		.loc 1 269 20 discriminator 3 view .LVU401
+ 1365 0012 04EB8302 		add	r2, r4, r3, lsl #2
+ 1366 0016 5060     		str	r0, [r2, #4]	@ float
+ 268:../Core/Src/controls.c ****         ctrl->x[i] = state[i];
+ 1367              		.loc 1 268 28 is_stmt 1 discriminator 3 view .LVU402
+ 268:../Core/Src/controls.c ****         ctrl->x[i] = state[i];
+ 1368              		.loc 1 268 29 is_stmt 0 discriminator 3 view .LVU403
+ 1369 0018 0133     		adds	r3, r3, #1
+ 1370              	.LVL134:
+ 1371              	.L96:
+ 268:../Core/Src/controls.c ****         ctrl->x[i] = state[i];
+ 1372              		.loc 1 268 21 is_stmt 1 discriminator 1 view .LVU404
+ARM GAS  /tmp/cc9wWjjg.s 			page 32
+
+
+ 268:../Core/Src/controls.c ****         ctrl->x[i] = state[i];
+ 1373              		.loc 1 268 5 is_stmt 0 discriminator 1 view .LVU405
+ 1374 001a 082B     		cmp	r3, #8
+ 1375 001c F6DD     		ble	.L97
+ 1376              	.LBE24:
+ 270:../Core/Src/controls.c ****     }
+ 271:../Core/Src/controls.c **** 
+ 272:../Core/Src/controls.c ****     reference_selector(ctrl); // Update the reference state
+ 1377              		.loc 1 272 5 is_stmt 1 view .LVU406
+ 1378 001e 2046     		mov	r0, r4
+ 1379 0020 FFF7FEFF 		bl	reference_selector
+ 1380              	.LVL135:
+ 273:../Core/Src/controls.c ****     LQR_gain_selector(ctrl); // Update the LQR gain matrix
+ 1381              		.loc 1 273 5 view .LVU407
+ 1382 0024 2046     		mov	r0, r4
+ 1383 0026 FFF7FEFF 		bl	LQR_gain_selector
+ 1384              	.LVL136:
+ 274:../Core/Src/controls.c ****     compute_controls(ctrl); // Compute the control moments
+ 1385              		.loc 1 274 5 view .LVU408
+ 1386 002a 2046     		mov	r0, r4
+ 1387 002c FFF7FEFF 		bl	compute_controls
+ 1388              	.LVL137:
+ 275:../Core/Src/controls.c ****     update_yaw_moment_arm(ctrl); // Update the yaw moment arm
+ 1389              		.loc 1 275 5 view .LVU409
+ 1390 0030 2046     		mov	r0, r4
+ 1391 0032 FFF7FEFF 		bl	update_yaw_moment_arm
+ 1392              	.LVL138:
+ 276:../Core/Src/controls.c ****     moment_to_sideforce(ctrl); // Convert moments to side forces
+ 1393              		.loc 1 276 5 view .LVU410
+ 1394 0036 2046     		mov	r0, r4
+ 1395 0038 FFF7FEFF 		bl	moment_to_sideforce
+ 1396              	.LVL139:
+ 277:../Core/Src/controls.c ****     sideforce_to_vane_angle(ctrl); // Convert side forces to vane angles
+ 1397              		.loc 1 277 5 view .LVU411
+ 1398 003c 2046     		mov	r0, r4
+ 1399 003e FFF7FEFF 		bl	sideforce_to_vane_angle
+ 1400              	.LVL140:
+ 278:../Core/Src/controls.c ****     vane_angle_to_servo_angle(ctrl); // Convert vane angles to servo angles
+ 1401              		.loc 1 278 5 view .LVU412
+ 1402 0042 2046     		mov	r0, r4
+ 1403 0044 FFF7FEFF 		bl	vane_angle_to_servo_angle
+ 1404              	.LVL141:
+ 279:../Core/Src/controls.c **** 
+ 280:../Core/Src/controls.c ****     // TODO: Send servo_deflections to the servo controller
+ 281:../Core/Src/controls.c **** }...
+ 1405              		.loc 1 281 1 is_stmt 0 view .LVU413
+ 1406 0048 10BD     		pop	{r4, pc}
+ 1407              		.loc 1 281 1 view .LVU414
+ 1408              		.cfi_endproc
+ 1409              	.LFE150:
+ 1411              		.global	num_ref_state_entries
+ 1412              		.global	ref_state_data
+ 1413              		.global	num_lqr_entries
+ 1414              		.global	lqr_data
+ 1415              		.section	.rodata
+ 1416              		.align	2
+ 1417              		.set	.LANCHOR1,. + 0
+ARM GAS  /tmp/cc9wWjjg.s 			page 33
+
+
+ 1418              	.LC0:
+ 1419 0000 00D00445 		.word	1157943296
+ 1420 0004 0040CE44 		.word	1154367488
+ 1421 0008 0040BF44 		.word	1153384448
+ 1422 000c 0000BE44 		.word	1153302528
+ 1423 0010 0040BA44 		.word	1153056768
+ 1424 0014 00C0A844 		.word	1151909888
+ 1425 0018 00A0A044 		.word	1151377408
+ 1426 001c 00C08F44 		.word	1150271488
+ 1427 0020 00807744 		.word	1148682240
+ 1428 0024 00003E44 		.word	1144913920
+ 1429 0028 00801844 		.word	1142456320
+ 1430 002c 0000C843 		.word	1137180672
+ 1431 0030 00008743 		.word	1132920832
+ 1432 0034 00001643 		.word	1125515264
+ 1433 0038 00000000 		.word	0
+ 1434              		.section	.rodata.lqr_data,"a"
+ 1435              		.align	2
+ 1438              	lqr_data:
+ 1439 0000 0000803F 		.word	1065353216
+ 1440 0004 4536B442 		.word	1119106629
+ 1441 0008 00000000 		.word	0
+ 1442 000c 00000000 		.space	28
+ 1442      00000000 
+ 1442      00000000 
+ 1442      00000000 
+ 1442      00000000 
+ 1443 0028 00000000 		.word	0
+ 1444 002c 00000000 		.word	0
+ 1445 0030 00000080 		.word	-2147483648
+ 1446 0034 7BD2FD41 		.word	1107153531
+ 1447 0038 00000000 		.word	0
+ 1448 003c 00000080 		.word	-2147483648
+ 1449 0040 73FBFC41 		.word	1107098483
+ 1450 0044 00000080 		.word	-2147483648
+ 1451 0048 00000000 		.word	0
+ 1452 004c 00000080 		.word	-2147483648
+ 1453 0050 00000080 		.word	-2147483648
+ 1454 0054 CDACA539 		.word	967158989
+ 1455 0058 00000000 		.word	0
+ 1456 005c 6C971040 		.word	1074829164
+ 1457 0060 00000080 		.word	-2147483648
+ 1458 0064 00000000 		.word	0
+ 1459 0068 1C0A3F3E 		.word	1044318748
+ 1460 006c 00000080 		.word	-2147483648
+ 1461 0070 00000000 		.word	0
+ 1462 0074 D2C8AFBE 		.word	-1095776046
+ 1463 0078 00000080 		.word	-2147483648
+ 1464 007c 00000000 		.word	0
+ 1465 0080 00000080 		.word	-2147483648
+ 1466 0084 DBD04742 		.word	1112002779
+ 1467 0088 00000000 		.word	0
+ 1468 008c 00000080 		.word	-2147483648
+ 1469 0090 2FB71741 		.word	1092073263
+ 1470 0094 00000000 		.word	0
+ 1471 0098 00000080 		.word	-2147483648
+ 1472 009c 00000080 		.word	-2147483648
+ARM GAS  /tmp/cc9wWjjg.s 			page 34
+
+
+ 1473 00a0 00000080 		.word	-2147483648
+ 1474 00a4 00000000 		.word	0
+ 1475 00a8 00000000 		.word	0
+ 1476 00ac 00000080 		.word	-2147483648
+ 1477 00b0 00000080 		.word	-2147483648
+ 1478 00b4 00000000 		.word	0
+ 1479 00b8 0000803F 		.word	1065353216
+ 1480 00bc F5E4BB42 		.word	1119610101
+ 1481 00c0 00000000 		.word	0
+ 1482 00c4 00000000 		.space	28
+ 1482      00000000 
+ 1482      00000000 
+ 1482      00000000 
+ 1482      00000000 
+ 1483 00e0 00000080 		.word	-2147483648
+ 1484 00e4 00000000 		.word	0
+ 1485 00e8 00000080 		.word	-2147483648
+ 1486 00ec 7BD2FD41 		.word	1107153531
+ 1487 00f0 00000080 		.word	-2147483648
+ 1488 00f4 00000080 		.word	-2147483648
+ 1489 00f8 73FBFC41 		.word	1107098483
+ 1490 00fc 00000080 		.word	-2147483648
+ 1491 0100 00000000 		.word	0
+ 1492 0104 00000080 		.word	-2147483648
+ 1493 0108 00000000 		.word	0
+ 1494 010c CDACA539 		.word	967158989
+ 1495 0110 00000080 		.word	-2147483648
+ 1496 0114 07D11040 		.word	1074843911
+ 1497 0118 00000000 		.word	0
+ 1498 011c 00000080 		.word	-2147483648
+ 1499 0120 11543D3E 		.word	1044206609
+ 1500 0124 00000000 		.word	0
+ 1501 0128 00000000 		.word	0
+ 1502 012c 78CFB1BE 		.word	-1095643272
+ 1503 0130 00000000 		.word	0
+ 1504 0134 00000000 		.word	0
+ 1505 0138 00000000 		.word	0
+ 1506 013c 59594A42 		.word	1112168793
+ 1507 0140 00000000 		.word	0
+ 1508 0144 00000000 		.word	0
+ 1509 0148 6B3A1241 		.word	1091713643
+ 1510 014c 00000000 		.word	0
+ 1511 0150 00000080 		.word	-2147483648
+ 1512 0154 00000000 		.word	0
+ 1513 0158 00000000 		.word	0
+ 1514 015c 00000000 		.word	0
+ 1515 0160 00000080 		.word	-2147483648
+ 1516 0164 00000000 		.word	0
+ 1517 0168 00000000 		.word	0
+ 1518 016c 00000080 		.word	-2147483648
+ 1519 0170 0000803F 		.word	1065353216
+ 1520 0174 4BF1C342 		.word	1120137547
+ 1521 0178 00000000 		.word	0
+ 1522 017c 00000000 		.space	28
+ 1522      00000000 
+ 1522      00000000 
+ 1522      00000000 
+ARM GAS  /tmp/cc9wWjjg.s 			page 35
+
+
+ 1522      00000000 
+ 1523 0198 00000000 		.word	0
+ 1524 019c 00000080 		.word	-2147483648
+ 1525 01a0 00000000 		.word	0
+ 1526 01a4 7BD2FD41 		.word	1107153531
+ 1527 01a8 00000000 		.word	0
+ 1528 01ac 00000000 		.word	0
+ 1529 01b0 73FBFC41 		.word	1107098483
+ 1530 01b4 00000000 		.word	0
+ 1531 01b8 00000000 		.word	0
+ 1532 01bc 00000080 		.word	-2147483648
+ 1533 01c0 00000000 		.word	0
+ 1534 01c4 CDACA539 		.word	967158989
+ 1535 01c8 00000000 		.word	0
+ 1536 01cc 880F1140 		.word	1074859912
+ 1537 01d0 00000080 		.word	-2147483648
+ 1538 01d4 00000000 		.word	0
+ 1539 01d8 2E913B3E 		.word	1044091182
+ 1540 01dc 00000080 		.word	-2147483648
+ 1541 01e0 00000080 		.word	-2147483648
+ 1542 01e4 5B06B4BE 		.word	-1095498149
+ 1543 01e8 00000080 		.word	-2147483648
+ 1544 01ec 00000080 		.word	-2147483648
+ 1545 01f0 00000080 		.word	-2147483648
+ 1546 01f4 35144D42 		.word	1112347701
+ 1547 01f8 00000080 		.word	-2147483648
+ 1548 01fc 00000080 		.word	-2147483648
+ 1549 0200 E4040D41 		.word	1091372260
+ 1550 0204 00000000 		.word	0
+ 1551 0208 00000000 		.word	0
+ 1552 020c 00000080 		.word	-2147483648
+ 1553 0210 00000080 		.word	-2147483648
+ 1554 0214 00000080 		.word	-2147483648
+ 1555 0218 00000000 		.word	0
+ 1556 021c 00000080 		.word	-2147483648
+ 1557 0220 00000080 		.word	-2147483648
+ 1558 0224 00000000 		.word	0
+ 1559 0228 0000803F 		.word	1065353216
+ 1560 022c AC4BCC42 		.word	1120684972
+ 1561 0230 00000000 		.word	0
+ 1562 0234 00000000 		.space	28
+ 1562      00000000 
+ 1562      00000000 
+ 1562      00000000 
+ 1562      00000000 
+ 1563 0250 00000080 		.word	-2147483648
+ 1564 0254 00000000 		.word	0
+ 1565 0258 00000000 		.word	0
+ 1566 025c 7BD2FD41 		.word	1107153531
+ 1567 0260 00000000 		.word	0
+ 1568 0264 00000000 		.word	0
+ 1569 0268 73FBFC41 		.word	1107098483
+ 1570 026c 00000000 		.word	0
+ 1571 0270 00000080 		.word	-2147483648
+ 1572 0274 00000080 		.word	-2147483648
+ 1573 0278 00000000 		.word	0
+ 1574 027c CDACA539 		.word	967158989
+ARM GAS  /tmp/cc9wWjjg.s 			page 36
+
+
+ 1575 0280 00000000 		.word	0
+ 1576 0284 BD521140 		.word	1074877117
+ 1577 0288 00000000 		.word	0
+ 1578 028c 00000000 		.word	0
+ 1579 0290 61C5393E 		.word	1043973473
+ 1580 0294 00000080 		.word	-2147483648
+ 1581 0298 00000080 		.word	-2147483648
+ 1582 029c FD6AB6BE 		.word	-1095341315
+ 1583 02a0 00000000 		.word	0
+ 1584 02a4 00000080 		.word	-2147483648
+ 1585 02a8 00000000 		.word	0
+ 1586 02ac 61FD4F42 		.word	1112538465
+ 1587 02b0 00000080 		.word	-2147483648
+ 1588 02b4 00000000 		.word	0
+ 1589 02b8 6A1F0841 		.word	1091051370
+ 1590 02bc 00000000 		.word	0
+ 1591 02c0 00000000 		.word	0
+ 1592 02c4 00000080 		.word	-2147483648
+ 1593 02c8 00000080 		.word	-2147483648
+ 1594 02cc 00000000 		.word	0
+ 1595 02d0 00000000 		.word	0
+ 1596 02d4 00000080 		.word	-2147483648
+ 1597 02d8 00000080 		.word	-2147483648
+ 1598 02dc 00000000 		.word	0
+ 1599 02e0 0000803F 		.word	1065353216
+ 1600 02e4 0358D442 		.word	1121212419
+ 1601 02e8 00000000 		.word	0
+ 1602 02ec 00000000 		.space	28
+ 1602      00000000 
+ 1602      00000000 
+ 1602      00000000 
+ 1602      00000000 
+ 1603 0308 00000000 		.word	0
+ 1604 030c 00000000 		.word	0
+ 1605 0310 00000080 		.word	-2147483648
+ 1606 0314 7BD2FD41 		.word	1107153531
+ 1607 0318 00000080 		.word	-2147483648
+ 1608 031c 00000000 		.word	0
+ 1609 0320 73FBFC41 		.word	1107098483
+ 1610 0324 00000080 		.word	-2147483648
+ 1611 0328 00000000 		.word	0
+ 1612 032c 00000080 		.word	-2147483648
+ 1613 0330 00000000 		.word	0
+ 1614 0334 CDACA539 		.word	967158989
+ 1615 0338 00000000 		.word	0
+ 1616 033c A7951140 		.word	1074894247
+ 1617 0340 00000080 		.word	-2147483648
+ 1618 0344 00000000 		.word	0
+ 1619 0348 7B12383E 		.word	1043862139
+ 1620 034c 00000080 		.word	-2147483648
+ 1621 0350 00000000 		.word	0
+ 1622 0354 5BCFB8BE 		.word	-1095184549
+ 1623 0358 00000080 		.word	-2147483648
+ 1624 035c 00000080 		.word	-2147483648
+ 1625 0360 00000080 		.word	-2147483648
+ 1626 0364 73DD5242 		.word	1112726899
+ 1627 0368 00000080 		.word	-2147483648
+ARM GAS  /tmp/cc9wWjjg.s 			page 37
+
+
+ 1628 036c 00000080 		.word	-2147483648
+ 1629 0370 F2D50341 		.word	1090770418
+ 1630 0374 00000000 		.word	0
+ 1631 0378 00000080 		.word	-2147483648
+ 1632 037c 00000080 		.word	-2147483648
+ 1633 0380 00000080 		.word	-2147483648
+ 1634 0384 00000080 		.word	-2147483648
+ 1635 0388 00000000 		.word	0
+ 1636 038c 00000000 		.word	0
+ 1637 0390 00000080 		.word	-2147483648
+ 1638 0394 00000080 		.word	-2147483648
+ 1639 0398 0000803F 		.word	1065353216
+ 1640 039c 64B2DC42 		.word	1121759844
+ 1641 03a0 00000000 		.word	0
+ 1642 03a4 00000000 		.space	28
+ 1642      00000000 
+ 1642      00000000 
+ 1642      00000000 
+ 1642      00000000 
+ 1643 03c0 00000080 		.word	-2147483648
+ 1644 03c4 00000000 		.word	0
+ 1645 03c8 00000000 		.word	0
+ 1646 03cc 7BD2FD41 		.word	1107153531
+ 1647 03d0 00000000 		.word	0
+ 1648 03d4 00000000 		.word	0
+ 1649 03d8 73FBFC41 		.word	1107098483
+ 1650 03dc 00000000 		.word	0
+ 1651 03e0 00000000 		.word	0
+ 1652 03e4 00000080 		.word	-2147483648
+ 1653 03e8 00000000 		.word	0
+ 1654 03ec CDACA539 		.word	967158989
+ 1655 03f0 00000080 		.word	-2147483648
+ 1656 03f4 55DD1140 		.word	1074912597
+ 1657 03f8 00000000 		.word	0
+ 1658 03fc 00000000 		.word	0
+ 1659 0400 3257363E 		.word	1043748658
+ 1660 0404 00000000 		.word	0
+ 1661 0408 00000080 		.word	-2147483648
+ 1662 040c F260BBBE 		.word	-1095016206
+ 1663 0410 00000000 		.word	0
+ 1664 0414 00000080 		.word	-2147483648
+ 1665 0418 00000000 		.word	0
+ 1666 041c 44EB5542 		.word	1112927044
+ 1667 0420 00000080 		.word	-2147483648
+ 1668 0424 00000000 		.word	0
+ 1669 0428 348FFF40 		.word	1090490164
+ 1670 042c 00000000 		.word	0
+ 1671 0430 00000080 		.word	-2147483648
+ 1672 0434 00000080 		.word	-2147483648
+ 1673 0438 00000000 		.word	0
+ 1674 043c 00000080 		.word	-2147483648
+ 1675 0440 00000000 		.word	0
+ 1676 0444 00000000 		.word	0
+ 1677 0448 00000080 		.word	-2147483648
+ 1678 044c 00000080 		.word	-2147483648
+ 1679 0450 0000803F 		.word	1065353216
+ 1680 0454 6C6AE542 		.word	1122331244
+ARM GAS  /tmp/cc9wWjjg.s 			page 38
+
+
+ 1681 0458 00000000 		.word	0
+ 1682 045c 00000000 		.space	28
+ 1682      00000000 
+ 1682      00000000 
+ 1682      00000000 
+ 1682      00000000 
+ 1683 0478 00000080 		.word	-2147483648
+ 1684 047c 00000000 		.word	0
+ 1685 0480 00000000 		.word	0
+ 1686 0484 7BD2FD41 		.word	1107153531
+ 1687 0488 00000000 		.word	0
+ 1688 048c 00000080 		.word	-2147483648
+ 1689 0490 73FBFC41 		.word	1107098483
+ 1690 0494 00000000 		.word	0
+ 1691 0498 00000000 		.word	0
+ 1692 049c 00000000 		.word	0
+ 1693 04a0 00000000 		.word	0
+ 1694 04a4 CDACA539 		.word	967158989
+ 1695 04a8 00000080 		.word	-2147483648
+ 1696 04ac 7C2A1240 		.word	1074932348
+ 1697 04b0 00000080 		.word	-2147483648
+ 1698 04b4 00000000 		.word	0
+ 1699 04b8 2A91343E 		.word	1043632426
+ 1700 04bc 00000000 		.word	0
+ 1701 04c0 00000080 		.word	-2147483648
+ 1702 04c4 4E26BEBE 		.word	-1094834610
+ 1703 04c8 00000000 		.word	0
+ 1704 04cc 00000000 		.word	0
+ 1705 04d0 00000080 		.word	-2147483648
+ 1706 04d4 E42D5942 		.word	1113140708
+ 1707 04d8 00000000 		.word	0
+ 1708 04dc 00000080 		.word	-2147483648
+ 1709 04e0 BCD8F740 		.word	1089984700
+ 1710 04e4 00000000 		.word	0
+ 1711 04e8 00000000 		.word	0
+ 1712 04ec 00000000 		.word	0
+ 1713 04f0 00000080 		.word	-2147483648
+ 1714 04f4 00000000 		.word	0
+ 1715 04f8 00000080 		.word	-2147483648
+ 1716 04fc 00000000 		.word	0
+ 1717 0500 00000000 		.word	0
+ 1718 0504 00000000 		.word	0
+ 1719 0508 00000040 		.word	1073741824
+ 1720 050c 1A250243 		.word	1124214042
+ 1721 0510 00000000 		.word	0
+ 1722 0514 00000000 		.space	28
+ 1722      00000000 
+ 1722      00000000 
+ 1722      00000000 
+ 1722      00000000 
+ 1723 0530 00000080 		.word	-2147483648
+ 1724 0534 00000080 		.word	-2147483648
+ 1725 0538 00000000 		.word	0
+ 1726 053c E9D1FD41 		.word	1107153385
+ 1727 0540 00000000 		.word	0
+ 1728 0544 00000000 		.word	0
+ 1729 0548 73FBFC41 		.word	1107098483
+ARM GAS  /tmp/cc9wWjjg.s 			page 39
+
+
+ 1730 054c 00000000 		.word	0
+ 1731 0550 00000080 		.word	-2147483648
+ 1732 0554 00000000 		.word	0
+ 1733 0558 00000000 		.word	0
+ 1734 055c CDACA539 		.word	967158989
+ 1735 0560 00000080 		.word	-2147483648
+ 1736 0564 75911240 		.word	1074958709
+ 1737 0568 00000080 		.word	-2147483648
+ 1738 056c 00000000 		.word	0
+ 1739 0570 44FA2D3E 		.word	1043200580
+ 1740 0574 00000080 		.word	-2147483648
+ 1741 0578 00000000 		.word	0
+ 1742 057c B69FCCBE 		.word	-1093886026
+ 1743 0580 00000080 		.word	-2147483648
+ 1744 0584 00000080 		.word	-2147483648
+ 1745 0588 00000080 		.word	-2147483648
+ 1746 058c 07206642 		.word	1113989127
+ 1747 0590 00000080 		.word	-2147483648
+ 1748 0594 00000080 		.word	-2147483648
+ 1749 0598 8FA6E140 		.word	1088530063
+ 1750 059c 00000000 		.word	0
+ 1751 05a0 00000000 		.word	0
+ 1752 05a4 00000080 		.word	-2147483648
+ 1753 05a8 00000000 		.word	0
+ 1754 05ac 00000080 		.word	-2147483648
+ 1755 05b0 00000080 		.word	-2147483648
+ 1756 05b4 00000080 		.word	-2147483648
+ 1757 05b8 00000080 		.word	-2147483648
+ 1758 05bc 00000000 		.word	0
+ 1759 05c0 00000040 		.word	1073741824
+ 1760 05c4 7CB10743 		.word	1124577660
+ 1761 05c8 00000000 		.word	0
+ 1762 05cc 00000000 		.space	28
+ 1762      00000000 
+ 1762      00000000 
+ 1762      00000000 
+ 1762      00000000 
+ 1763 05e8 00000080 		.word	-2147483648
+ 1764 05ec 00000080 		.word	-2147483648
+ 1765 05f0 00000000 		.word	0
+ 1766 05f4 E9D1FD41 		.word	1107153385
+ 1767 05f8 00000000 		.word	0
+ 1768 05fc 00000080 		.word	-2147483648
+ 1769 0600 73FBFC41 		.word	1107098483
+ 1770 0604 00000000 		.word	0
+ 1771 0608 00000000 		.word	0
+ 1772 060c 00000000 		.word	0
+ 1773 0610 00000000 		.word	0
+ 1774 0614 CDACA539 		.word	967158989
+ 1775 0618 00000080 		.word	-2147483648
+ 1776 061c DA001340 		.word	1074987226
+ 1777 0620 00000000 		.word	0
+ 1778 0624 00000000 		.word	0
+ 1779 0628 9EEB2B3E 		.word	1043065758
+ 1780 062c 00000080 		.word	-2147483648
+ 1781 0630 00000000 		.word	0
+ 1782 0634 59C4D0BE 		.word	-1093614503
+ARM GAS  /tmp/cc9wWjjg.s 			page 40
+
+
+ 1783 0638 00000000 		.word	0
+ 1784 063c 00000000 		.word	0
+ 1785 0640 00000000 		.word	0
+ 1786 0644 E4B96A42 		.word	1114290660
+ 1787 0648 00000000 		.word	0
+ 1788 064c 00000000 		.word	0
+ 1789 0650 DC2ADB40 		.word	1088105180
+ 1790 0654 00000000 		.word	0
+ 1791 0658 00000000 		.word	0
+ 1792 065c 00000080 		.word	-2147483648
+ 1793 0660 00000080 		.word	-2147483648
+ 1794 0664 00000000 		.word	0
+ 1795 0668 00000080 		.word	-2147483648
+ 1796 066c 00000080 		.word	-2147483648
+ 1797 0670 00000000 		.word	0
+ 1798 0674 00000080 		.word	-2147483648
+ 1799 0678 00000040 		.word	1073741824
+ 1800 067c 4D7C0D43 		.word	1124957261
+ 1801 0680 00000000 		.word	0
+ 1802 0684 00000000 		.space	28
+ 1802      00000000 
+ 1802      00000000 
+ 1802      00000000 
+ 1802      00000000 
+ 1803 06a0 00000000 		.word	0
+ 1804 06a4 00000080 		.word	-2147483648
+ 1805 06a8 00000000 		.word	0
+ 1806 06ac E9D1FD41 		.word	1107153385
+ 1807 06b0 00000000 		.word	0
+ 1808 06b4 00000080 		.word	-2147483648
+ 1809 06b8 73FBFC41 		.word	1107098483
+ 1810 06bc 00000000 		.word	0
+ 1811 06c0 00000080 		.word	-2147483648
+ 1812 06c4 00000000 		.word	0
+ 1813 06c8 00000000 		.word	0
+ 1814 06cc CDACA539 		.word	967158989
+ 1815 06d0 00000080 		.word	-2147483648
+ 1816 06d4 AB781340 		.word	1075017899
+ 1817 06d8 00000080 		.word	-2147483648
+ 1818 06dc 00000000 		.word	0
+ 1819 06e0 89D3293E 		.word	1042928521
+ 1820 06e4 00000080 		.word	-2147483648
+ 1821 06e8 00000080 		.word	-2147483648
+ 1822 06ec 363CD5BE 		.word	-1093321674
+ 1823 06f0 00000000 		.word	0
+ 1824 06f4 00000000 		.word	0
+ 1825 06f8 00000080 		.word	-2147483648
+ 1826 06fc 52A36F42 		.word	1114612562
+ 1827 0700 00000000 		.word	0
+ 1828 0704 00000080 		.word	-2147483648
+ 1829 0708 5716D540 		.word	1087706711
+ 1830 070c 00000000 		.word	0
+ 1831 0710 00000080 		.word	-2147483648
+ 1832 0714 00000080 		.word	-2147483648
+ 1833 0718 00000000 		.word	0
+ 1834 071c 00000080 		.word	-2147483648
+ 1835 0720 00000000 		.word	0
+ARM GAS  /tmp/cc9wWjjg.s 			page 41
+
+
+ 1836 0724 00000000 		.word	0
+ 1837 0728 00000080 		.word	-2147483648
+ 1838 072c 00000000 		.word	0
+ 1839 0730 00000040 		.word	1073741824
+ 1840 0734 8E851343 		.word	1125352846
+ 1841 0738 00000000 		.word	0
+ 1842 073c 00000000 		.space	28
+ 1842      00000000 
+ 1842      00000000 
+ 1842      00000000 
+ 1842      00000000 
+ 1843 0758 00000000 		.word	0
+ 1844 075c 00000080 		.word	-2147483648
+ 1845 0760 00000080 		.word	-2147483648
+ 1846 0764 E9D1FD41 		.word	1107153385
+ 1847 0768 00000080 		.word	-2147483648
+ 1848 076c 00000080 		.word	-2147483648
+ 1849 0770 73FBFC41 		.word	1107098483
+ 1850 0774 00000080 		.word	-2147483648
+ 1851 0778 00000080 		.word	-2147483648
+ 1852 077c 00000080 		.word	-2147483648
+ 1853 0780 00000080 		.word	-2147483648
+ 1854 0784 CDACA539 		.word	967158989
+ 1855 0788 00000080 		.word	-2147483648
+ 1856 078c 38F91340 		.word	1075050808
+ 1857 0790 00000000 		.word	0
+ 1858 0794 00000000 		.word	0
+ 1859 0798 53B3273E 		.word	1042789203
+ 1860 079c 00000080 		.word	-2147483648
+ 1861 07a0 00000080 		.word	-2147483648
+ 1862 07a4 A20BDABE 		.word	-1093006430
+ 1863 07a8 00000000 		.word	0
+ 1864 07ac 00000000 		.word	0
+ 1865 07b0 00000080 		.word	-2147483648
+ 1866 07b4 4EDF7442 		.word	1114955598
+ 1867 07b8 00000000 		.word	0
+ 1868 07bc 00000080 		.word	-2147483648
+ 1869 07c0 2368CF40 		.word	1087334435
+ 1870 07c4 00000000 		.word	0
+ 1871 07c8 00000000 		.word	0
+ 1872 07cc 00000080 		.word	-2147483648
+ 1873 07d0 00000080 		.word	-2147483648
+ 1874 07d4 00000080 		.word	-2147483648
+ 1875 07d8 00000080 		.word	-2147483648
+ 1876 07dc 00000000 		.word	0
+ 1877 07e0 00000080 		.word	-2147483648
+ 1878 07e4 00000080 		.word	-2147483648
+ 1879 07e8 00000040 		.word	1073741824
+ 1880 07ec 60501943 		.word	1125732448
+ 1881 07f0 00000000 		.word	0
+ 1882 07f4 00000000 		.space	28
+ 1882      00000000 
+ 1882      00000000 
+ 1882      00000000 
+ 1882      00000000 
+ 1883 0810 00000080 		.word	-2147483648
+ 1884 0814 00000080 		.word	-2147483648
+ARM GAS  /tmp/cc9wWjjg.s 			page 42
+
+
+ 1885 0818 00000000 		.word	0
+ 1886 081c E9D1FD41 		.word	1107153385
+ 1887 0820 00000000 		.word	0
+ 1888 0824 00000080 		.word	-2147483648
+ 1889 0828 73FBFC41 		.word	1107098483
+ 1890 082c 00000000 		.word	0
+ 1891 0830 00000080 		.word	-2147483648
+ 1892 0834 00000000 		.word	0
+ 1893 0838 00000000 		.word	0
+ 1894 083c CDACA539 		.word	967158989
+ 1895 0840 00000000 		.word	0
+ 1896 0844 FB771440 		.word	1075083259
+ 1897 0848 00000080 		.word	-2147483648
+ 1898 084c 00000000 		.word	0
+ 1899 0850 C3B6253E 		.word	1042659011
+ 1900 0854 00000080 		.word	-2147483648
+ 1901 0858 00000000 		.word	0
+ 1902 085c 42CFDEBE 		.word	-1092694206
+ 1903 0860 00000000 		.word	0
+ 1904 0864 00000000 		.word	0
+ 1905 0868 00000000 		.word	0
+ 1906 086c 23017A42 		.word	1115291939
+ 1907 0870 00000000 		.word	0
+ 1908 0874 00000000 		.word	0
+ 1909 0878 8482CA40 		.word	1087013508
+ 1910 087c 00000000 		.word	0
+ 1911 0880 00000080 		.word	-2147483648
+ 1912 0884 00000000 		.word	0
+ 1913 0888 00000080 		.word	-2147483648
+ 1914 088c 00000080 		.word	-2147483648
+ 1915 0890 00000000 		.word	0
+ 1916 0894 00000000 		.word	0
+ 1917 0898 00000000 		.word	0
+ 1918 089c 00000000 		.word	0
+ 1919 08a0 00000040 		.word	1073741824
+ 1920 08a4 A0591F43 		.word	1126128032
+ 1921 08a8 00000000 		.word	0
+ 1922 08ac 00000000 		.space	28
+ 1922      00000000 
+ 1922      00000000 
+ 1922      00000000 
+ 1922      00000000 
+ 1923 08c8 00000000 		.word	0
+ 1924 08cc 00000000 		.word	0
+ 1925 08d0 00000000 		.word	0
+ 1926 08d4 E9D1FD41 		.word	1107153385
+ 1927 08d8 00000000 		.word	0
+ 1928 08dc 00000080 		.word	-2147483648
+ 1929 08e0 73FBFC41 		.word	1107098483
+ 1930 08e4 00000000 		.word	0
+ 1931 08e8 00000080 		.word	-2147483648
+ 1932 08ec 00000000 		.word	0
+ 1933 08f0 00000000 		.word	0
+ 1934 08f4 CDACA539 		.word	967158989
+ 1935 08f8 00000080 		.word	-2147483648
+ 1936 08fc 7AFF1440 		.word	1075117946
+ 1937 0900 00000080 		.word	-2147483648
+ARM GAS  /tmp/cc9wWjjg.s 			page 43
+
+
+ 1938 0904 00000000 		.word	0
+ 1939 0908 9AB2233E 		.word	1042526874
+ 1940 090c 00000080 		.word	-2147483648
+ 1941 0910 00000080 		.word	-2147483648
+ 1942 0914 B7EDE3BE 		.word	-1092358729
+ 1943 0918 00000080 		.word	-2147483648
+ 1944 091c 00000000 		.word	0
+ 1945 0920 00000080 		.word	-2147483648
+ 1946 0924 2F777F42 		.word	1115649839
+ 1947 0928 00000000 		.word	0
+ 1948 092c 00000080 		.word	-2147483648
+ 1949 0930 D1EAC540 		.word	1086712529
+ 1950 0934 00000000 		.word	0
+ 1951 0938 00000080 		.word	-2147483648
+ 1952 093c 00000000 		.word	0
+ 1953 0940 00000000 		.word	0
+ 1954 0944 00000080 		.word	-2147483648
+ 1955 0948 00000000 		.word	0
+ 1956 094c 00000080 		.word	-2147483648
+ 1957 0950 00000080 		.word	-2147483648
+ 1958 0954 00000000 		.word	0
+ 1959 0958 00000040 		.word	1073741824
+ 1960 095c 50A12543 		.word	1126539600
+ 1961 0960 00000000 		.word	0
+ 1962 0964 00000000 		.space	28
+ 1962      00000000 
+ 1962      00000000 
+ 1962      00000000 
+ 1962      00000000 
+ 1963 0980 00000000 		.word	0
+ 1964 0984 00000080 		.word	-2147483648
+ 1965 0988 00000000 		.word	0
+ 1966 098c E9D1FD41 		.word	1107153385
+ 1967 0990 00000000 		.word	0
+ 1968 0994 00000080 		.word	-2147483648
+ 1969 0998 73FBFC41 		.word	1107098483
+ 1970 099c 00000000 		.word	0
+ 1971 09a0 00000080 		.word	-2147483648
+ 1972 09a4 00000080 		.word	-2147483648
+ 1973 09a8 00000000 		.word	0
+ 1974 09ac CDACA539 		.word	967158989
+ 1975 09b0 00000000 		.word	0
+ 1976 09b4 F78F1540 		.word	1075154935
+ 1977 09b8 00000080 		.word	-2147483648
+ 1978 09bc 00000000 		.word	0
+ 1979 09c0 E3A7213E 		.word	1042393059
+ 1980 09c4 00000080 		.word	-2147483648
+ 1981 09c8 00000000 		.word	0
+ 1982 09cc A46CE9BE 		.word	-1091998556
+ 1983 09d0 00000080 		.word	-2147483648
+ 1984 09d4 00000000 		.word	0
+ 1985 09d8 00000080 		.word	-2147483648
+ 1986 09dc 6FA28242 		.word	1115857519
+ 1987 09e0 00000000 		.word	0
+ 1988 09e4 00000080 		.word	-2147483648
+ 1989 09e8 68A1C140 		.word	1086431592
+ 1990 09ec 00000000 		.word	0
+ARM GAS  /tmp/cc9wWjjg.s 			page 44
+
+
+ 1991 09f0 00000000 		.word	0
+ 1992 09f4 00000000 		.word	0
+ 1993 09f8 00000080 		.word	-2147483648
+ 1994 09fc 00000000 		.word	0
+ 1995 0a00 00000080 		.word	-2147483648
+ 1996 0a04 00000080 		.word	-2147483648
+ 1997 0a08 00000000 		.word	0
+ 1998 0a0c 00000080 		.word	-2147483648
+ 1999 0a10 00004040 		.word	1077936128
+ 2000 0a14 032AE542 		.word	1122314755
+ 2001 0a18 00000000 		.word	0
+ 2002 0a1c 00000000 		.space	28
+ 2002      00000000 
+ 2002      00000000 
+ 2002      00000000 
+ 2002      00000000 
+ 2003 0a38 00000080 		.word	-2147483648
+ 2004 0a3c 00000000 		.word	0
+ 2005 0a40 00000080 		.word	-2147483648
+ 2006 0a44 58D1FD41 		.word	1107153240
+ 2007 0a48 00000080 		.word	-2147483648
+ 2008 0a4c 00000000 		.word	0
+ 2009 0a50 73FBFC41 		.word	1107098483
+ 2010 0a54 00000080 		.word	-2147483648
+ 2011 0a58 00000000 		.word	0
+ 2012 0a5c 00000080 		.word	-2147483648
+ 2013 0a60 00000000 		.word	0
+ 2014 0a64 CDACA539 		.word	967158989
+ 2015 0a68 00000080 		.word	-2147483648
+ 2016 0a6c D1AE1040 		.word	1074835153
+ 2017 0a70 00000000 		.word	0
+ 2018 0a74 00000000 		.word	0
+ 2019 0a78 4870333E 		.word	1043558472
+ 2020 0a7c 00000080 		.word	-2147483648
+ 2021 0a80 00000080 		.word	-2147483648
+ 2022 0a84 9B8DC5BE 		.word	-1094349413
+ 2023 0a88 00000080 		.word	-2147483648
+ 2024 0a8c 00000080 		.word	-2147483648
+ 2025 0a90 00000000 		.word	0
+ 2026 0a94 A9845A42 		.word	1113228457
+ 2027 0a98 00000080 		.word	-2147483648
+ 2028 0a9c 00000000 		.word	0
+ 2029 0aa0 FE39F840 		.word	1090009598
+ 2030 0aa4 00000000 		.word	0
+ 2031 0aa8 00000080 		.word	-2147483648
+ 2032 0aac 00000080 		.word	-2147483648
+ 2033 0ab0 00000000 		.word	0
+ 2034 0ab4 00000000 		.word	0
+ 2035 0ab8 00000000 		.word	0
+ 2036 0abc 00000000 		.word	0
+ 2037 0ac0 00000000 		.word	0
+ 2038 0ac4 00000080 		.word	-2147483648
+ 2039 0ac8 00004040 		.word	1077936128
+ 2040 0acc 00FBEE42 		.word	1122958080
+ 2041 0ad0 00000000 		.word	0
+ 2042 0ad4 00000000 		.space	28
+ 2042      00000000 
+ARM GAS  /tmp/cc9wWjjg.s 			page 45
+
+
+ 2042      00000000 
+ 2042      00000000 
+ 2042      00000000 
+ 2043 0af0 00000000 		.word	0
+ 2044 0af4 00000080 		.word	-2147483648
+ 2045 0af8 00000000 		.word	0
+ 2046 0afc 58D1FD41 		.word	1107153240
+ 2047 0b00 00000080 		.word	-2147483648
+ 2048 0b04 00000000 		.word	0
+ 2049 0b08 73FBFC41 		.word	1107098483
+ 2050 0b0c 00000080 		.word	-2147483648
+ 2051 0b10 00000080 		.word	-2147483648
+ 2052 0b14 00000000 		.word	0
+ 2053 0b18 00000000 		.word	0
+ 2054 0b1c CDACA539 		.word	967158989
+ 2055 0b20 00000080 		.word	-2147483648
+ 2056 0b24 4F081140 		.word	1074858063
+ 2057 0b28 00000000 		.word	0
+ 2058 0b2c 00000080 		.word	-2147483648
+ 2059 0b30 E57C313E 		.word	1043430629
+ 2060 0b34 00000080 		.word	-2147483648
+ 2061 0b38 00000000 		.word	0
+ 2062 0b3c E4F5C8BE 		.word	-1094126108
+ 2063 0b40 00000080 		.word	-2147483648
+ 2064 0b44 00000080 		.word	-2147483648
+ 2065 0b48 00000000 		.word	0
+ 2066 0b4c 765C5E42 		.word	1113480310
+ 2067 0b50 00000080 		.word	-2147483648
+ 2068 0b54 00000000 		.word	0
+ 2069 0b58 FD5DF040 		.word	1089494525
+ 2070 0b5c 00000000 		.word	0
+ 2071 0b60 00000080 		.word	-2147483648
+ 2072 0b64 00000080 		.word	-2147483648
+ 2073 0b68 00000080 		.word	-2147483648
+ 2074 0b6c 00000080 		.word	-2147483648
+ 2075 0b70 00000000 		.word	0
+ 2076 0b74 00000080 		.word	-2147483648
+ 2077 0b78 00000080 		.word	-2147483648
+ 2078 0b7c 00000080 		.word	-2147483648
+ 2079 0b80 00004040 		.word	1077936128
+ 2080 0b84 A329F942 		.word	1123625379
+ 2081 0b88 00000000 		.word	0
+ 2082 0b8c 00000000 		.space	28
+ 2082      00000000 
+ 2082      00000000 
+ 2082      00000000 
+ 2082      00000000 
+ 2083 0ba8 00000080 		.word	-2147483648
+ 2084 0bac 00000080 		.word	-2147483648
+ 2085 0bb0 00000000 		.word	0
+ 2086 0bb4 58D1FD41 		.word	1107153240
+ 2087 0bb8 00000000 		.word	0
+ 2088 0bbc 00000000 		.word	0
+ 2089 0bc0 73FBFC41 		.word	1107098483
+ 2090 0bc4 00000000 		.word	0
+ 2091 0bc8 00000000 		.word	0
+ 2092 0bcc 00000000 		.word	0
+ARM GAS  /tmp/cc9wWjjg.s 			page 46
+
+
+ 2093 0bd0 00000000 		.word	0
+ 2094 0bd4 CDACA539 		.word	967158989
+ 2095 0bd8 00000000 		.word	0
+ 2096 0bdc 27681140 		.word	1074882599
+ 2097 0be0 00000080 		.word	-2147483648
+ 2098 0be4 00000000 		.word	0
+ 2099 0be8 E9812F3E 		.word	1043300841
+ 2100 0bec 00000080 		.word	-2147483648
+ 2101 0bf0 00000080 		.word	-2147483648
+ 2102 0bf4 7C9DCCBE 		.word	-1093886596
+ 2103 0bf8 00000000 		.word	0
+ 2104 0bfc 00000080 		.word	-2147483648
+ 2105 0c00 00000080 		.word	-2147483648
+ 2106 0c04 A0706242 		.word	1113747616
+ 2107 0c08 00000080 		.word	-2147483648
+ 2108 0c0c 00000080 		.word	-2147483648
+ 2109 0c10 7B03E940 		.word	1089012603
+ 2110 0c14 00000000 		.word	0
+ 2111 0c18 00000080 		.word	-2147483648
+ 2112 0c1c 00000000 		.word	0
+ 2113 0c20 00000080 		.word	-2147483648
+ 2114 0c24 00000000 		.word	0
+ 2115 0c28 00000000 		.word	0
+ 2116 0c2c 00000000 		.word	0
+ 2117 0c30 00000000 		.word	0
+ 2118 0c34 00000080 		.word	-2147483648
+ 2119 0c38 00004040 		.word	1077936128
+ 2120 0c3c 93EA0143 		.word	1124199059
+ 2121 0c40 00000000 		.word	0
+ 2122 0c44 00000000 		.space	28
+ 2122      00000000 
+ 2122      00000000 
+ 2122      00000000 
+ 2122      00000000 
+ 2123 0c60 00000000 		.word	0
+ 2124 0c64 00000000 		.word	0
+ 2125 0c68 00000000 		.word	0
+ 2126 0c6c 58D1FD41 		.word	1107153240
+ 2127 0c70 00000000 		.word	0
+ 2128 0c74 00000000 		.word	0
+ 2129 0c78 73FBFC41 		.word	1107098483
+ 2130 0c7c 00000000 		.word	0
+ 2131 0c80 00000080 		.word	-2147483648
+ 2132 0c84 00000080 		.word	-2147483648
+ 2133 0c88 00000000 		.word	0
+ 2134 0c8c CDACA539 		.word	967158989
+ 2135 0c90 00000000 		.word	0
+ 2136 0c94 D1CF1140 		.word	1074909137
+ 2137 0c98 00000000 		.word	0
+ 2138 0c9c 00000000 		.word	0
+ 2139 0ca0 637B2D3E 		.word	1043168099
+ 2140 0ca4 00000080 		.word	-2147483648
+ 2141 0ca8 00000000 		.word	0
+ 2142 0cac AB92D0BE 		.word	-1093627221
+ 2143 0cb0 00000000 		.word	0
+ 2144 0cb4 00000080 		.word	-2147483648
+ 2145 0cb8 00000000 		.word	0
+ARM GAS  /tmp/cc9wWjjg.s 			page 47
+
+
+ 2146 0cbc D8CF6642 		.word	1114034136
+ 2147 0cc0 00000080 		.word	-2147483648
+ 2148 0cc4 00000000 		.word	0
+ 2149 0cc8 3A12E240 		.word	1088557626
+ 2150 0ccc 00000000 		.word	0
+ 2151 0cd0 00000080 		.word	-2147483648
+ 2152 0cd4 00000000 		.word	0
+ 2153 0cd8 00000000 		.word	0
+ 2154 0cdc 00000000 		.word	0
+ 2155 0ce0 00000000 		.word	0
+ 2156 0ce4 00000000 		.word	0
+ 2157 0ce8 00000000 		.word	0
+ 2158 0cec 00000080 		.word	-2147483648
+ 2159 0cf0 00004040 		.word	1077936128
+ 2160 0cf4 B2090743 		.word	1124534706
+ 2161 0cf8 00000000 		.word	0
+ 2162 0cfc 00000000 		.space	28
+ 2162      00000000 
+ 2162      00000000 
+ 2162      00000000 
+ 2162      00000000 
+ 2163 0d18 00000000 		.word	0
+ 2164 0d1c 00000000 		.word	0
+ 2165 0d20 00000000 		.word	0
+ 2166 0d24 58D1FD41 		.word	1107153240
+ 2167 0d28 00000000 		.word	0
+ 2168 0d2c 00000000 		.word	0
+ 2169 0d30 73FBFC41 		.word	1107098483
+ 2170 0d34 00000000 		.word	0
+ 2171 0d38 00000080 		.word	-2147483648
+ 2172 0d3c 00000000 		.word	0
+ 2173 0d40 00000000 		.word	0
+ 2174 0d44 CDACA539 		.word	967158989
+ 2175 0d48 00000080 		.word	-2147483648
+ 2176 0d4c 50361240 		.word	1074935376
+ 2177 0d50 00000000 		.word	0
+ 2178 0d54 00000000 		.word	0
+ 2179 0d58 D9942B3E 		.word	1043043545
+ 2180 0d5c 00000080 		.word	-2147483648
+ 2181 0d60 00000080 		.word	-2147483648
+ 2182 0d64 4A7ED4BE 		.word	-1093370294
+ 2183 0d68 00000000 		.word	0
+ 2184 0d6c 00000080 		.word	-2147483648
+ 2185 0d70 00000000 		.word	0
+ 2186 0d74 B4196B42 		.word	1114315188
+ 2187 0d78 00000080 		.word	-2147483648
+ 2188 0d7c 00000000 		.word	0
+ 2189 0d80 540DDC40 		.word	1088163156
+ 2190 0d84 00000000 		.word	0
+ 2191 0d88 00000080 		.word	-2147483648
+ 2192 0d8c 00000000 		.word	0
+ 2193 0d90 00000080 		.word	-2147483648
+ 2194 0d94 00000000 		.word	0
+ 2195 0d98 00000000 		.word	0
+ 2196 0d9c 00000080 		.word	-2147483648
+ 2197 0da0 00000000 		.word	0
+ 2198 0da4 00000000 		.word	0
+ARM GAS  /tmp/cc9wWjjg.s 			page 48
+
+
+ 2199 0da8 00004040 		.word	1077936128
+ 2200 0dac A5570C43 		.word	1124882341
+ 2201 0db0 00000000 		.word	0
+ 2202 0db4 00000000 		.space	28
+ 2202      00000000 
+ 2202      00000000 
+ 2202      00000000 
+ 2202      00000000 
+ 2203 0dd0 00000080 		.word	-2147483648
+ 2204 0dd4 00000080 		.word	-2147483648
+ 2205 0dd8 00000000 		.word	0
+ 2206 0ddc 58D1FD41 		.word	1107153240
+ 2207 0de0 00000000 		.word	0
+ 2208 0de4 00000080 		.word	-2147483648
+ 2209 0de8 73FBFC41 		.word	1107098483
+ 2210 0dec 00000000 		.word	0
+ 2211 0df0 00000080 		.word	-2147483648
+ 2212 0df4 00000000 		.word	0
+ 2213 0df8 00000080 		.word	-2147483648
+ 2214 0dfc CDACA539 		.word	967158989
+ 2215 0e00 00000080 		.word	-2147483648
+ 2216 0e04 72A31240 		.word	1074963314
+ 2217 0e08 00000000 		.word	0
+ 2218 0e0c 00000000 		.word	0
+ 2219 0e10 8BA8293E 		.word	1042917515
+ 2220 0e14 00000080 		.word	-2147483648
+ 2221 0e18 00000000 		.word	0
+ 2222 0e1c 47ADD8BE 		.word	-1093096121
+ 2223 0e20 00000080 		.word	-2147483648
+ 2224 0e24 00000080 		.word	-2147483648
+ 2225 0e28 00000080 		.word	-2147483648
+ 2226 0e2c 60A26F42 		.word	1114612320
+ 2227 0e30 00000080 		.word	-2147483648
+ 2228 0e34 00000080 		.word	-2147483648
+ 2229 0e38 E667D640 		.word	1087793126
+ 2230 0e3c 00000000 		.word	0
+ 2231 0e40 00000000 		.word	0
+ 2232 0e44 00000000 		.word	0
+ 2233 0e48 00000000 		.word	0
+ 2234 0e4c 00000080 		.word	-2147483648
+ 2235 0e50 00000080 		.word	-2147483648
+ 2236 0e54 00000000 		.word	0
+ 2237 0e58 00000080 		.word	-2147483648
+ 2238 0e5c 00000080 		.word	-2147483648
+ 2239 0e60 00004040 		.word	1077936128
+ 2240 0e64 3ADC1143 		.word	1125243962
+ 2241 0e68 00000000 		.word	0
+ 2242 0e6c 00000000 		.space	28
+ 2242      00000000 
+ 2242      00000000 
+ 2242      00000000 
+ 2242      00000000 
+ 2243 0e88 00000080 		.word	-2147483648
+ 2244 0e8c 00000080 		.word	-2147483648
+ 2245 0e90 00000000 		.word	0
+ 2246 0e94 58D1FD41 		.word	1107153240
+ 2247 0e98 00000000 		.word	0
+ARM GAS  /tmp/cc9wWjjg.s 			page 49
+
+
+ 2248 0e9c 00000080 		.word	-2147483648
+ 2249 0ea0 73FBFC41 		.word	1107098483
+ 2250 0ea4 00000000 		.word	0
+ 2251 0ea8 00000000 		.word	0
+ 2252 0eac 00000000 		.word	0
+ 2253 0eb0 00000080 		.word	-2147483648
+ 2254 0eb4 CDACA539 		.word	967158989
+ 2255 0eb8 00000000 		.word	0
+ 2256 0ebc 16181340 		.word	1074993174
+ 2257 0ec0 00000000 		.word	0
+ 2258 0ec4 00000000 		.word	0
+ 2259 0ec8 E5B4273E 		.word	1042789605
+ 2260 0ecc 00000080 		.word	-2147483648
+ 2261 0ed0 00000000 		.word	0
+ 2262 0ed4 3529DDBE 		.word	-1092802251
+ 2263 0ed8 00000000 		.word	0
+ 2264 0edc 00000000 		.word	0
+ 2265 0ee0 00000000 		.word	0
+ 2266 0ee4 BF727442 		.word	1114927807
+ 2267 0ee8 00000000 		.word	0
+ 2268 0eec 00000000 		.word	0
+ 2269 0ef0 3518D140 		.word	1087445045
+ 2270 0ef4 00000000 		.word	0
+ 2271 0ef8 00000000 		.word	0
+ 2272 0efc 00000080 		.word	-2147483648
+ 2273 0f00 00000080 		.word	-2147483648
+ 2274 0f04 00000080 		.word	-2147483648
+ 2275 0f08 00000080 		.word	-2147483648
+ 2276 0f0c 00000080 		.word	-2147483648
+ 2277 0f10 00000080 		.word	-2147483648
+ 2278 0f14 00000080 		.word	-2147483648
+ 2279 0f18 00008040 		.word	1082130432
+ 2280 0f1c 57B3C942 		.word	1120514903
+ 2281 0f20 00000000 		.word	0
+ 2282 0f24 00000000 		.space	28
+ 2282      00000000 
+ 2282      00000000 
+ 2282      00000000 
+ 2282      00000000 
+ 2283 0f40 00000080 		.word	-2147483648
+ 2284 0f44 00000000 		.word	0
+ 2285 0f48 00000080 		.word	-2147483648
+ 2286 0f4c C6D0FD41 		.word	1107153094
+ 2287 0f50 00000080 		.word	-2147483648
+ 2288 0f54 00000000 		.word	0
+ 2289 0f58 73FBFC41 		.word	1107098483
+ 2290 0f5c 00000080 		.word	-2147483648
+ 2291 0f60 00000000 		.word	0
+ 2292 0f64 00000000 		.word	0
+ 2293 0f68 00000000 		.word	0
+ 2294 0f6c CDACA539 		.word	967158989
+ 2295 0f70 00000000 		.word	0
+ 2296 0f74 21070F40 		.word	1074726689
+ 2297 0f78 00000080 		.word	-2147483648
+ 2298 0f7c 00000000 		.word	0
+ 2299 0f80 EC87383E 		.word	1043892204
+ 2300 0f84 00000080 		.word	-2147483648
+ARM GAS  /tmp/cc9wWjjg.s 			page 50
+
+
+ 2301 0f88 00000000 		.word	0
+ 2302 0f8c 535DC0BE 		.word	-1094689453
+ 2303 0f90 00000000 		.word	0
+ 2304 0f94 00000080 		.word	-2147483648
+ 2305 0f98 00000080 		.word	-2147483648
+ 2306 0f9c 14E55042 		.word	1112597780
+ 2307 0fa0 00000080 		.word	-2147483648
+ 2308 0fa4 00000080 		.word	-2147483648
+ 2309 0fa8 00A60941 		.word	1091151360
+ 2310 0fac 00000000 		.word	0
+ 2311 0fb0 00000000 		.word	0
+ 2312 0fb4 00000000 		.word	0
+ 2313 0fb8 00000000 		.word	0
+ 2314 0fbc 00000000 		.word	0
+ 2315 0fc0 00000080 		.word	-2147483648
+ 2316 0fc4 00000000 		.word	0
+ 2317 0fc8 00000000 		.word	0
+ 2318 0fcc 00000000 		.word	0
+ 2319 0fd0 00008040 		.word	1082130432
+ 2320 0fd4 284CD242 		.word	1121078312
+ 2321 0fd8 00000000 		.word	0
+ 2322 0fdc 00000000 		.space	28
+ 2322      00000000 
+ 2322      00000000 
+ 2322      00000000 
+ 2322      00000000 
+ 2323 0ff8 00000000 		.word	0
+ 2324 0ffc 00000080 		.word	-2147483648
+ 2325 1000 00000080 		.word	-2147483648
+ 2326 1004 C6D0FD41 		.word	1107153094
+ 2327 1008 00000000 		.word	0
+ 2328 100c 00000080 		.word	-2147483648
+ 2329 1010 73FBFC41 		.word	1107098483
+ 2330 1014 00000000 		.word	0
+ 2331 1018 00000080 		.word	-2147483648
+ 2332 101c 00000080 		.word	-2147483648
+ 2333 1020 00000080 		.word	-2147483648
+ 2334 1024 CDACA539 		.word	967158989
+ 2335 1028 00000000 		.word	0
+ 2336 102c DB4D0F40 		.word	1074744795
+ 2337 1030 00000000 		.word	0
+ 2338 1034 00000000 		.word	0
+ 2339 1038 9EB6363E 		.word	1043773086
+ 2340 103c 00000080 		.word	-2147483648
+ 2341 1040 00000080 		.word	-2147483648
+ 2342 1044 681FC3BE 		.word	-1094508696
+ 2343 1048 00000080 		.word	-2147483648
+ 2344 104c 00000000 		.word	0
+ 2345 1050 00000080 		.word	-2147483648
+ 2346 1054 CC0F5442 		.word	1112805324
+ 2347 1058 00000000 		.word	0
+ 2348 105c 00000080 		.word	-2147483648
+ 2349 1060 35F80441 		.word	1090844725
+ 2350 1064 00000000 		.word	0
+ 2351 1068 00000080 		.word	-2147483648
+ 2352 106c 00000080 		.word	-2147483648
+ 2353 1070 00000080 		.word	-2147483648
+ARM GAS  /tmp/cc9wWjjg.s 			page 51
+
+
+ 2354 1074 00000080 		.word	-2147483648
+ 2355 1078 00000000 		.word	0
+ 2356 107c 00000080 		.word	-2147483648
+ 2357 1080 00000080 		.word	-2147483648
+ 2358 1084 00000080 		.word	-2147483648
+ 2359 1088 00008040 		.word	1082130432
+ 2360 108c 9F42DB42 		.word	1121665695
+ 2361 1090 00000000 		.word	0
+ 2362 1094 00000000 		.space	28
+ 2362      00000000 
+ 2362      00000000 
+ 2362      00000000 
+ 2362      00000000 
+ 2363 10b0 00000080 		.word	-2147483648
+ 2364 10b4 00000080 		.word	-2147483648
+ 2365 10b8 00000080 		.word	-2147483648
+ 2366 10bc C6D0FD41 		.word	1107153094
+ 2367 10c0 00000000 		.word	0
+ 2368 10c4 00000000 		.word	0
+ 2369 10c8 73FBFC41 		.word	1107098483
+ 2370 10cc 00000000 		.word	0
+ 2371 10d0 00000000 		.word	0
+ 2372 10d4 00000080 		.word	-2147483648
+ 2373 10d8 00000000 		.word	0
+ 2374 10dc CDACA539 		.word	967158989
+ 2375 10e0 00000000 		.word	0
+ 2376 10e4 249A0F40 		.word	1074764324
+ 2377 10e8 00000080 		.word	-2147483648
+ 2378 10ec 00000000 		.word	0
+ 2379 10f0 16DB343E 		.word	1043651350
+ 2380 10f4 00000080 		.word	-2147483648
+ 2381 10f8 00000080 		.word	-2147483648
+ 2382 10fc C51AC6BE 		.word	-1094313275
+ 2383 1100 00000080 		.word	-2147483648
+ 2384 1104 00000000 		.word	0
+ 2385 1108 00000080 		.word	-2147483648
+ 2386 110c 05725742 		.word	1113027077
+ 2387 1110 00000000 		.word	0
+ 2388 1114 00000080 		.word	-2147483648
+ 2389 1118 7E8E0041 		.word	1090555518
+ 2390 111c 00000000 		.word	0
+ 2391 1120 00000080 		.word	-2147483648
+ 2392 1124 00000000 		.word	0
+ 2393 1128 00000080 		.word	-2147483648
+ 2394 112c 00000000 		.word	0
+ 2395 1130 00000000 		.word	0
+ 2396 1134 00000000 		.word	0
+ 2397 1138 00000000 		.word	0
+ 2398 113c 00000080 		.word	-2147483648
+ 2399 1140 00008040 		.word	1082130432
+ 2400 1144 59A6E442 		.word	1122281049
+ 2401 1148 00000000 		.word	0
+ 2402 114c 00000000 		.space	28
+ 2402      00000000 
+ 2402      00000000 
+ 2402      00000000 
+ 2402      00000000 
+ARM GAS  /tmp/cc9wWjjg.s 			page 52
+
+
+ 2403 1168 00000080 		.word	-2147483648
+ 2404 116c 00000000 		.word	0
+ 2405 1170 00000080 		.word	-2147483648
+ 2406 1174 C6D0FD41 		.word	1107153094
+ 2407 1178 00000080 		.word	-2147483648
+ 2408 117c 00000080 		.word	-2147483648
+ 2409 1180 73FBFC41 		.word	1107098483
+ 2410 1184 00000080 		.word	-2147483648
+ 2411 1188 00000080 		.word	-2147483648
+ 2412 118c 00000000 		.word	0
+ 2413 1190 00000000 		.word	0
+ 2414 1194 CDACA539 		.word	967158989
+ 2415 1198 00000080 		.word	-2147483648
+ 2416 119c C4EC0F40 		.word	1074785476
+ 2417 11a0 00000000 		.word	0
+ 2418 11a4 00000080 		.word	-2147483648
+ 2419 11a8 B6F2323E 		.word	1043526326
+ 2420 11ac 00000080 		.word	-2147483648
+ 2421 11b0 00000000 		.word	0
+ 2422 11b4 E256C9BE 		.word	-1094101278
+ 2423 11b8 00000000 		.word	0
+ 2424 11bc 00000000 		.word	0
+ 2425 11c0 00000000 		.word	0
+ 2426 11c4 6B135B42 		.word	1113265003
+ 2427 11c8 00000000 		.word	0
+ 2428 11cc 00000000 		.word	0
+ 2429 11d0 D5C1F840 		.word	1090044373
+ 2430 11d4 00000000 		.word	0
+ 2431 11d8 00000000 		.word	0
+ 2432 11dc 00000000 		.word	0
+ 2433 11e0 00000080 		.word	-2147483648
+ 2434 11e4 00000000 		.word	0
+ 2435 11e8 00000080 		.word	-2147483648
+ 2436 11ec 00000080 		.word	-2147483648
+ 2437 11f0 00000000 		.word	0
+ 2438 11f4 00000000 		.word	0
+ 2439 11f8 00008040 		.word	1082130432
+ 2440 11fc 6CACED42 		.word	1122872428
+ 2441 1200 00000000 		.word	0
+ 2442 1204 00000000 		.space	28
+ 2442      00000000 
+ 2442      00000000 
+ 2442      00000000 
+ 2442      00000000 
+ 2443 1220 00000000 		.word	0
+ 2444 1224 00000000 		.word	0
+ 2445 1228 00000080 		.word	-2147483648
+ 2446 122c C6D0FD41 		.word	1107153094
+ 2447 1230 00000080 		.word	-2147483648
+ 2448 1234 00000000 		.word	0
+ 2449 1238 73FBFC41 		.word	1107098483
+ 2450 123c 00000080 		.word	-2147483648
+ 2451 1240 00000000 		.word	0
+ 2452 1244 00000000 		.word	0
+ 2453 1248 00000000 		.word	0
+ 2454 124c CDACA539 		.word	967158989
+ 2455 1250 00000080 		.word	-2147483648
+ARM GAS  /tmp/cc9wWjjg.s 			page 53
+
+
+ 2456 1254 BC3E1040 		.word	1074806460
+ 2457 1258 00000080 		.word	-2147483648
+ 2458 125c 00000080 		.word	-2147483648
+ 2459 1260 2D27313E 		.word	1043408685
+ 2460 1264 00000080 		.word	-2147483648
+ 2461 1268 00000080 		.word	-2147483648
+ 2462 126c 5C8DCCBE 		.word	-1093890724
+ 2463 1270 00000000 		.word	0
+ 2464 1274 00000080 		.word	-2147483648
+ 2465 1278 00000000 		.word	0
+ 2466 127c E2A45E42 		.word	1113498850
+ 2467 1280 00000080 		.word	-2147483648
+ 2468 1284 00000000 		.word	0
+ 2469 1288 B97AF140 		.word	1089567417
+ 2470 128c 00000000 		.word	0
+ 2471 1290 00000080 		.word	-2147483648
+ 2472 1294 00000000 		.word	0
+ 2473 1298 00000000 		.word	0
+ 2474 129c 00000080 		.word	-2147483648
+ 2475 12a0 00000000 		.word	0
+ 2476 12a4 00000080 		.word	-2147483648
+ 2477 12a8 00000080 		.word	-2147483648
+ 2478 12ac 00000080 		.word	-2147483648
+ 2479 12b0 00008040 		.word	1082130432
+ 2480 12b4 8B00F742 		.word	1123483787
+ 2481 12b8 00000000 		.word	0
+ 2482 12bc 00000000 		.space	28
+ 2482      00000000 
+ 2482      00000000 
+ 2482      00000000 
+ 2482      00000000 
+ 2483 12d8 00000080 		.word	-2147483648
+ 2484 12dc 00000080 		.word	-2147483648
+ 2485 12e0 00000080 		.word	-2147483648
+ 2486 12e4 C6D0FD41 		.word	1107153094
+ 2487 12e8 00000080 		.word	-2147483648
+ 2488 12ec 00000000 		.word	0
+ 2489 12f0 73FBFC41 		.word	1107098483
+ 2490 12f4 00000080 		.word	-2147483648
+ 2491 12f8 00000000 		.word	0
+ 2492 12fc 00000000 		.word	0
+ 2493 1300 00000000 		.word	0
+ 2494 1304 CDACA539 		.word	967158989
+ 2495 1308 00000080 		.word	-2147483648
+ 2496 130c 07961040 		.word	1074828807
+ 2497 1310 00000080 		.word	-2147483648
+ 2498 1314 00000080 		.word	-2147483648
+ 2499 1318 DE552F3E 		.word	1043289566
+ 2500 131c 00000080 		.word	-2147483648
+ 2501 1320 00000000 		.word	0
+ 2502 1324 3CFACFBE 		.word	-1093666244
+ 2503 1328 00000080 		.word	-2147483648
+ 2504 132c 00000080 		.word	-2147483648
+ 2505 1330 00000080 		.word	-2147483648
+ 2506 1334 57696242 		.word	1113745751
+ 2507 1338 00000080 		.word	-2147483648
+ 2508 133c 00000080 		.word	-2147483648
+ARM GAS  /tmp/cc9wWjjg.s 			page 54
+
+
+ 2509 1340 7BA3EA40 		.word	1089119099
+ 2510 1344 00000000 		.word	0
+ 2511 1348 00000080 		.word	-2147483648
+ 2512 134c 00000080 		.word	-2147483648
+ 2513 1350 00000000 		.word	0
+ 2514 1354 00000080 		.word	-2147483648
+ 2515 1358 00000000 		.word	0
+ 2516 135c 00000000 		.word	0
+ 2517 1360 00000080 		.word	-2147483648
+ 2518 1364 00000080 		.word	-2147483648
+ 2519 1368 00008040 		.word	1082130432
+ 2520 136c 28590043 		.word	1124096296
+ 2521 1370 00000000 		.word	0
+ 2522 1374 00000000 		.space	28
+ 2522      00000000 
+ 2522      00000000 
+ 2522      00000000 
+ 2522      00000000 
+ 2523 1390 00000080 		.word	-2147483648
+ 2524 1394 00000000 		.word	0
+ 2525 1398 00000080 		.word	-2147483648
+ 2526 139c C6D0FD41 		.word	1107153094
+ 2527 13a0 00000080 		.word	-2147483648
+ 2528 13a4 00000000 		.word	0
+ 2529 13a8 73FBFC41 		.word	1107098483
+ 2530 13ac 00000080 		.word	-2147483648
+ 2531 13b0 00000080 		.word	-2147483648
+ 2532 13b4 00000000 		.word	0
+ 2533 13b8 00000000 		.word	0
+ 2534 13bc CDACA539 		.word	967158989
+ 2535 13c0 00000000 		.word	0
+ 2536 13c4 67F31040 		.word	1074852711
+ 2537 13c8 00000000 		.word	0
+ 2538 13cc 00000000 		.word	0
+ 2539 13d0 707C2D3E 		.word	1043168368
+ 2540 13d4 00000080 		.word	-2147483648
+ 2541 13d8 00000000 		.word	0
+ 2542 13dc 5DA5D3BE 		.word	-1093425827
+ 2543 13e0 00000000 		.word	0
+ 2544 13e4 00000080 		.word	-2147483648
+ 2545 13e8 00000000 		.word	0
+ 2546 13ec A0686642 		.word	1114007712
+ 2547 13f0 00000000 		.word	0
+ 2548 13f4 00000000 		.word	0
+ 2549 13f8 082EE440 		.word	1088695816
+ 2550 13fc 00000000 		.word	0
+ 2551 1400 00000000 		.word	0
+ 2552 1404 00000080 		.word	-2147483648
+ 2553 1408 00000080 		.word	-2147483648
+ 2554 140c 00000080 		.word	-2147483648
+ 2555 1410 00000080 		.word	-2147483648
+ 2556 1414 00000080 		.word	-2147483648
+ 2557 1418 00000080 		.word	-2147483648
+ 2558 141c 00000000 		.word	0
+ 2559 1420 0000A040 		.word	1084227584
+ 2560 1424 83DEB042 		.word	1118887555
+ 2561 1428 00000000 		.word	0
+ARM GAS  /tmp/cc9wWjjg.s 			page 55
+
+
+ 2562 142c 00000000 		.space	28
+ 2562      00000000 
+ 2562      00000000 
+ 2562      00000000 
+ 2562      00000000 
+ 2563 1448 00000080 		.word	-2147483648
+ 2564 144c 00000080 		.word	-2147483648
+ 2565 1450 00000000 		.word	0
+ 2566 1454 D810C842 		.word	1120407768
+ 2567 1458 00000000 		.word	0
+ 2568 145c 00000000 		.word	0
+ 2569 1460 73FBFC41 		.word	1107098483
+ 2570 1464 00000000 		.word	0
+ 2571 1468 00000080 		.word	-2147483648
+ 2572 146c 00000080 		.word	-2147483648
+ 2573 1470 00000000 		.word	0
+ 2574 1474 6F12833A 		.word	981668463
+ 2575 1478 00000000 		.word	0
+ 2576 147c 1BD55340 		.word	1079235867
+ 2577 1480 00000080 		.word	-2147483648
+ 2578 1484 00000080 		.word	-2147483648
+ 2579 1488 ACA8B93E 		.word	1052354732
+ 2580 148c 00000000 		.word	0
+ 2581 1490 00000000 		.word	0
+ 2582 1494 73487DC1 		.word	-1048754061
+ 2583 1498 00000000 		.word	0
+ 2584 149c 00000080 		.word	-2147483648
+ 2585 14a0 00000080 		.word	-2147483648
+ 2586 14a4 CD298044 		.word	1149249997
+ 2587 14a8 00000080 		.word	-2147483648
+ 2588 14ac 00000000 		.word	0
+ 2589 14b0 D4FC89C3 		.word	-1014367020
+ 2590 14b4 9C534936 		.word	910775196
+ 2591 14b8 00000080 		.word	-2147483648
+ 2592 14bc 00000080 		.word	-2147483648
+ 2593 14c0 00000080 		.word	-2147483648
+ 2594 14c4 00000080 		.word	-2147483648
+ 2595 14c8 00000000 		.word	0
+ 2596 14cc 00000000 		.word	0
+ 2597 14d0 00000080 		.word	-2147483648
+ 2598 14d4 00000000 		.word	0
+ 2599 14d8 0000A040 		.word	1084227584
+ 2600 14dc FB6DB842 		.word	1119383035
+ 2601 14e0 00000000 		.word	0
+ 2602 14e4 00000000 		.space	28
+ 2602      00000000 
+ 2602      00000000 
+ 2602      00000000 
+ 2602      00000000 
+ 2603 1500 00000080 		.word	-2147483648
+ 2604 1504 00000080 		.word	-2147483648
+ 2605 1508 00000080 		.word	-2147483648
+ 2606 150c D810C842 		.word	1120407768
+ 2607 1510 00000080 		.word	-2147483648
+ 2608 1514 00000080 		.word	-2147483648
+ 2609 1518 73FBFC41 		.word	1107098483
+ 2610 151c 00000080 		.word	-2147483648
+ARM GAS  /tmp/cc9wWjjg.s 			page 56
+
+
+ 2611 1520 00000080 		.word	-2147483648
+ 2612 1524 00000080 		.word	-2147483648
+ 2613 1528 00000000 		.word	0
+ 2614 152c 6F12833A 		.word	981668463
+ 2615 1530 00000080 		.word	-2147483648
+ 2616 1534 F2775440 		.word	1079277554
+ 2617 1538 00000080 		.word	-2147483648
+ 2618 153c 00000000 		.word	0
+ 2619 1540 F772B73E 		.word	1052209911
+ 2620 1544 00000000 		.word	0
+ 2621 1548 00000000 		.word	0
+ 2622 154c BA2F79C1 		.word	-1049022534
+ 2623 1550 00000080 		.word	-2147483648
+ 2624 1554 00000080 		.word	-2147483648
+ 2625 1558 00000080 		.word	-2147483648
+ 2626 155c C5378044 		.word	1149253573
+ 2627 1560 00000080 		.word	-2147483648
+ 2628 1564 00000080 		.word	-2147483648
+ 2629 1568 752C98C3 		.word	-1013437323
+ 2630 156c 9C534936 		.word	910775196
+ 2631 1570 00000000 		.word	0
+ 2632 1574 00000080 		.word	-2147483648
+ 2633 1578 00000080 		.word	-2147483648
+ 2634 157c 00000080 		.word	-2147483648
+ 2635 1580 00000080 		.word	-2147483648
+ 2636 1584 00000000 		.word	0
+ 2637 1588 00000080 		.word	-2147483648
+ 2638 158c 00000000 		.word	0
+ 2639 1590 0000A040 		.word	1084227584
+ 2640 1594 7E4BC042 		.word	1119898494
+ 2641 1598 00000000 		.word	0
+ 2642 159c 00000000 		.space	28
+ 2642      00000000 
+ 2642      00000000 
+ 2642      00000000 
+ 2642      00000000 
+ 2643 15b8 00000000 		.word	0
+ 2644 15bc 00000080 		.word	-2147483648
+ 2645 15c0 00000080 		.word	-2147483648
+ 2646 15c4 D810C842 		.word	1120407768
+ 2647 15c8 00000080 		.word	-2147483648
+ 2648 15cc 00000000 		.word	0
+ 2649 15d0 73FBFC41 		.word	1107098483
+ 2650 15d4 00000080 		.word	-2147483648
+ 2651 15d8 00000080 		.word	-2147483648
+ 2652 15dc 00000080 		.word	-2147483648
+ 2653 15e0 00000080 		.word	-2147483648
+ 2654 15e4 6F12833A 		.word	981668463
+ 2655 15e8 00000080 		.word	-2147483648
+ 2656 15ec 7C265540 		.word	1079322236
+ 2657 15f0 00000080 		.word	-2147483648
+ 2658 15f4 00000000 		.word	0
+ 2659 15f8 6535B53E 		.word	1052063077
+ 2660 15fc 00000080 		.word	-2147483648
+ 2661 1600 00000000 		.word	0
+ 2662 1604 7E0B75C1 		.word	-1049293954
+ 2663 1608 00000000 		.word	0
+ARM GAS  /tmp/cc9wWjjg.s 			page 57
+
+
+ 2664 160c 00000080 		.word	-2147483648
+ 2665 1610 00000000 		.word	0
+ 2666 1614 45468044 		.word	1149257285
+ 2667 1618 00000080 		.word	-2147483648
+ 2668 161c 00000000 		.word	0
+ 2669 1620 0CA3A5C3 		.word	-1012554996
+ 2670 1624 9C534936 		.word	910775196
+ 2671 1628 00000000 		.word	0
+ 2672 162c 00000080 		.word	-2147483648
+ 2673 1630 00000080 		.word	-2147483648
+ 2674 1634 00000000 		.word	0
+ 2675 1638 00000000 		.word	0
+ 2676 163c 00000000 		.word	0
+ 2677 1640 00000000 		.word	0
+ 2678 1644 00000000 		.word	0
+ 2679 1648 0000A040 		.word	1084227584
+ 2680 164c A886C842 		.word	1120437928
+ 2681 1650 00000000 		.word	0
+ 2682 1654 00000000 		.space	28
+ 2682      00000000 
+ 2682      00000000 
+ 2682      00000000 
+ 2682      00000000 
+ 2683 1670 00000000 		.word	0
+ 2684 1674 00000080 		.word	-2147483648
+ 2685 1678 00000080 		.word	-2147483648
+ 2686 167c D810C842 		.word	1120407768
+ 2687 1680 00000080 		.word	-2147483648
+ 2688 1684 00000080 		.word	-2147483648
+ 2689 1688 73FBFC41 		.word	1107098483
+ 2690 168c 00000080 		.word	-2147483648
+ 2691 1690 00000080 		.word	-2147483648
+ 2692 1694 00000080 		.word	-2147483648
+ 2693 1698 00000000 		.word	0
+ 2694 169c 6F12833A 		.word	981668463
+ 2695 16a0 00000080 		.word	-2147483648
+ 2696 16a4 8BE25540 		.word	1079370379
+ 2697 16a8 00000080 		.word	-2147483648
+ 2698 16ac 00000000 		.word	0
+ 2699 16b0 D0ECB23E 		.word	1051913424
+ 2700 16b4 00000000 		.word	0
+ 2701 16b8 00000000 		.word	0
+ 2702 16bc 40DC70C1 		.word	-1049568192
+ 2703 16c0 00000000 		.word	0
+ 2704 16c4 00000080 		.word	-2147483648
+ 2705 16c8 00000000 		.word	0
+ 2706 16cc 74558044 		.word	1149261172
+ 2707 16d0 00000080 		.word	-2147483648
+ 2708 16d4 00000000 		.word	0
+ 2709 16d8 8976B2C3 		.word	-1011714423
+ 2710 16dc 9C534936 		.word	910775196
+ 2711 16e0 00000080 		.word	-2147483648
+ 2712 16e4 00000000 		.word	0
+ 2713 16e8 00000080 		.word	-2147483648
+ 2714 16ec 00000080 		.word	-2147483648
+ 2715 16f0 00000000 		.word	0
+ 2716 16f4 00000080 		.word	-2147483648
+ARM GAS  /tmp/cc9wWjjg.s 			page 58
+
+
+ 2717 16f8 00000000 		.word	0
+ 2718 16fc 00000080 		.word	-2147483648
+ 2719 1700 0000A040 		.word	1084227584
+ 2720 1704 C773D042 		.word	1120957383
+ 2721 1708 00000000 		.word	0
+ 2722 170c 00000000 		.space	28
+ 2722      00000000 
+ 2722      00000000 
+ 2722      00000000 
+ 2722      00000000 
+ 2723 1728 00000080 		.word	-2147483648
+ 2724 172c 00000000 		.word	0
+ 2725 1730 00000000 		.word	0
+ 2726 1734 D810C842 		.word	1120407768
+ 2727 1738 00000000 		.word	0
+ 2728 173c 00000080 		.word	-2147483648
+ 2729 1740 73FBFC41 		.word	1107098483
+ 2730 1744 00000000 		.word	0
+ 2731 1748 00000000 		.word	0
+ 2732 174c 00000080 		.word	-2147483648
+ 2733 1750 00000000 		.word	0
+ 2734 1754 6F12833A 		.word	981668463
+ 2735 1758 00000080 		.word	-2147483648
+ 2736 175c A29C5640 		.word	1079418018
+ 2737 1760 00000000 		.word	0
+ 2738 1764 00000000 		.word	0
+ 2739 1768 CDC8B03E 		.word	1051773133
+ 2740 176c 00000000 		.word	0
+ 2741 1770 00000080 		.word	-2147483648
+ 2742 1774 A5FC6CC1 		.word	-1049822043
+ 2743 1778 00000080 		.word	-2147483648
+ 2744 177c 00000000 		.word	0
+ 2745 1780 00000000 		.word	0
+ 2746 1784 1D648044 		.word	1149264925
+ 2747 1788 00000000 		.word	0
+ 2748 178c 00000080 		.word	-2147483648
+ 2749 1790 51B9BDC3 		.word	-1010976431
+ 2750 1794 9C534936 		.word	910775196
+ 2751 1798 00000080 		.word	-2147483648
+ 2752 179c 00000080 		.word	-2147483648
+ 2753 17a0 00000080 		.word	-2147483648
+ 2754 17a4 00000080 		.word	-2147483648
+ 2755 17a8 00000000 		.word	0
+ 2756 17ac 00000080 		.word	-2147483648
+ 2757 17b0 00000080 		.word	-2147483648
+ 2758 17b4 00000080 		.word	-2147483648
+ 2759 17b8 0000A040 		.word	1084227584
+ 2760 17bc F0AED842 		.word	1121496816
+ 2761 17c0 00000000 		.word	0
+ 2762 17c4 00000000 		.space	28
+ 2762      00000000 
+ 2762      00000000 
+ 2762      00000000 
+ 2762      00000000 
+ 2763 17e0 00000080 		.word	-2147483648
+ 2764 17e4 00000000 		.word	0
+ 2765 17e8 00000000 		.word	0
+ARM GAS  /tmp/cc9wWjjg.s 			page 59
+
+
+ 2766 17ec D810C842 		.word	1120407768
+ 2767 17f0 00000000 		.word	0
+ 2768 17f4 00000080 		.word	-2147483648
+ 2769 17f8 73FBFC41 		.word	1107098483
+ 2770 17fc 00000000 		.word	0
+ 2771 1800 00000000 		.word	0
+ 2772 1804 00000080 		.word	-2147483648
+ 2773 1808 00000000 		.word	0
+ 2774 180c 6F12833A 		.word	981668463
+ 2775 1810 00000080 		.word	-2147483648
+ 2776 1814 D4625740 		.word	1079468756
+ 2777 1818 00000080 		.word	-2147483648
+ 2778 181c 00000080 		.word	-2147483648
+ 2779 1820 809EAE3E 		.word	1051631232
+ 2780 1824 00000000 		.word	0
+ 2781 1828 00000080 		.word	-2147483648
+ 2782 182c 242269C1 		.word	-1050074588
+ 2783 1830 00000080 		.word	-2147483648
+ 2784 1834 00000000 		.word	0
+ 2785 1838 00000080 		.word	-2147483648
+ 2786 183c 69738044 		.word	1149268841
+ 2787 1840 00000000 		.word	0
+ 2788 1844 00000080 		.word	-2147483648
+ 2789 1848 5468C8C3 		.word	-1010276268
+ 2790 184c 9C534936 		.word	910775196
+ 2791 1850 00000080 		.word	-2147483648
+ 2792 1854 00000000 		.word	0
+ 2793 1858 00000080 		.word	-2147483648
+ 2794 185c 00000000 		.word	0
+ 2795 1860 00000000 		.word	0
+ 2796 1864 00000080 		.word	-2147483648
+ 2797 1868 00000000 		.word	0
+ 2798 186c 00000080 		.word	-2147483648
+ 2799 1870 0000A040 		.word	1084227584
+ 2800 1874 2538E142 		.word	1122056229
+ 2801 1878 00000000 		.word	0
+ 2802 187c 00000000 		.space	28
+ 2802      00000000 
+ 2802      00000000 
+ 2802      00000000 
+ 2802      00000000 
+ 2803 1898 00000080 		.word	-2147483648
+ 2804 189c 00000080 		.word	-2147483648
+ 2805 18a0 00000080 		.word	-2147483648
+ 2806 18a4 D810C842 		.word	1120407768
+ 2807 18a8 00000080 		.word	-2147483648
+ 2808 18ac 00000000 		.word	0
+ 2809 18b0 73FBFC41 		.word	1107098483
+ 2810 18b4 00000080 		.word	-2147483648
+ 2811 18b8 00000000 		.word	0
+ 2812 18bc 00000080 		.word	-2147483648
+ 2813 18c0 00000080 		.word	-2147483648
+ 2814 18c4 6F12833A 		.word	981668463
+ 2815 18c8 00000000 		.word	0
+ 2816 18cc 7E355840 		.word	1079522686
+ 2817 18d0 00000080 		.word	-2147483648
+ 2818 18d4 00000080 		.word	-2147483648
+ARM GAS  /tmp/cc9wWjjg.s 			page 60
+
+
+ 2819 18d8 586FAC3E 		.word	1051488088
+ 2820 18dc 00000080 		.word	-2147483648
+ 2821 18e0 00000080 		.word	-2147483648
+ 2822 18e4 625265C1 		.word	-1050324382
+ 2823 18e8 00000080 		.word	-2147483648
+ 2824 18ec 00000000 		.word	0
+ 2825 18f0 00000080 		.word	-2147483648
+ 2826 18f4 60838044 		.word	1149272928
+ 2827 18f8 00000000 		.word	0
+ 2828 18fc 00000080 		.word	-2147483648
+ 2829 1900 2D84D2C3 		.word	-1009613779
+ 2830 1904 9C534936 		.word	910775196
+ 2831 1908 00000000 		.word	0
+ 2832 190c 00000080 		.word	-2147483648
+ 2833 1910 00000000 		.word	0
+ 2834 1914 00000000 		.word	0
+ 2835 1918 00000080 		.word	-2147483648
+ 2836 191c 00000000 		.word	0
+ 2837 1920 00000080 		.word	-2147483648
+ 2838 1924 00000000 		.word	0
+ 2839 1928 0000C040 		.word	1086324736
+ 2840 192c CE159A42 		.word	1117394382
+ 2841 1930 00000000 		.word	0
+ 2842 1934 00000000 		.space	28
+ 2842      00000000 
+ 2842      00000000 
+ 2842      00000000 
+ 2842      00000000 
+ 2843 1950 00000080 		.word	-2147483648
+ 2844 1954 00000080 		.word	-2147483648
+ 2845 1958 00000000 		.word	0
+ 2846 195c CD10C842 		.word	1120407757
+ 2847 1960 00000000 		.word	0
+ 2848 1964 00000080 		.word	-2147483648
+ 2849 1968 73FBFC41 		.word	1107098483
+ 2850 196c 00000000 		.word	0
+ 2851 1970 00000080 		.word	-2147483648
+ 2852 1974 00000080 		.word	-2147483648
+ 2853 1978 00000000 		.word	0
+ 2854 197c 6F12833A 		.word	981668463
+ 2855 1980 00000000 		.word	0
+ 2856 1984 F5F15040 		.word	1079046645
+ 2857 1988 00000000 		.word	0
+ 2858 198c 00000080 		.word	-2147483648
+ 2859 1990 CD03C03E 		.word	1052771277
+ 2860 1994 00000080 		.word	-2147483648
+ 2861 1998 00000000 		.word	0
+ 2862 199c 011487C1 		.word	-1048112127
+ 2863 19a0 00000000 		.word	0
+ 2864 19a4 00000080 		.word	-2147483648
+ 2865 19a8 00000000 		.word	0
+ 2866 19ac 35048044 		.word	1149240373
+ 2867 19b0 00000000 		.word	0
+ 2868 19b4 00000000 		.word	0
+ 2869 19b8 5AF130C3 		.word	-1020202662
+ 2870 19bc BD378636 		.word	914765757
+ 2871 19c0 00000000 		.word	0
+ARM GAS  /tmp/cc9wWjjg.s 			page 61
+
+
+ 2872 19c4 00000000 		.word	0
+ 2873 19c8 00000000 		.word	0
+ 2874 19cc 00000000 		.word	0
+ 2875 19d0 00000080 		.word	-2147483648
+ 2876 19d4 00000000 		.word	0
+ 2877 19d8 00000000 		.word	0
+ 2878 19dc 00000080 		.word	-2147483648
+ 2879 19e0 0000C040 		.word	1086324736
+ 2880 19e4 89ABA042 		.word	1117825929
+ 2881 19e8 00000000 		.word	0
+ 2882 19ec 00000000 		.space	28
+ 2882      00000000 
+ 2882      00000000 
+ 2882      00000000 
+ 2882      00000000 
+ 2883 1a08 00000080 		.word	-2147483648
+ 2884 1a0c 00000080 		.word	-2147483648
+ 2885 1a10 00000080 		.word	-2147483648
+ 2886 1a14 CD10C842 		.word	1120407757
+ 2887 1a18 00000080 		.word	-2147483648
+ 2888 1a1c 00000000 		.word	0
+ 2889 1a20 73FBFC41 		.word	1107098483
+ 2890 1a24 00000080 		.word	-2147483648
+ 2891 1a28 00000080 		.word	-2147483648
+ 2892 1a2c 00000080 		.word	-2147483648
+ 2893 1a30 00000000 		.word	0
+ 2894 1a34 6F12833A 		.word	981668463
+ 2895 1a38 00000000 		.word	0
+ 2896 1a3c BD715140 		.word	1079079357
+ 2897 1a40 00000080 		.word	-2147483648
+ 2898 1a44 00000000 		.word	0
+ 2899 1a48 6FF0BD3E 		.word	1052635247
+ 2900 1a4c 00000000 		.word	0
+ 2901 1a50 00000080 		.word	-2147483648
+ 2902 1a54 F73285C1 		.word	-1048235273
+ 2903 1a58 00000000 		.word	0
+ 2904 1a5c 00000000 		.word	0
+ 2905 1a60 00000000 		.word	0
+ 2906 1a64 FB108044 		.word	1149243643
+ 2907 1a68 00000000 		.word	0
+ 2908 1a6c 00000000 		.word	0
+ 2909 1a70 00C951C3 		.word	-1018050304
+ 2910 1a74 BD378636 		.word	914765757
+ 2911 1a78 00000000 		.word	0
+ 2912 1a7c 00000000 		.word	0
+ 2913 1a80 00000000 		.word	0
+ 2914 1a84 00000000 		.word	0
+ 2915 1a88 00000080 		.word	-2147483648
+ 2916 1a8c 00000080 		.word	-2147483648
+ 2917 1a90 00000000 		.word	0
+ 2918 1a94 00000000 		.word	0
+ 2919 1a98 0000C040 		.word	1086324736
+ 2920 1a9c 4F8FA742 		.word	1118277455
+ 2921 1aa0 00000000 		.word	0
+ 2922 1aa4 00000000 		.space	28
+ 2922      00000000 
+ 2922      00000000 
+ARM GAS  /tmp/cc9wWjjg.s 			page 62
+
+
+ 2922      00000000 
+ 2922      00000000 
+ 2923 1ac0 00000080 		.word	-2147483648
+ 2924 1ac4 00000080 		.word	-2147483648
+ 2925 1ac8 00000080 		.word	-2147483648
+ 2926 1acc CD10C842 		.word	1120407757
+ 2927 1ad0 00000000 		.word	0
+ 2928 1ad4 00000000 		.word	0
+ 2929 1ad8 73FBFC41 		.word	1107098483
+ 2930 1adc 00000000 		.word	0
+ 2931 1ae0 00000080 		.word	-2147483648
+ 2932 1ae4 00000000 		.word	0
+ 2933 1ae8 00000080 		.word	-2147483648
+ 2934 1aec 6F12833A 		.word	981668463
+ 2935 1af0 00000000 		.word	0
+ 2936 1af4 D2FB5140 		.word	1079114706
+ 2937 1af8 00000000 		.word	0
+ 2938 1afc 00000080 		.word	-2147483648
+ 2939 1b00 C0D0BB3E 		.word	1052496064
+ 2940 1b04 00000080 		.word	-2147483648
+ 2941 1b08 00000000 		.word	0
+ 2942 1b0c FA3C83C1 		.word	-1048363782
+ 2943 1b10 00000000 		.word	0
+ 2944 1b14 00000000 		.word	0
+ 2945 1b18 00000000 		.word	0
+ 2946 1b1c 361E8044 		.word	1149247030
+ 2947 1b20 00000000 		.word	0
+ 2948 1b24 00000000 		.word	0
+ 2949 1b28 AD5C71C3 		.word	-1015980883
+ 2950 1b2c BD378636 		.word	914765757
+ 2951 1b30 00000080 		.word	-2147483648
+ 2952 1b34 00000000 		.word	0
+ 2953 1b38 00000080 		.word	-2147483648
+ 2954 1b3c 00000080 		.word	-2147483648
+ 2955 1b40 00000000 		.word	0
+ 2956 1b44 00000000 		.word	0
+ 2957 1b48 00000080 		.word	-2147483648
+ 2958 1b4c 00000000 		.word	0
+ 2959 1b50 0000C040 		.word	1086324736
+ 2960 1b54 20C1AE42 		.word	1118748960
+ 2961 1b58 00000000 		.word	0
+ 2962 1b5c 00000000 		.space	28
+ 2962      00000000 
+ 2962      00000000 
+ 2962      00000000 
+ 2962      00000000 
+ 2963 1b78 00000080 		.word	-2147483648
+ 2964 1b7c 00000000 		.word	0
+ 2965 1b80 00000000 		.word	0
+ 2966 1b84 CD10C842 		.word	1120407757
+ 2967 1b88 00000000 		.word	0
+ 2968 1b8c 00000000 		.word	0
+ 2969 1b90 73FBFC41 		.word	1107098483
+ 2970 1b94 00000000 		.word	0
+ 2971 1b98 00000000 		.word	0
+ 2972 1b9c 00000080 		.word	-2147483648
+ 2973 1ba0 00000000 		.word	0
+ARM GAS  /tmp/cc9wWjjg.s 			page 63
+
+
+ 2974 1ba4 6F12833A 		.word	981668463
+ 2975 1ba8 00000080 		.word	-2147483648
+ 2976 1bac A8905240 		.word	1079152808
+ 2977 1bb0 00000080 		.word	-2147483648
+ 2978 1bb4 00000000 		.word	0
+ 2979 1bb8 2FA6B93E 		.word	1052354095
+ 2980 1bbc 00000000 		.word	0
+ 2981 1bc0 00000080 		.word	-2147483648
+ 2982 1bc4 D53681C1 		.word	-1048496427
+ 2983 1bc8 00000000 		.word	0
+ 2984 1bcc 00000000 		.word	0
+ 2985 1bd0 00000000 		.word	0
+ 2986 1bd4 EB2B8044 		.word	1149250539
+ 2987 1bd8 00000000 		.word	0
+ 2988 1bdc 00000000 		.word	0
+ 2989 1be0 ACCA87C3 		.word	-1014510932
+ 2990 1be4 9C534936 		.word	910775196
+ 2991 1be8 00000080 		.word	-2147483648
+ 2992 1bec 00000000 		.word	0
+ 2993 1bf0 00000080 		.word	-2147483648
+ 2994 1bf4 00000080 		.word	-2147483648
+ 2995 1bf8 00000000 		.word	0
+ 2996 1bfc 00000000 		.word	0
+ 2997 1c00 00000000 		.word	0
+ 2998 1c04 00000080 		.word	-2147483648
+ 2999 1c08 0000C040 		.word	1086324736
+ 3000 1c0c E6A4B542 		.word	1119200486
+ 3001 1c10 00000000 		.word	0
+ 3002 1c14 00000000 		.space	28
+ 3002      00000000 
+ 3002      00000000 
+ 3002      00000000 
+ 3002      00000000 
+ 3003 1c30 00000080 		.word	-2147483648
+ 3004 1c34 00000080 		.word	-2147483648
+ 3005 1c38 00000000 		.word	0
+ 3006 1c3c CD10C842 		.word	1120407757
+ 3007 1c40 00000000 		.word	0
+ 3008 1c44 00000000 		.word	0
+ 3009 1c48 73FBFC41 		.word	1107098483
+ 3010 1c4c 00000000 		.word	0
+ 3011 1c50 00000080 		.word	-2147483648
+ 3012 1c54 00000080 		.word	-2147483648
+ 3013 1c58 00000000 		.word	0
+ 3014 1c5c 6F12833A 		.word	981668463
+ 3015 1c60 00000080 		.word	-2147483648
+ 3016 1c64 79235340 		.word	1079190393
+ 3017 1c68 00000080 		.word	-2147483648
+ 3018 1c6c 00000000 		.word	0
+ 3019 1c70 669FB73E 		.word	1052221286
+ 3020 1c74 00000000 		.word	0
+ 3021 1c78 00000000 		.word	0
+ 3022 1c7c AC9F7EC1 		.word	-1048666196
+ 3023 1c80 00000080 		.word	-2147483648
+ 3024 1c84 00000080 		.word	-2147483648
+ 3025 1c88 00000080 		.word	-2147483648
+ 3026 1c8c F8388044 		.word	1149253880
+ARM GAS  /tmp/cc9wWjjg.s 			page 64
+
+
+ 3027 1c90 00000080 		.word	-2147483648
+ 3028 1c94 00000080 		.word	-2147483648
+ 3029 1c98 2E1295C3 		.word	-1013640658
+ 3030 1c9c 9C534936 		.word	910775196
+ 3031 1ca0 00000000 		.word	0
+ 3032 1ca4 00000000 		.word	0
+ 3033 1ca8 00000000 		.word	0
+ 3034 1cac 00000000 		.word	0
+ 3035 1cb0 00000080 		.word	-2147483648
+ 3036 1cb4 00000000 		.word	0
+ 3037 1cb8 00000000 		.word	0
+ 3038 1cbc 00000000 		.word	0
+ 3039 1cc0 0000C040 		.word	1086324736
+ 3040 1cc4 1CC7BC42 		.word	1119667996
+ 3041 1cc8 00000000 		.word	0
+ 3042 1ccc 00000000 		.space	28
+ 3042      00000000 
+ 3042      00000000 
+ 3042      00000000 
+ 3042      00000000 
+ 3043 1ce8 00000080 		.word	-2147483648
+ 3044 1cec 00000000 		.word	0
+ 3045 1cf0 00000080 		.word	-2147483648
+ 3046 1cf4 CD10C842 		.word	1120407757
+ 3047 1cf8 00000080 		.word	-2147483648
+ 3048 1cfc 00000000 		.word	0
+ 3049 1d00 73FBFC41 		.word	1107098483
+ 3050 1d04 00000080 		.word	-2147483648
+ 3051 1d08 00000080 		.word	-2147483648
+ 3052 1d0c 00000000 		.word	0
+ 3053 1d10 00000000 		.word	0
+ 3054 1d14 6F12833A 		.word	981668463
+ 3055 1d18 00000080 		.word	-2147483648
+ 3056 1d1c C6BF5340 		.word	1079230406
+ 3057 1d20 00000000 		.word	0
+ 3058 1d24 00000000 		.word	0
+ 3059 1d28 7592B53E 		.word	1052086901
+ 3060 1d2c 00000000 		.word	0
+ 3061 1d30 00000000 		.word	0
+ 3062 1d34 5AC77AC1 		.word	-1048918182
+ 3063 1d38 00000080 		.word	-2147483648
+ 3064 1d3c 00000000 		.word	0
+ 3065 1d40 00000080 		.word	-2147483648
+ 3066 1d44 70468044 		.word	1149257328
+ 3067 1d48 00000080 		.word	-2147483648
+ 3068 1d4c 00000080 		.word	-2147483648
+ 3069 1d50 3CB6A1C3 		.word	-1012812228
+ 3070 1d54 9C534936 		.word	910775196
+ 3071 1d58 00000000 		.word	0
+ 3072 1d5c 00000080 		.word	-2147483648
+ 3073 1d60 00000000 		.word	0
+ 3074 1d64 00000000 		.word	0
+ 3075 1d68 00000080 		.word	-2147483648
+ 3076 1d6c 00000000 		.word	0
+ 3077 1d70 00000000 		.word	0
+ 3078 1d74 00000000 		.word	0
+ 3079 1d78 0000C040 		.word	1086324736
+ARM GAS  /tmp/cc9wWjjg.s 			page 65
+
+
+ 3080 1d7c 5C37C442 		.word	1120155484
+ 3081 1d80 00000000 		.word	0
+ 3082 1d84 00000000 		.space	28
+ 3082      00000000 
+ 3082      00000000 
+ 3082      00000000 
+ 3082      00000000 
+ 3083 1da0 00000000 		.word	0
+ 3084 1da4 00000080 		.word	-2147483648
+ 3085 1da8 00000080 		.word	-2147483648
+ 3086 1dac CD10C842 		.word	1120407757
+ 3087 1db0 00000080 		.word	-2147483648
+ 3088 1db4 00000000 		.word	0
+ 3089 1db8 73FBFC41 		.word	1107098483
+ 3090 1dbc 00000080 		.word	-2147483648
+ 3091 1dc0 00000000 		.word	0
+ 3092 1dc4 00000000 		.word	0
+ 3093 1dc8 00000000 		.word	0
+ 3094 1dcc 6F12833A 		.word	981668463
+ 3095 1dd0 00000080 		.word	-2147483648
+ 3096 1dd4 3C675440 		.word	1079273276
+ 3097 1dd8 00000080 		.word	-2147483648
+ 3098 1ddc 00000000 		.word	0
+ 3099 1de0 357CB33E 		.word	1051950133
+ 3100 1de4 00000000 		.word	0
+ 3101 1de8 00000000 		.word	0
+ 3102 1dec 36E376C1 		.word	-1049173194
+ 3103 1df0 00000080 		.word	-2147483648
+ 3104 1df4 00000080 		.word	-2147483648
+ 3105 1df8 00000080 		.word	-2147483648
+ 3106 1dfc 78548044 		.word	1149260920
+ 3107 1e00 00000000 		.word	0
+ 3108 1e04 00000080 		.word	-2147483648
+ 3109 1e08 1FCFADC3 		.word	-1012019425
+ 3110 1e0c 9C534936 		.word	910775196
+ 3111 1e10 00000000 		.word	0
+ 3112 1e14 00000080 		.word	-2147483648
+ 3113 1e18 00000080 		.word	-2147483648
+ 3114 1e1c 00000080 		.word	-2147483648
+ 3115 1e20 00000000 		.word	0
+ 3116 1e24 00000080 		.word	-2147483648
+ 3117 1e28 00000080 		.word	-2147483648
+ 3118 1e2c 00000000 		.word	0
+ 3119              		.section	.rodata.num_lqr_entries,"a"
+ 3120              		.align	2
+ 3123              	num_lqr_entries:
+ 3124 0000 2A000000 		.word	42
+ 3125              		.section	.rodata.num_ref_state_entries,"a"
+ 3126              		.align	2
+ 3129              	num_ref_state_entries:
+ 3130 0000 0E000000 		.word	14
+ 3131              		.section	.rodata.ref_state_data,"a"
+ 3132              		.align	2
+ 3133              		.set	.LANCHOR0,. + 0
+ 3136              	ref_state_data:
+ 3137 0000 00000000 		.word	0
+ 3138 0004 00000000 		.word	0
+ARM GAS  /tmp/cc9wWjjg.s 			page 66
+
+
+ 3139 0008 00000000 		.word	0
+ 3140 000c 00000000 		.word	0
+ 3141 0010 00000000 		.word	0
+ 3142 0014 00000000 		.word	0
+ 3143 0018 00000000 		.word	0
+ 3144 001c 00000000 		.word	0
+ 3145 0020 00000000 		.word	0
+ 3146 0024 00000000 		.word	0
+ 3147 0028 00000000 		.word	0
+ 3148 002c 0000803F 		.word	1065353216
+ 3149 0030 AC4BCC42 		.word	1120684972
+ 3150 0034 00000000 		.word	0
+ 3151 0038 00000000 		.word	0
+ 3152 003c 00000000 		.word	0
+ 3153 0040 00000000 		.word	0
+ 3154 0044 00000000 		.word	0
+ 3155 0048 00000000 		.word	0
+ 3156 004c 00000000 		.word	0
+ 3157 0050 00000000 		.word	0
+ 3158 0054 00000000 		.space	4
+ 3159 0058 00000040 		.word	1073741824
+ 3160 005c 8E851343 		.word	1125352846
+ 3161 0060 00000000 		.word	0
+ 3162 0064 00000000 		.word	0
+ 3163 0068 00000000 		.word	0
+ 3164 006c 00000000 		.word	0
+ 3165 0070 00000000 		.word	0
+ 3166 0074 00000000 		.word	0
+ 3167 0078 00000000 		.word	0
+ 3168 007c 00000000 		.word	0
+ 3169 0080 00000000 		.space	4
+ 3170 0084 00004040 		.word	1077936128
+ 3171 0088 93EA0143 		.word	1124199059
+ 3172 008c 00000000 		.word	0
+ 3173 0090 00000000 		.word	0
+ 3174 0094 00000000 		.word	0
+ 3175 0098 00000000 		.word	0
+ 3176 009c 00000000 		.word	0
+ 3177 00a0 00000000 		.word	0
+ 3178 00a4 00000000 		.word	0
+ 3179 00a8 00000000 		.word	0
+ 3180 00ac 00000000 		.space	4
+ 3181 00b0 00008040 		.word	1082130432
+ 3182 00b4 59A6E442 		.word	1122281049
+ 3183 00b8 00000000 		.word	0
+ 3184 00bc 00000000 		.word	0
+ 3185 00c0 00000000 		.word	0
+ 3186 00c4 00000000 		.word	0
+ 3187 00c8 00000000 		.word	0
+ 3188 00cc 00000000 		.word	0
+ 3189 00d0 00000000 		.word	0
+ 3190 00d4 00000000 		.word	0
+ 3191 00d8 00000000 		.space	4
+ 3192 00dc 0000A040 		.word	1084227584
+ 3193 00e0 A886C842 		.word	1120437928
+ 3194 00e4 00000000 		.word	0
+ 3195 00e8 00000000 		.word	0
+ARM GAS  /tmp/cc9wWjjg.s 			page 67
+
+
+ 3196 00ec 00000000 		.word	0
+ 3197 00f0 00000000 		.word	0
+ 3198 00f4 00000000 		.word	0
+ 3199 00f8 00000000 		.word	0
+ 3200 00fc 00000000 		.word	0
+ 3201 0100 00000000 		.word	0
+ 3202 0104 00000000 		.space	4
+ 3203 0108 0000C040 		.word	1086324736
+ 3204 010c 20C1AE42 		.word	1118748960
+ 3205 0110 00000000 		.word	0
+ 3206 0114 00000000 		.word	0
+ 3207 0118 00000000 		.word	0
+ 3208 011c 00000000 		.word	0
+ 3209 0120 00000000 		.word	0
+ 3210 0124 00000000 		.word	0
+ 3211 0128 00000000 		.word	0
+ 3212 012c 00000000 		.word	0
+ 3213 0130 00000000 		.space	4
+ 3214              		.text
+ 3215              	.Letext0:
+ 3216              		.file 2 "../Core/Include/controls.h"
+ 3217              		.file 3 "Drivers/CMSIS/DSP/Include/arm_math_types.h"
+ 3218              		.file 4 "../Core/Include/reference_data.h"
+ 3219              		.file 5 "/usr/include/newlib/math.h"
+ 3220              		.file 6 "<built-in>"
+ARM GAS  /tmp/cc9wWjjg.s 			page 68
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 controls.c
+     /tmp/cc9wWjjg.s:21     .text.LQR_gain_selector:0000000000000000 $t
+     /tmp/cc9wWjjg.s:29     .text.LQR_gain_selector:0000000000000000 LQR_gain_selector
+     /tmp/cc9wWjjg.s:277    .text.LQR_gain_selector:0000000000000128 $d
+     /tmp/cc9wWjjg.s:1438   .rodata.lqr_data:0000000000000000 lqr_data
+     /tmp/cc9wWjjg.s:284    .text.reference_selector:0000000000000000 $t
+     /tmp/cc9wWjjg.s:291    .text.reference_selector:0000000000000000 reference_selector
+     /tmp/cc9wWjjg.s:411    .text.reference_selector:0000000000000070 $d
+     /tmp/cc9wWjjg.s:417    .text.initialize_controls:0000000000000000 $t
+     /tmp/cc9wWjjg.s:424    .text.initialize_controls:0000000000000000 initialize_controls
+     /tmp/cc9wWjjg.s:609    .text.initialize_controls:00000000000000cc $d
+     /tmp/cc9wWjjg.s:616    .text.compute_controls:0000000000000000 $t
+     /tmp/cc9wWjjg.s:623    .text.compute_controls:0000000000000000 compute_controls
+     /tmp/cc9wWjjg.s:910    .text.compute_controls:0000000000000130 $d
+     /tmp/cc9wWjjg.s:915    .text.update_yaw_moment_arm:0000000000000000 $t
+     /tmp/cc9wWjjg.s:922    .text.update_yaw_moment_arm:0000000000000000 update_yaw_moment_arm
+     /tmp/cc9wWjjg.s:949    .text.update_yaw_moment_arm:000000000000001c $d
+     /tmp/cc9wWjjg.s:955    .text.moment_to_sideforce:0000000000000000 $t
+     /tmp/cc9wWjjg.s:962    .text.moment_to_sideforce:0000000000000000 moment_to_sideforce
+     /tmp/cc9wWjjg.s:998    .text.sideforce_to_vane_angle:0000000000000000 $t
+     /tmp/cc9wWjjg.s:1005   .text.sideforce_to_vane_angle:0000000000000000 sideforce_to_vane_angle
+     /tmp/cc9wWjjg.s:1226   .text.sideforce_to_vane_angle:0000000000000120 $d
+     /tmp/cc9wWjjg.s:1234   .text.vane_angle_to_servo_angle:0000000000000000 $t
+     /tmp/cc9wWjjg.s:1241   .text.vane_angle_to_servo_angle:0000000000000000 vane_angle_to_servo_angle
+     /tmp/cc9wWjjg.s:1320   .text.vane_angle_to_servo_angle:0000000000000070 $d
+     /tmp/cc9wWjjg.s:1326   .text.run_controls:0000000000000000 $t
+     /tmp/cc9wWjjg.s:1333   .text.run_controls:0000000000000000 run_controls
+     /tmp/cc9wWjjg.s:3129   .rodata.num_ref_state_entries:0000000000000000 num_ref_state_entries
+     /tmp/cc9wWjjg.s:3136   .rodata.ref_state_data:0000000000000000 ref_state_data
+     /tmp/cc9wWjjg.s:3123   .rodata.num_lqr_entries:0000000000000000 num_lqr_entries
+     /tmp/cc9wWjjg.s:1416   .rodata:0000000000000000 $d
+     /tmp/cc9wWjjg.s:1435   .rodata.lqr_data:0000000000000000 $d
+     /tmp/cc9wWjjg.s:3120   .rodata.num_lqr_entries:0000000000000000 $d
+     /tmp/cc9wWjjg.s:3126   .rodata.num_ref_state_entries:0000000000000000 $d
+     /tmp/cc9wWjjg.s:3132   .rodata.ref_state_data:0000000000000000 $d
+
+UNDEFINED SYMBOLS
+__aeabi_f2d
+__aeabi_d2iz
+__aeabi_d2f
+round
+sqrt
+memset
+__aeabi_dcmpge
+__aeabi_dsub
+__aeabi_dmul
+__aeabi_dadd
+floor

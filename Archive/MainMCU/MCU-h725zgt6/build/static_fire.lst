@@ -1,0 +1,1818 @@
+ARM GAS  /tmp/cc0nB5JE.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 1
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"static_fire.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "../Core/Src/static_fire.c"
+  19              		.section	.text.update_servos_for_ms,"ax",%progbits
+  20              		.align	1
+  21              		.global	update_servos_for_ms
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	update_servos_for_ms:
+  27              	.LVL0:
+  28              	.LFB398:
+   1:../Core/Src/static_fire.c **** #include "static_fire.h"
+   2:../Core/Src/static_fire.c **** #include "adc.h"
+   3:../Core/Src/static_fire.c **** 
+   4:../Core/Src/static_fire.c **** void init_servos(Servo_T *servos);
+   5:../Core/Src/static_fire.c **** void enable_servos(Servo_T *servos);
+   6:../Core/Src/static_fire.c **** void disable_servos(Servo_T *servos);
+   7:../Core/Src/static_fire.c **** void set_servo_angles(Servo_T *servos, float angle_rad);
+   8:../Core/Src/static_fire.c **** void record_servo_adcs(uint16_t *zeros, uint16_t **servo_deflections);
+   9:../Core/Src/static_fire.c **** void measure_adc_with_delay(void);
+  10:../Core/Src/static_fire.c **** void calibrate_servos(Servo_T *servos, uint16_t **servo_deflections);
+  11:../Core/Src/static_fire.c **** 
+  12:../Core/Src/static_fire.c **** 
+  13:../Core/Src/static_fire.c **** void update_servos_for_ms(Servo_T *servos, uint32_t ms) {
+  29              		.loc 1 13 57 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              		.loc 1 13 57 is_stmt 0 view .LVU1
+  34 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+  35              	.LCFI0:
+  36              		.cfi_def_cfa_offset 24
+  37              		.cfi_offset 4, -24
+  38              		.cfi_offset 5, -20
+  39              		.cfi_offset 6, -16
+  40              		.cfi_offset 7, -12
+  41              		.cfi_offset 8, -8
+  42              		.cfi_offset 14, -4
+  43 0004 0646     		mov	r6, r0
+  14:../Core/Src/static_fire.c ****     static TickType_t last_ticks = 0;
+  44              		.loc 1 14 5 is_stmt 1 view .LVU2
+ARM GAS  /tmp/cc0nB5JE.s 			page 2
+
+
+  15:../Core/Src/static_fire.c **** 
+  16:../Core/Src/static_fire.c ****     uint32_t n_iters = ms / 20;
+  45              		.loc 1 16 5 view .LVU3
+  46              		.loc 1 16 14 is_stmt 0 view .LVU4
+  47 0006 164B     		ldr	r3, .L10
+  48 0008 A3FB0138 		umull	r3, r8, r3, r1
+  49 000c 4FEA1818 		lsr	r8, r8, #4
+  50              	.LVL1:
+  17:../Core/Src/static_fire.c **** 
+  18:../Core/Src/static_fire.c ****     if (last_ticks == 0) {
+  51              		.loc 1 18 5 is_stmt 1 view .LVU5
+  52              		.loc 1 18 20 is_stmt 0 view .LVU6
+  53 0010 144B     		ldr	r3, .L10+4
+  54 0012 1B68     		ldr	r3, [r3]
+  55              		.loc 1 18 8 view .LVU7
+  56 0014 0BB1     		cbz	r3, .L8
+  57              	.LVL2:
+  58              	.L2:
+  59              	.LBB2:
+  60              	.LBB3:
+  61              	.LBB4:
+  19:../Core/Src/static_fire.c ****         last_ticks = xTaskGetTickCount();
+  20:../Core/Src/static_fire.c ****     }
+  21:../Core/Src/static_fire.c **** 
+  22:../Core/Src/static_fire.c ****     for (int i = 0; i < n_iters; i ++) {
+  23:../Core/Src/static_fire.c ****         TickType_t diff_ticks = xTaskGetTickCount() - last_ticks;
+  24:../Core/Src/static_fire.c **** 
+  25:../Core/Src/static_fire.c ****         for (int j = 0; j < 4; j ++) {
+  62              		.loc 1 25 18 discriminator 1 view .LVU8
+  63 0016 0027     		movs	r7, #0
+  64 0018 16E0     		b	.L3
+  65              	.LVL3:
+  66              	.L8:
+  67              		.loc 1 25 18 discriminator 1 view .LVU9
+  68              	.LBE4:
+  69              	.LBE3:
+  70              	.LBE2:
+  19:../Core/Src/static_fire.c ****         last_ticks = xTaskGetTickCount();
+  71              		.loc 1 19 9 is_stmt 1 view .LVU10
+  19:../Core/Src/static_fire.c ****         last_ticks = xTaskGetTickCount();
+  72              		.loc 1 19 22 is_stmt 0 view .LVU11
+  73 001a FFF7FEFF 		bl	xTaskGetTickCount
+  74              	.LVL4:
+  19:../Core/Src/static_fire.c ****         last_ticks = xTaskGetTickCount();
+  75              		.loc 1 19 20 view .LVU12
+  76 001e 114B     		ldr	r3, .L10+4
+  77 0020 1860     		str	r0, [r3]
+  78 0022 F8E7     		b	.L2
+  79              	.LVL5:
+  80              	.L5:
+  81              	.LBB9:
+  82              	.LBB7:
+  83              	.LBB5:
+  26:../Core/Src/static_fire.c ****             update_servo_true_command_position(&servos[j], diff_ticks);
+  84              		.loc 1 26 13 is_stmt 1 discriminator 3 view .LVU13
+  85              		.loc 1 26 55 is_stmt 0 discriminator 3 view .LVU14
+  86 0024 04EB8400 		add	r0, r4, r4, lsl #2
+ARM GAS  /tmp/cc0nB5JE.s 			page 3
+
+
+  87              		.loc 1 26 13 discriminator 3 view .LVU15
+  88 0028 2946     		mov	r1, r5
+  89 002a 06EBC000 		add	r0, r6, r0, lsl #3
+  90 002e FFF7FEFF 		bl	update_servo_true_command_position
+  91              	.LVL6:
+  25:../Core/Src/static_fire.c ****             update_servo_true_command_position(&servos[j], diff_ticks);
+  92              		.loc 1 25 34 is_stmt 1 discriminator 3 view .LVU16
+  93 0032 0134     		adds	r4, r4, #1
+  94              	.LVL7:
+  95              	.L4:
+  25:../Core/Src/static_fire.c ****             update_servo_true_command_position(&servos[j], diff_ticks);
+  96              		.loc 1 25 27 discriminator 1 view .LVU17
+  97 0034 032C     		cmp	r4, #3
+  98 0036 F5DD     		ble	.L5
+  99              	.LBE5:
+  27:../Core/Src/static_fire.c ****         }
+  28:../Core/Src/static_fire.c **** 
+  29:../Core/Src/static_fire.c ****         last_ticks = xTaskGetTickCount();
+ 100              		.loc 1 29 9 discriminator 2 view .LVU18
+ 101              		.loc 1 29 22 is_stmt 0 discriminator 2 view .LVU19
+ 102 0038 FFF7FEFF 		bl	xTaskGetTickCount
+ 103              	.LVL8:
+ 104              		.loc 1 29 20 discriminator 2 view .LVU20
+ 105 003c 094B     		ldr	r3, .L10+4
+ 106 003e 1860     		str	r0, [r3]
+  30:../Core/Src/static_fire.c ****         vTaskDelay(pdMS_TO_TICKS(20));
+ 107              		.loc 1 30 9 is_stmt 1 discriminator 2 view .LVU21
+ 108 0040 1420     		movs	r0, #20
+ 109 0042 FFF7FEFF 		bl	vTaskDelay
+ 110              	.LVL9:
+ 111              	.LBE7:
+  22:../Core/Src/static_fire.c ****         TickType_t diff_ticks = xTaskGetTickCount() - last_ticks;
+ 112              		.loc 1 22 36 discriminator 2 view .LVU22
+ 113 0046 0137     		adds	r7, r7, #1
+ 114              	.LVL10:
+ 115              	.L3:
+  22:../Core/Src/static_fire.c ****         TickType_t diff_ticks = xTaskGetTickCount() - last_ticks;
+ 116              		.loc 1 22 23 discriminator 1 view .LVU23
+ 117 0048 4745     		cmp	r7, r8
+ 118 004a 06D2     		bcs	.L9
+ 119              	.LBB8:
+  23:../Core/Src/static_fire.c **** 
+ 120              		.loc 1 23 9 view .LVU24
+  23:../Core/Src/static_fire.c **** 
+ 121              		.loc 1 23 33 is_stmt 0 view .LVU25
+ 122 004c FFF7FEFF 		bl	xTaskGetTickCount
+ 123              	.LVL11:
+  23:../Core/Src/static_fire.c **** 
+ 124              		.loc 1 23 53 view .LVU26
+ 125 0050 044B     		ldr	r3, .L10+4
+ 126 0052 1D68     		ldr	r5, [r3]
+  23:../Core/Src/static_fire.c **** 
+ 127              		.loc 1 23 20 view .LVU27
+ 128 0054 451B     		subs	r5, r0, r5
+ 129              	.LVL12:
+  25:../Core/Src/static_fire.c ****             update_servo_true_command_position(&servos[j], diff_ticks);
+ 130              		.loc 1 25 9 is_stmt 1 view .LVU28
+ARM GAS  /tmp/cc0nB5JE.s 			page 4
+
+
+ 131              	.LBB6:
+  25:../Core/Src/static_fire.c ****             update_servo_true_command_position(&servos[j], diff_ticks);
+ 132              		.loc 1 25 14 view .LVU29
+  25:../Core/Src/static_fire.c ****             update_servo_true_command_position(&servos[j], diff_ticks);
+ 133              		.loc 1 25 18 is_stmt 0 view .LVU30
+ 134 0056 0024     		movs	r4, #0
+  25:../Core/Src/static_fire.c ****             update_servo_true_command_position(&servos[j], diff_ticks);
+ 135              		.loc 1 25 9 view .LVU31
+ 136 0058 ECE7     		b	.L4
+ 137              	.LVL13:
+ 138              	.L9:
+  25:../Core/Src/static_fire.c ****             update_servo_true_command_position(&servos[j], diff_ticks);
+ 139              		.loc 1 25 9 view .LVU32
+ 140              	.LBE6:
+ 141              	.LBE8:
+ 142              	.LBE9:
+  31:../Core/Src/static_fire.c ****     }
+  32:../Core/Src/static_fire.c **** }
+ 143              		.loc 1 32 1 view .LVU33
+ 144 005a BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 145              	.LVL14:
+ 146              	.L11:
+ 147              		.loc 1 32 1 view .LVU34
+ 148 005e 00BF     		.align	2
+ 149              	.L10:
+ 150 0060 CDCCCCCC 		.word	-858993459
+ 151 0064 00000000 		.word	last_ticks.0
+ 152              		.cfi_endproc
+ 153              	.LFE398:
+ 155              		.section	.text.init_servos,"ax",%progbits
+ 156              		.align	1
+ 157              		.global	init_servos
+ 158              		.syntax unified
+ 159              		.thumb
+ 160              		.thumb_func
+ 162              	init_servos:
+ 163              	.LVL15:
+ 164              	.LFB399:
+  33:../Core/Src/static_fire.c **** 
+  34:../Core/Src/static_fire.c **** void init_servos(Servo_T *servos) {
+ 165              		.loc 1 34 35 is_stmt 1 view -0
+ 166              		.cfi_startproc
+ 167              		@ args = 0, pretend = 0, frame = 0
+ 168              		@ frame_needed = 0, uses_anonymous_args = 0
+ 169              		.loc 1 34 35 is_stmt 0 view .LVU36
+ 170 0000 38B5     		push	{r3, r4, r5, lr}
+ 171              	.LCFI1:
+ 172              		.cfi_def_cfa_offset 16
+ 173              		.cfi_offset 3, -16
+ 174              		.cfi_offset 4, -12
+ 175              		.cfi_offset 5, -8
+ 176              		.cfi_offset 14, -4
+ 177 0002 0446     		mov	r4, r0
+  35:../Core/Src/static_fire.c ****     servo_init(&servos[3], PWM0_TIMER, PWM0_CHANNEL, false);
+ 178              		.loc 1 35 5 is_stmt 1 view .LVU37
+ 179 0004 0D4D     		ldr	r5, .L14
+ 180 0006 0023     		movs	r3, #0
+ARM GAS  /tmp/cc0nB5JE.s 			page 5
+
+
+ 181 0008 1A46     		mov	r2, r3
+ 182 000a 2946     		mov	r1, r5
+ 183 000c 7830     		adds	r0, r0, #120
+ 184              	.LVL16:
+ 185              		.loc 1 35 5 is_stmt 0 view .LVU38
+ 186 000e FFF7FEFF 		bl	servo_init
+ 187              	.LVL17:
+  36:../Core/Src/static_fire.c ****     servo_init(&servos[2], PWM1_TIMER, PWM1_CHANNEL, false);
+ 188              		.loc 1 36 5 is_stmt 1 view .LVU39
+ 189 0012 0023     		movs	r3, #0
+ 190 0014 0422     		movs	r2, #4
+ 191 0016 2946     		mov	r1, r5
+ 192 0018 04F15000 		add	r0, r4, #80
+ 193 001c FFF7FEFF 		bl	servo_init
+ 194              	.LVL18:
+  37:../Core/Src/static_fire.c ****     servo_init(&servos[1], PWM2_TIMER, PWM2_CHANNEL, false);
+ 195              		.loc 1 37 5 view .LVU40
+ 196 0020 0023     		movs	r3, #0
+ 197 0022 0822     		movs	r2, #8
+ 198 0024 2946     		mov	r1, r5
+ 199 0026 04F12800 		add	r0, r4, #40
+ 200 002a FFF7FEFF 		bl	servo_init
+ 201              	.LVL19:
+  38:../Core/Src/static_fire.c ****     servo_init(&servos[0], PWM3_TIMER, PWM3_CHANNEL, false);
+ 202              		.loc 1 38 5 view .LVU41
+ 203 002e 0023     		movs	r3, #0
+ 204 0030 0422     		movs	r2, #4
+ 205 0032 0349     		ldr	r1, .L14+4
+ 206 0034 2046     		mov	r0, r4
+ 207 0036 FFF7FEFF 		bl	servo_init
+ 208              	.LVL20:
+  39:../Core/Src/static_fire.c **** }
+ 209              		.loc 1 39 1 is_stmt 0 view .LVU42
+ 210 003a 38BD     		pop	{r3, r4, r5, pc}
+ 211              	.LVL21:
+ 212              	.L15:
+ 213              		.loc 1 39 1 view .LVU43
+ 214              		.align	2
+ 215              	.L14:
+ 216 003c 00000000 		.word	htim2
+ 217 0040 00000000 		.word	htim4
+ 218              		.cfi_endproc
+ 219              	.LFE399:
+ 221              		.section	.text.enable_servos,"ax",%progbits
+ 222              		.align	1
+ 223              		.global	enable_servos
+ 224              		.syntax unified
+ 225              		.thumb
+ 226              		.thumb_func
+ 228              	enable_servos:
+ 229              	.LVL22:
+ 230              	.LFB400:
+  40:../Core/Src/static_fire.c **** 
+  41:../Core/Src/static_fire.c **** void enable_servos(Servo_T *servos) {
+ 231              		.loc 1 41 37 is_stmt 1 view -0
+ 232              		.cfi_startproc
+ 233              		@ args = 0, pretend = 0, frame = 0
+ARM GAS  /tmp/cc0nB5JE.s 			page 6
+
+
+ 234              		@ frame_needed = 0, uses_anonymous_args = 0
+ 235              		.loc 1 41 37 is_stmt 0 view .LVU45
+ 236 0000 38B5     		push	{r3, r4, r5, lr}
+ 237              	.LCFI2:
+ 238              		.cfi_def_cfa_offset 16
+ 239              		.cfi_offset 3, -16
+ 240              		.cfi_offset 4, -12
+ 241              		.cfi_offset 5, -8
+ 242              		.cfi_offset 14, -4
+ 243 0002 0546     		mov	r5, r0
+  42:../Core/Src/static_fire.c ****     for (int i = 0; i < 4; i++) {
+ 244              		.loc 1 42 5 is_stmt 1 view .LVU46
+ 245              	.LBB10:
+ 246              		.loc 1 42 10 view .LVU47
+ 247              	.LVL23:
+ 248              		.loc 1 42 14 is_stmt 0 view .LVU48
+ 249 0004 0024     		movs	r4, #0
+ 250              		.loc 1 42 5 view .LVU49
+ 251 0006 06E0     		b	.L17
+ 252              	.LVL24:
+ 253              	.L18:
+  43:../Core/Src/static_fire.c ****         servo_enable(&servos[i]);
+ 254              		.loc 1 43 9 is_stmt 1 discriminator 3 view .LVU50
+ 255              		.loc 1 43 29 is_stmt 0 discriminator 3 view .LVU51
+ 256 0008 04EB8400 		add	r0, r4, r4, lsl #2
+ 257              		.loc 1 43 9 discriminator 3 view .LVU52
+ 258 000c 05EBC000 		add	r0, r5, r0, lsl #3
+ 259 0010 FFF7FEFF 		bl	servo_enable
+ 260              	.LVL25:
+  42:../Core/Src/static_fire.c ****     for (int i = 0; i < 4; i++) {
+ 261              		.loc 1 42 29 is_stmt 1 discriminator 3 view .LVU53
+ 262 0014 0134     		adds	r4, r4, #1
+ 263              	.LVL26:
+ 264              	.L17:
+  42:../Core/Src/static_fire.c ****     for (int i = 0; i < 4; i++) {
+ 265              		.loc 1 42 23 discriminator 1 view .LVU54
+ 266 0016 032C     		cmp	r4, #3
+ 267 0018 F6DD     		ble	.L18
+ 268              	.LBE10:
+  44:../Core/Src/static_fire.c ****     }
+  45:../Core/Src/static_fire.c **** }
+ 269              		.loc 1 45 1 is_stmt 0 view .LVU55
+ 270 001a 38BD     		pop	{r3, r4, r5, pc}
+ 271              		.loc 1 45 1 view .LVU56
+ 272              		.cfi_endproc
+ 273              	.LFE400:
+ 275              		.section	.text.disable_servos,"ax",%progbits
+ 276              		.align	1
+ 277              		.global	disable_servos
+ 278              		.syntax unified
+ 279              		.thumb
+ 280              		.thumb_func
+ 282              	disable_servos:
+ 283              	.LVL27:
+ 284              	.LFB401:
+  46:../Core/Src/static_fire.c **** 
+  47:../Core/Src/static_fire.c **** void disable_servos(Servo_T *servos) {
+ARM GAS  /tmp/cc0nB5JE.s 			page 7
+
+
+ 285              		.loc 1 47 38 is_stmt 1 view -0
+ 286              		.cfi_startproc
+ 287              		@ args = 0, pretend = 0, frame = 0
+ 288              		@ frame_needed = 0, uses_anonymous_args = 0
+ 289              		.loc 1 47 38 is_stmt 0 view .LVU58
+ 290 0000 38B5     		push	{r3, r4, r5, lr}
+ 291              	.LCFI3:
+ 292              		.cfi_def_cfa_offset 16
+ 293              		.cfi_offset 3, -16
+ 294              		.cfi_offset 4, -12
+ 295              		.cfi_offset 5, -8
+ 296              		.cfi_offset 14, -4
+ 297 0002 0546     		mov	r5, r0
+  48:../Core/Src/static_fire.c ****     for (int i = 0; i < 4; i++) {
+ 298              		.loc 1 48 5 is_stmt 1 view .LVU59
+ 299              	.LBB11:
+ 300              		.loc 1 48 10 view .LVU60
+ 301              	.LVL28:
+ 302              		.loc 1 48 14 is_stmt 0 view .LVU61
+ 303 0004 0024     		movs	r4, #0
+ 304              		.loc 1 48 5 view .LVU62
+ 305 0006 06E0     		b	.L21
+ 306              	.LVL29:
+ 307              	.L22:
+  49:../Core/Src/static_fire.c ****         servo_disable(&servos[i]);
+ 308              		.loc 1 49 9 is_stmt 1 discriminator 3 view .LVU63
+ 309              		.loc 1 49 30 is_stmt 0 discriminator 3 view .LVU64
+ 310 0008 04EB8400 		add	r0, r4, r4, lsl #2
+ 311              		.loc 1 49 9 discriminator 3 view .LVU65
+ 312 000c 05EBC000 		add	r0, r5, r0, lsl #3
+ 313 0010 FFF7FEFF 		bl	servo_disable
+ 314              	.LVL30:
+  48:../Core/Src/static_fire.c ****     for (int i = 0; i < 4; i++) {
+ 315              		.loc 1 48 29 is_stmt 1 discriminator 3 view .LVU66
+ 316 0014 0134     		adds	r4, r4, #1
+ 317              	.LVL31:
+ 318              	.L21:
+  48:../Core/Src/static_fire.c ****     for (int i = 0; i < 4; i++) {
+ 319              		.loc 1 48 23 discriminator 1 view .LVU67
+ 320 0016 032C     		cmp	r4, #3
+ 321 0018 F6DD     		ble	.L22
+ 322              	.LBE11:
+  50:../Core/Src/static_fire.c ****     }
+  51:../Core/Src/static_fire.c **** }
+ 323              		.loc 1 51 1 is_stmt 0 view .LVU68
+ 324 001a 38BD     		pop	{r3, r4, r5, pc}
+ 325              		.loc 1 51 1 view .LVU69
+ 326              		.cfi_endproc
+ 327              	.LFE401:
+ 329              		.section	.rodata.set_servo_angles.str1.4,"aMS",%progbits,1
+ 330              		.align	2
+ 331              	.LC0:
+ 332 0000 54696D65 		.ascii	"Timer counts: %d\015\012\000"
+ 332      7220636F 
+ 332      756E7473 
+ 332      3A202564 
+ 332      0D0A00
+ARM GAS  /tmp/cc0nB5JE.s 			page 8
+
+
+ 333              		.section	.text.set_servo_angles,"ax",%progbits
+ 334              		.align	1
+ 335              		.global	set_servo_angles
+ 336              		.syntax unified
+ 337              		.thumb
+ 338              		.thumb_func
+ 340              	set_servo_angles:
+ 341              	.LVL32:
+ 342              	.LFB402:
+  52:../Core/Src/static_fire.c **** 
+  53:../Core/Src/static_fire.c **** void set_servo_angles(Servo_T *servos, float angle_rad) {
+ 343              		.loc 1 53 57 is_stmt 1 view -0
+ 344              		.cfi_startproc
+ 345              		@ args = 0, pretend = 0, frame = 104
+ 346              		@ frame_needed = 0, uses_anonymous_args = 0
+ 347              		.loc 1 53 57 is_stmt 0 view .LVU71
+ 348 0000 30B5     		push	{r4, r5, lr}
+ 349              	.LCFI4:
+ 350              		.cfi_def_cfa_offset 12
+ 351              		.cfi_offset 4, -12
+ 352              		.cfi_offset 5, -8
+ 353              		.cfi_offset 14, -4
+ 354 0002 2DED028B 		vpush.64	{d8}
+ 355              	.LCFI5:
+ 356              		.cfi_def_cfa_offset 20
+ 357              		.cfi_offset 80, -20
+ 358              		.cfi_offset 81, -16
+ 359 0006 9BB0     		sub	sp, sp, #108
+ 360              	.LCFI6:
+ 361              		.cfi_def_cfa_offset 128
+ 362 0008 0546     		mov	r5, r0
+ 363 000a B0EE408A 		vmov.f32	s16, s0
+  54:../Core/Src/static_fire.c ****     for (int i = 0; i < 4; i++) {
+ 364              		.loc 1 54 5 is_stmt 1 view .LVU72
+ 365              	.LBB12:
+ 366              		.loc 1 54 10 view .LVU73
+ 367              	.LVL33:
+ 368              		.loc 1 54 14 is_stmt 0 view .LVU74
+ 369 000e 0024     		movs	r4, #0
+ 370              		.loc 1 54 5 view .LVU75
+ 371 0010 16E0     		b	.L25
+ 372              	.LVL34:
+ 373              	.L26:
+ 374              	.LBB13:
+  55:../Core/Src/static_fire.c ****         char buf[100];
+ 375              		.loc 1 55 9 is_stmt 1 discriminator 3 view .LVU76
+  56:../Core/Src/static_fire.c ****         sprintf(buf, "Timer counts: %d\r\n", servo_set_angle(&servos[i], angle_rad));
+ 376              		.loc 1 56 9 discriminator 3 view .LVU77
+ 377              		.loc 1 56 69 is_stmt 0 discriminator 3 view .LVU78
+ 378 0012 04EB8400 		add	r0, r4, r4, lsl #2
+ 379              		.loc 1 56 46 discriminator 3 view .LVU79
+ 380 0016 B7EEC80A 		vcvt.f64.f32	d0, s16
+ 381 001a 05EBC000 		add	r0, r5, r0, lsl #3
+ 382 001e FFF7FEFF 		bl	servo_set_angle
+ 383              	.LVL35:
+ 384 0022 0246     		mov	r2, r0
+ 385              		.loc 1 56 9 discriminator 3 view .LVU80
+ARM GAS  /tmp/cc0nB5JE.s 			page 9
+
+
+ 386 0024 0949     		ldr	r1, .L28
+ 387 0026 01A8     		add	r0, sp, #4
+ 388 0028 FFF7FEFF 		bl	sprintf
+ 389              	.LVL36:
+  57:../Core/Src/static_fire.c ****         HAL_UART_Transmit(&debug_uart, buf, strlen(buf), 10);
+ 390              		.loc 1 57 9 is_stmt 1 discriminator 3 view .LVU81
+ 391              		.loc 1 57 45 is_stmt 0 discriminator 3 view .LVU82
+ 392 002c 01A8     		add	r0, sp, #4
+ 393 002e FFF7FEFF 		bl	strlen
+ 394              	.LVL37:
+ 395              		.loc 1 57 9 discriminator 3 view .LVU83
+ 396 0032 0A23     		movs	r3, #10
+ 397 0034 82B2     		uxth	r2, r0
+ 398 0036 01A9     		add	r1, sp, #4
+ 399 0038 0548     		ldr	r0, .L28+4
+ 400 003a FFF7FEFF 		bl	HAL_UART_Transmit
+ 401              	.LVL38:
+ 402              	.LBE13:
+  54:../Core/Src/static_fire.c ****         char buf[100];
+ 403              		.loc 1 54 29 is_stmt 1 discriminator 3 view .LVU84
+ 404 003e 0134     		adds	r4, r4, #1
+ 405              	.LVL39:
+ 406              	.L25:
+  54:../Core/Src/static_fire.c ****         char buf[100];
+ 407              		.loc 1 54 23 discriminator 1 view .LVU85
+ 408 0040 032C     		cmp	r4, #3
+ 409 0042 E6DD     		ble	.L26
+ 410              	.LBE12:
+  58:../Core/Src/static_fire.c ****     }
+  59:../Core/Src/static_fire.c **** }
+ 411              		.loc 1 59 1 is_stmt 0 view .LVU86
+ 412 0044 1BB0     		add	sp, sp, #108
+ 413              	.LCFI7:
+ 414              		.cfi_def_cfa_offset 20
+ 415              		@ sp needed
+ 416 0046 BDEC028B 		vldm	sp!, {d8}
+ 417              	.LCFI8:
+ 418              		.cfi_restore 80
+ 419              		.cfi_restore 81
+ 420              		.cfi_def_cfa_offset 12
+ 421              	.LVL40:
+ 422              		.loc 1 59 1 view .LVU87
+ 423 004a 30BD     		pop	{r4, r5, pc}
+ 424              	.LVL41:
+ 425              	.L29:
+ 426              		.loc 1 59 1 view .LVU88
+ 427              		.align	2
+ 428              	.L28:
+ 429 004c 00000000 		.word	.LC0
+ 430 0050 00000000 		.word	huart2
+ 431              		.cfi_endproc
+ 432              	.LFE402:
+ 434              		.section	.text.record_servo_adcs,"ax",%progbits
+ 435              		.align	1
+ 436              		.global	record_servo_adcs
+ 437              		.syntax unified
+ 438              		.thumb
+ARM GAS  /tmp/cc0nB5JE.s 			page 10
+
+
+ 439              		.thumb_func
+ 441              	record_servo_adcs:
+ 442              	.LVL42:
+ 443              	.LFB403:
+  60:../Core/Src/static_fire.c **** 
+  61:../Core/Src/static_fire.c **** void record_servo_adcs(uint16_t *adcs, uint16_t **servo_deflections) {
+ 444              		.loc 1 61 70 is_stmt 1 view -0
+ 445              		.cfi_startproc
+ 446              		@ args = 0, pretend = 0, frame = 0
+ 447              		@ frame_needed = 0, uses_anonymous_args = 0
+ 448              		.loc 1 61 70 is_stmt 0 view .LVU90
+ 449 0000 38B5     		push	{r3, r4, r5, lr}
+ 450              	.LCFI9:
+ 451              		.cfi_def_cfa_offset 16
+ 452              		.cfi_offset 3, -16
+ 453              		.cfi_offset 4, -12
+ 454              		.cfi_offset 5, -8
+ 455              		.cfi_offset 14, -4
+ 456 0002 0446     		mov	r4, r0
+ 457 0004 0D46     		mov	r5, r1
+  62:../Core/Src/static_fire.c ****     poll_adcs();
+ 458              		.loc 1 62 5 is_stmt 1 view .LVU91
+ 459 0006 FFF7FEFF 		bl	poll_adcs
+ 460              	.LVL43:
+  63:../Core/Src/static_fire.c **** 
+  64:../Core/Src/static_fire.c ****     if (xSemaphoreTake(g_state_mutex_handle, portMAX_DELAY) == pdTRUE) {
+ 461              		.loc 1 64 5 view .LVU92
+ 462              		.loc 1 64 9 is_stmt 0 view .LVU93
+ 463 000a 4FF0FF31 		mov	r1, #-1
+ 464 000e 0C4B     		ldr	r3, .L37
+ 465 0010 1868     		ldr	r0, [r3]
+ 466 0012 FFF7FEFF 		bl	xQueueSemaphoreTake
+ 467              	.LVL44:
+ 468              		.loc 1 64 8 view .LVU94
+ 469 0016 0128     		cmp	r0, #1
+ 470 0018 10D0     		beq	.L36
+ 471              	.L30:
+  65:../Core/Src/static_fire.c ****         for (int i = 0; i < 4; i++) {
+  66:../Core/Src/static_fire.c ****             adcs[i] = (*servo_deflections[i]);
+  67:../Core/Src/static_fire.c ****         }
+  68:../Core/Src/static_fire.c **** 
+  69:../Core/Src/static_fire.c ****         xSemaphoreGive(g_state_mutex_handle);
+  70:../Core/Src/static_fire.c ****     }
+  71:../Core/Src/static_fire.c **** }
+ 472              		.loc 1 71 1 view .LVU95
+ 473 001a 38BD     		pop	{r3, r4, r5, pc}
+ 474              	.LVL45:
+ 475              	.L33:
+ 476              	.LBB14:
+  66:../Core/Src/static_fire.c ****         }
+ 477              		.loc 1 66 13 is_stmt 1 discriminator 3 view .LVU96
+  66:../Core/Src/static_fire.c ****         }
+ 478              		.loc 1 66 42 is_stmt 0 discriminator 3 view .LVU97
+ 479 001c 55F82320 		ldr	r2, [r5, r3, lsl #2]
+  66:../Core/Src/static_fire.c ****         }
+ 480              		.loc 1 66 24 discriminator 3 view .LVU98
+ 481 0020 1288     		ldrh	r2, [r2]
+ARM GAS  /tmp/cc0nB5JE.s 			page 11
+
+
+  66:../Core/Src/static_fire.c ****         }
+ 482              		.loc 1 66 21 discriminator 3 view .LVU99
+ 483 0022 24F81320 		strh	r2, [r4, r3, lsl #1]	@ movhi
+  65:../Core/Src/static_fire.c ****         for (int i = 0; i < 4; i++) {
+ 484              		.loc 1 65 33 is_stmt 1 discriminator 3 view .LVU100
+ 485 0026 0133     		adds	r3, r3, #1
+ 486              	.LVL46:
+ 487              	.L31:
+  65:../Core/Src/static_fire.c ****         for (int i = 0; i < 4; i++) {
+ 488              		.loc 1 65 27 discriminator 1 view .LVU101
+ 489 0028 032B     		cmp	r3, #3
+ 490 002a F7DD     		ble	.L33
+ 491              	.LBE14:
+  69:../Core/Src/static_fire.c ****     }
+ 492              		.loc 1 69 9 view .LVU102
+ 493 002c 0023     		movs	r3, #0
+ 494              	.LVL47:
+  69:../Core/Src/static_fire.c ****     }
+ 495              		.loc 1 69 9 is_stmt 0 view .LVU103
+ 496 002e 1A46     		mov	r2, r3
+ 497 0030 1946     		mov	r1, r3
+ 498 0032 0348     		ldr	r0, .L37
+ 499 0034 0068     		ldr	r0, [r0]
+ 500 0036 FFF7FEFF 		bl	xQueueGenericSend
+ 501              	.LVL48:
+ 502              		.loc 1 71 1 view .LVU104
+ 503 003a EEE7     		b	.L30
+ 504              	.LVL49:
+ 505              	.L36:
+ 506              	.LBB15:
+  65:../Core/Src/static_fire.c ****         for (int i = 0; i < 4; i++) {
+ 507              		.loc 1 65 18 view .LVU105
+ 508 003c 0023     		movs	r3, #0
+ 509 003e F3E7     		b	.L31
+ 510              	.L38:
+ 511              		.align	2
+ 512              	.L37:
+ 513 0040 00000000 		.word	g_state_mutex_handle
+ 514              	.LBE15:
+ 515              		.cfi_endproc
+ 516              	.LFE403:
+ 518              		.section	.rodata.calibrate_servos.str1.4,"aMS",%progbits,1
+ 519              		.align	2
+ 520              	.LC1:
+ 521 0000 53657276 		.ascii	"Servo zero %d\015\012\000"
+ 521      6F207A65 
+ 521      726F2025 
+ 521      640D0A00 
+ 522              		.align	2
+ 523              	.LC2:
+ 524 0010 476F696E 		.ascii	"Going to start position...\000"
+ 524      6720746F 
+ 524      20737461 
+ 524      72742070 
+ 524      6F736974 
+ 525 002b 00       		.align	2
+ 526              	.LC3:
+ARM GAS  /tmp/cc0nB5JE.s 			page 12
+
+
+ 527 002c 446F6E65 		.ascii	"Done\015\012\000"
+ 527      0D0A00
+ 528 0033 00       		.align	2
+ 529              	.LC4:
+ 530 0034 476F696E 		.ascii	"Going to end position...\000"
+ 530      6720746F 
+ 530      20656E64 
+ 530      20706F73 
+ 530      6974696F 
+ 531 004d 000000   		.align	2
+ 532              	.LC5:
+ 533 0050 5A65726F 		.ascii	"Zero: %d, Start: %d, End: %d\012\000"
+ 533      3A202564 
+ 533      2C205374 
+ 533      6172743A 
+ 533      2025642C 
+ 534              		.section	.text.calibrate_servos,"ax",%progbits
+ 535              		.align	1
+ 536              		.global	calibrate_servos
+ 537              		.syntax unified
+ 538              		.thumb
+ 539              		.thumb_func
+ 541              	calibrate_servos:
+ 542              	.LVL50:
+ 543              	.LFB404:
+  72:../Core/Src/static_fire.c **** 
+  73:../Core/Src/static_fire.c **** void calibrate_servos(Servo_T *servos, uint16_t **servo_deflections) {
+ 544              		.loc 1 73 70 is_stmt 1 view -0
+ 545              		.cfi_startproc
+ 546              		@ args = 0, pretend = 0, frame = 224
+ 547              		@ frame_needed = 0, uses_anonymous_args = 0
+ 548              		.loc 1 73 70 is_stmt 0 view .LVU107
+ 549 0000 70B5     		push	{r4, r5, r6, lr}
+ 550              	.LCFI10:
+ 551              		.cfi_def_cfa_offset 16
+ 552              		.cfi_offset 4, -16
+ 553              		.cfi_offset 5, -12
+ 554              		.cfi_offset 6, -8
+ 555              		.cfi_offset 14, -4
+ 556 0002 BAB0     		sub	sp, sp, #232
+ 557              	.LCFI11:
+ 558              		.cfi_def_cfa_offset 248
+ 559 0004 0546     		mov	r5, r0
+ 560 0006 0E46     		mov	r6, r1
+  74:../Core/Src/static_fire.c ****     uint16_t adc_zeros[4] = {0};
+ 561              		.loc 1 74 5 is_stmt 1 view .LVU108
+ 562              		.loc 1 74 14 is_stmt 0 view .LVU109
+ 563 0008 0024     		movs	r4, #0
+ 564 000a 3894     		str	r4, [sp, #224]
+ 565 000c 3994     		str	r4, [sp, #228]
+  75:../Core/Src/static_fire.c ****     uint16_t adc_starts[4] = {0};
+ 566              		.loc 1 75 5 is_stmt 1 view .LVU110
+ 567              		.loc 1 75 14 is_stmt 0 view .LVU111
+ 568 000e 3694     		str	r4, [sp, #216]
+ 569 0010 3794     		str	r4, [sp, #220]
+  76:../Core/Src/static_fire.c ****     uint16_t adc_ends[4] = {0};
+ 570              		.loc 1 76 5 is_stmt 1 view .LVU112
+ARM GAS  /tmp/cc0nB5JE.s 			page 13
+
+
+ 571              		.loc 1 76 14 is_stmt 0 view .LVU113
+ 572 0012 3494     		str	r4, [sp, #208]
+ 573 0014 3594     		str	r4, [sp, #212]
+  77:../Core/Src/static_fire.c ****     
+  78:../Core/Src/static_fire.c ****     record_servo_adcs(adc_zeros, servo_deflections);
+ 574              		.loc 1 78 5 is_stmt 1 view .LVU114
+ 575 0016 38A8     		add	r0, sp, #224
+ 576              	.LVL51:
+ 577              		.loc 1 78 5 is_stmt 0 view .LVU115
+ 578 0018 FFF7FEFF 		bl	record_servo_adcs
+ 579              	.LVL52:
+  79:../Core/Src/static_fire.c **** 
+  80:../Core/Src/static_fire.c ****     char buf1[100];
+ 580              		.loc 1 80 5 is_stmt 1 view .LVU116
+  81:../Core/Src/static_fire.c ****     sprintf(buf1, "Servo zero %d\r\n", adc_zeros[2]);
+ 581              		.loc 1 81 5 view .LVU117
+ 582 001c BDF8E420 		ldrh	r2, [sp, #228]
+ 583 0020 4149     		ldr	r1, .L47
+ 584 0022 1BA8     		add	r0, sp, #108
+ 585 0024 FFF7FEFF 		bl	sprintf
+ 586              	.LVL53:
+  82:../Core/Src/static_fire.c ****     HAL_UART_Transmit(&debug_uart, buf1, strlen(buf1), 10);
+ 587              		.loc 1 82 5 view .LVU118
+ 588              		.loc 1 82 42 is_stmt 0 view .LVU119
+ 589 0028 1BA8     		add	r0, sp, #108
+ 590 002a FFF7FEFF 		bl	strlen
+ 591              	.LVL54:
+ 592              		.loc 1 82 5 view .LVU120
+ 593 002e 0A23     		movs	r3, #10
+ 594 0030 82B2     		uxth	r2, r0
+ 595 0032 1BA9     		add	r1, sp, #108
+ 596 0034 3D48     		ldr	r0, .L47+4
+ 597 0036 FFF7FEFF 		bl	HAL_UART_Transmit
+ 598              	.LVL55:
+  83:../Core/Src/static_fire.c **** 
+  84:../Core/Src/static_fire.c ****     // Enable Servos and sweep to record end points
+  85:../Core/Src/static_fire.c ****     enable_servos(servos);
+ 599              		.loc 1 85 5 is_stmt 1 view .LVU121
+ 600 003a 2846     		mov	r0, r5
+ 601 003c FFF7FEFF 		bl	enable_servos
+ 602              	.LVL56:
+  86:../Core/Src/static_fire.c **** 
+  87:../Core/Src/static_fire.c ****     for (int i = 0; i < 4; ++i) {
+ 603              		.loc 1 87 5 view .LVU122
+ 604              	.LBB16:
+ 605              		.loc 1 87 10 view .LVU123
+ 606              		.loc 1 87 5 is_stmt 0 view .LVU124
+ 607 0040 06E0     		b	.L40
+ 608              	.LVL57:
+ 609              	.L41:
+  88:../Core/Src/static_fire.c ****         servo_go_to_calibration_start(&servos[i]);
+ 610              		.loc 1 88 9 is_stmt 1 discriminator 3 view .LVU125
+ 611              		.loc 1 88 46 is_stmt 0 discriminator 3 view .LVU126
+ 612 0042 04EB8400 		add	r0, r4, r4, lsl #2
+ 613              		.loc 1 88 9 discriminator 3 view .LVU127
+ 614 0046 05EBC000 		add	r0, r5, r0, lsl #3
+ 615 004a FFF7FEFF 		bl	servo_go_to_calibration_start
+ARM GAS  /tmp/cc0nB5JE.s 			page 14
+
+
+ 616              	.LVL58:
+  87:../Core/Src/static_fire.c ****         servo_go_to_calibration_start(&servos[i]);
+ 617              		.loc 1 87 28 is_stmt 1 discriminator 3 view .LVU128
+ 618 004e 0134     		adds	r4, r4, #1
+ 619              	.LVL59:
+ 620              	.L40:
+  87:../Core/Src/static_fire.c ****         servo_go_to_calibration_start(&servos[i]);
+ 621              		.loc 1 87 23 discriminator 1 view .LVU129
+ 622 0050 032C     		cmp	r4, #3
+ 623 0052 F6DD     		ble	.L41
+ 624              	.LBE16:
+  89:../Core/Src/static_fire.c ****     }
+  90:../Core/Src/static_fire.c ****     HAL_UART_Transmit(&debug_uart, (uint8_t *) "Going to start position...", 26, HAL_MAX_DELAY);
+ 625              		.loc 1 90 5 view .LVU130
+ 626 0054 354C     		ldr	r4, .L47+4
+ 627              	.LVL60:
+ 628              		.loc 1 90 5 is_stmt 0 view .LVU131
+ 629 0056 4FF0FF33 		mov	r3, #-1
+ 630 005a 1A22     		movs	r2, #26
+ 631 005c 3449     		ldr	r1, .L47+8
+ 632 005e 2046     		mov	r0, r4
+ 633 0060 FFF7FEFF 		bl	HAL_UART_Transmit
+ 634              	.LVL61:
+  91:../Core/Src/static_fire.c ****     update_servos_for_ms(servos, 15000);
+ 635              		.loc 1 91 5 is_stmt 1 view .LVU132
+ 636 0064 43F69821 		movw	r1, #15000
+ 637 0068 2846     		mov	r0, r5
+ 638 006a FFF7FEFF 		bl	update_servos_for_ms
+ 639              	.LVL62:
+  92:../Core/Src/static_fire.c ****     HAL_UART_Transmit(&debug_uart, (uint8_t *) "Done\r\n", 6, HAL_MAX_DELAY);
+ 640              		.loc 1 92 5 view .LVU133
+ 641 006e 4FF0FF33 		mov	r3, #-1
+ 642 0072 0622     		movs	r2, #6
+ 643 0074 2F49     		ldr	r1, .L47+12
+ 644 0076 2046     		mov	r0, r4
+ 645 0078 FFF7FEFF 		bl	HAL_UART_Transmit
+ 646              	.LVL63:
+  93:../Core/Src/static_fire.c ****     record_servo_adcs(adc_starts, servo_deflections);
+ 647              		.loc 1 93 5 view .LVU134
+ 648 007c 3146     		mov	r1, r6
+ 649 007e 36A8     		add	r0, sp, #216
+ 650 0080 FFF7FEFF 		bl	record_servo_adcs
+ 651              	.LVL64:
+  94:../Core/Src/static_fire.c ****     
+  95:../Core/Src/static_fire.c ****     for (int i = 0; i < 4; ++i) {
+ 652              		.loc 1 95 5 view .LVU135
+ 653              	.LBB17:
+ 654              		.loc 1 95 10 view .LVU136
+ 655              		.loc 1 95 14 is_stmt 0 view .LVU137
+ 656 0084 0024     		movs	r4, #0
+ 657              		.loc 1 95 5 view .LVU138
+ 658 0086 06E0     		b	.L42
+ 659              	.LVL65:
+ 660              	.L43:
+  96:../Core/Src/static_fire.c ****         servo_go_to_calibration_end(&servos[i]);
+ 661              		.loc 1 96 9 is_stmt 1 discriminator 3 view .LVU139
+ 662              		.loc 1 96 44 is_stmt 0 discriminator 3 view .LVU140
+ARM GAS  /tmp/cc0nB5JE.s 			page 15
+
+
+ 663 0088 04EB8400 		add	r0, r4, r4, lsl #2
+ 664              		.loc 1 96 9 discriminator 3 view .LVU141
+ 665 008c 05EBC000 		add	r0, r5, r0, lsl #3
+ 666 0090 FFF7FEFF 		bl	servo_go_to_calibration_end
+ 667              	.LVL66:
+  95:../Core/Src/static_fire.c ****         servo_go_to_calibration_end(&servos[i]);
+ 668              		.loc 1 95 28 is_stmt 1 discriminator 3 view .LVU142
+ 669 0094 0134     		adds	r4, r4, #1
+ 670              	.LVL67:
+ 671              	.L42:
+  95:../Core/Src/static_fire.c ****         servo_go_to_calibration_end(&servos[i]);
+ 672              		.loc 1 95 23 discriminator 1 view .LVU143
+ 673 0096 032C     		cmp	r4, #3
+ 674 0098 F6DD     		ble	.L43
+ 675              	.LBE17:
+  97:../Core/Src/static_fire.c ****     }
+  98:../Core/Src/static_fire.c ****     HAL_UART_Transmit(&debug_uart, (uint8_t *) "Going to end position...", 24, HAL_MAX_DELAY);
+ 676              		.loc 1 98 5 view .LVU144
+ 677 009a 244C     		ldr	r4, .L47+4
+ 678              	.LVL68:
+ 679              		.loc 1 98 5 is_stmt 0 view .LVU145
+ 680 009c 4FF0FF33 		mov	r3, #-1
+ 681 00a0 1822     		movs	r2, #24
+ 682 00a2 2549     		ldr	r1, .L47+16
+ 683 00a4 2046     		mov	r0, r4
+ 684 00a6 FFF7FEFF 		bl	HAL_UART_Transmit
+ 685              	.LVL69:
+  99:../Core/Src/static_fire.c ****     update_servos_for_ms(servos, 15000);
+ 686              		.loc 1 99 5 is_stmt 1 view .LVU146
+ 687 00aa 43F69821 		movw	r1, #15000
+ 688 00ae 2846     		mov	r0, r5
+ 689 00b0 FFF7FEFF 		bl	update_servos_for_ms
+ 690              	.LVL70:
+ 100:../Core/Src/static_fire.c ****     HAL_UART_Transmit(&debug_uart, (uint8_t *) "Done\r\n", 6, HAL_MAX_DELAY);
+ 691              		.loc 1 100 5 view .LVU147
+ 692 00b4 4FF0FF33 		mov	r3, #-1
+ 693 00b8 0622     		movs	r2, #6
+ 694 00ba 1E49     		ldr	r1, .L47+12
+ 695 00bc 2046     		mov	r0, r4
+ 696 00be FFF7FEFF 		bl	HAL_UART_Transmit
+ 697              	.LVL71:
+ 101:../Core/Src/static_fire.c ****     
+ 102:../Core/Src/static_fire.c ****     record_servo_adcs(adc_ends, servo_deflections);
+ 698              		.loc 1 102 5 view .LVU148
+ 699 00c2 3146     		mov	r1, r6
+ 700 00c4 34A8     		add	r0, sp, #208
+ 701 00c6 FFF7FEFF 		bl	record_servo_adcs
+ 702              	.LVL72:
+ 103:../Core/Src/static_fire.c **** 
+ 104:../Core/Src/static_fire.c ****     for (int i = 0; i < 4; ++i) {
+ 703              		.loc 1 104 5 view .LVU149
+ 704              	.LBB18:
+ 705              		.loc 1 104 10 view .LVU150
+ 706              		.loc 1 104 14 is_stmt 0 view .LVU151
+ 707 00ca 0024     		movs	r4, #0
+ 708              		.loc 1 104 5 view .LVU152
+ 709 00cc 0FE0     		b	.L44
+ARM GAS  /tmp/cc0nB5JE.s 			page 16
+
+
+ 710              	.LVL73:
+ 711              	.L45:
+ 105:../Core/Src/static_fire.c ****         servo_set_zero(&servos[i], adc_starts[i], adc_ends[i], adc_zeros[i]);
+ 712              		.loc 1 105 9 is_stmt 1 discriminator 3 view .LVU153
+ 713              		.loc 1 105 31 is_stmt 0 discriminator 3 view .LVU154
+ 714 00ce 04EB8400 		add	r0, r4, r4, lsl #2
+ 715              		.loc 1 105 9 discriminator 3 view .LVU155
+ 716 00d2 3AAB     		add	r3, sp, #232
+ 717 00d4 03EB4401 		add	r1, r3, r4, lsl #1
+ 718 00d8 31F8083C 		ldrh	r3, [r1, #-8]
+ 719 00dc 31F8182C 		ldrh	r2, [r1, #-24]
+ 720 00e0 31F8101C 		ldrh	r1, [r1, #-16]
+ 721 00e4 05EBC000 		add	r0, r5, r0, lsl #3
+ 722 00e8 FFF7FEFF 		bl	servo_set_zero
+ 723              	.LVL74:
+ 104:../Core/Src/static_fire.c ****         servo_set_zero(&servos[i], adc_starts[i], adc_ends[i], adc_zeros[i]);
+ 724              		.loc 1 104 28 is_stmt 1 discriminator 3 view .LVU156
+ 725 00ec 0134     		adds	r4, r4, #1
+ 726              	.LVL75:
+ 727              	.L44:
+ 104:../Core/Src/static_fire.c ****         servo_set_zero(&servos[i], adc_starts[i], adc_ends[i], adc_zeros[i]);
+ 728              		.loc 1 104 23 discriminator 1 view .LVU157
+ 729 00ee 032C     		cmp	r4, #3
+ 730 00f0 EDDD     		ble	.L45
+ 731              	.LBE18:
+ 106:../Core/Src/static_fire.c ****     }
+ 107:../Core/Src/static_fire.c **** 
+ 108:../Core/Src/static_fire.c ****     char buf[100];
+ 732              		.loc 1 108 5 view .LVU158
+ 109:../Core/Src/static_fire.c ****     sprintf(buf, "Zero: %d, Start: %d, End: %d\n", adc_zeros[2], adc_starts[2], adc_ends[2]);
+ 733              		.loc 1 109 5 view .LVU159
+ 734              		.loc 1 109 89 is_stmt 0 view .LVU160
+ 735 00f2 BDF8D430 		ldrh	r3, [sp, #212]
+ 736              		.loc 1 109 5 view .LVU161
+ 737 00f6 0093     		str	r3, [sp]
+ 738 00f8 BDF8DC30 		ldrh	r3, [sp, #220]
+ 739 00fc BDF8E420 		ldrh	r2, [sp, #228]
+ 740 0100 0E49     		ldr	r1, .L47+20
+ 741 0102 02A8     		add	r0, sp, #8
+ 742 0104 FFF7FEFF 		bl	sprintf
+ 743              	.LVL76:
+ 110:../Core/Src/static_fire.c ****     HAL_UART_Transmit(&debug_uart, buf, strlen(buf), 10);
+ 744              		.loc 1 110 5 is_stmt 1 view .LVU162
+ 745              		.loc 1 110 41 is_stmt 0 view .LVU163
+ 746 0108 02A8     		add	r0, sp, #8
+ 747 010a FFF7FEFF 		bl	strlen
+ 748              	.LVL77:
+ 749              		.loc 1 110 5 view .LVU164
+ 750 010e 0A23     		movs	r3, #10
+ 751 0110 82B2     		uxth	r2, r0
+ 752 0112 02A9     		add	r1, sp, #8
+ 753 0114 0548     		ldr	r0, .L47+4
+ 754 0116 FFF7FEFF 		bl	HAL_UART_Transmit
+ 755              	.LVL78:
+ 111:../Core/Src/static_fire.c **** 
+ 112:../Core/Src/static_fire.c ****     // Go back to zero position
+ 113:../Core/Src/static_fire.c ****     set_servo_angles(servos, 0);
+ARM GAS  /tmp/cc0nB5JE.s 			page 17
+
+
+ 756              		.loc 1 113 5 is_stmt 1 view .LVU165
+ 757 011a 9FED090A 		vldr.32	s0, .L47+24
+ 758 011e 2846     		mov	r0, r5
+ 759 0120 FFF7FEFF 		bl	set_servo_angles
+ 760              	.LVL79:
+ 114:../Core/Src/static_fire.c **** }
+ 761              		.loc 1 114 1 is_stmt 0 view .LVU166
+ 762 0124 3AB0     		add	sp, sp, #232
+ 763              	.LCFI12:
+ 764              		.cfi_def_cfa_offset 16
+ 765              		@ sp needed
+ 766 0126 70BD     		pop	{r4, r5, r6, pc}
+ 767              	.LVL80:
+ 768              	.L48:
+ 769              		.loc 1 114 1 view .LVU167
+ 770              		.align	2
+ 771              	.L47:
+ 772 0128 00000000 		.word	.LC1
+ 773 012c 00000000 		.word	huart2
+ 774 0130 10000000 		.word	.LC2
+ 775 0134 2C000000 		.word	.LC3
+ 776 0138 34000000 		.word	.LC4
+ 777 013c 50000000 		.word	.LC5
+ 778 0140 00000000 		.word	0
+ 779              		.cfi_endproc
+ 780              	.LFE404:
+ 782              		.section	.rodata.static_fire_task.str1.4,"aMS",%progbits,1
+ 783              		.align	2
+ 784              	.LC6:
+ 785 0000 43616C69 		.ascii	"Calibrated servos\015\012\000"
+ 785      62726174 
+ 785      65642073 
+ 785      6572766F 
+ 785      730D0A00 
+ 786              		.align	2
+ 787              	.LC7:
+ 788 0014 42656769 		.ascii	"Beginning static fire\015\012\000"
+ 788      6E6E696E 
+ 788      67207374 
+ 788      61746963 
+ 788      20666972 
+ 789              		.global	__aeabi_uldivmod
+ 790              		.align	2
+ 791              	.LC8:
+ 792 002c 54696D65 		.ascii	"Time: %f, Angle: %f\015\012\000"
+ 792      3A202566 
+ 792      2C20416E 
+ 792      676C653A 
+ 792      2025660D 
+ 793 0042 0000     		.align	2
+ 794              	.LC9:
+ 795 0044 53656E74 		.ascii	"Sent state\015\012\000"
+ 795      20737461 
+ 795      74650D0A 
+ 795      00
+ 796              		.section	.text.static_fire_task,"ax",%progbits
+ 797              		.align	1
+ARM GAS  /tmp/cc0nB5JE.s 			page 18
+
+
+ 798              		.global	static_fire_task
+ 799              		.syntax unified
+ 800              		.thumb
+ 801              		.thumb_func
+ 803              	static_fire_task:
+ 804              	.LVL81:
+ 805              	.LFB405:
+ 115:../Core/Src/static_fire.c **** 
+ 116:../Core/Src/static_fire.c **** void static_fire_task(void *args) {
+ 806              		.loc 1 116 35 is_stmt 1 view -0
+ 807              		.cfi_startproc
+ 808              		@ args = 0, pretend = 0, frame = 456
+ 809              		@ frame_needed = 0, uses_anonymous_args = 0
+ 810              		.loc 1 116 35 is_stmt 0 view .LVU169
+ 811 0000 70B5     		push	{r4, r5, r6, lr}
+ 812              	.LCFI13:
+ 813              		.cfi_def_cfa_offset 16
+ 814              		.cfi_offset 4, -16
+ 815              		.cfi_offset 5, -12
+ 816              		.cfi_offset 6, -8
+ 817              		.cfi_offset 14, -4
+ 818 0002 2DED028B 		vpush.64	{d8}
+ 819              	.LCFI14:
+ 820              		.cfi_def_cfa_offset 24
+ 821              		.cfi_offset 80, -24
+ 822              		.cfi_offset 81, -20
+ 823 0006 F4B0     		sub	sp, sp, #464
+ 824              	.LCFI15:
+ 825              		.cfi_def_cfa_offset 488
+ 117:../Core/Src/static_fire.c ****     /* Initialize servos */
+ 118:../Core/Src/static_fire.c ****     Servo_T servo1 = {0};
+ 826              		.loc 1 118 5 is_stmt 1 view .LVU170
+ 827              		.loc 1 118 13 is_stmt 0 view .LVU171
+ 828 0008 2824     		movs	r4, #40
+ 829 000a 2246     		mov	r2, r4
+ 830 000c 0021     		movs	r1, #0
+ 831 000e 6AA8     		add	r0, sp, #424
+ 832              	.LVL82:
+ 833              		.loc 1 118 13 view .LVU172
+ 834 0010 FFF7FEFF 		bl	memset
+ 835              	.LVL83:
+ 119:../Core/Src/static_fire.c ****     Servo_T servo2 = {0};
+ 836              		.loc 1 119 5 is_stmt 1 view .LVU173
+ 837              		.loc 1 119 13 is_stmt 0 view .LVU174
+ 838 0014 2246     		mov	r2, r4
+ 839 0016 0021     		movs	r1, #0
+ 840 0018 60A8     		add	r0, sp, #384
+ 841 001a FFF7FEFF 		bl	memset
+ 842              	.LVL84:
+ 120:../Core/Src/static_fire.c ****     Servo_T servo3 = {0};
+ 843              		.loc 1 120 5 is_stmt 1 view .LVU175
+ 844              		.loc 1 120 13 is_stmt 0 view .LVU176
+ 845 001e 2246     		mov	r2, r4
+ 846 0020 0021     		movs	r1, #0
+ 847 0022 56A8     		add	r0, sp, #344
+ 848 0024 FFF7FEFF 		bl	memset
+ 849              	.LVL85:
+ARM GAS  /tmp/cc0nB5JE.s 			page 19
+
+
+ 121:../Core/Src/static_fire.c ****     Servo_T servo4 = {0};
+ 850              		.loc 1 121 5 is_stmt 1 view .LVU177
+ 851              		.loc 1 121 13 is_stmt 0 view .LVU178
+ 852 0028 2246     		mov	r2, r4
+ 853 002a 0021     		movs	r1, #0
+ 854 002c 4CA8     		add	r0, sp, #304
+ 855 002e FFF7FEFF 		bl	memset
+ 856              	.LVL86:
+ 122:../Core/Src/static_fire.c **** 
+ 123:../Core/Src/static_fire.c ****     Servo_T servos[] = {servo1, servo2, servo3, servo4};
+ 857              		.loc 1 123 5 is_stmt 1 view .LVU179
+ 858              		.loc 1 123 13 is_stmt 0 view .LVU180
+ 859 0032 24AD     		add	r5, sp, #144
+ 860 0034 6AAC     		add	r4, sp, #424
+ 861 0036 0FCC     		ldmia	r4!, {r0, r1, r2, r3}
+ 862 0038 0FC5     		stmia	r5!, {r0, r1, r2, r3}
+ 863 003a 0FCC     		ldmia	r4!, {r0, r1, r2, r3}
+ 864 003c 0FC5     		stmia	r5!, {r0, r1, r2, r3}
+ 865 003e 94E80300 		ldm	r4, {r0, r1}
+ 866 0042 85E80300 		stm	r5, {r0, r1}
+ 867 0046 2EAD     		add	r5, sp, #184
+ 868 0048 60AC     		add	r4, sp, #384
+ 869 004a 0FCC     		ldmia	r4!, {r0, r1, r2, r3}
+ 870 004c 0FC5     		stmia	r5!, {r0, r1, r2, r3}
+ 871 004e 0FCC     		ldmia	r4!, {r0, r1, r2, r3}
+ 872 0050 0FC5     		stmia	r5!, {r0, r1, r2, r3}
+ 873 0052 94E80300 		ldm	r4, {r0, r1}
+ 874 0056 85E80300 		stm	r5, {r0, r1}
+ 875 005a 38AD     		add	r5, sp, #224
+ 876 005c 56AC     		add	r4, sp, #344
+ 877 005e 0FCC     		ldmia	r4!, {r0, r1, r2, r3}
+ 878 0060 0FC5     		stmia	r5!, {r0, r1, r2, r3}
+ 879 0062 0FCC     		ldmia	r4!, {r0, r1, r2, r3}
+ 880 0064 0FC5     		stmia	r5!, {r0, r1, r2, r3}
+ 881 0066 94E80300 		ldm	r4, {r0, r1}
+ 882 006a 85E80300 		stm	r5, {r0, r1}
+ 883 006e 42AD     		add	r5, sp, #264
+ 884 0070 4CAC     		add	r4, sp, #304
+ 885 0072 0FCC     		ldmia	r4!, {r0, r1, r2, r3}
+ 886 0074 0FC5     		stmia	r5!, {r0, r1, r2, r3}
+ 887 0076 0FCC     		ldmia	r4!, {r0, r1, r2, r3}
+ 888 0078 0FC5     		stmia	r5!, {r0, r1, r2, r3}
+ 889 007a 94E80300 		ldm	r4, {r0, r1}
+ 890 007e 85E80300 		stm	r5, {r0, r1}
+ 124:../Core/Src/static_fire.c **** 
+ 125:../Core/Src/static_fire.c ****     /*
+ 126:../Core/Src/static_fire.c ****     init_servos(servos);
+ 127:../Core/Src/static_fire.c ****     enable_servos(servos);
+ 128:../Core/Src/static_fire.c ****     servo_set_angle_from_direct_ratio(&servos[0], 0.5);
+ 129:../Core/Src/static_fire.c ****     servo_set_angle_from_direct_ratio(&servos[1], 0.5);
+ 130:../Core/Src/static_fire.c ****     servo_set_angle_from_direct_ratio(&servos[2], 0.5);
+ 131:../Core/Src/static_fire.c ****     servo_set_angle_from_direct_ratio(&servos[3], 0.5);
+ 132:../Core/Src/static_fire.c **** 
+ 133:../Core/Src/static_fire.c ****     update_servos_for_ms(servos, 5000);
+ 134:../Core/Src/static_fire.c ****     */
+ 135:../Core/Src/static_fire.c **** 
+ 136:../Core/Src/static_fire.c ****     uint16_t *servo1_deflection = &g_current_state.servo_deflections.servo_1_actual;
+ARM GAS  /tmp/cc0nB5JE.s 			page 20
+
+
+ 891              		.loc 1 136 5 is_stmt 1 view .LVU181
+ 892              	.LVL87:
+ 137:../Core/Src/static_fire.c ****     uint16_t *servo2_deflection = &g_current_state.servo_deflections.servo_2_actual;
+ 893              		.loc 1 137 5 view .LVU182
+ 138:../Core/Src/static_fire.c ****     uint16_t *servo3_deflection = &g_current_state.servo_deflections.servo_3_actual;
+ 894              		.loc 1 138 5 view .LVU183
+ 139:../Core/Src/static_fire.c ****     uint16_t *servo4_deflection = &g_current_state.servo_deflections.servo_4_actual;
+ 895              		.loc 1 139 5 view .LVU184
+ 140:../Core/Src/static_fire.c **** 
+ 141:../Core/Src/static_fire.c ****     uint16_t *servo_deflections[] = {servo1_deflection, servo2_deflection, servo3_deflection, servo
+ 896              		.loc 1 141 5 view .LVU185
+ 897              		.loc 1 141 15 is_stmt 0 view .LVU186
+ 898 0082 914B     		ldr	r3, .L59+16
+ 899              	.LVL88:
+ 900              		.loc 1 141 15 view .LVU187
+ 901 0084 2093     		str	r3, [sp, #128]
+ 902 0086 1A1D     		adds	r2, r3, #4
+ 903 0088 2192     		str	r2, [sp, #132]
+ 904 008a 03F10802 		add	r2, r3, #8
+ 905 008e 2292     		str	r2, [sp, #136]
+ 906 0090 0C33     		adds	r3, r3, #12
+ 907              	.LVL89:
+ 908              		.loc 1 141 15 view .LVU188
+ 909 0092 2393     		str	r3, [sp, #140]
+ 142:../Core/Src/static_fire.c **** 
+ 143:../Core/Src/static_fire.c ****     vTaskDelay(1000);
+ 910              		.loc 1 143 5 is_stmt 1 view .LVU189
+ 911 0094 4FF47A70 		mov	r0, #1000
+ 912 0098 FFF7FEFF 		bl	vTaskDelay
+ 913              	.LVL90:
+ 144:../Core/Src/static_fire.c **** 
+ 145:../Core/Src/static_fire.c ****     init_servos(servos);
+ 914              		.loc 1 145 5 view .LVU190
+ 915 009c 24A8     		add	r0, sp, #144
+ 916 009e FFF7FEFF 		bl	init_servos
+ 917              	.LVL91:
+ 146:../Core/Src/static_fire.c **** 
+ 147:../Core/Src/static_fire.c ****     // Wait for zero servo notification
+ 148:../Core/Src/static_fire.c ****     /*
+ 149:../Core/Src/static_fire.c ****     uint32_t notification_value = 0;
+ 150:../Core/Src/static_fire.c ****     while ((notification_value & ZERO_SERVOS_NOTIFICATION_BIT) == 0) {
+ 151:../Core/Src/static_fire.c ****         xTaskNotifyWait(0, ZERO_SERVOS_NOTIFICATION_BIT, &notification_value, portMAX_DELAY);
+ 152:../Core/Src/static_fire.c ****     }
+ 153:../Core/Src/static_fire.c ****     */
+ 154:../Core/Src/static_fire.c **** 
+ 155:../Core/Src/static_fire.c ****     // Calibrate servos
+ 156:../Core/Src/static_fire.c **** 
+ 157:../Core/Src/static_fire.c ****     //vTaskDelay(pdMS_TO_TICKS(5000));
+ 158:../Core/Src/static_fire.c ****     
+ 159:../Core/Src/static_fire.c ****     calibrate_servos(servos, servo_deflections);
+ 918              		.loc 1 159 5 view .LVU191
+ 919 00a2 20A9     		add	r1, sp, #128
+ 920 00a4 24A8     		add	r0, sp, #144
+ 921 00a6 FFF7FEFF 		bl	calibrate_servos
+ 922              	.LVL92:
+ 160:../Core/Src/static_fire.c **** 
+ 161:../Core/Src/static_fire.c ****     HAL_UART_Transmit(&debug_uart, (uint8_t *) "Calibrated servos\r\n", 20, HAL_MAX_DELAY);
+ARM GAS  /tmp/cc0nB5JE.s 			page 21
+
+
+ 923              		.loc 1 161 5 view .LVU192
+ 924 00aa 4FF0FF33 		mov	r3, #-1
+ 925 00ae 1422     		movs	r2, #20
+ 926 00b0 8649     		ldr	r1, .L59+20
+ 927 00b2 8748     		ldr	r0, .L59+24
+ 928 00b4 FFF7FEFF 		bl	HAL_UART_Transmit
+ 929              	.LVL93:
+ 162:../Core/Src/static_fire.c **** 
+ 163:../Core/Src/static_fire.c ****     servo_set_angle(&servos[0], 0);
+ 930              		.loc 1 163 5 view .LVU193
+ 931 00b8 9FED7F8B 		vldr.64	d8, .L59
+ 932 00bc B0EE480B 		vmov.f64	d0, d8
+ 933 00c0 24A8     		add	r0, sp, #144
+ 934 00c2 FFF7FEFF 		bl	servo_set_angle
+ 935              	.LVL94:
+ 164:../Core/Src/static_fire.c ****     servo_set_angle(&servos[1], 0);
+ 936              		.loc 1 164 5 view .LVU194
+ 937 00c6 B0EE480B 		vmov.f64	d0, d8
+ 938 00ca 2EA8     		add	r0, sp, #184
+ 939 00cc FFF7FEFF 		bl	servo_set_angle
+ 940              	.LVL95:
+ 165:../Core/Src/static_fire.c ****     servo_set_angle(&servos[2], 0);
+ 941              		.loc 1 165 5 view .LVU195
+ 942 00d0 B0EE480B 		vmov.f64	d0, d8
+ 943 00d4 38A8     		add	r0, sp, #224
+ 944 00d6 FFF7FEFF 		bl	servo_set_angle
+ 945              	.LVL96:
+ 166:../Core/Src/static_fire.c ****     servo_set_angle(&servos[3], 0);
+ 946              		.loc 1 166 5 view .LVU196
+ 947 00da B0EE480B 		vmov.f64	d0, d8
+ 948 00de 42A8     		add	r0, sp, #264
+ 949 00e0 FFF7FEFF 		bl	servo_set_angle
+ 950              	.LVL97:
+ 167:../Core/Src/static_fire.c ****     
+ 168:../Core/Src/static_fire.c ****     update_servos_for_ms(servos, 2000);
+ 951              		.loc 1 168 5 view .LVU197
+ 952 00e4 4FF4FA61 		mov	r1, #2000
+ 953 00e8 24A8     		add	r0, sp, #144
+ 954 00ea FFF7FEFF 		bl	update_servos_for_ms
+ 955              	.LVL98:
+ 169:../Core/Src/static_fire.c **** 
+ 170:../Core/Src/static_fire.c ****     /* Wait for notification to begin */
+ 171:../Core/Src/static_fire.c ****     uint32_t notification_value = 0;
+ 956              		.loc 1 171 5 view .LVU198
+ 957              		.loc 1 171 14 is_stmt 0 view .LVU199
+ 958 00ee 0023     		movs	r3, #0
+ 959 00f0 1F93     		str	r3, [sp, #124]
+ 172:../Core/Src/static_fire.c ****     while ((notification_value & BEGIN_STATIC_FIRE_NOTIFICATION_BIT) == 0) {
+ 960              		.loc 1 172 5 is_stmt 1 view .LVU200
+ 961              		.loc 1 172 11 is_stmt 0 view .LVU201
+ 962 00f2 08E0     		b	.L50
+ 963              	.L51:
+ 173:../Core/Src/static_fire.c ****         xTaskNotifyWait(0, BEGIN_STATIC_FIRE_NOTIFICATION_BIT, &notification_value, portMAX_DELAY);
+ 964              		.loc 1 173 9 is_stmt 1 view .LVU202
+ 965 00f4 4FF0FF33 		mov	r3, #-1
+ 966 00f8 0093     		str	r3, [sp]
+ 967 00fa 1FAB     		add	r3, sp, #124
+ARM GAS  /tmp/cc0nB5JE.s 			page 22
+
+
+ 968 00fc 0222     		movs	r2, #2
+ 969 00fe 0021     		movs	r1, #0
+ 970 0100 0846     		mov	r0, r1
+ 971 0102 FFF7FEFF 		bl	xTaskGenericNotifyWait
+ 972              	.LVL99:
+ 973              	.L50:
+ 172:../Core/Src/static_fire.c ****     while ((notification_value & BEGIN_STATIC_FIRE_NOTIFICATION_BIT) == 0) {
+ 974              		.loc 1 172 70 view .LVU203
+ 172:../Core/Src/static_fire.c ****     while ((notification_value & BEGIN_STATIC_FIRE_NOTIFICATION_BIT) == 0) {
+ 975              		.loc 1 172 32 is_stmt 0 view .LVU204
+ 976 0106 1F9B     		ldr	r3, [sp, #124]
+ 172:../Core/Src/static_fire.c ****     while ((notification_value & BEGIN_STATIC_FIRE_NOTIFICATION_BIT) == 0) {
+ 977              		.loc 1 172 70 view .LVU205
+ 978 0108 13F0020F 		tst	r3, #2
+ 979 010c F2D0     		beq	.L51
+ 174:../Core/Src/static_fire.c ****     }
+ 175:../Core/Src/static_fire.c **** 
+ 176:../Core/Src/static_fire.c ****     HAL_UART_Transmit(&debug_uart, (uint8_t *) "Beginning static fire\r\n", 24, HAL_MAX_DELAY);
+ 980              		.loc 1 176 5 is_stmt 1 view .LVU206
+ 981 010e 4FF0FF33 		mov	r3, #-1
+ 982 0112 1822     		movs	r2, #24
+ 983 0114 6F49     		ldr	r1, .L59+28
+ 984 0116 6E48     		ldr	r0, .L59+24
+ 985 0118 FFF7FEFF 		bl	HAL_UART_Transmit
+ 986              	.LVL100:
+ 177:../Core/Src/static_fire.c ****    
+ 178:../Core/Src/static_fire.c ****     //vTaskDelay(pdMS_TO_TICKS(2000));
+ 179:../Core/Src/static_fire.c **** 
+ 180:../Core/Src/static_fire.c ****     HAL_GPIO_WritePin(PYRO_0_GPIO_Port, PYRO_0_Pin, GPIO_PIN_SET);
+ 987              		.loc 1 180 5 view .LVU207
+ 988 011c 0122     		movs	r2, #1
+ 989 011e 8021     		movs	r1, #128
+ 990 0120 6D48     		ldr	r0, .L59+32
+ 991 0122 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 992              	.LVL101:
+ 181:../Core/Src/static_fire.c **** 
+ 182:../Core/Src/static_fire.c ****     //vTaskDelay(pdMS_TO_TICKS(MOTOR_STARTUP_TIME));
+ 183:../Core/Src/static_fire.c **** 
+ 184:../Core/Src/static_fire.c ****     TickType_t start_ms = pdTICKS_TO_MS(xTaskGetTickCount());
+ 993              		.loc 1 184 5 view .LVU208
+ 994              		.loc 1 184 27 is_stmt 0 view .LVU209
+ 995 0126 FFF7FEFF 		bl	xTaskGetTickCount
+ 996              	.LVL102:
+ 997 012a C30E     		lsrs	r3, r0, #27
+ 998 012c 4101     		lsls	r1, r0, #5
+ 999 012e 091A     		subs	r1, r1, r0
+ 1000 0130 63F10003 		sbc	r3, r3, #0
+ 1001 0134 9B00     		lsls	r3, r3, #2
+ 1002 0136 43EA9173 		orr	r3, r3, r1, lsr #30
+ 1003 013a 8900     		lsls	r1, r1, #2
+ 1004 013c 0918     		adds	r1, r1, r0
+ 1005 013e 43F10003 		adc	r3, r3, #0
+ 1006 0142 DC00     		lsls	r4, r3, #3
+ 1007 0144 4FF47A72 		mov	r2, #1000
+ 1008 0148 0023     		movs	r3, #0
+ 1009 014a C800     		lsls	r0, r1, #3
+ 1010 014c 44EA5171 		orr	r1, r4, r1, lsr #29
+ARM GAS  /tmp/cc0nB5JE.s 			page 23
+
+
+ 1011 0150 FFF7FEFF 		bl	__aeabi_uldivmod
+ 1012              	.LVL103:
+ 1013              		.loc 1 184 16 view .LVU210
+ 1014 0154 0546     		mov	r5, r0
+ 1015              	.LVL104:
+ 1016              		.loc 1 184 16 view .LVU211
+ 1017 0156 3BE0     		b	.L56
+ 1018              	.LVL105:
+ 1019              	.L53:
+ 1020              	.LBB19:
+ 1021              	.LBB20:
+ 1022              	.LBB21:
+ 185:../Core/Src/static_fire.c ****     
+ 186:../Core/Src/static_fire.c ****     while (1) {
+ 187:../Core/Src/static_fire.c ****         TickType_t current_ms = pdTICKS_TO_MS(xTaskGetTickCount());
+ 188:../Core/Src/static_fire.c **** 
+ 189:../Core/Src/static_fire.c ****         float t = (float) (current_ms - start_ms) / STATIC_FIRE_ACTUATION_TIME_MS;
+ 190:../Core/Src/static_fire.c ****         float angle_rad = t * STATIC_FIRE_ACTUATION_RANGE_RAD;
+ 191:../Core/Src/static_fire.c **** 
+ 192:../Core/Src/static_fire.c ****         char foo[100];
+ 193:../Core/Src/static_fire.c ****         sprintf(foo, "Time: %f, Angle: %f\r\n", t, angle_rad);
+ 194:../Core/Src/static_fire.c ****         HAL_UART_Transmit(&debug_uart, foo, strlen(foo), HAL_MAX_DELAY);
+ 195:../Core/Src/static_fire.c **** 
+ 196:../Core/Src/static_fire.c ****         float desired_angles[4] = {angle_rad, 0, -angle_rad, 0};
+ 197:../Core/Src/static_fire.c ****         
+ 198:../Core/Src/static_fire.c **** 
+ 199:../Core/Src/static_fire.c ****         for (int i = 0; i < 4; i++) {
+ 200:../Core/Src/static_fire.c ****             char buf[100];
+ 1023              		.loc 1 200 13 is_stmt 1 discriminator 3 view .LVU212
+ 201:../Core/Src/static_fire.c ****             //sprintf(buf, "Setting servo %d angle %f\r\n", i, desired_angles[i]);
+ 202:../Core/Src/static_fire.c ****             //HAL_UART_Transmit(&debug_uart, buf, strlen(buf), HAL_MAX_DELAY);
+ 203:../Core/Src/static_fire.c ****             
+ 204:../Core/Src/static_fire.c ****             //__HAL_TIM_SET_COMPARE(servos[i].htim, servos[i].tim_channel, 8000 - t * (8000 - 1600)
+ 205:../Core/Src/static_fire.c ****             servo_set_angle(&servos[i], desired_angles[i]);
+ 1024              		.loc 1 205 13 discriminator 3 view .LVU213
+ 1025              		.loc 1 205 55 is_stmt 0 discriminator 3 view .LVU214
+ 1026 0158 02AB     		add	r3, sp, #8
+ 1027 015a 03EB8403 		add	r3, r3, r4, lsl #2
+ 1028 015e 93ED000A 		vldr.32	s0, [r3]
+ 1029              		.loc 1 205 13 discriminator 3 view .LVU215
+ 1030 0162 04EB8400 		add	r0, r4, r4, lsl #2
+ 1031 0166 B7EEC00A 		vcvt.f64.f32	d0, s0
+ 1032 016a 24AB     		add	r3, sp, #144
+ 1033 016c 03EBC000 		add	r0, r3, r0, lsl #3
+ 1034 0170 FFF7FEFF 		bl	servo_set_angle
+ 1035              	.LVL106:
+ 1036              	.LBE21:
+ 199:../Core/Src/static_fire.c ****             char buf[100];
+ 1037              		.loc 1 199 33 is_stmt 1 discriminator 3 view .LVU216
+ 1038 0174 0134     		adds	r4, r4, #1
+ 1039              	.LVL107:
+ 1040              	.L52:
+ 199:../Core/Src/static_fire.c ****             char buf[100];
+ 1041              		.loc 1 199 27 discriminator 1 view .LVU217
+ 1042 0176 032C     		cmp	r4, #3
+ 1043 0178 EEDD     		ble	.L53
+ 1044              	.LBE20:
+ARM GAS  /tmp/cc0nB5JE.s 			page 24
+
+
+ 206:../Core/Src/static_fire.c ****         }
+ 207:../Core/Src/static_fire.c **** 
+ 208:../Core/Src/static_fire.c ****         
+ 209:../Core/Src/static_fire.c ****         if (xSemaphoreTake(g_state_mutex_handle, portMAX_DELAY) == pdTRUE) {
+ 1045              		.loc 1 209 9 view .LVU218
+ 1046              		.loc 1 209 13 is_stmt 0 view .LVU219
+ 1047 017a 4FF0FF31 		mov	r1, #-1
+ 1048 017e 574B     		ldr	r3, .L59+36
+ 1049 0180 1868     		ldr	r0, [r3]
+ 1050 0182 FFF7FEFF 		bl	xQueueSemaphoreTake
+ 1051              	.LVL108:
+ 1052              		.loc 1 209 12 view .LVU220
+ 1053 0186 0128     		cmp	r0, #1
+ 1054 0188 69D0     		beq	.L58
+ 1055              	.LVL109:
+ 1056              	.L54:
+ 210:../Core/Src/static_fire.c ****             g_current_state.servo_deflections.servo_1_desired = servo_rad_to_adc(&servos[0]);
+ 211:../Core/Src/static_fire.c ****             g_current_state.servo_deflections.servo_2_desired = servo_rad_to_adc(&servos[1]);
+ 212:../Core/Src/static_fire.c ****             g_current_state.servo_deflections.servo_3_desired = servo_rad_to_adc(&servos[2]);
+ 213:../Core/Src/static_fire.c ****             g_current_state.servo_deflections.servo_4_desired = servo_rad_to_adc(&servos[3]);
+ 214:../Core/Src/static_fire.c **** 
+ 215:../Core/Src/static_fire.c ****             g_current_state.servo_deflections.timestamp = xTaskGetTickCount();
+ 216:../Core/Src/static_fire.c ****     
+ 217:../Core/Src/static_fire.c ****             xSemaphoreGive(g_state_mutex_handle);
+ 218:../Core/Src/static_fire.c ****         }
+ 219:../Core/Src/static_fire.c ****         
+ 220:../Core/Src/static_fire.c ****         if (current_ms - start_ms > STATIC_FIRE_ACTUATION_TIME_MS) {
+ 1057              		.loc 1 220 9 is_stmt 1 view .LVU221
+ 1058              		.loc 1 220 12 is_stmt 0 view .LVU222
+ 1059 018a 42F21073 		movw	r3, #10000
+ 1060 018e 9E42     		cmp	r6, r3
+ 1061 0190 00F28280 		bhi	.L55
+ 221:../Core/Src/static_fire.c ****             break;
+ 222:../Core/Src/static_fire.c ****         }
+ 223:../Core/Src/static_fire.c ****         
+ 224:../Core/Src/static_fire.c ****         /* Trigger ADC conversion sequence */
+ 225:../Core/Src/static_fire.c ****         
+ 226:../Core/Src/static_fire.c ****         poll_adcs();
+ 1062              		.loc 1 226 9 is_stmt 1 view .LVU223
+ 1063 0194 FFF7FEFF 		bl	poll_adcs
+ 1064              	.LVL110:
+ 227:../Core/Src/static_fire.c **** 
+ 228:../Core/Src/static_fire.c ****         xTaskNotify(g_state_tx_task_handle, SEND_STATE_NOTIFICATION_BIT, eSetBits);
+ 1065              		.loc 1 228 9 view .LVU224
+ 1066 0198 0024     		movs	r4, #0
+ 1067 019a 0094     		str	r4, [sp]
+ 1068 019c 0123     		movs	r3, #1
+ 1069 019e 1A46     		mov	r2, r3
+ 1070 01a0 2146     		mov	r1, r4
+ 1071 01a2 4F48     		ldr	r0, .L59+40
+ 1072 01a4 0068     		ldr	r0, [r0]
+ 1073 01a6 FFF7FEFF 		bl	xTaskGenericNotify
+ 1074              	.LVL111:
+ 229:../Core/Src/static_fire.c ****         xTaskNotify(g_state_flash_task_handle, FLASH_STATE_NOTIFICATION_BIT, eSetBits);
+ 1075              		.loc 1 229 9 view .LVU225
+ 1076 01aa 0094     		str	r4, [sp]
+ 1077 01ac 0123     		movs	r3, #1
+ARM GAS  /tmp/cc0nB5JE.s 			page 25
+
+
+ 1078 01ae 1A46     		mov	r2, r3
+ 1079 01b0 2146     		mov	r1, r4
+ 1080 01b2 4C48     		ldr	r0, .L59+44
+ 1081 01b4 0068     		ldr	r0, [r0]
+ 1082 01b6 FFF7FEFF 		bl	xTaskGenericNotify
+ 1083              	.LVL112:
+ 230:../Core/Src/static_fire.c ****         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Sent state\r\n", 11, HAL_MAX_DELAY);
+ 1084              		.loc 1 230 9 view .LVU226
+ 1085 01ba 4FF0FF33 		mov	r3, #-1
+ 1086 01be 0B22     		movs	r2, #11
+ 1087 01c0 4949     		ldr	r1, .L59+48
+ 1088 01c2 4348     		ldr	r0, .L59+24
+ 1089 01c4 FFF7FEFF 		bl	HAL_UART_Transmit
+ 1090              	.LVL113:
+ 231:../Core/Src/static_fire.c **** 
+ 232:../Core/Src/static_fire.c ****         update_servos_for_ms(servos, 100);
+ 1091              		.loc 1 232 9 view .LVU227
+ 1092 01c8 6421     		movs	r1, #100
+ 1093 01ca 24A8     		add	r0, sp, #144
+ 1094 01cc FFF7FEFF 		bl	update_servos_for_ms
+ 1095              	.LVL114:
+ 1096              	.LBE19:
+ 186:../Core/Src/static_fire.c ****         TickType_t current_ms = pdTICKS_TO_MS(xTaskGetTickCount());
+ 1097              		.loc 1 186 11 view .LVU228
+ 1098              	.L56:
+ 186:../Core/Src/static_fire.c ****         TickType_t current_ms = pdTICKS_TO_MS(xTaskGetTickCount());
+ 1099              		.loc 1 186 5 view .LVU229
+ 1100              	.LBB23:
+ 187:../Core/Src/static_fire.c **** 
+ 1101              		.loc 1 187 9 view .LVU230
+ 187:../Core/Src/static_fire.c **** 
+ 1102              		.loc 1 187 33 is_stmt 0 view .LVU231
+ 1103 01d0 FFF7FEFF 		bl	xTaskGetTickCount
+ 1104              	.LVL115:
+ 1105 01d4 C30E     		lsrs	r3, r0, #27
+ 1106 01d6 4101     		lsls	r1, r0, #5
+ 1107 01d8 091A     		subs	r1, r1, r0
+ 1108 01da 63F10003 		sbc	r3, r3, #0
+ 1109 01de 9B00     		lsls	r3, r3, #2
+ 1110 01e0 43EA9173 		orr	r3, r3, r1, lsr #30
+ 1111 01e4 8900     		lsls	r1, r1, #2
+ 1112 01e6 0918     		adds	r1, r1, r0
+ 1113 01e8 43F10003 		adc	r3, r3, #0
+ 1114 01ec DC00     		lsls	r4, r3, #3
+ 1115 01ee 4FF47A72 		mov	r2, #1000
+ 1116 01f2 0023     		movs	r3, #0
+ 1117 01f4 C800     		lsls	r0, r1, #3
+ 1118 01f6 44EA5171 		orr	r1, r4, r1, lsr #29
+ 1119 01fa FFF7FEFF 		bl	__aeabi_uldivmod
+ 1120              	.LVL116:
+ 189:../Core/Src/static_fire.c ****         float angle_rad = t * STATIC_FIRE_ACTUATION_RANGE_RAD;
+ 1121              		.loc 1 189 9 is_stmt 1 view .LVU232
+ 189:../Core/Src/static_fire.c ****         float angle_rad = t * STATIC_FIRE_ACTUATION_RANGE_RAD;
+ 1122              		.loc 1 189 39 is_stmt 0 view .LVU233
+ 1123 01fe 461B     		subs	r6, r0, r5
+ 189:../Core/Src/static_fire.c ****         float angle_rad = t * STATIC_FIRE_ACTUATION_RANGE_RAD;
+ 1124              		.loc 1 189 19 view .LVU234
+ARM GAS  /tmp/cc0nB5JE.s 			page 26
+
+
+ 1125 0200 07EE906A 		vmov	s15, r6	@ int
+ 1126 0204 B8EE677A 		vcvt.f32.u32	s14, s15
+ 189:../Core/Src/static_fire.c ****         float angle_rad = t * STATIC_FIRE_ACTUATION_RANGE_RAD;
+ 1127              		.loc 1 189 15 view .LVU235
+ 1128 0208 DFED387A 		vldr.32	s15, .L59+52
+ 1129 020c 87EE276A 		vdiv.f32	s12, s14, s15
+ 1130              	.LVL117:
+ 190:../Core/Src/static_fire.c **** 
+ 1131              		.loc 1 190 9 is_stmt 1 view .LVU236
+ 190:../Core/Src/static_fire.c **** 
+ 1132              		.loc 1 190 29 is_stmt 0 view .LVU237
+ 1133 0210 B7EEC66A 		vcvt.f64.f32	d6, s12
+ 1134              	.LVL118:
+ 190:../Core/Src/static_fire.c **** 
+ 1135              		.loc 1 190 29 view .LVU238
+ 1136 0214 9FED2A7B 		vldr.64	d7, .L59+8
+ 1137              	.LVL119:
+ 190:../Core/Src/static_fire.c **** 
+ 1138              		.loc 1 190 29 view .LVU239
+ 1139 0218 26EE077B 		vmul.f64	d7, d6, d7
+ 190:../Core/Src/static_fire.c **** 
+ 1140              		.loc 1 190 15 view .LVU240
+ 1141 021c B7EEC78B 		vcvt.f32.f64	s16, d7
+ 1142              	.LVL120:
+ 192:../Core/Src/static_fire.c ****         sprintf(foo, "Time: %f, Angle: %f\r\n", t, angle_rad);
+ 1143              		.loc 1 192 9 is_stmt 1 view .LVU241
+ 193:../Core/Src/static_fire.c ****         HAL_UART_Transmit(&debug_uart, foo, strlen(foo), HAL_MAX_DELAY);
+ 1144              		.loc 1 193 9 view .LVU242
+ 1145 0220 B7EEC87A 		vcvt.f64.f32	d7, s16
+ 1146 0224 8DED007B 		vstr.64	d7, [sp]
+ 1147 0228 53EC162B 		vmov	r2, r3, d6
+ 1148 022c 3049     		ldr	r1, .L59+56
+ 1149 022e 06A8     		add	r0, sp, #24
+ 1150              	.LVL121:
+ 193:../Core/Src/static_fire.c ****         HAL_UART_Transmit(&debug_uart, foo, strlen(foo), HAL_MAX_DELAY);
+ 1151              		.loc 1 193 9 is_stmt 0 view .LVU243
+ 1152 0230 FFF7FEFF 		bl	sprintf
+ 1153              	.LVL122:
+ 194:../Core/Src/static_fire.c **** 
+ 1154              		.loc 1 194 9 is_stmt 1 view .LVU244
+ 194:../Core/Src/static_fire.c **** 
+ 1155              		.loc 1 194 45 is_stmt 0 view .LVU245
+ 1156 0234 06A8     		add	r0, sp, #24
+ 1157 0236 FFF7FEFF 		bl	strlen
+ 1158              	.LVL123:
+ 194:../Core/Src/static_fire.c **** 
+ 1159              		.loc 1 194 9 view .LVU246
+ 1160 023a 4FF0FF33 		mov	r3, #-1
+ 1161 023e 82B2     		uxth	r2, r0
+ 1162 0240 06A9     		add	r1, sp, #24
+ 1163 0242 2348     		ldr	r0, .L59+24
+ 1164 0244 FFF7FEFF 		bl	HAL_UART_Transmit
+ 1165              	.LVL124:
+ 196:../Core/Src/static_fire.c ****         
+ 1166              		.loc 1 196 9 is_stmt 1 view .LVU247
+ 196:../Core/Src/static_fire.c ****         
+ 1167              		.loc 1 196 15 is_stmt 0 view .LVU248
+ARM GAS  /tmp/cc0nB5JE.s 			page 27
+
+
+ 1168 0248 8DED028A 		vstr.32	s16, [sp, #8]
+ 1169 024c 0023     		movs	r3, #0
+ 1170 024e 0393     		str	r3, [sp, #12]	@ float
+ 196:../Core/Src/static_fire.c ****         
+ 1171              		.loc 1 196 50 view .LVU249
+ 1172 0250 B1EE487A 		vneg.f32	s14, s16
+ 196:../Core/Src/static_fire.c ****         
+ 1173              		.loc 1 196 15 view .LVU250
+ 1174 0254 8DED047A 		vstr.32	s14, [sp, #16]
+ 1175 0258 0593     		str	r3, [sp, #20]	@ float
+ 199:../Core/Src/static_fire.c ****             char buf[100];
+ 1176              		.loc 1 199 9 is_stmt 1 view .LVU251
+ 1177              	.LBB22:
+ 199:../Core/Src/static_fire.c ****             char buf[100];
+ 1178              		.loc 1 199 14 view .LVU252
+ 1179              	.LVL125:
+ 199:../Core/Src/static_fire.c ****             char buf[100];
+ 1180              		.loc 1 199 18 is_stmt 0 view .LVU253
+ 1181 025a 0024     		movs	r4, #0
+ 199:../Core/Src/static_fire.c ****             char buf[100];
+ 1182              		.loc 1 199 9 view .LVU254
+ 1183 025c 8BE7     		b	.L52
+ 1184              	.LVL126:
+ 1185              	.L58:
+ 199:../Core/Src/static_fire.c ****             char buf[100];
+ 1186              		.loc 1 199 9 view .LVU255
+ 1187              	.LBE22:
+ 210:../Core/Src/static_fire.c ****             g_current_state.servo_deflections.servo_2_desired = servo_rad_to_adc(&servos[1]);
+ 1188              		.loc 1 210 13 is_stmt 1 view .LVU256
+ 210:../Core/Src/static_fire.c ****             g_current_state.servo_deflections.servo_2_desired = servo_rad_to_adc(&servos[1]);
+ 1189              		.loc 1 210 65 is_stmt 0 view .LVU257
+ 1190 025e 24A8     		add	r0, sp, #144
+ 1191 0260 FFF7FEFF 		bl	servo_rad_to_adc
+ 1192              	.LVL127:
+ 210:../Core/Src/static_fire.c ****             g_current_state.servo_deflections.servo_2_desired = servo_rad_to_adc(&servos[1]);
+ 1193              		.loc 1 210 63 view .LVU258
+ 1194 0264 234C     		ldr	r4, .L59+60
+ 1195              	.LVL128:
+ 210:../Core/Src/static_fire.c ****             g_current_state.servo_deflections.servo_2_desired = servo_rad_to_adc(&servos[1]);
+ 1196              		.loc 1 210 63 view .LVU259
+ 1197 0266 2080     		strh	r0, [r4]	@ movhi
+ 211:../Core/Src/static_fire.c ****             g_current_state.servo_deflections.servo_3_desired = servo_rad_to_adc(&servos[2]);
+ 1198              		.loc 1 211 13 is_stmt 1 view .LVU260
+ 211:../Core/Src/static_fire.c ****             g_current_state.servo_deflections.servo_3_desired = servo_rad_to_adc(&servos[2]);
+ 1199              		.loc 1 211 65 is_stmt 0 view .LVU261
+ 1200 0268 2EA8     		add	r0, sp, #184
+ 1201 026a FFF7FEFF 		bl	servo_rad_to_adc
+ 1202              	.LVL129:
+ 211:../Core/Src/static_fire.c ****             g_current_state.servo_deflections.servo_3_desired = servo_rad_to_adc(&servos[2]);
+ 1203              		.loc 1 211 63 view .LVU262
+ 1204 026e A080     		strh	r0, [r4, #4]	@ movhi
+ 212:../Core/Src/static_fire.c ****             g_current_state.servo_deflections.servo_4_desired = servo_rad_to_adc(&servos[3]);
+ 1205              		.loc 1 212 13 is_stmt 1 view .LVU263
+ 212:../Core/Src/static_fire.c ****             g_current_state.servo_deflections.servo_4_desired = servo_rad_to_adc(&servos[3]);
+ 1206              		.loc 1 212 65 is_stmt 0 view .LVU264
+ 1207 0270 38A8     		add	r0, sp, #224
+ 1208 0272 FFF7FEFF 		bl	servo_rad_to_adc
+ARM GAS  /tmp/cc0nB5JE.s 			page 28
+
+
+ 1209              	.LVL130:
+ 212:../Core/Src/static_fire.c ****             g_current_state.servo_deflections.servo_4_desired = servo_rad_to_adc(&servos[3]);
+ 1210              		.loc 1 212 63 view .LVU265
+ 1211 0276 2081     		strh	r0, [r4, #8]	@ movhi
+ 213:../Core/Src/static_fire.c **** 
+ 1212              		.loc 1 213 13 is_stmt 1 view .LVU266
+ 213:../Core/Src/static_fire.c **** 
+ 1213              		.loc 1 213 65 is_stmt 0 view .LVU267
+ 1214 0278 42A8     		add	r0, sp, #264
+ 1215 027a FFF7FEFF 		bl	servo_rad_to_adc
+ 1216              	.LVL131:
+ 213:../Core/Src/static_fire.c **** 
+ 1217              		.loc 1 213 63 view .LVU268
+ 1218 027e A081     		strh	r0, [r4, #12]	@ movhi
+ 215:../Core/Src/static_fire.c ****     
+ 1219              		.loc 1 215 13 is_stmt 1 view .LVU269
+ 215:../Core/Src/static_fire.c ****     
+ 1220              		.loc 1 215 59 is_stmt 0 view .LVU270
+ 1221 0280 FFF7FEFF 		bl	xTaskGetTickCount
+ 1222              	.LVL132:
+ 1223 0284 0021     		movs	r1, #0
+ 215:../Core/Src/static_fire.c ****     
+ 1224              		.loc 1 215 57 view .LVU271
+ 1225 0286 2061     		str	r0, [r4, #16]
+ 1226 0288 6161     		str	r1, [r4, #20]
+ 217:../Core/Src/static_fire.c ****         }
+ 1227              		.loc 1 217 13 is_stmt 1 view .LVU272
+ 1228 028a 0B46     		mov	r3, r1
+ 1229 028c 0A46     		mov	r2, r1
+ 1230 028e 1348     		ldr	r0, .L59+36
+ 1231 0290 0068     		ldr	r0, [r0]
+ 1232 0292 FFF7FEFF 		bl	xQueueGenericSend
+ 1233              	.LVL133:
+ 1234 0296 78E7     		b	.L54
+ 1235              	.L55:
+ 217:../Core/Src/static_fire.c ****         }
+ 1236              		.loc 1 217 13 is_stmt 0 view .LVU273
+ 1237              	.LBE23:
+ 233:../Core/Src/static_fire.c ****     }
+ 234:../Core/Src/static_fire.c **** 
+ 235:../Core/Src/static_fire.c ****     xTaskNotify(g_state_flash_task_handle, FLASH_SD_CARD_NOTIFICATION_BIT, eSetBits);
+ 1238              		.loc 1 235 5 is_stmt 1 view .LVU274
+ 1239 0298 0024     		movs	r4, #0
+ 1240 029a 0094     		str	r4, [sp]
+ 1241 029c 0123     		movs	r3, #1
+ 1242 029e 0222     		movs	r2, #2
+ 1243 02a0 2146     		mov	r1, r4
+ 1244 02a2 1048     		ldr	r0, .L59+44
+ 1245 02a4 0068     		ldr	r0, [r0]
+ 1246 02a6 FFF7FEFF 		bl	xTaskGenericNotify
+ 1247              	.LVL134:
+ 236:../Core/Src/static_fire.c **** 
+ 237:../Core/Src/static_fire.c ****     vTaskSuspend(NULL);
+ 1248              		.loc 1 237 5 view .LVU275
+ 1249 02aa 2046     		mov	r0, r4
+ 1250 02ac FFF7FEFF 		bl	vTaskSuspend
+ 1251              	.LVL135:
+ARM GAS  /tmp/cc0nB5JE.s 			page 29
+
+
+ 238:../Core/Src/static_fire.c **** }...
+ 1252              		.loc 1 238 1 is_stmt 0 view .LVU276
+ 1253 02b0 74B0     		add	sp, sp, #464
+ 1254              	.LCFI16:
+ 1255              		.cfi_def_cfa_offset 24
+ 1256              		@ sp needed
+ 1257 02b2 BDEC028B 		vldm	sp!, {d8}
+ 1258              	.LCFI17:
+ 1259              		.cfi_restore 80
+ 1260              		.cfi_restore 81
+ 1261              		.cfi_def_cfa_offset 16
+ 1262              	.LVL136:
+ 1263              		.loc 1 238 1 view .LVU277
+ 1264 02b6 70BD     		pop	{r4, r5, r6, pc}
+ 1265              	.LVL137:
+ 1266              	.L60:
+ 1267              		.loc 1 238 1 view .LVU278
+ 1268              		.align	3
+ 1269              	.L59:
+ 1270 02b8 00000000 		.word	0
+ 1271 02bc 00000000 		.word	0
+ 1272 02c0 65732D38 		.word	942502757
+ 1273 02c4 52C1E03F 		.word	1071694162
+ 1274 02c8 02000000 		.word	g_current_state+2
+ 1275 02cc 00000000 		.word	.LC6
+ 1276 02d0 00000000 		.word	huart2
+ 1277 02d4 14000000 		.word	.LC7
+ 1278 02d8 00100258 		.word	1476530176
+ 1279 02dc 00000000 		.word	g_state_mutex_handle
+ 1280 02e0 00000000 		.word	g_state_tx_task_handle
+ 1281 02e4 00000000 		.word	g_state_flash_task_handle
+ 1282 02e8 44000000 		.word	.LC9
+ 1283 02ec 00401C46 		.word	1176256512
+ 1284 02f0 2C000000 		.word	.LC8
+ 1285 02f4 00000000 		.word	g_current_state
+ 1286              		.cfi_endproc
+ 1287              	.LFE405:
+ 1289              		.section	.bss.last_ticks.0,"aw",%nobits
+ 1290              		.align	2
+ 1293              	last_ticks.0:
+ 1294 0000 00000000 		.space	4
+ 1295              		.text
+ 1296              	.Letext0:
+ 1297              		.file 2 "/nix/store/lcj4nx7xv8c36cif7armkfa7b5cmfh74-gcc-arm-embedded-12.3.rel1/arm-none-eabi/incl
+ 1298              		.file 3 "/nix/store/lcj4nx7xv8c36cif7armkfa7b5cmfh74-gcc-arm-embedded-12.3.rel1/arm-none-eabi/incl
+ 1299              		.file 4 "Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h725xx.h"
+ 1300              		.file 5 "/nix/store/lcj4nx7xv8c36cif7armkfa7b5cmfh74-gcc-arm-embedded-12.3.rel1/lib/gcc/arm-none-e
+ 1301              		.file 6 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_def.h"
+ 1302              		.file 7 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_gpio.h"
+ 1303              		.file 8 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dma.h"
+ 1304              		.file 9 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim.h"
+ 1305              		.file 10 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h"
+ 1306              		.file 11 "Core/Inc/portmacro.h"
+ 1307              		.file 12 "../Core/Include/servo.h"
+ 1308              		.file 13 "../Core/Include/adc.h"
+ 1309              		.file 14 "Core/Inc/port_config.h"
+ 1310              		.file 15 "../Core/FreeRTOS-Kernel/include/task.h"
+ARM GAS  /tmp/cc0nB5JE.s 			page 30
+
+
+ 1311              		.file 16 "../Core/FreeRTOS-Kernel/include/queue.h"
+ 1312              		.file 17 "../Core/FreeRTOS-Kernel/include/semphr.h"
+ 1313              		.file 18 "../Core/Include/protocol.h"
+ 1314              		.file 19 "../Core/Include/state.h"
+ 1315              		.file 20 "../Core/Include/globals.h"
+ 1316              		.file 21 "/nix/store/lcj4nx7xv8c36cif7armkfa7b5cmfh74-gcc-arm-embedded-12.3.rel1/arm-none-eabi/inc
+ 1317              		.file 22 "/nix/store/lcj4nx7xv8c36cif7armkfa7b5cmfh74-gcc-arm-embedded-12.3.rel1/arm-none-eabi/inc
+ 1318              		.file 23 "<built-in>"
+ARM GAS  /tmp/cc0nB5JE.s 			page 31
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 static_fire.c
+     /tmp/cc0nB5JE.s:20     .text.update_servos_for_ms:00000000 $t
+     /tmp/cc0nB5JE.s:26     .text.update_servos_for_ms:00000000 update_servos_for_ms
+     /tmp/cc0nB5JE.s:150    .text.update_servos_for_ms:00000060 $d
+     /tmp/cc0nB5JE.s:1293   .bss.last_ticks.0:00000000 last_ticks.0
+     /tmp/cc0nB5JE.s:156    .text.init_servos:00000000 $t
+     /tmp/cc0nB5JE.s:162    .text.init_servos:00000000 init_servos
+     /tmp/cc0nB5JE.s:216    .text.init_servos:0000003c $d
+     /tmp/cc0nB5JE.s:222    .text.enable_servos:00000000 $t
+     /tmp/cc0nB5JE.s:228    .text.enable_servos:00000000 enable_servos
+     /tmp/cc0nB5JE.s:276    .text.disable_servos:00000000 $t
+     /tmp/cc0nB5JE.s:282    .text.disable_servos:00000000 disable_servos
+     /tmp/cc0nB5JE.s:330    .rodata.set_servo_angles.str1.4:00000000 $d
+     /tmp/cc0nB5JE.s:334    .text.set_servo_angles:00000000 $t
+     /tmp/cc0nB5JE.s:340    .text.set_servo_angles:00000000 set_servo_angles
+     /tmp/cc0nB5JE.s:429    .text.set_servo_angles:0000004c $d
+     /tmp/cc0nB5JE.s:435    .text.record_servo_adcs:00000000 $t
+     /tmp/cc0nB5JE.s:441    .text.record_servo_adcs:00000000 record_servo_adcs
+     /tmp/cc0nB5JE.s:513    .text.record_servo_adcs:00000040 $d
+     /tmp/cc0nB5JE.s:519    .rodata.calibrate_servos.str1.4:00000000 $d
+     /tmp/cc0nB5JE.s:535    .text.calibrate_servos:00000000 $t
+     /tmp/cc0nB5JE.s:541    .text.calibrate_servos:00000000 calibrate_servos
+     /tmp/cc0nB5JE.s:772    .text.calibrate_servos:00000128 $d
+     /tmp/cc0nB5JE.s:783    .rodata.static_fire_task.str1.4:00000000 $d
+     /tmp/cc0nB5JE.s:797    .text.static_fire_task:00000000 $t
+     /tmp/cc0nB5JE.s:803    .text.static_fire_task:00000000 static_fire_task
+     /tmp/cc0nB5JE.s:1270   .text.static_fire_task:000002b8 $d
+     /tmp/cc0nB5JE.s:1290   .bss.last_ticks.0:00000000 $d
+
+UNDEFINED SYMBOLS
+xTaskGetTickCount
+update_servo_true_command_position
+vTaskDelay
+servo_init
+htim2
+htim4
+servo_enable
+servo_disable
+servo_set_angle
+sprintf
+strlen
+HAL_UART_Transmit
+huart2
+poll_adcs
+xQueueSemaphoreTake
+xQueueGenericSend
+g_state_mutex_handle
+servo_go_to_calibration_start
+servo_go_to_calibration_end
+servo_set_zero
+__aeabi_uldivmod
+memset
+xTaskGenericNotifyWait
+HAL_GPIO_WritePin
+xTaskGenericNotify
+servo_rad_to_adc
+ARM GAS  /tmp/cc0nB5JE.s 			page 32
+
+
+vTaskSuspend
+g_current_state
+g_state_tx_task_handle
+g_state_flash_task_handle

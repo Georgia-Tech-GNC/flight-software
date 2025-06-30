@@ -1,3 +1,5 @@
+#include "lib.h"
+
 uint8_t lib_packet_encode(uint8_t packet_id, RocketState rocket_state, uint8_t *payload_buf, size_t payload_buf_size) {
     return 1;
 }

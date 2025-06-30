@@ -40,7 +40,7 @@ int log_printf(LogLevel level, const char *format, va_list args) {
             status_str = "ERROR";
             break;
         default:
-            status_str = "UNDEF";
+            status_str = "???";
             break;
     }
 

@@ -1,12 +1,20 @@
 #include "state_flash.h"
 
-int flash_test(void);
-int sd_test(void);
+/* Private defines */
+#define CSV_LINE_SIZE 2048
+
+#define STATE_FLASH_START_SECTOR 0
+#define STATE_FLASH_N_SECTORS 8
+
+#define FLASH_TEST_SIZE EXT_FLASH_SECTOR_SIZE
+#define SD_TEST_SIZE 2048
+
+/* Private function definitions */
+uint8_t flash_test(void);
+uint8_t sd_test(void);
 
 void write_to_flash(FlashBlock *flash_block, RocketState *rocket_state, size_t page_index);
 void flash_sd_card(FlashBlock *flash_block, SDFile *sd_file, size_t n_states);
-size_t to_csv_line(RocketState *rocket_state, char *line);
-size_t printf_fixed_float(char *buf, float f);
 
 /**
  * @brief Task to handle writing state to flash chip and SD card
@@ -33,6 +41,9 @@ void state_flash_task(void *args) {
         log_printf(LOG_ERROR, "SD test FAIL")
     }
 
+    /* Rocket state should be able to fit in one flash page */
+    assert(sizeof(RocketState) <= EXT_FLASH_PAGE_SIZE, "Rocket state size less than flash page size");
+
     /* Wait for notification before beginning */
     await_notification(BEGIN_STATE_FLASH_NOTIFICATION_BIT, portMAX_DELAY);
 
@@ -42,18 +53,19 @@ void state_flash_task(void *args) {
     flash_init_block(&flash_block, STATE_FLASH_START_SECTOR, STATE_FLASH_N_SECTORS);
     sd_init_file(&sd_file, "/data.csv");
 
-    size_t flash_page_index = 0;
-
     while (1) {
+        size_t flash_page_index = 0;
+
         /* Wait for next notification */
         uint32_t notification_value = await_notification(FLASH_STATE_NOTIFICATION_BIT | FLASH_SD_CARD_NOTIFICATION_BIT, portMAX_DELAY);
 
         /* Flash state to SD card */
         if (notification_value & FLASH_SD_CARD_NOTIFICATION_BIT) {
-            log_printf(LOG_INFO, "Flashing SD card...");
+            log_printf(LOG_INFO, "Flashing SD card");
             flash_sd_card(&flash_block, &sd_file, flash_page_index);
 
-            /* Stop everything */
+            /* Stop all other tasks */
+            log_printf(LOG_INFO, "Suspending all tasks");
             vTaskSuspendAll();
 
             /* Tasks aren't allowed to exit, so stall here */
@@ -64,12 +76,12 @@ void state_flash_task(void *args) {
         if (notification_value & FLASH_STATE_NOTIFICATION_BIT) {
             uint8_t state_bytes[EXT_FLASH_PAGE_SIZE];
 
-            /* Always use mutex on g_current_state */
-            memcpy_state_bytes(state_bytes);
-
-            /* Flash state */
-            flash_write_block(&flash_block, flash_page_index * EXT_FLASH_PAGE_SIZE, state_bytes, EXT_FLASH_PAGE_SIZE);
-            flash_page_index ++;
+            if (memcpy_state_bytes(state_bytes)) {
+                flash_write_block(&flash_block, flash_page_index * EXT_FLASH_PAGE_SIZE, state_bytes, EXT_FLASH_PAGE_SIZE);
+                flash_page_index ++;
+            } else {
+                log_printf(LOG_ERROR, "Failed to copy state bytes");
+            } 
         }
     }
 }
@@ -117,7 +129,7 @@ int flash_test(void) {
         }
     }
 
-    /* Erase what we just wroe */
+    /* Erase what we just wrote */
     if (!flash_erase_block(&test_block)) {
         log_printf(LOG_ERROR, "Failed to erase flash");
         return 0;
@@ -131,7 +143,7 @@ int flash_test(void) {
  * Writes a test pattern to the SD card, reads it back, and deletes the file.
  * @return 1 if the test passes, 0 otherwise
  */
-int sd_test(void) {
+uint8_t sd_test(void) {
     SDFile test_file;
 
     if (!sd_init_file(&test_file, "/test.txt")) {
@@ -202,7 +214,7 @@ void flash_sd_card(FlashBlock *flash_block, SDFile *sd_file, size_t n_states) {
     RocketState rocket_state;
     uint8_t data_buffer[EXT_FLASH_PAGE_SIZE];
 
-    char line_buf[2048];
+    char line_buf[CSV_LINE_SIZE];
     log_printf(LOG_INFO, "Writing to SD card...");
 
     size_t sd_bytes_written = 0;
@@ -216,12 +228,15 @@ void flash_sd_card(FlashBlock *flash_block, SDFile *sd_file, size_t n_states) {
 
         size_t bytes_written;
         
-        if (!lib_csv_encode(&rocket_state, line_buf, 2048, &bytes_written)) {
-            log_printf(LOG_ERROR, "Error encoding rocket CSV line");
+        if (!lib_csv_encode(&rocket_state, line_buf, CSV_LINE_SIZE, &bytes_written)) {
+            log_printf(LOG_ERROR, "Error encoding rocket CSV line #%zu", bytes_written);
+            continue;
         }
 
         if (sd_write_file(sd_file, sd_bytes_written, (uint8_t *) line_buf, line_len)) {
-            log_printf(LOG_INFO, "writing to SD card");
+            log_printf(LOG_INFO, "Wrote CSV line #%zu to SD card", i);
+        } else {
+            log_printf(LOG_ERROR, "Error writing rocket CSV line #%zu", bytes_written);
         }
 
         sd_bytes_written += line_len;

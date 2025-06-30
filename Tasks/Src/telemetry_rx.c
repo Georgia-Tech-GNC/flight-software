@@ -1,16 +1,10 @@
 #include "telemetry_rx.h"
 
-void rx_process_byte(uint8_t byte, uint8_t *packet_buffer, uint8_t *extracted_buffer, uint8_t *packet_buffer_size, uint8_t *recieved_uuids);
-
-void process_command(int command_id);
-
-void command_idle_to_ground();
-void command_fire_pyro();
-void command_flash_sd_card();
-void command_ignite();
-void command_zero_servos();
-
+/* Private defines */
 #define N_COMMAND_UUIDS 256
+
+/* Private function definitions */
+void rx_process_byte(uint8_t byte, uint8_t *packet_buffer, uint8_t *extracted_buffer, uint8_t *packet_buffer_size, uint8_t *recieved_uuids);
 
 /**
  * Task to handle incoming telemetry data
@@ -51,6 +45,7 @@ void telemetry_rx_task(void *args) {
  * @param extracted_buffer The buffer to hold the extracted packet
  */
 void rx_process_byte(uint8_t byte, uint8_t *packet_buffer, uint8_t *extracted_buffer, uint8_t *packet_buffer_size, uint8_t *recieved_uuids) {
+    /* TODO: This function needs some commenting and/or refactoring */
     int next_packet_buffer_size = process_incoming_byte(byte, packet_buffer, *packet_buffer_size);
     log_printf(LOG_INFO, "Recieved byte: %02x", byte);
 

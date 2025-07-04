@@ -12,7 +12,19 @@
         "string.h": "c",
         "lib.h": "c",
         "protocol.h": "c",
-        "stm32f4xx_hal.h": "c"
+        "stm32f4xx_hal.h": "c",
+        "stddef.h": "c",
+        "stdint.h": "c",
+        "ff.h": "c",
+        "integer.h": "c",
+        "ffconf.h": "c",
+        "target.h": "c",
+        "target_nucleo_f429zi.h": "c",
+        "rtos_globals.h": "c",
+        "log.h": "c",
+        "jet_vanes.h": "c",
+        "packet_encode.h": "c",
+        "telemetry.h": "c"
     },
     "C_Cpp.errorSquiggles": "enabled"
 }

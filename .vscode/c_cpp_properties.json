@@ -6,18 +6,23 @@
                 "${workspaceFolder}/HALAL/Inc",
                 "${workspaceFolder}/RocketLib/Controls/Inc",
                 "${workspaceFolder}/RocketLib/Utils/Inc",
-                "${workspaceFolder}/Rockets/Example/Inc",
-                "${workspaceFolder}/Targets/Nucleo-F429/Inc",
-                "${workspaceFolder}/Targets/Nucleo-F429/Drivers/CMSIS/Device/ST/STM32F4xx/Include",
-                "${workspaceFolder}/Targets/Nucleo-F429/Drivers/CMSIS/Include",
-                "${workspaceFolder}/Targets/Nucleo-F429/Drivers/STM32F4xx_HAL_Driver/Inc",
+                "${workspaceFolder}/RocketLib/Telemetry/Inc",
+                "${workspaceFolder}/RocketLib/FatFs/src",
+                "${workspaceFolder}/Rockets/Inc",
+                "${workspaceFolder}/Rockets/JetVanes/Inc",
+                "${workspaceFolder}/Targets/Inc",
+                "${workspaceFolder}/Targets/Nucleo-F429ZI/Core/Inc",
+                "${workspaceFolder}/Targets/Nucleo-F429ZI/Drivers/CMSIS/Device/ST/STM32F4xx/Include",
+                "${workspaceFolder}/Targets/Nucleo-F429ZI/Drivers/CMSIS/Include",
+                "${workspaceFolder}/Targets/Nucleo-F429ZI/Drivers/STM32F4xx_HAL_Driver/Inc",
                 "${workspaceFolder}/Tasks/Inc",
                 "${workspaceFolder}/FreeRTOS-Kernel/Inc"
             ],
             "defines": [
                 "_DEBUG",
                 "UNICODE",
-                "_UNICODE"
+                "_UNICODE",
+                "RocketStateStruct=JetVanesRocketState"
             ]
         }
     ],

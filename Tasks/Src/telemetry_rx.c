@@ -1,5 +1,14 @@
 #include "telemetry_rx.h"
 
+#include "stdint.h"
+#include "stddef.h"
+#include "telemetry.h"
+#include "log.h"
+#include "protocol.h"
+#include "packet_encode.h"
+#include "rtos_globals.h"
+#include "commands.h"
+
 /* Private defines */
 #define N_COMMAND_UUIDS 256
 
@@ -77,7 +86,7 @@ void rx_process_byte(uint8_t byte, uint8_t *packet_buffer, uint8_t *extracted_bu
 
             telemetry_send_message(payload, 2, COMMAND_ACK_MSG_ID);
 
-            lib_process_command(command_id);
+            process_command(command_id);
         }
     } else if (next_packet_buffer_size < TELEMETRY_MAX_PACKET_SIZE) {
         *packet_buffer_size = next_packet_buffer_size;

@@ -95,13 +95,6 @@ size_t generate_command_payload(uint8_t *buffer, uint8_t command_id, uint8_t com
 bool extract_command(uint8_t *buffer, uint8_t buffer_size, struct CommandStruct* destination);
 
 /**
- * Calculates the size of a message given its ID
- * @param id	the ID of the message
- * @return		the size of the message in bytes, or -1 if the message id is invalid
- */
-int get_msg_size(int message_id);
-
-/**
  * Returns true if this message id corresponds to a data packet, and false otherwise
  */
 bool is_data_send_msg(int message_id);

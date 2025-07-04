@@ -1,5 +1,15 @@
 #include "state_flash.h"
 
+#include "FreeRTOS.h"
+#include "task.h"
+
+#include "stdint.h"
+#include "stddef.h"
+#include "lib.h"
+#include "log.h"
+#include "periph_io.h"
+#include "util.h"
+
 /* Private defines */
 #define CSV_LINE_SIZE 2048
 
@@ -13,7 +23,7 @@
 uint8_t flash_test(void);
 uint8_t sd_test(void);
 
-void write_to_flash(FlashBlock *flash_block, RocketState *rocket_state, size_t page_index);
+void write_to_flash(FlashBlock *flash_block, RocketStateStruct *rocket_state, size_t page_index);
 void flash_sd_card(FlashBlock *flash_block, SDFile *sd_file, size_t n_states);
 
 /**
@@ -38,11 +48,11 @@ void state_flash_task(void *args) {
     if (sd_test()) {
         log_printf(LOG_INFO, "SD test PASS");
     } else {
-        log_printf(LOG_ERROR, "SD test FAIL")
+        log_printf(LOG_ERROR, "SD test FAIL");
     }
 
     /* Rocket state should be able to fit in one flash page */
-    assert(sizeof(RocketState) <= EXT_FLASH_PAGE_SIZE, "Rocket state size less than flash page size");
+    rocket_assert(sizeof(RocketStateStruct) <= EXT_FLASH_PAGE_SIZE, "Rocket state size less than flash page size");
 
     /* Wait for notification before beginning */
     await_notification(BEGIN_STATE_FLASH_NOTIFICATION_BIT, portMAX_DELAY);
@@ -75,8 +85,9 @@ void state_flash_task(void *args) {
         /* Write state to flash chip */
         if (notification_value & FLASH_STATE_NOTIFICATION_BIT) {
             uint8_t state_bytes[EXT_FLASH_PAGE_SIZE];
+            size_t bytes_copied = 0;
 
-            if (memcpy_state_bytes(state_bytes)) {
+            if (memcpy_state_bytes(state_bytes, EXT_FLASH_PAGE_SIZE, &bytes_copied)) {
                 flash_write_block(&flash_block, flash_page_index * EXT_FLASH_PAGE_SIZE, state_bytes, EXT_FLASH_PAGE_SIZE);
                 flash_page_index ++;
             } else {
@@ -91,7 +102,7 @@ void state_flash_task(void *args) {
  * Writes a test pattern to the flash chip, reads it back, and erases the block.
  * @return 1 if the test passes, 0 otherwise
  */
-int flash_test(void) {
+uint8_t flash_test(void) {
     FlashBlock test_block;
 
     /* Allocate a new 2-sector block starting at sector 1 */
@@ -211,7 +222,7 @@ void flash_sd_card(FlashBlock *flash_block, SDFile *sd_file, size_t n_states) {
         log_printf(LOG_INFO, "Successfully opened SD card file");
     }
 
-    RocketState rocket_state;
+    RocketStateStruct rocket_state;
     uint8_t data_buffer[EXT_FLASH_PAGE_SIZE];
 
     char line_buf[CSV_LINE_SIZE];
@@ -224,7 +235,7 @@ void flash_sd_card(FlashBlock *flash_block, SDFile *sd_file, size_t n_states) {
 
         flash_read_block(flash_block, i * EXT_FLASH_PAGE_SIZE, data_buffer, EXT_FLASH_PAGE_SIZE);
 
-        memcpy(&rocket_state, data_buffer, sizeof(RocketState));
+        memcpy(&rocket_state, data_buffer, sizeof(RocketStateStruct));
 
         size_t bytes_written;
         
@@ -233,13 +244,13 @@ void flash_sd_card(FlashBlock *flash_block, SDFile *sd_file, size_t n_states) {
             continue;
         }
 
-        if (sd_write_file(sd_file, sd_bytes_written, (uint8_t *) line_buf, line_len)) {
+        if (sd_write_file(sd_file, sd_bytes_written, (uint8_t *) line_buf, bytes_written)) {
             log_printf(LOG_INFO, "Wrote CSV line #%zu to SD card", i);
         } else {
             log_printf(LOG_ERROR, "Error writing rocket CSV line #%zu", bytes_written);
         }
 
-        sd_bytes_written += line_len;
+        sd_bytes_written += bytes_written;
     }
 
     if (sd_close_file(sd_file)) {

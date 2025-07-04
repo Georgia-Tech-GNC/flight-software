@@ -61,17 +61,6 @@ bool extract_command(uint8_t *buffer, uint8_t buffer_size, struct CommandStruct*
 	return true;
 }
 
-int get_msg_size(int message_id) {
-	switch (message_id) {
-    	case ROCKETSTATE_MSG_ID:
-			return ROCKETSTATE_SIZE;
-    	case SERVODEFLECTIONS_MSG_ID:
-			return SERVODEFLECTIONS_SIZE;
-    	default:
-			return -1;
-	}
-}
-
 bool is_data_send_msg(int message_id) {
 	return (message_id >= 10) && (message_id <= 10 + 2);
 }

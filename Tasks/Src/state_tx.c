@@ -1,7 +1,15 @@
 #include "state_tx.h"
 
+#include "stdint.h"
+#include "stddef.h"
+#include "lib.h"
+#include "log.h"
+#include "hal_modules.h"
+
 /* Private defines */
 #define TX_FREQ_HZ 5
+#define TELEMETRY_MAX_PAYLOAD_SIZE 64
+#define TELEMETRY_MAX_PACKET_SIZE (TELEMETRY_MAX_PAYLOAD_SIZE + 5)
 
 /* Private function definitions */
 uint8_t telemetry_send_message(uint8_t *payload, uint8_t payload_size, uint8_t message_id);
@@ -16,16 +24,16 @@ void state_tx_task(void *args) {
     RocketState local_state;
 
     /* Wait for start notification */
-    await_notification(BEGIN_STATE_TX_NOTIFICATION_BIT)
+    await_notification(BEGIN_STATE_TX_NOTIFICATION_BIT);
 
     while (1) {
         await_notification(SEND_STATE_NOTIFICATION_BIT);
 
         memcpy_state(&local_state);
 
-        for (uint8_t i = 0; i < N_TELEMETRY_STATE_PACKETS; i ++) {
+        for (uint8_t i = 0; i < N_TELEMETRY_MESSAGE_PACKETS; i ++) {
             uint32_t timestamp = pdTICKS_TO_MS(xTaskGetTickCount());
-            uint8_t packet_id = telemetry_state_packets[i];
+            uint8_t packet_id = telemetry_msg_ids[i];
             
             size_t payload_size;
             if (!lib_packet_encode(packet_id, &local_state, payload_buf, TELEMETRY_MAX_PAYLOAD_SIZE, &payload_size)) {

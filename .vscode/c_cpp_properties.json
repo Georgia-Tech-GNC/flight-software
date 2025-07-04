@@ -3,18 +3,22 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/**",
-                "${workspaceFolder}/StateEstimation/Drivers/CMSIS/DSP/Include",
-                "${workspaceFolder}/StateEstimation/Core/Inc",
-                "${workspaceFolder}/StateEstimation/Drivers/CMSIS/Include",
-                "${workspaceFolder}/StateEstimation/Core/Inc"
+                "${workspaceFolder}/HALAL/Inc",
+                "${workspaceFolder}/RocketLib/Controls/Inc",
+                "${workspaceFolder}/RocketLib/Utils/Inc",
+                "${workspaceFolder}/Rockets/Example/Inc",
+                "${workspaceFolder}/Targets/Nucleo-F429/Inc",
+                "${workspaceFolder}/Targets/Nucleo-F429/Drivers/CMSIS/Device/ST/STM32F4xx/Include",
+                "${workspaceFolder}/Targets/Nucleo-F429/Drivers/CMSIS/Include",
+                "${workspaceFolder}/Targets/Nucleo-F429/Drivers/STM32F4xx_HAL_Driver/Inc",
+                "${workspaceFolder}/Tasks/Inc",
+                "${workspaceFolder}/FreeRTOS-Kernel/Inc"
             ],
             "defines": [
                 "_DEBUG",
                 "UNICODE",
                 "_UNICODE"
-            ],
-            "compilerPath": "C:\\MinGW\\bin/gcc.exe"
+            ]
         }
     ],
     "version": 4

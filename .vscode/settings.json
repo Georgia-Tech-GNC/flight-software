@@ -8,7 +8,11 @@
         "port_config.h": "c",
         "cstdint": "c",
         "servo.h": "c",
-        "fatfs_sd.h": "c"
+        "fatfs_sd.h": "c",
+        "string.h": "c",
+        "lib.h": "c",
+        "protocol.h": "c",
+        "stm32f4xx_hal.h": "c"
     },
     "C_Cpp.errorSquiggles": "enabled"
 }

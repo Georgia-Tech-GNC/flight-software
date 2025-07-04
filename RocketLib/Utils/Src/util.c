@@ -1,3 +1,8 @@
+#include "util.h"
+
+#include "rocket.h"
+#include "rtos_globals.h"
+
 uint32_t await_notification(uint32_t mask, TickType_t timeout) {
     uint32_t notification_value = 0;
     while ((notification_value & mask) == 0) {

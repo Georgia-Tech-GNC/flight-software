@@ -239,7 +239,7 @@ void flash_sd_card(FlashBlock *flash_block, SDFile *sd_file, size_t n_states) {
 
         size_t bytes_written;
         
-        if (!lib_csv_encode(&rocket_state, line_buf, CSV_LINE_SIZE, &bytes_written)) {
+        if (!csv_encode(&rocket_state, line_buf, CSV_LINE_SIZE, &bytes_written)) {
             log_printf(LOG_ERROR, "Error encoding rocket CSV line #%zu", bytes_written);
             continue;
         }

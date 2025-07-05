@@ -57,7 +57,7 @@ uint8_t log_printf(LogLevel level, const char *format, ...) {
     TickType_t sec = ms / 1000;
     ms %= 1000;
 
-    ret = snprintf(line_buf, LINE_BUF_SIZE, "%d.%d [%s] - %s%s", sec, ms, status_str, msg_buf, DEBUG_UART_NEWLINE);
+    ret = snprintf(line_buf, LINE_BUF_SIZE, "[%d.%03d - %s] - %s%s", sec, ms, status_str, msg_buf, DEBUG_UART_NEWLINE);
 
     if (ret < 0 || ret > LINE_BUF_SIZE) {
         return 0;

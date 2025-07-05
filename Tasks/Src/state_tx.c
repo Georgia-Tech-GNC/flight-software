@@ -30,21 +30,22 @@ void state_tx_task(void *args) {
     /* Wait for start notification */
     await_notification(BEGIN_STATE_TX_NOTIFICATION_BIT, portMAX_DELAY);
 
+    uint8_t start_msg_id = get_start_msg_id();
+    uint8_t end_msg_id = get_end_msg_id();
+
     while (1) {
         await_notification(SEND_STATE_NOTIFICATION_BIT, portMAX_DELAY);
 
         memcpy_state(&local_state);
 
-        for (uint8_t i = 0; i < N_TELEMETRY_MESSAGE_PACKETS; i ++) {
-            uint8_t packet_id = telemetry_msg_ids[i];
-            
+        for (uint8_t msg_id = start_msg_id; msg_id <= end_msg_id; msg_id ++) {            
             size_t payload_size;
-            if (!lib_packet_encode(packet_id, &local_state, payload_buf, TELEMETRY_MAX_PAYLOAD_SIZE, &payload_size)) {
-                log_printf(LOG_ERROR, "Failed to encode telemetry packet id %d", packet_id);
+            if (!packet_encode(msg_id, &local_state, payload_buf, TELEMETRY_MAX_PAYLOAD_SIZE, &payload_size)) {
+                log_printf(LOG_ERROR, "Failed to encode telemetry packet id %d", msg_id);
             }
             
-            if (!telemetry_send_message(payload_buf, payload_size, packet_id)) {
-                log_printf(LOG_ERROR, "Failed to send telemetry packet id %d", packet_id);
+            if (!telemetry_send_message(payload_buf, payload_size, msg_id)) {
+                log_printf(LOG_ERROR, "Failed to send telemetry packet id %d", msg_id);
             }
         }
     }

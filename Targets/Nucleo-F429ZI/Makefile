@@ -38,6 +38,7 @@ BUILD_DIR = build
 C_SOURCES =  \
 Core/Src/main.c \
 Core/Src/port.c \
+Core/Src/periph_io.c \
 Core/Src/stm32f4xx_it.c \
 Core/Src/stm32f4xx_hal_msp.c \
 Core/Src/stm32f4xx_hal_timebase_tim.c \
@@ -81,6 +82,7 @@ Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_adc.c \
 ../../RocketLib/Telemetry/Src/crc_hash.c \
 ../../RocketLib/Telemetry/Src/packet_encode.c \
 ../../RocketLib/Telemetry/Src/protocol.c \
+../../RocketLib/Telemetry/Src/telemetry.c \
 ../../RocketLib/Utils/Src/log.c \
 ../../RocketLib/Utils/Src/util.c \
 ../../FreeRTOS-Kernel/Src/croutine.c \

@@ -24,7 +24,8 @@
         "log.h": "c",
         "jet_vanes.h": "c",
         "packet_encode.h": "c",
-        "telemetry.h": "c"
+        "telemetry.h": "c",
+        "main.h": "c"
     },
     "C_Cpp.errorSquiggles": "enabled"
 }

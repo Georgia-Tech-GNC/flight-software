@@ -6,6 +6,15 @@
 #include "rocket.h"
 #include "rtos_globals.h"
 
+uint32_t await_notification_indexed(uint32_t index, uint32_t mask, TickType_t timeout) {
+    uint32_t notification_value = 0;
+    while ((notification_value & mask) == 0) {
+        xTaskNotifyWaitIndexed(index, 0, mask, &notification_value, timeout);
+    }
+
+    return notification_value;
+}
+
 uint32_t await_notification(uint32_t mask, TickType_t timeout) {
     uint32_t notification_value = 0;
     while ((notification_value & mask) == 0) {

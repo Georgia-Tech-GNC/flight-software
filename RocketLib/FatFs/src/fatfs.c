@@ -30,7 +30,7 @@ FIL USERFile;       /* File object for USER */
 void MX_FATFS_Init(void)
 {
   /*## FatFS: Link the USER driver ###########################*/
-  retUSER = FATFS_LinkDriver(&USER_Driver, USERPath);
+  retUSER = FATFS_LinkDriver(&USBH_Driver, USERPath);
 
   /* USER CODE BEGIN Init */
   /* additional user code for init */

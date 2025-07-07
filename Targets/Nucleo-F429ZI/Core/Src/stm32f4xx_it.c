@@ -61,6 +61,7 @@ extern UART_HandleTypeDef huart2;
 extern UART_HandleTypeDef huart3;
 extern UART_HandleTypeDef huart6;
 extern TIM_HandleTypeDef htim1;
+extern HCD_HandleTypeDef hhcd_USB_OTG_FS;
 
 /* USER CODE BEGIN EV */
 
@@ -276,5 +277,15 @@ void USART6_IRQHandler(void)
 }
 
 /* USER CODE BEGIN 1 */
+void OTG_FS_IRQHandler(void)
+{
+  /* USER CODE BEGIN OTG_FS_IRQn 0 */
+
+  /* USER CODE END OTG_FS_IRQn 0 */
+  HAL_HCD_IRQHandler(&hhcd_USB_OTG_FS);
+  /* USER CODE BEGIN OTG_FS_IRQn 1 */
+
+  /* USER CODE END OTG_FS_IRQn 1 */
+}
 
 /* USER CODE END 1 */

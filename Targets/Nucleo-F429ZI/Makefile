@@ -46,6 +46,9 @@ Core/Src/syscalls.c \
 Core/Src/sysmem.c \
 Core/Src/system_stm32f4xx.c \
 Core/Src/w25q.c \
+USB_HOST/App/usb_host.c \
+USB_HOST/Target/usbh_conf.c \
+USB_HOST/Target/usbh_platform.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c \
@@ -66,13 +69,22 @@ Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c \
+Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_hcd.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_adc.c \
+../../RocketLib/STM32_USB_Host_Library/Class/MSC/Src/usbh_msc_bot.c \
+../../RocketLib/STM32_USB_Host_Library/Class/MSC/Src/usbh_msc_scsi.c \
+../../RocketLib/STM32_USB_Host_Library/Class/MSC/Src/usbh_msc.c \
+../../RocketLib/STM32_USB_Host_Library/Core/Src/usbh_core.c \
+../../RocketLib/STM32_USB_Host_Library/Core/Src/usbh_ctlreq.c \
+../../RocketLib/STM32_USB_Host_Library/Core/Src/usbh_ioreq.c \
+../../RocketLib/STM32_USB_Host_Library/Core/Src/usbh_pipes.c \
 ../../RocketLib/FatFs/src/fatfs.c \
 ../../RocketLib/FatFs/src/fatfs_sd.c \
 ../../RocketLib/FatFs/src/user_diskio.c \
+../../RocketLib/FatFs/src/usbh_diskio.c \
 ../../RocketLib/FatFs/src/diskio.c \
 ../../RocketLib/FatFs/src/ff.c \
 ../../RocketLib/FatFs/src/ff_gen_drv.c \
@@ -163,6 +175,8 @@ C_INCLUDES =  \
 -I../../HALAL/Inc \
 -I../../Tasks/Inc \
 -I../../FreeRTOS-Kernel/Inc \
+-I../../RocketLib/STM32_USB_Host_Library/Class/MSC/Inc \
+-I../../RocketLib/STM32_USB_Host_Library/Core/Inc \
 -I../../RocketLib/Controls/Inc \
 -I../../RocketLib/Utils/Inc \
 -I../../RocketLib/FatFs/src \
@@ -176,6 +190,8 @@ C_INCLUDES =  \
 -IDrivers/CMSIS/Device/ST/STM32F4xx/Include \
 -IDrivers/CMSIS/DSP/Include \
 -IDrivers/CMSIS/Include \
+-IUSB_HOST/App \
+-IUSB_HOST/Target
 
 # compile gcc flags
 ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections

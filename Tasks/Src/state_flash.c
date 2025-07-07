@@ -31,6 +31,8 @@ void flash_sd_card(FlashBlock *flash_block, SDFile *sd_file, size_t n_states);
  * @param args Unused
  */
 void state_flash_task(void *args) {
+    await_notification_indexed(READY_NOTIFICATION_INDEX, SDCARD_READY_NOTIFICATION_BIT, portMAX_DELAY);
+
     /* Initialize flash chip and SD card */
     if (io_init()) {
         log_printf(LOG_INFO, "IO initialized");
@@ -67,7 +69,7 @@ void state_flash_task(void *args) {
         size_t flash_page_index = 0;
 
         /* Wait for next notification */
-        uint32_t notification_value = await_notification(FLASH_STATE_NOTIFICATION_BIT | FLASH_SD_CARD_NOTIFICATION_BIT, portMAX_DELAY);
+        uint32_t notification_value = await_notification_indexed(FLASH_NOTIFICATION_INDEX, FLASH_STATE_NOTIFICATION_BIT | FLASH_SD_CARD_NOTIFICATION_BIT, portMAX_DELAY);
 
         /* Flash state to SD card */
         if (notification_value & FLASH_SD_CARD_NOTIFICATION_BIT) {

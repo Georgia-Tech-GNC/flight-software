@@ -4,6 +4,8 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/HALAL/Inc",
+                "${workspaceFolder}/RocketLib/STM32_USB_Host_Library/Class/MSC/Inc",
+                "${workspaceFolder}/RocketLib/STM32_USB_Host_Library/Core/Inc",
                 "${workspaceFolder}/RocketLib/Controls/Inc",
                 "${workspaceFolder}/RocketLib/Utils/Inc",
                 "${workspaceFolder}/RocketLib/Telemetry/Inc",
@@ -12,8 +14,11 @@
                 "${workspaceFolder}/Rockets/JetVanes/Inc",
                 "${workspaceFolder}/Targets/Inc",
                 "${workspaceFolder}/Targets/Nucleo-F429ZI/Core/Inc",
+                "${workspaceFolder}/Targets/Nucleo-F429ZI/USB_HOST/App",
+                "${workspaceFolder}/Targets/Nucleo-F429ZI/USB_HOST/Target",
                 "${workspaceFolder}/Targets/Nucleo-F429ZI/Drivers/CMSIS/Device/ST/STM32F4xx/Include",
                 "${workspaceFolder}/Targets/Nucleo-F429ZI/Drivers/CMSIS/Include",
+                "${workspaceFolder}/Targets/Nucleo-F429ZI/Drivers/CMSIS/Core/Include",
                 "${workspaceFolder}/Targets/Nucleo-F429ZI/Drivers/STM32F4xx_HAL_Driver/Inc",
                 "${workspaceFolder}/Tasks/Inc",
                 "${workspaceFolder}/FreeRTOS-Kernel/Inc"
@@ -22,7 +27,8 @@
                 "_DEBUG",
                 "UNICODE",
                 "_UNICODE",
-                "RocketStateStruct=JetVanesRocketState"
+                "RocketStateStruct=JetVanesRocketState",
+                "STM32F429xx"
             ]
         }
     ],

@@ -24,8 +24,11 @@ uint8_t flash_init = 0;
 struct w25q_device flash_chip;
 FATFS fs;
 
+BYTE mkfs_work[4096];
+
 int io_init(void) {
     HAL_UART_Transmit(&debug_uart, (uint8_t *) "Initializing IO devices...\r\n", 28, HAL_MAX_DELAY);
+    f_mkfs("/", FM_FAT32, 0, mkfs_work, sizeof(mkfs_work));
     int sd_status = f_mount(&fs, "/", 1);
     if (sd_status == FR_OK) {
         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Mounted SD card\r\n", 17, HAL_MAX_DELAY);

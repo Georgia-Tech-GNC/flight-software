@@ -9,6 +9,8 @@
 #include "w25q.h"
 #include "target.h"
 
+#include "stdio.h"
+
 /* Size of flash chip in software emulation */
 #define SW_FLASH_CHIP_SIZE (8 * EXT_FLASH_SECTOR_SIZE)
 

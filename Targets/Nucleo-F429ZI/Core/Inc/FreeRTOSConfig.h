@@ -138,6 +138,6 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 
 #define configKERNEL_PROVIDED_STATIC_MEMORY 1
 #define configUSE_TASK_NOTIFICATIONS 1
-#define configTASK_NOTFICATION_ARRAY_ENTRIES 1
+#define configTASK_NOTFICATION_ARRAY_ENTRIES 2
 
 #endif /* FREERTOS_CONFIG_H */

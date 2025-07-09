@@ -25,7 +25,8 @@
         "jet_vanes.h": "c",
         "packet_encode.h": "c",
         "telemetry.h": "c",
-        "main.h": "c"
+        "main.h": "c",
+        "usb_host.h": "c"
     },
     "C_Cpp.errorSquiggles": "enabled"
 }

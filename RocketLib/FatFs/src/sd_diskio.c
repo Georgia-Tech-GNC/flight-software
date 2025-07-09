@@ -1,11 +1,21 @@
-#define TRUE  1
-#define FALSE 0
-#define bool BYTE
-
+#include "sd_diskio.h"
+#include "fatfs_sd.h"
 #include "target.h"
 #include "diskio.h"
 #include "fatfs_sd.h"
 #include "stdint.h"
+
+Diskio_drvTypeDef sd_diskio_driver = {
+    SD_disk_initialize,
+    SD_disk_status,
+    SD_disk_read,
+    SD_disk_write,
+    SD_disk_ioctl,
+};
+
+#define TRUE  1
+#define FALSE 0
+#define bool BYTE
 
 #define HSPI_SDCARD		 	&sd_spi
 

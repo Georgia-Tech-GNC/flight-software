@@ -57,7 +57,7 @@ void state_flash_task(void *args) {
     rocket_assert(sizeof(RocketStateStruct) <= EXT_FLASH_PAGE_SIZE, "Rocket state size less than flash page size");
 
     /* Wait for notification before beginning */
-    await_notification(BEGIN_STATE_FLASH_NOTIFICATION_BIT, portMAX_DELAY);
+    //await_notification_indexed(FLASH_NOTIFICATION_INDEX, BEGIN_STATE_FLASH_NOTIFICATION_BIT, portMAX_DELAY);
 
     FlashBlock flash_block;
     SDFile sd_file;
@@ -65,8 +65,9 @@ void state_flash_task(void *args) {
     flash_init_block(&flash_block, STATE_FLASH_START_SECTOR, STATE_FLASH_N_SECTORS);
     sd_init_file(&sd_file, "/data.csv");
 
+    size_t flash_page_index = 0;
+
     while (1) {
-        size_t flash_page_index = 0;
 
         /* Wait for next notification */
         uint32_t notification_value = await_notification_indexed(FLASH_NOTIFICATION_INDEX, FLASH_STATE_NOTIFICATION_BIT | FLASH_SD_CARD_NOTIFICATION_BIT, portMAX_DELAY);
@@ -90,6 +91,7 @@ void state_flash_task(void *args) {
             size_t bytes_copied = 0;
 
             if (memcpy_state_bytes(state_bytes, EXT_FLASH_PAGE_SIZE, &bytes_copied)) {
+                log_printf(LOG_INFO, "Copied state bytes %d", flash_page_index);
                 flash_write_block(&flash_block, flash_page_index * EXT_FLASH_PAGE_SIZE, state_bytes, EXT_FLASH_PAGE_SIZE);
                 flash_page_index ++;
             } else {
@@ -247,7 +249,7 @@ void flash_sd_card(FlashBlock *flash_block, SDFile *sd_file, size_t n_states) {
         }
 
         if (sd_write_file(sd_file, sd_bytes_written, (uint8_t *) line_buf, bytes_written)) {
-            log_printf(LOG_INFO, "Wrote CSV line #%zu to SD card", i);
+            log_printf(LOG_INFO, "Wrote CSV line #%d to SD card", i);
         } else {
             log_printf(LOG_ERROR, "Error writing rocket CSV line #%zu", bytes_written);
         }

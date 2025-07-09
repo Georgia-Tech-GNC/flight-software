@@ -2,31 +2,18 @@
 #define PORT_CONFIG_H
 
 #include "stm32f4xx_hal.h"
+#include "usbh_diskio.h"
 
-extern UART_HandleTypeDef huart2;
-extern UART_HandleTypeDef huart3;
-extern UART_HandleTypeDef huart6;
-
-extern SPI_HandleTypeDef hspi1;
-
-extern ADC_HandleTypeDef hadc1;
-extern ADC_HandleTypeDef hadc2;
-extern ADC_HandleTypeDef hadc3;
-
-extern TIM_HandleTypeDef htim1;
-extern TIM_HandleTypeDef htim2;
-extern TIM_HandleTypeDef htim3;
-extern TIM_HandleTypeDef htim4;
+#include "uart.h"
 
 #define NUCLEO_F429ZI
 
 #define SD_CS_GPIO_PORT     GPIOA
 #define SD_CS_PIN           GPIO_PIN_4
 
-#define telemetry_uart      huart2
-#define state_uart          huart6
-#define debug_uart          huart3
-#define sd_spi              hspi1
+#define telemetry_uart      g_uart2
+#define state_uart          g_uart6
+#define debug_uart          g_uart3
 
 //#define USE_ADC1
 #define USE_ADC2

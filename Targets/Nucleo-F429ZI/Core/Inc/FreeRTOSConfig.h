@@ -77,6 +77,9 @@
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION  0
 #define configTASK_NOTIFICATION_ARRAY_ENTRIES    2
 
+#include "log.h"
+#define configASSERT( x )  if( ( x ) == 0 ) log_printf(LOG_ERROR, "FreeRTOS assert failed")
+
 /* Defaults to size_t for backward compatibility, but can be changed
    if lengths will always be less than the number of bytes in a size_t. */
 #define configMESSAGE_BUFFER_LENGTH_TYPE         size_t

@@ -2,7 +2,6 @@
 #define PORT_CONFIG_H
 
 #include "stm32f4xx_hal.h"
-#include "usbh_diskio.h"
 
 #define NUCLEO_F429ZI
 

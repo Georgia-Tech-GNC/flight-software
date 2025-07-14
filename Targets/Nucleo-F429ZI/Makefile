@@ -44,11 +44,9 @@ Core/Src/sysmem.c \
 Core/Src/system_stm32f4xx.c \
 Core/Src/w25q.c \
 Modules/Src/gpio.c \
-Modules/Src/uart.c \
 Modules/Src/rcc.c \
 Modules/Src/tim.c \
 Modules/Src/adc.c \
-Modules/Src/usb_host.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c \
@@ -78,6 +76,8 @@ Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_adc.c \
 ../../HALAL/Src/Debug/debug_uart.c \
 ../../HALAL/Src/Radio/radio_uart.c \
 ../../HALAL/Src/StateEstimation/state_estimation_uart.c \
+../../HALAL/Src/Storage/storage_usb.c \
+../../HALAL/Src/Storage/usbh_diskio.c \
 ../../HALAL/Src/Isr/uart_isr.c \
 ../../RocketLib/USBHost/Class/MSC/Src/usbh_msc_bot.c \
 ../../RocketLib/USBHost/Class/MSC/Src/usbh_msc_scsi.c \
@@ -87,8 +87,6 @@ Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_adc.c \
 ../../RocketLib/USBHost/Core/Src/usbh_ctlreq.c \
 ../../RocketLib/USBHost/Core/Src/usbh_ioreq.c \
 ../../RocketLib/USBHost/Core/Src/usbh_pipes.c \
-../../RocketLib/FatFs/src/fatfs.c \
-../../RocketLib/FatFs/src/usbh_diskio.c \
 ../../RocketLib/FatFs/src/diskio.c \
 ../../RocketLib/FatFs/src/ff.c \
 ../../RocketLib/FatFs/src/ff_gen_drv.c \

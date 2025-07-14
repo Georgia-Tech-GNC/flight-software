@@ -1,33 +1,22 @@
-#include "usbh_diskio.h"
-#include "usb_host.h"
+#include "storage.h"
+
+#include "ff_gen_drv.h"
 
 #include "usbh_core.h"
 #include "usbh_msc.h"
 
 #define USB_DEFAULT_BLOCK_SIZE 512
 
-DSTATUS USBH_initialize(BYTE);
-DSTATUS USBH_status(BYTE);
-DRESULT USBH_read(BYTE, BYTE*, DWORD, UINT);
-DRESULT USBH_write(BYTE, const BYTE*, DWORD, UINT);
-DRESULT USBH_ioctl(BYTE, BYTE, void*);
+extern USBH_HandleTypeDef usb_host;
 
-const Diskio_drvTypeDef usbh_diskio_driver = {
-    USBH_initialize,
-    USBH_status,
-    USBH_read,
-    USBH_write,
-    USBH_ioctl
-};
-
-DSTATUS USBH_initialize(BYTE lun) {
+DSTATUS HALAL_storage_initialize(BYTE lun) {
     return RES_OK;
 }
 
-DSTATUS USBH_status(BYTE lun) {
+DSTATUS HALAL_storage_status(BYTE lun) {
     DRESULT res = RES_ERROR;
 
-    if (USBH_MSC_UnitIsReady(&g_usb_host, lun)) {
+    if (USBH_MSC_UnitIsReady(&usb_host, lun)) {
         res = RES_OK;
     } else {
         res = RES_ERROR;
@@ -36,14 +25,14 @@ DSTATUS USBH_status(BYTE lun) {
     return res;
 }
 
-DRESULT USBH_read(BYTE lun, BYTE *buff, DWORD sector, UINT count) {
+DRESULT HALAL_storage_read(BYTE lun, BYTE *buff, DWORD sector, UINT count) {
     DRESULT res = RES_ERROR;
     MSC_LUNTypeDef info;
 
-    if (USBH_MSC_Read(&g_usb_host, lun, sector, buff, count) == USBH_OK) {
+    if (USBH_MSC_Read(&usb_host, lun, sector, buff, count) == USBH_OK) {
         res = RES_OK;
     } else {
-        USBH_MSC_GetLUNInfo(&g_usb_host, lun, &info);
+        USBH_MSC_GetLUNInfo(&usb_host, lun, &info);
         
         switch (info.sense.asc) {
             case SCSI_ASC_LOGICAL_UNIT_NOT_READY:
@@ -60,14 +49,14 @@ DRESULT USBH_read(BYTE lun, BYTE *buff, DWORD sector, UINT count) {
     return res;
 }
 
-DRESULT USBH_write(BYTE lun, const BYTE *buff, DWORD sector, UINT count) {
+DRESULT HALAL_storage_write(BYTE lun, const BYTE *buff, DWORD sector, UINT count) {
     DRESULT res = RES_ERROR;
     MSC_LUNTypeDef info;
 
-    if(USBH_MSC_Write(&g_usb_host, lun, sector, (BYTE *)buff, count) == USBH_OK) {
+    if(USBH_MSC_Write(&usb_host, lun, sector, (BYTE *)buff, count) == USBH_OK) {
         res = RES_OK;
     } else {
-        USBH_MSC_GetLUNInfo(&g_usb_host, lun, &info);
+        USBH_MSC_GetLUNInfo(&usb_host, lun, &info);
 
         switch (info.sense.asc) {
             case SCSI_ASC_WRITE_PROTECTED:
@@ -87,7 +76,7 @@ DRESULT USBH_write(BYTE lun, const BYTE *buff, DWORD sector, UINT count) {
     return res;
 }
 
-DRESULT USBH_ioctl(BYTE lun, BYTE cmd, void *buff) {
+DRESULT HALAL_storage_ioctl(BYTE lun, BYTE cmd, void *buff) {
     DRESULT res = RES_ERROR;
     MSC_LUNTypeDef info;
 
@@ -96,7 +85,7 @@ DRESULT USBH_ioctl(BYTE lun, BYTE cmd, void *buff) {
             res = RES_OK;
             break;
         case GET_SECTOR_COUNT:
-            if(USBH_MSC_GetLUNInfo(&g_usb_host, lun, &info) == USBH_OK) {
+            if(USBH_MSC_GetLUNInfo(&usb_host, lun, &info) == USBH_OK) {
                 *(DWORD*)buff = info.capacity.block_nbr;
                 res = RES_OK;
             } else {
@@ -105,7 +94,7 @@ DRESULT USBH_ioctl(BYTE lun, BYTE cmd, void *buff) {
 
             break;
         case GET_SECTOR_SIZE:
-            if(USBH_MSC_GetLUNInfo(&g_usb_host, lun, &info) == USBH_OK) {
+            if(USBH_MSC_GetLUNInfo(&usb_host, lun, &info) == USBH_OK) {
                 *(DWORD*)buff = info.capacity.block_size;
                 res = RES_OK;
             } else {
@@ -114,7 +103,7 @@ DRESULT USBH_ioctl(BYTE lun, BYTE cmd, void *buff) {
 
             break;
         case GET_BLOCK_SIZE:
-            if(USBH_MSC_GetLUNInfo(&g_usb_host, lun, &info) == USBH_OK) {
+            if(USBH_MSC_GetLUNInfo(&usb_host, lun, &info) == USBH_OK) {
                 *(DWORD*)buff = info.capacity.block_size / USB_DEFAULT_BLOCK_SIZE;
                 res = RES_OK;
             } else {

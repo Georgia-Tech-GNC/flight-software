@@ -46,4 +46,20 @@
 #define HALAL_STATE_ESTIMATION_UART_ISR             USART6_IRQHandler
 #define HALAL_STATE_ESTIMATION_PACKET_SIZE          116
 
+#define HALAL_STORAGE_MODULE_ENABLED
+#define HALAL_STORAGE_USB_ENABLED
+#define HALAL_STORAGE_USB_VBUS_PIN                  GPIO_PIN_9
+#define HALAL_STORAGE_USB_VBUS_PORT                 GPIOA
+#define HALAL_STORAGE_USB_VBUS_EN_PIN               GPIO_PIN_6
+#define HALAL_STORAGE_USB_VBUS_EN_PORT              GPIOG
+#define HALAL_STORAGE_USB_DM_PIN                    GPIO_PIN_11
+#define HALAL_STORAGE_USB_DM_PORT                   GPIOA
+#define HALAL_STORAGE_USB_DP_PIN                    GPIO_PIN_12
+#define HALAL_STORAGE_USB_DP_PORT                   GPIOA
+#define HALAL_STORAGE_USB_TIM_RCC_ENABLE()          __HAL_RCC_TIM2_CLK_ENABLE()
+#define HALAL_STORAGE_USB_TIM_CLK_FREQ              (2*HAL_RCC_GetPCLK2Freq())
+#define HALAL_STORAGE_USB_TIM_INSTANCE              TIM2
+#define HALAL_STORAGE_USB_TIM_IRQn                  TIM2_IRQn
+#define HALAL_STORAGE_USB_TIM_ISR                   TIM2_IRQHandler
+
 #endif

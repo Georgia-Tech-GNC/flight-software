@@ -1,4 +1,5 @@
 #include "state_flash.h"
+#include "storage.h"
 
 #include "FreeRTOS.h"
 #include "task.h"

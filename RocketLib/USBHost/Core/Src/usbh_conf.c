@@ -21,6 +21,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usbh_core.h"
+#include "FreeRTOS.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -380,7 +381,7 @@ uint8_t USBH_LL_GetToggle(USBH_HandleTypeDef *phost, uint8_t pipe)
   */
 void USBH_Delay(uint32_t Delay)
 {
-  HAL_Delay(Delay);
+  vTaskDelay(Delay);
 }
 
 /**

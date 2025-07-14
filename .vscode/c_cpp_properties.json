@@ -4,6 +4,7 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/HALAL/Inc",
+                "${workspaceFolder}/HALAL/Src/Isr",
                 "${workspaceFolder}/RocketLib/USBHost/Class/MSC/Inc",
                 "${workspaceFolder}/RocketLib/USBHost/Core/Inc",
                 "${workspaceFolder}/RocketLib/Controls/Inc",
@@ -14,7 +15,7 @@
                 "${workspaceFolder}/Rockets/JetVanes/Inc",
                 "${workspaceFolder}/Targets/Inc",
                 "${workspaceFolder}/Targets/Nucleo-F429ZI/Core/Inc",
-                "${workspaceFolder}/Targets/Nucleo-F429ZI/Core/Src/Modules/Inc",
+                "${workspaceFolder}/Targets/Nucleo-F429ZI/Modules/Inc",
                 "${workspaceFolder}/Targets/Nucleo-F429ZI/Drivers/CMSIS/Device/ST/STM32F4xx/Include",
                 "${workspaceFolder}/Targets/Nucleo-F429ZI/Drivers/CMSIS/Include",
                 "${workspaceFolder}/Targets/Nucleo-F429ZI/Drivers/CMSIS/Core/Include",
@@ -27,7 +28,8 @@
                 "UNICODE",
                 "_UNICODE",
                 "RocketStateStruct=JetVanesRocketState",
-                "STM32F429xx"
+                "STM32F429xx",
+                "TARGET_NUCLEO_F429ZI"
             ]
         }
     ],

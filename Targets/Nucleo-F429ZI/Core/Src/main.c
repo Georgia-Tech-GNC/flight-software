@@ -4,12 +4,14 @@
 #include "usb_host.h"
 
 #include "rcc.h"
-#include "uart.h"
 #include "gpio.h"
+#include "tim.h"
+#include "adc.h"
 #include "usb_host.h"
 
 #include "rocket.h"
 #include "target.h"
+#include "halal.h"
 
 static void error_handler(void);
 
@@ -22,22 +24,55 @@ int main(void) {
 
   gpio_init();
   
-  if (uart_init()) {
-    log_printf(LOG_INFO, "UART Initialized");
+  if (HALAL_init()) {
+    log_printf(LOG_INFO, "HALAL initialized");
   } else {
+    log_printf(LOG_ERROR, "HALAL not initialized");
+  }
+
+  if (tim_init()) {
+    log_printf(LOG_INFO, "TIM initialized");
+  } else {
+    log_printf(LOG_ERROR, "TIM not initialized");
     error_handler();
   }
   
-  FATFS_LinkDriver(&usbh_diskio_driver, "");
+  if (adc_init()) {
+    log_printf(LOG_INFO, "ADC initialized");
+  } else {
+    log_printf(LOG_ERROR, "ADC not initialized");
+    error_handler();
+  }
 
-  usb_host_init();
+  if (FATFS_LinkDriver(&usbh_diskio_driver, "") == 0) {
+    log_printf(LOG_INFO, "FATFS driver linked");
+  } else {
+    log_printf(LOG_ERROR, "FATFS driver not linked");
+    error_handler();
+  }
 
-  for (int i = 0; i < 5; i ++) {
-    log_printf(LOG_INFO, "Testing HAL_DELAY (1 second): %ld", HAL_GetTick());
-    HAL_Delay(1000);
+  if (usb_host_init()) {
+    log_printf(LOG_INFO, "USB host initialized");
+  } else {
+    log_printf(LOG_ERROR, "USB host not initialized");
+    error_handler();
   }
 
   rocket_init();
+
+  if (HALAL_radio_start()) {
+    log_printf(LOG_INFO, "Radio started");
+  } else {
+    log_printf(LOG_ERROR, "Radio not started");
+  }
+
+  if (HAL_TIM_Base_Start_IT(&g_tim2) == HAL_OK) {
+    log_printf(LOG_INFO, "USB update timer started");
+  } else {
+    log_printf(LOG_ERROR, "USB update timer not started");
+    error_handler();
+  }
+
   rocket_start();
 }
 

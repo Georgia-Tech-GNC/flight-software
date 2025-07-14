@@ -19,7 +19,7 @@ uint8_t rcc_init(void) {
     RCC_OscInitStruct.PLL.PLLQ = 7;
 
     if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
-        return FAILURE;
+        return RET_FAILURE;
     }
 
     RCC_ClkInitStruct.ClockType =   RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK
@@ -30,8 +30,8 @@ uint8_t rcc_init(void) {
     RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
 
     if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5) != HAL_OK) {
-        return FAILURE;
+        return RET_FAILURE;
     }
 
-    return SUCCESS;
+    return RET_SUCCESS;
 }

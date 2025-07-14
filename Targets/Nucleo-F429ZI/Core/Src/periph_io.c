@@ -10,6 +10,7 @@
 #include "target.h"
 
 #include "stdio.h"
+#include "log.h"
 
 /* Size of flash chip in software emulation */
 #define SW_FLASH_CHIP_SIZE (8 * EXT_FLASH_SECTOR_SIZE)
@@ -29,16 +30,14 @@ FATFS fs;
 BYTE mkfs_work[4096];
 
 int io_init(void) {
-    HAL_UART_Transmit(&debug_uart, (uint8_t *) "Initializing IO devices...\r\n", 28, HAL_MAX_DELAY);
+    log_printf(LOG_INFO, "Initializing IO devices...");
     f_mkfs("/", FM_FAT32, 0, mkfs_work, sizeof(mkfs_work));
     int sd_status = f_mount(&fs, "/", 1);
     if (sd_status == FR_OK) {
-        HAL_UART_Transmit(&debug_uart, (uint8_t *) "Mounted SD card\r\n", 17, HAL_MAX_DELAY);
+        log_printf(LOG_INFO, "Mounted SD card");
         sd_mounted = 1;
     } else {
-        char buf[100];
-        sprintf(buf, "Failed to mount SD card: %d\r\n", sd_status);
-        HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
+        log_printf(LOG_ERROR, "Failed to mount SD card: %d", sd_status);
         sd_mounted = 0;
     }
 
@@ -100,14 +99,10 @@ int sd_open_file(SDFile *file, uint8_t mode) {
 
 int sd_write_file(SDFile *file, uint16_t start_addr, uint8_t *data, size_t len) {
     if (file == NULL || file->is_deleted || (file->current_mode & FA_WRITE) != FA_WRITE || data == NULL || !sd_mounted) {
-        char buf[100];
-        sprintf(buf, "File is deleted: %d, Current mode: %d, SD mounted: %d\r\n", file->is_deleted, file->current_mode & FA_WRITE, sd_mounted);
-        HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
         return 0;
     }
     
     if (f_lseek(&file->fil, start_addr) != FR_OK) {
-        HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failure 2\r\n", 11, HAL_MAX_DELAY);
         return 0;
     }
 
@@ -119,10 +114,6 @@ int sd_write_file(SDFile *file, uint16_t start_addr, uint8_t *data, size_t len) 
         if (f_write(&file->fil, data + offset, write_size, &bytes_written) != FR_OK) {
             return 0;
         }
-
-        char buf[100];
-        sprintf(buf, "Wrote %d bytes starting at %d\r\n", bytes_written, start_addr + offset);
-        HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, strlen(buf), HAL_MAX_DELAY);
     }
 
     return 1;

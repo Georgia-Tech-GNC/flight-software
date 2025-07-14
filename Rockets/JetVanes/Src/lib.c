@@ -6,6 +6,7 @@
 
 #include "util.h"
 #include "protocol.h"
+#include "rocket.h"
 
 #define MSG_MIN_ID ROCKETSTATEVECTOR_MSG_ID
 #define MSG_MAX_ID ROCKETANALOGFEEDBACKDATA_MSG_ID
@@ -56,7 +57,7 @@ uint8_t packet_encode(uint8_t message_id, JetVanesRocketState *rocket_state, uin
             RocketStateVector_encode(&rocket_state->state_vector, payload_buf);
             break;
         case ROCKETSERVODEFLECTION_MSG_ID:
-            RocketServoDeflection_encode(&rocket_state->servo_deflection, payload_buf);
+            RocketServoDeflection_encode(&rocket_state->servo_deflections, payload_buf);
             break;
         case ROCKETSTATE_MSG_ID:
             RocketState_encode(&rocket_state->rocket_state, payload_buf);
@@ -75,7 +76,7 @@ uint8_t packet_encode(uint8_t message_id, JetVanesRocketState *rocket_state, uin
             break;
     }
 
-    return SUCCESS;
+    return RET_SUCCESS;
 }
 
 uint8_t csv_encode(JetVanesRocketState *rocket_state, char *csv_line, size_t csv_line_size, size_t *bytes_written) {
@@ -84,12 +85,48 @@ uint8_t csv_encode(JetVanesRocketState *rocket_state, char *csv_line, size_t csv
     size_t bytes_copied = strlen(strncpy(csv_line, line, csv_line_size));
 
     if (!rocket_assert(bytes_copied <= csv_line_size, "CSV line size less than buffer size")) {
-        return FAILURE;
+        return RET_FAILURE;
     }
 
     *bytes_written = bytes_copied;
 
-    return SUCCESS;
+    return RET_SUCCESS;
+}
+
+void set_adc_value(JetVanesADCChannel channel, uint16_t value) {
+	switch (channel) {
+		case ADC_PYRO_I_0:
+			g_current_state.analog_feedback_data.pyro_0_cont = value;
+			break;
+		case ADC_PYRO_I_1:
+			g_current_state.analog_feedback_data.pyro_1_cont = value;
+			break;
+		case ADC_PYRO_I_2:
+			g_current_state.analog_feedback_data.pyro_2_cont = value;
+			break;
+		case ADC_VCC_I:
+			g_current_state.analog_feedback_data.current_fb_33 = value;
+			break;
+		case ADC_SERVO_0:
+			g_current_state.servo_adcs[0] = value;
+			break;
+		case ADC_SERVO_1:
+			g_current_state.servo_adcs[1] = value;
+			break;
+		case ADC_SERVO_2:
+			g_current_state.servo_adcs[2] = value;
+			break;
+		case ADC_SERVO_3:
+			g_current_state.servo_adcs[3] = value;
+			break;
+		case ADC_SERVO_4:
+			break;
+	}
+}
+
+uint8_t update_rocket_state(RocketStateStruct *rocket_state, uint8_t *state_estimation_bytes, size_t size) {
+	/* TODO: Implement this function */
+	return RET_SUCCESS;
 }
 
 void RocketStateVector_encode(struct RocketStateVector *input, uint8_t *output) {

@@ -8,25 +8,25 @@
 
 #include "log.h"
 
-HCD_HandleTypeDef g_hcd_usb_host;
-USBH_HandleTypeDef g_usb_host;
+HCD_HandleTypeDef g_hcd_usb_host = {0};
+USBH_HandleTypeDef g_usb_host = {0};
 
 static void usb_host_user_process(USBH_HandleTypeDef *phost, uint8_t id);
 
 uint8_t usb_host_init(void) {
     if (USBH_Init(&g_usb_host, usb_host_user_process, HOST_FS) != USBH_OK) {
-        return FAILURE;
+        return RET_FAILURE;
     }
 
     if (USBH_RegisterClass(&g_usb_host, USBH_MSC_CLASS) != USBH_OK) {
-        return FAILURE;
+        return RET_FAILURE;
     }
 
     if (USBH_Start(&g_usb_host) != USBH_OK) {
-        return FAILURE;
+        return RET_FAILURE;
     }
 
-    return SUCCESS;
+    return RET_SUCCESS;
 }
 
 void usb_host_process(void) {

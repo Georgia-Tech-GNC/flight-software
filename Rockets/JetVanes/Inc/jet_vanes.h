@@ -101,14 +101,31 @@ struct RocketAnalogFeedbackData {
 
 typedef struct {
     struct RocketStateVector state_vector;
-    struct RocketServoDeflection servo_deflection;
+    struct RocketServoDeflection servo_deflections;
     struct RocketState rocket_state;
     struct RocketGroundEKF ground_ekf;
     struct RocketSensorData sensor_data;
     struct RocketAnalogFeedbackData analog_feedback_data;
+	uint16_t servo_adcs[4];
    	uint32_t startup_timestamp; /* Not when the rocket powers on, but something like idle to ground, for example */
     uint32_t launch_timestamp; /* When the motor actually ignites */
 } JetVanesRocketState;
+
+#define RocketStateStruct JetVanesRocketState
+
+typedef enum {
+    ADC_PYRO_I_0 = 0,
+    ADC_PYRO_I_1 = 1,
+    ADC_PYRO_I_2 = 2,
+    ADC_VCC_I = 3,
+    ADC_SERVO_0 = 4,
+    ADC_SERVO_1 = 5,
+    ADC_SERVO_2 = 6,
+    ADC_SERVO_3 = 7,
+    ADC_SERVO_4 = 8,
+} JetVanesADCChannel;
+
+#define RocketADCChannel JetVanesADCChannel
 
 extern StaticTask_t g_jet_vanes_task;
 

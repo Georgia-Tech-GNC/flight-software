@@ -26,7 +26,15 @@
         "packet_encode.h": "c",
         "telemetry.h": "c",
         "main.h": "c",
-        "usb_host.h": "c"
+        "usb_host.h": "c",
+        "stream_buffer.h": "c",
+        "util.h": "c",
+        "compare": "c",
+        "radio_uart.h": "c",
+        "state_estimation_uart.h": "c",
+        "freertos.h": "c",
+        "stm32f4xx_hal_usart.h": "c",
+        "uart_isr.h": "c"
     },
     "C_Cpp.errorSquiggles": "enabled"
 }

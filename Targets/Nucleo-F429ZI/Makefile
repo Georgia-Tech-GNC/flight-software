@@ -43,11 +43,12 @@ Core/Src/syscalls.c \
 Core/Src/sysmem.c \
 Core/Src/system_stm32f4xx.c \
 Core/Src/w25q.c \
-Core/Src/Modules/Src/gpio.c \
-Core/Src/Modules/Src/uart.c \
-Core/Src/Modules/Src/rcc.c \
-Core/Src/Modules/Src/tim.c \
-Core/Src/Modules/Src/usb_host.c \
+Modules/Src/gpio.c \
+Modules/Src/uart.c \
+Modules/Src/rcc.c \
+Modules/Src/tim.c \
+Modules/Src/adc.c \
+Modules/Src/usb_host.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c \
@@ -73,6 +74,11 @@ Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_adc.c \
+../../HALAL/Src/halal.c \
+../../HALAL/Src/Debug/debug_uart.c \
+../../HALAL/Src/Radio/radio_uart.c \
+../../HALAL/Src/StateEstimation/state_estimation_uart.c \
+../../HALAL/Src/Isr/uart_isr.c \
 ../../RocketLib/USBHost/Class/MSC/Src/usbh_msc_bot.c \
 ../../RocketLib/USBHost/Class/MSC/Src/usbh_msc_scsi.c \
 ../../RocketLib/USBHost/Class/MSC/Src/usbh_msc.c \
@@ -161,6 +167,7 @@ AS_DEFS =
 # C defines
 C_DEFS =  \
 -DUSE_HAL_DRIVER \
+-DTARGET_NUCLEO_F429ZI \
 -DSTM32F429xx \
 -DRocketStateStruct=JetVanesRocketState \
 
@@ -171,6 +178,7 @@ AS_INCLUDES =
 # C includes
 C_INCLUDES =  \
 -I../../HALAL/Inc \
+-I../../HALAL/Src/Isr/ \
 -I../../Tasks/Inc \
 -I../../FreeRTOS-Kernel/Inc \
 -I../../RocketLib/USBHost/Class/MSC/Inc \
@@ -183,7 +191,7 @@ C_INCLUDES =  \
 -I../../Rockets/JetVanes/Inc \
 -I../../Targets/Inc \
 -ICore/Inc \
--ICore/Src/Modules/Inc \
+-IModules/Inc \
 -IDrivers/STM32F4xx_HAL_Driver/Inc \
 -IDrivers/STM32F4xx_HAL_Driver/Inc/Legacy \
 -IDrivers/CMSIS/Device/ST/STM32F4xx/Include \

@@ -1,5 +1,6 @@
 #include "gpio.h"
 #include "stm32f4xx_hal.h"
+#include "util.h"
 
 uint8_t gpio_init(void) {
     __HAL_RCC_GPIOA_CLK_ENABLE();
@@ -19,5 +20,5 @@ uint8_t gpio_init(void) {
     HAL_GPIO_Init(USB_POWER_SWITCH_PORT, &gpio_init);
     HAL_GPIO_WritePin(USB_POWER_SWITCH_PORT, USB_POWER_SWITCH_PIN, GPIO_PIN_SET);
 
-    return SUCCESS;
+    return RET_SUCCESS;
 }

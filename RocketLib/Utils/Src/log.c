@@ -2,7 +2,9 @@
 
 #include "FreeRTOS.h"
 #include "task.h"
-#include "target.h"
+#include "debug.h"
+#include "util.h"
+#include "halal.h"
 #include <string.h>
 #include <stdio.h>
 
@@ -60,12 +62,12 @@ uint8_t log_printf(LogLevel level, const char *format, ...) {
     ret = snprintf(line_buf, LINE_BUF_SIZE, "[%d.%03d - %s] - %s%s", sec, ms, status_str, msg_buf, DEBUG_UART_NEWLINE);
 
     if (ret < 0 || ret > LINE_BUF_SIZE) {
-        return 0;
+        return RET_FAILURE;
     }
 
-    if (HAL_UART_Transmit(&debug_uart, (uint8_t *) line_buf, strlen(line_buf), DEBUG_UART_TIMEOUT) != HAL_OK) {
-        return 0;
+    if (!HALAL_debug_write(line_buf, strlen(line_buf), DEBUG_UART_TIMEOUT)) {
+        return RET_FAILURE;
     }
 
-    return 1;
+    return RET_SUCCESS;
 }

@@ -4,8 +4,8 @@
 #include "FreeRTOS.h"
 #include "lib.h"
 
-#define SUCCESS 1
-#define FAILURE 0
+#define RET_SUCCESS 1
+#define RET_FAILURE 0
 
 #define TRUE 1
 #define FALSE 0

@@ -4,16 +4,10 @@
 #include "stm32f4xx_hal.h"
 #include "usbh_diskio.h"
 
-#include "uart.h"
-
 #define NUCLEO_F429ZI
 
 #define SD_CS_GPIO_PORT     GPIOA
 #define SD_CS_PIN           GPIO_PIN_4
-
-#define telemetry_uart      g_uart2
-#define state_uart          g_uart6
-#define debug_uart          g_uart3
 
 //#define USE_ADC1
 #define USE_ADC2

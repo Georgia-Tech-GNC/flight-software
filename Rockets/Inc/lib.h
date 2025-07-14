@@ -15,4 +15,8 @@ uint8_t packet_encode(uint8_t message_id, RocketStateStruct *rocket_state, uint8
 
 uint8_t csv_encode(RocketStateStruct *rocket_state, char *csv_line, size_t csv_line_size, size_t *bytes_written);
 
+uint8_t update_rocket_state(RocketStateStruct *rocket_state, uint8_t *state_estimation_bytes, size_t size);
+
+void set_adc_value(RocketADCChannel channel, uint16_t value);
+
 #endif

@@ -41,13 +41,23 @@ uint8_t HALAL_init(void) {
     if (!HALAL_module_init(HALAL_state_estimation_init, "state estimation")) return RET_FAILURE;
 #endif
 
+#ifdef HALAL_ADC_MODULE_ENABLED
+    if (!HALAL_module_init(HALAL_adc_init, "ADC")) return RET_FAILURE;
+#endif
+
     return RET_SUCCESS;
 }
 
 static uint8_t HALAL_module_init(uint8_t (*init_function)(), const char *module_name) {
     if (init_function()) {
         log_printf(LOG_INFO, "HALAL %s module initialized", module_name);
+        return RET_SUCCESS;
     } else {
         log_printf(LOG_ERROR, "Error initializing HALAL %s module", module_name);
+        return RET_FAILURE;
     }
 }
+
+/* HALAL Weak function definitions */
+void __attribute__((weak)) HALAL_adc_convert_callback(uint32_t channel_uuid, uint16_t adc_value) {}
+

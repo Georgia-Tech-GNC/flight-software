@@ -46,7 +46,6 @@ Core/Src/w25q.c \
 Modules/Src/gpio.c \
 Modules/Src/rcc.c \
 Modules/Src/tim.c \
-Modules/Src/adc.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c \
@@ -73,12 +72,15 @@ Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_adc.c \
 ../../HALAL/Src/halal.c \
+../../HALAL/Src/Adc/adc_internal.c \
+../../HALAL/Src/Adc/adc_jet_vanes.c \
 ../../HALAL/Src/Debug/debug_uart.c \
 ../../HALAL/Src/Radio/radio_uart.c \
 ../../HALAL/Src/StateEstimation/state_estimation_uart.c \
 ../../HALAL/Src/Storage/storage_usb.c \
 ../../HALAL/Src/Storage/usbh_diskio.c \
 ../../HALAL/Src/Isr/uart_isr.c \
+../../HALAL/Src/Isr/adc_isr.c \
 ../../RocketLib/USBHost/Class/MSC/Src/usbh_msc_bot.c \
 ../../RocketLib/USBHost/Class/MSC/Src/usbh_msc_scsi.c \
 ../../RocketLib/USBHost/Class/MSC/Src/usbh_msc.c \
@@ -176,6 +178,7 @@ AS_INCLUDES =
 # C includes
 C_INCLUDES =  \
 -I../../HALAL/Inc \
+-I../../HALAL/Src/Adc/ \
 -I../../HALAL/Src/Isr/ \
 -I../../Tasks/Inc \
 -I../../FreeRTOS-Kernel/Inc \

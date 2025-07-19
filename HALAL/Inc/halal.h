@@ -6,6 +6,22 @@
     #include "nucleo_f429zi_halal.h"
 #endif
 
+#ifdef HALAL_ADC_MODULE_ENABLED
+    #include "adc.h"
+#endif
+
+#ifdef HALAL_DEBUG_MODULE_ENABLED
+    #include "debug.h"
+#endif
+
+#ifdef HALAL_RADIO_MODULE_ENABLED
+    #include "radio.h"
+#endif
+
+#ifdef HALAL_STORAGE_MODULE_ENABLED
+    #include "storage.h"
+#endif
+
 uint8_t HALAL_init(void);
 
 #endif

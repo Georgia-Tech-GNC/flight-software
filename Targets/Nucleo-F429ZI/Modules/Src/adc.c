@@ -35,10 +35,7 @@ static void adc2_msp_init(void) {
     HAL_NVIC_EnableIRQ(ADC_IRQn);
 }
 
-void ADC_IRQHandler(void) {
-    HAL_ADC_IRQHandler(&g_adc2);
-    HAL_ADC_IRQHandler(&g_adc3);
-}
+
 
 static uint8_t adc2_init(void) {
     ADC_ChannelConfTypeDef adc_channel = {0};
@@ -54,7 +51,7 @@ static uint8_t adc2_init(void) {
     g_adc2.Init.DataAlign = ADC_DATAALIGN_RIGHT;
     g_adc2.Init.NbrOfConversion = 1;
     g_adc2.Init.DMAContinuousRequests = DISABLE;
-    g_adc2.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
+    g_adc2.Init.EOCSelection = ADC_EOC_SINGLE_SEQ_CONV;
 
     if (HAL_ADC_Init(&g_adc2) != HAL_OK) {
         return RET_FAILURE;

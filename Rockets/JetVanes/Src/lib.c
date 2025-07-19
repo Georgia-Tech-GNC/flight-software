@@ -93,31 +93,31 @@ uint8_t csv_encode(JetVanesRocketState *rocket_state, char *csv_line, size_t csv
     return RET_SUCCESS;
 }
 
-void set_adc_value(JetVanesADCChannel channel, uint16_t value) {
+void set_adc_value(JetVanesRocketState *rocket_state, JetVanesADCChannel channel, uint16_t value) {
 	switch (channel) {
 		case ADC_PYRO_I_0:
-			g_current_state.analog_feedback_data.pyro_0_cont = value;
+			rocket_state->analog_feedback_data.pyro_0_cont = value;
 			break;
 		case ADC_PYRO_I_1:
-			g_current_state.analog_feedback_data.pyro_1_cont = value;
+			rocket_state->analog_feedback_data.pyro_1_cont = value;
 			break;
 		case ADC_PYRO_I_2:
-			g_current_state.analog_feedback_data.pyro_2_cont = value;
+			rocket_state->analog_feedback_data.pyro_2_cont = value;
 			break;
 		case ADC_VCC_I:
-			g_current_state.analog_feedback_data.current_fb_33 = value;
+			rocket_state->analog_feedback_data.current_fb_33 = value;
 			break;
 		case ADC_SERVO_0:
-			g_current_state.servo_adcs[0] = value;
+			rocket_state->servo_adcs[0] = value;
 			break;
 		case ADC_SERVO_1:
-			g_current_state.servo_adcs[1] = value;
+			rocket_state->servo_adcs[1] = value;
 			break;
 		case ADC_SERVO_2:
-			g_current_state.servo_adcs[2] = value;
+			rocket_state->servo_adcs[2] = value;
 			break;
 		case ADC_SERVO_3:
-			g_current_state.servo_adcs[3] = value;
+			rocket_state->servo_adcs[3] = value;
 			break;
 		case ADC_SERVO_4:
 			break;

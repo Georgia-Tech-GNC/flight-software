@@ -36,7 +36,11 @@
         "stm32f4xx_hal_usart.h": "c",
         "uart_isr.h": "c",
         "gpio.h": "c",
-        "cstdlib": "c"
+        "cstdlib": "c",
+        "adc_isr.h": "c",
+        "halal.h": "c",
+        "adc_internal.h": "c",
+        "portmacro.h": "c"
     },
     "C_Cpp.errorSquiggles": "enabled"
 }

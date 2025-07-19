@@ -3,7 +3,7 @@
 
 #include "rcc.h"
 #include "gpio.h"
-#include "adc.h"
+#include "adc_internal.h"
 
 #include "rocket.h"
 #include "target.h"
@@ -25,16 +25,13 @@ int main(void) {
   } else {
     log_printf(LOG_ERROR, "HALAL not initialized");
   }
-
-  if (adc_init()) {
-    log_printf(LOG_INFO, "ADC initialized");
-  } else {
-    log_printf(LOG_ERROR, "ADC not initialized");
-    error_handler();
-  }
-
+  
   rocket_init();
   rocket_start();
+}
+
+void HALAL_adc_convert_callback(uint32_t channel_uuid, uint16_t adc_value) {
+  log_printf(LOG_INFO, "ADC %d, %d", channel_uuid, adc_value);
 }
 
 void error_handler(void) {

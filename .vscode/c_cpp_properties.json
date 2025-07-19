@@ -4,6 +4,7 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/HALAL/Inc",
+                "${workspaceFolder}/HALAL/Src/Adc",
                 "${workspaceFolder}/HALAL/Src/Isr",
                 "${workspaceFolder}/RocketLib/USBHost/Class/MSC/Inc",
                 "${workspaceFolder}/RocketLib/USBHost/Core/Inc",
@@ -27,8 +28,8 @@
                 "_DEBUG",
                 "UNICODE",
                 "_UNICODE",
-                "RocketStateStruct=JetVanesRocketState",
                 "STM32F429xx",
+                "ROCKET_JET_VANES",
                 "TARGET_NUCLEO_F429ZI"
             ]
         }

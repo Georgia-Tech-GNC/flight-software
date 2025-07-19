@@ -9,6 +9,8 @@
 #include <inttypes.h>
 #include <stdio.h>
 
+#include "adc.h"
+
 #define ROCKET_IDLE_TO_GROUND_COMMAND_ID 1
 #define ROCKET_FIRE_PYRO_COMMAND_ID 2
 #define ROCKET_FLASH_SD_CARD_COMMAND_ID 3
@@ -124,8 +126,6 @@ typedef enum {
     ADC_SERVO_3 = 7,
     ADC_SERVO_4 = 8,
 } JetVanesADCChannel;
-
-#define RocketADCChannel JetVanesADCChannel
 
 extern StaticTask_t g_jet_vanes_task;
 

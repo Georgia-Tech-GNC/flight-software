@@ -1,5 +1,6 @@
 #include "jet_vanes.h"
 
+#include "halal.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "portmacro.h"
@@ -26,6 +27,8 @@ void jet_vanes_task(void *args) {
         }
 
         iters ++;
+
+        HALAL_adc_convert();
     }
 
     while (1);

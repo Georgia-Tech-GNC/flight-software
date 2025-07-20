@@ -32,36 +32,9 @@ uint8_t HALAL_storage_init(void) {
     if (USBH_Start(&usb_host) != USBH_OK) {
         return RET_FAILURE;
     }
-    log_printf(LOG_INFO, "Whee");
+
     usb_process_task_handle = xTaskCreateStatic(usb_host_process_task, "usb_process", 1024, NULL, tskIDLE_PRIORITY, usb_process_task_stack, &usb_process_task_buff);
     if (usb_process_task_handle == NULL) return RET_FAILURE;
-    log_printf(LOG_INFO, "Whee2");
-
-    return RET_SUCCESS;
-}
-
-static uint8_t usb_process_tim_init(void) {
-    HALAL_STORAGE_USB_TIM_RCC_ENABLE();
-
-    uint32_t tim_clock = HALAL_STORAGE_USB_TIM_CLK_FREQ;
-
-    /* Compute the prescaler value to have TIM2 counter clock equal to 1MHz */
-    uint32_t prescaler = (uint32_t) ((tim_clock / 1000000U) - 1U);
-
-    /* Initialize TIM2 */
-    usb_process_tim.Instance = HALAL_STORAGE_USB_TIM_INSTANCE;
-    usb_process_tim.Init.Period = (1000000U / 1000U) - 1U; /* Period 1ms */
-    usb_process_tim.Init.Prescaler = prescaler;
-    usb_process_tim.Init.ClockDivision = 0;
-    usb_process_tim.Init.CounterMode = TIM_COUNTERMODE_UP;
-    usb_process_tim.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-
-    HAL_NVIC_EnableIRQ(HALAL_STORAGE_USB_TIM_IRQn);
-    HAL_NVIC_SetPriority(HALAL_STORAGE_USB_TIM_IRQn, 5, 0);
-
-    if (HAL_TIM_Base_Init(&usb_process_tim) != HAL_OK) {
-        return RET_FAILURE;
-    }
 
     return RET_SUCCESS;
 }
@@ -69,7 +42,6 @@ static uint8_t usb_process_tim_init(void) {
 void usb_host_process_task(void *args) {
     while (1) {
         USBH_Process(&usb_host);
-        vTaskDelay(pdMS_TO_TICKS(1));
     }
 }
 

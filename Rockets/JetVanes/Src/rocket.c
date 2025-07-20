@@ -16,7 +16,7 @@ StaticTask_t jet_vanes_task_buff;
 uint8_t rocket_init(void) {
     if (!init_tasks()) return 0;
 
-    g_jet_vanes_task_handle = xTaskCreateStatic(jet_vanes_task, "jet_vanes_task", 4096, NULL, tskIDLE_PRIORITY, jet_vanes_task_stack, &jet_vanes_task_buff);
+    g_jet_vanes_task_handle = xTaskCreateStatic(jet_vanes_task, "jet_vanes_task", 4096, NULL, 1, jet_vanes_task_stack, &jet_vanes_task_buff);
     if (g_jet_vanes_task_handle == NULL) return 0;
     
     return 1;

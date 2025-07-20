@@ -38,7 +38,7 @@ void state_tx_task(void *args) {
 
         memcpy_state(&local_state);
 
-        for (uint8_t msg_id = start_msg_id; msg_id <= end_msg_id; msg_id ++) {            
+        for (uint8_t msg_id = start_msg_id; msg_id <= end_msg_id; msg_id ++) {           
             size_t payload_size;
             if (!packet_encode(msg_id, &local_state, payload_buf, TELEMETRY_MAX_PAYLOAD_SIZE, &payload_size)) {
                 log_printf(LOG_ERROR, "Failed to encode telemetry packet id %d", msg_id);

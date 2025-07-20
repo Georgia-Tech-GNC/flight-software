@@ -31,7 +31,6 @@ BYTE mkfs_work[4096];
 
 int io_init(void) {
     log_printf(LOG_INFO, "Initializing IO devices...");
-    f_mkfs("/", FM_FAT32, 0, mkfs_work, sizeof(mkfs_work));
     int sd_status = f_mount(&fs, "/", 1);
     if (sd_status == FR_OK) {
         log_printf(LOG_INFO, "Mounted SD card");

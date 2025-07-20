@@ -1,6 +1,7 @@
 #include "telemetry.h"
 #include "halal.h"
 #include "radio.h"
+#include "util.h"
 
 /**
  * Transmit a telemetry packet over uart
@@ -13,9 +14,9 @@ uint8_t telemetry_send_message(uint8_t *payload, uint8_t payload_size, uint8_t m
     uint8_t packet_buf[TELEMETRY_MAX_PACKET_SIZE];
     int packet_size = generate_packet(payload, payload_size, packet_buf, message_id);    
  
-    if (HALAL_radio_transmit(packet_buf, packet_size, HAL_MAX_DELAY) != HAL_OK) {
-        return 0;
+    if (!HALAL_radio_transmit(packet_buf, packet_size, HAL_MAX_DELAY)) {
+        return RET_FAILURE;
     }
 
-    return 1;
+    return RET_SUCCESS;
 }

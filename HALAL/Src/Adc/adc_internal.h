@@ -42,6 +42,5 @@ typedef enum {
 
 uint8_t adc_internal_init(HALAL_ADCInternalInit *init, HALAL_ADCInternalHandle *handle);
 uint8_t adc_internal_convert(HALAL_ADCInternalHandle handle);
-void adc_internal_conv_complete(ADC_HandleTypeDef *hal_adc);
 
 #endif

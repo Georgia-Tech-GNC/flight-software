@@ -1,8 +1,10 @@
 #ifndef ADC_ISR_H
 #define ADC_ISR_H
 
-#ifdef HALAL_ADC_HAL_ENABLED
-void adc_hal_conv_complete(HAL_ADCTypeDef *hadc);
+#include "FreeRTOS.h"
+
+#ifdef HALAL_ADC_MODULE_ENABLED
+void adc_internal_conv_complete(ADC_HandleTypeDef *hal_adc, BaseType_t *xHigherPriorityTaskWoken);
 #endif
 
 #endif

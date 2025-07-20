@@ -41,13 +41,13 @@ uint8_t init_tasks(void) {
     if (g_telemetry_rx_sb_handle == NULL) return 0;
 
     /* Create tasks */
-    g_telemetry_rx_task_handle = xTaskCreateStatic(telemetry_rx_task, "telemetry_rx_task", 4096, NULL, tskIDLE_PRIORITY, telemetry_rx_task_stack, &telemetry_rx_task_buff);
+    g_telemetry_rx_task_handle = xTaskCreateStatic(telemetry_rx_task, "telemetry_rx_task", 4096, NULL, 1, telemetry_rx_task_stack, &telemetry_rx_task_buff);
     if (g_telemetry_rx_task_handle == NULL) return 0;
 
-    g_state_tx_task_handle = xTaskCreateStatic(state_tx_task, "state_tx_task", 4096, NULL, tskIDLE_PRIORITY, state_tx_task_stack, &state_tx_task_buff);
+    g_state_tx_task_handle = xTaskCreateStatic(state_tx_task, "state_tx_task", 4096, NULL, 1, state_tx_task_stack, &state_tx_task_buff);
     if (g_state_tx_task_handle == NULL) return 0;
 
-    g_state_flash_task_handle = xTaskCreateStatic(state_flash_task, "state_flash_task", 4096, NULL, tskIDLE_PRIORITY, state_flash_task_stack, &state_flash_task_buff);
+    g_state_flash_task_handle = xTaskCreateStatic(state_flash_task, "state_flash_task", 4096, NULL, 1, state_flash_task_stack, &state_flash_task_buff);
     if (g_state_flash_task_handle == NULL) return 0;
 
     return 1;

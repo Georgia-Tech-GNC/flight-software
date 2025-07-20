@@ -14,21 +14,9 @@ void jet_vanes_task(void *args) {
     uint16_t iters = 0;
 
     while (1) {
-        xTaskNotifyIndexed(g_state_flash_task_handle, FLASH_NOTIFICATION_INDEX, FLASH_STATE_NOTIFICATION_BIT, eSetBits);
-
-        log_printf(LOG_INFO, "Running!");
-
-        vTaskDelay(pdMS_TO_TICKS(100));
-
-        if (iters == 100) {
-            log_printf(LOG_INFO, "Writing disk");
-            xTaskNotifyIndexed(g_state_flash_task_handle, FLASH_NOTIFICATION_INDEX, FLASH_SD_CARD_NOTIFICATION_BIT, eSetBits);
-            break;
-        }
-
-        iters ++;
-
         HALAL_adc_convert();
+
+        vTaskDelay(10);
     }
 
     while (1);

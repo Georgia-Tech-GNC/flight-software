@@ -8,6 +8,7 @@
 #include "packet_encode.h"
 #include "rtos_globals.h"
 #include "commands.h"
+#include "halal.h"
 
 /* Private defines */
 #define N_COMMAND_UUIDS 256
@@ -34,6 +35,12 @@ void telemetry_rx_task(void *args) {
 
     /* Current size of incoming packet buffer */
     uint8_t packet_buffer_size = 0;
+
+    if (HALAL_radio_start()) {
+        log_printf(LOG_INFO, "Started radio RX");
+    } else {
+        log_printf(LOG_ERROR, "Error starting radio RX");
+    }
 
     while (1) {
         /* Wait for new bytes to read */

@@ -4,6 +4,12 @@
 #include "lib.h"
 #include "rocket.h"
 
+#include "FreeRTOS.h"
+#include "semphr.h"
+#include "rtos_globals.h"
+#include "state_flash.h"
+#include "state_tx.h"
+
 UART_HandleTypeDef state_estimation_uart = {0};
 
 uint8_t state_uart_rx_buf[HALAL_STATE_ESTIMATION_PACKET_SIZE];
@@ -42,6 +48,9 @@ uint8_t HALAL_state_estimation_init(void) {
     if (HAL_UART_Init(&state_estimation_uart) != HAL_OK) {
         return RET_FAILURE;
     }
+
+    HAL_NVIC_SetPriority(HALAL_STATE_ESTIMATION_UART_IRQn, 5, 0);
+    HAL_NVIC_EnableIRQ(HALAL_STATE_ESTIMATION_UART_IRQn);
    
     return RET_SUCCESS;
 }
@@ -62,7 +71,7 @@ void HALAL_STATE_ESTIMATION_UART_ISR(void) {
     HAL_UART_IRQHandler(&state_estimation_uart);
 }
 
-void state_estimation_uart_rx_event_isr(uint16_t size) {
+void state_estimation_uart_rx_event_isr(uint16_t size, BaseType_t *xHigherPriorityTaskWoken) {
     static uint8_t state_bytes_received = 0;
 
     uint16_t size_to_recieve = size;
@@ -78,7 +87,11 @@ void state_estimation_uart_rx_event_isr(uint16_t size) {
 
     /* If a full packet is recieved, update the rocket state */
     if (state_bytes_received == HALAL_STATE_ESTIMATION_PACKET_SIZE) {
-        update_rocket_state(&g_current_state, state_bytes, HALAL_STATE_ESTIMATION_PACKET_SIZE);
+        HALAL_state_estimation_callback(state_bytes, HALAL_STATE_ESTIMATION_PACKET_SIZE);
+
+        xTaskNotifyFromISR(g_state_tx_task_handle, SEND_STATE_NOTIFICATION_BIT, eSetBits, xHigherPriorityTaskWoken);
+        xTaskNotifyIndexedFromISR(g_state_flash_task_handle, FLASH_NOTIFICATION_INDEX, FLASH_STATE_NOTIFICATION_BIT, eSetBits, xHigherPriorityTaskWoken);
+        
         state_bytes_received = 0;
     }
 
@@ -87,4 +100,6 @@ void state_estimation_uart_rx_event_isr(uint16_t size) {
     /* Copy remaining data */
     memcpy(state_bytes + state_bytes_received, state_uart_rx_buf + size_to_recieve, remaining_size);
     state_bytes_received += remaining_size;
+
+    HAL_UARTEx_ReceiveToIdle_IT(&state_estimation_uart, state_uart_rx_buf, sizeof(state_uart_rx_buf));
 }

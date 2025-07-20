@@ -1,6 +1,7 @@
 /* Note that this is not an actual HALAL module, it just acts as a library for other ADC HALAL modules */
 
 #include "adc_internal.h"
+#include "adc_isr.h"
 #include "util.h"
 
 uint8_t n_handles = 0;
@@ -140,7 +141,7 @@ uint8_t adc_internal_convert(HALAL_ADCInternalHandle handle) {
     return RET_SUCCESS;
 }
 
-void adc_internal_conv_complete(ADC_HandleTypeDef *hal_adc) {
+void adc_internal_conv_complete(ADC_HandleTypeDef *hal_adc, BaseType_t *xHigherPriorityTaskWoken) {
     HALAL_ADCInternal *adc;
 
     if (hal_adc->Instance == ADC1) {
@@ -152,6 +153,6 @@ void adc_internal_conv_complete(ADC_HandleTypeDef *hal_adc) {
     }
     
     for (uint8_t j = 0; j < adc->n_channels; j ++) {
-        HALAL_adc_convert_callback(adc->channel_uuids[j], adc->channel_values[j]);
+        HALAL_adc_convert_callback(adc->channel_uuids[j], adc->channel_values[j], xHigherPriorityTaskWoken);
     }
 }

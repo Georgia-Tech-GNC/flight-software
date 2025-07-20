@@ -41,6 +41,9 @@ uint8_t HALAL_radio_init(void) {
     if (HAL_UART_Init(&radio_uart) != HAL_OK) {
         return RET_FAILURE;
     }
+
+    HAL_NVIC_SetPriority(HALAL_RADIO_UART_IRQn, 5, 0);
+    HAL_NVIC_EnableIRQ(HALAL_RADIO_UART_IRQn);
    
     return RET_SUCCESS;
 }
@@ -65,10 +68,7 @@ void HALAL_RADIO_UART_ISR() {
     HAL_UART_IRQHandler(&radio_uart);
 }
 
-void radio_uart_rx_event_isr(uint16_t size) {
-    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-
-    xStreamBufferSendFromISR(g_telemetry_rx_sb_handle, radio_uart_rx_buf, size, &xHigherPriorityTaskWoken);
-
-    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+void radio_uart_rx_event_isr(uint16_t size, BaseType_t *xHigherPriorityTaskWoken) {
+    xStreamBufferSendFromISR(g_telemetry_rx_sb_handle, radio_uart_rx_buf, size, xHigherPriorityTaskWoken);
+    HAL_UARTEx_ReceiveToIdle_IT(&radio_uart, radio_uart_rx_buf, sizeof(radio_uart_rx_buf));
 }

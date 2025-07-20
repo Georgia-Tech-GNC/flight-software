@@ -12,7 +12,7 @@
 #define DEBUG_UART_NEWLINE "\r\n"
 
 #define PREFIX_SIZE 64
-#define MSG_BUF_SIZE 256
+#define MSG_BUF_SIZE 1024
 #define LINE_BUF_SIZE (MSG_BUF_SIZE + PREFIX_SIZE + strlen(DEBUG_UART_NEWLINE))
 
 /**

@@ -22,6 +22,10 @@
     #include "storage.h"
 #endif
 
+#ifdef HALAL_FLASH_CHIP_MODULE_ENABLED
+    #include "flash_chip.h"
+#endif
+
 uint8_t HALAL_init(void);
 
 #endif

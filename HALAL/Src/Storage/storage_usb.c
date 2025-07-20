@@ -48,7 +48,7 @@ void usb_host_process_task(void *args) {
 static void usb_host_user_process(USBH_HandleTypeDef *host, uint8_t id) {
     switch(id) {
         case HOST_USER_CLASS_ACTIVE:
-            xTaskNotifyIndexed(g_state_flash_task_handle, READY_NOTIFICATION_INDEX, SDCARD_READY_NOTIFICATION_BIT, eSetBits);
+            xTaskNotifyIndexed(g_state_flash_task_handle, READY_NOTIFICATION_INDEX, FS_READY_NOTIFICATION_BIT, eSetBits);
             break;
     }
 }

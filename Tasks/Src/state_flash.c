@@ -8,8 +8,9 @@
 #include "stddef.h"
 #include "lib.h"
 #include "log.h"
-#include "periph_io.h"
 #include "util.h"
+#include "fs_wrapper.h"
+#include "halal.h"
 
 /* Private defines */
 #define CSV_LINE_SIZE 2048
@@ -17,65 +18,55 @@
 #define STATE_FLASH_START_SECTOR 0
 #define STATE_FLASH_N_SECTORS 8
 
-#define FLASH_TEST_SIZE EXT_FLASH_SECTOR_SIZE
-#define SD_TEST_SIZE 2048
+#define FLASH_TEST_SIZE 4096
+#define FS_TEST_SIZE 4096
 
 /* Private function definitions */
 uint8_t flash_test(void);
-uint8_t sd_test(void);
+uint8_t fs_test(void);
 
-void write_to_flash(FlashBlock *flash_block, RocketStateStruct *rocket_state, size_t page_index);
-void flash_sd_card(FlashBlock *flash_block, SDFile *sd_file, size_t n_states);
+void write_to_flash(RocketStateStruct *rocket_state, size_t addr);
+void flash_fs(FSFile *file, size_t n_states);
 
 /**
- * @brief Task to handle writing state to flash chip and SD card
+ * @brief Task to handle writing state to flash chip and file system
  * @param args Unused
  */
 void state_flash_task(void *args) {
-    await_notification_indexed(READY_NOTIFICATION_INDEX, SDCARD_READY_NOTIFICATION_BIT, portMAX_DELAY);
+    await_notification_indexed(READY_NOTIFICATION_INDEX, FS_READY_NOTIFICATION_BIT, portMAX_DELAY);
 
-    /* Initialize flash chip and SD card */
-    if (io_init()) {
-        log_printf(LOG_INFO, "IO initialized");
+    if (fs_mount()) {
+        log_printf(LOG_INFO, "File system mounted");
     } else {
-        log_printf(LOG_ERROR, "Failed to initialize IO");
+        log_printf(LOG_INFO, "Error mounting file system");
     }
 
     /* Run tests */
     if (flash_test()) {
         log_printf(LOG_INFO, "Flash test PASS");
     } else {
-        log_printf(LOG_ERROR, "Flash test PASS");
+        log_printf(LOG_ERROR, "Flash test FAIL");
     }
 
-    if (sd_test()) {
-        log_printf(LOG_INFO, "SD test PASS");
+    if (fs_test()) {
+        log_printf(LOG_INFO, "File system test PASS");
     } else {
-        log_printf(LOG_ERROR, "SD test FAIL");
+        log_printf(LOG_ERROR, "File system test FAIL");
     }
 
-    /* Rocket state should be able to fit in one flash page */
-    rocket_assert(sizeof(RocketStateStruct) <= EXT_FLASH_PAGE_SIZE, "Rocket state size less than flash page size");
+    FSFile file;
+    fs_init_file(&file, "/data.csv");
 
-    /* Wait for notification before beginning */
-    //await_notification_indexed(FLASH_NOTIFICATION_INDEX, BEGIN_STATE_FLASH_NOTIFICATION_BIT, portMAX_DELAY);
-
-    FlashBlock flash_block;
-    SDFile sd_file;
-
-    flash_init_block(&flash_block, STATE_FLASH_START_SECTOR, STATE_FLASH_N_SECTORS);
-    sd_init_file(&sd_file, "/data.csv");
-
-    size_t flash_page_index = 0;
+    size_t n_states = 0;
 
     while (1) {
         /* Wait for next notification */
-        uint32_t notification_value = await_notification_indexed(FLASH_NOTIFICATION_INDEX, FLASH_STATE_NOTIFICATION_BIT | FLASH_SD_CARD_NOTIFICATION_BIT, portMAX_DELAY);
+        uint32_t notification_value = await_notification_indexed(FLASH_NOTIFICATION_INDEX, FLASH_STATE_NOTIFICATION_BIT | FLASH_FS_NOTIFICATION_BIT, portMAX_DELAY);
 
-        /* Flash state to SD card */
-        if (notification_value & FLASH_SD_CARD_NOTIFICATION_BIT) {
-            log_printf(LOG_INFO, "Flashing SD card");
-            flash_sd_card(&flash_block, &sd_file, flash_page_index);
+        /* Flash state to file system */
+        if (notification_value & FLASH_FS_NOTIFICATION_BIT) {
+            log_printf(LOG_INFO, "Flashing file system");
+            flash_fs(&file, n_states);
 
             /* Stop all other tasks */
             log_printf(LOG_INFO, "Suspending all tasks");
@@ -86,12 +77,12 @@ void state_flash_task(void *args) {
         }
         /* Write state to flash chip */
         if (notification_value & FLASH_STATE_NOTIFICATION_BIT) {
-            uint8_t state_bytes[EXT_FLASH_PAGE_SIZE];
+            uint8_t state_bytes[sizeof(RocketStateStruct)];
             size_t bytes_copied = 0;
 
-            if (memcpy_state_bytes(state_bytes, EXT_FLASH_PAGE_SIZE, &bytes_copied)) {
-                flash_write_block(&flash_block, flash_page_index * EXT_FLASH_PAGE_SIZE, state_bytes, EXT_FLASH_PAGE_SIZE);
-                flash_page_index ++;
+            if (memcpy_state_bytes(state_bytes, sizeof(RocketStateStruct), &bytes_copied)) {
+                HALAL_flash_write_page(n_states, state_bytes, 1);
+                n_states ++;
             } else {
                 log_printf(LOG_ERROR, "Failed to copy state bytes");
             } 
@@ -105,16 +96,10 @@ void state_flash_task(void *args) {
  * @return 1 if the test passes, 0 otherwise
  */
 uint8_t flash_test(void) {
-    FlashBlock test_block;
-
-    /* Allocate a new 2-sector block starting at sector 1 */
-    if (!flash_init_block(&test_block, 1, 2)) {
-        log_printf(LOG_ERROR, "Failed to initialize flash block");
-        return 0;
-    }
-
     uint8_t test_bytes[FLASH_TEST_SIZE];
     const uint8_t offset = xTaskGetTickCount() % 256;
+
+    size_t n_pages = FLASH_TEST_SIZE / HALAL_FLASH_PAGE_SIZE;
 
     /* Create test pattern */
     for (size_t i = 0; i < FLASH_TEST_SIZE; i ++) {
@@ -122,15 +107,16 @@ uint8_t flash_test(void) {
     }
 
     /* Write pattern to flash chip */
-    if (!flash_write_block(&test_block, 0, test_bytes, FLASH_TEST_SIZE)) {
+    if (!HALAL_flash_write_page(0, test_bytes, n_pages)) {
         log_printf(LOG_ERROR, "Failed to write to flash");
         return 0;
     }
+    
 
     memset(test_bytes, 0, FLASH_TEST_SIZE);
 
     /* Read it back */
-    if (!flash_read_block(&test_block, 0, test_bytes, FLASH_TEST_SIZE)) {
+    if (!HALAL_flash_read_page(0, test_bytes, n_pages)) {
         log_printf(LOG_ERROR, "Failed to read from flash");
         return 0;
     }
@@ -143,7 +129,7 @@ uint8_t flash_test(void) {
     }
 
     /* Erase what we just wrote */
-    if (!flash_erase_block(&test_block)) {
+    if (!HALAL_flash_erase_page(0, n_pages)) {
         log_printf(LOG_ERROR, "Failed to erase flash");
         return 0;
     }
@@ -152,61 +138,61 @@ uint8_t flash_test(void) {
 }
 
 /**
- * @brief Do a simple test of the SD card.
- * Writes a test pattern to the SD card, reads it back, and deletes the file.
+ * @brief Do a simple test of the file system.
+ * Writes a test pattern to the file system, reads it back, and deletes the file.
  * @return 1 if the test passes, 0 otherwise
  */
-uint8_t sd_test(void) {
-    SDFile test_file;
+uint8_t fs_test(void) {
+    FSFile test_file;
 
-    if (!sd_init_file(&test_file, "/test.txt")) {
-        log_printf(LOG_ERROR, "Failed to initialize SD card file");
+    if (!fs_init_file(&test_file, "/test.txt")) {
+        log_printf(LOG_ERROR, "Failed to initialize file");
         return 0;
     }
 
-    if (!sd_open_file(&test_file, FA_READ | FA_WRITE | FA_CREATE_ALWAYS)) {
-        log_printf(LOG_ERROR, "Failed to open SD card file");
+    if (!fs_open_file(&test_file, FA_READ | FA_WRITE | FA_CREATE_ALWAYS)) {
+        log_printf(LOG_ERROR, "Failed to open file");
         return 0;
     }
 
-    uint8_t test_bytes[SD_TEST_SIZE + 1];
+    uint8_t test_bytes[FS_TEST_SIZE + 1];
     const uint8_t offset = xTaskGetTickCount() % 256;
 
     /* Create test pattern */
-    for (size_t i = 0; i < SD_TEST_SIZE; i ++) {
+    for (size_t i = 0; i < FS_TEST_SIZE; i ++) {
         test_bytes[i] = (i + offset) % 256;
     }
 
-    /* Write pattern to SD card */
-    if (!sd_write_file(&test_file, 0, test_bytes, SD_TEST_SIZE)) {
-        log_printf(LOG_ERROR, "Failed to write to SD card");
+    /* Write pattern to file system */
+    if (!fs_write_file(&test_file, 0, test_bytes, FS_TEST_SIZE)) {
+        log_printf(LOG_ERROR, "Failed to write to file system");
         return 0;
     }
 
-    memset(test_bytes, 0, SD_TEST_SIZE);
+    memset(test_bytes, 0, FS_TEST_SIZE);
 
     /* Read it back */
-    if (!sd_read_file(&test_file, 0, test_bytes, SD_TEST_SIZE)) {
-        log_printf(LOG_ERROR, "Failed to read from SD card");
+    if (!fs_read_file(&test_file, 0, test_bytes, FS_TEST_SIZE)) {
+        log_printf(LOG_ERROR, "Failed to read from file system");
         return 0;
     }
 
     /* Check if the pattern matches */
-    for (size_t i = 0; i < SD_TEST_SIZE; i ++) {
+    for (size_t i = 0; i < FS_TEST_SIZE; i ++) {
         if (test_bytes[i] != (i + offset) % 256) {
-            log_printf(LOG_ERROR, "SD card read error");
+            log_printf(LOG_ERROR, "File system read error");
             return 0;
         }
     }
 
-    if (!sd_close_file(&test_file)) {
-        log_printf(LOG_ERROR, "Failed to close SD card file");
+    if (!fs_close_file(&test_file)) {
+        log_printf(LOG_ERROR, "Failed to close file");
         return 0;
     }
 
     /* Erase what we just wrote */
-    if (!sd_delete_file(&test_file)) {
-        log_printf(LOG_ERROR, "Failed to delete SD card file");
+    if (!fs_delete_file(&test_file)) {
+        log_printf(LOG_ERROR, "Failed to delete file");
         return 0;
     }
 
@@ -214,28 +200,28 @@ uint8_t sd_test(void) {
 }
 
 /**
- * @brief Copy the state from the flash chip to the SD card
+ * @brief Copy the state from the flash chip to the file system
  * @param flash_block Flash block to read from
- * @param sd_file SD card file to write to
+ * @param file File to write to
  * @param n_states Number of states to copy
  */
-void flash_sd_card(FlashBlock *flash_block, SDFile *sd_file, size_t n_states) {
-    if (sd_open_file(sd_file, FA_READ | FA_WRITE | FA_CREATE_ALWAYS)) {
-        log_printf(LOG_INFO, "Successfully opened SD card file");
+void flash_fs(FSFile *file, size_t n_states) {
+    if (fs_open_file(file, FA_READ | FA_WRITE | FA_CREATE_ALWAYS)) {
+        log_printf(LOG_INFO, "Successfully opened file");
     }
 
     RocketStateStruct rocket_state;
-    uint8_t data_buffer[EXT_FLASH_PAGE_SIZE];
+    uint8_t data_buffer[HALAL_FLASH_PAGE_SIZE];
 
     char line_buf[CSV_LINE_SIZE];
-    log_printf(LOG_INFO, "Writing to SD card...");
+    log_printf(LOG_INFO, "Writing to file system...");
 
-    size_t sd_bytes_written = 0;
+    size_t fs_bytes_written = 0;
 
     for (size_t i = 0; i < n_states; i ++) {
-        log_printf(LOG_INFO, "Writing to SD card: %d/%d", i + 1, n_states);
+        log_printf(LOG_INFO, "Writing to file system: %d/%d", i + 1, n_states);
 
-        flash_read_block(flash_block, i * EXT_FLASH_PAGE_SIZE, data_buffer, EXT_FLASH_PAGE_SIZE);
+        HALAL_flash_read_page(i, data_buffer, 1);
 
         memcpy(&rocket_state, data_buffer, sizeof(RocketStateStruct));
 
@@ -246,19 +232,19 @@ void flash_sd_card(FlashBlock *flash_block, SDFile *sd_file, size_t n_states) {
             continue;
         }
 
-        if (sd_write_file(sd_file, sd_bytes_written, (uint8_t *) line_buf, bytes_written)) {
-            log_printf(LOG_INFO, "Wrote CSV line #%d to SD card", i);
+        if (fs_write_file(file, fs_bytes_written, (uint8_t *) line_buf, bytes_written)) {
+            log_printf(LOG_INFO, "Wrote CSV line #%d to file system", i);
             log_printf(LOG_INFO, "CSV Data: %s", line_buf);
         } else {
             log_printf(LOG_ERROR, "Error writing rocket CSV line #%zu", bytes_written);
         }
 
-        sd_bytes_written += bytes_written;
+        fs_bytes_written += bytes_written;
     }
 
-    if (sd_close_file(sd_file)) {
-        log_printf(LOG_INFO, "Closed SD card file");
+    if (fs_close_file(file)) {
+        log_printf(LOG_INFO, "Closed file");
     }
 
-    log_printf(LOG_INFO, "Wrote to SD card");
+    log_printf(LOG_INFO, "Wrote to file system");
 }

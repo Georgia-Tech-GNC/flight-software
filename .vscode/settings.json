@@ -40,7 +40,8 @@
         "adc_isr.h": "c",
         "halal.h": "c",
         "adc_internal.h": "c",
-        "portmacro.h": "c"
+        "portmacro.h": "c",
+        "fs_wrapper.h": "c"
     },
     "C_Cpp.errorSquiggles": "enabled"
 }

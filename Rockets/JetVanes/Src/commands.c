@@ -26,6 +26,6 @@ static uint8_t command_idle_to_ground(void) {
 }
 
 static uint8_t command_flash_sd_card(void) {
-    xTaskNotifyIndexed(g_state_flash_task_handle, FLASH_NOTIFICATION_INDEX, FLASH_SD_CARD_NOTIFICATION_BIT, eSetBits);
+    xTaskNotifyIndexed(g_state_flash_task_handle, FLASH_NOTIFICATION_INDEX, FLASH_FS_NOTIFICATION_BIT, eSetBits);
 }
 

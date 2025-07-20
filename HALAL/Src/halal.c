@@ -45,6 +45,10 @@ uint8_t HALAL_init(void) {
     if (!HALAL_module_init(HALAL_adc_init, "ADC")) return RET_FAILURE;
 #endif
 
+#ifdef HALAL_FLASH_CHIP_MODULE_ENABLED
+    if (!HALAL_module_init(HALAL_flash_init, "flash chip")) return RET_FAILURE;
+#endif
+
     return RET_SUCCESS;
 }
 

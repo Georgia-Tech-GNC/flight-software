@@ -38,11 +38,9 @@ BUILD_DIR = build
 C_SOURCES =  \
 Core/Src/main.c \
 Core/Src/port.c \
-Core/Src/periph_io.c \
 Core/Src/syscalls.c \
 Core/Src/sysmem.c \
 Core/Src/system_stm32f4xx.c \
-Core/Src/w25q.c \
 Modules/Src/gpio.c \
 Modules/Src/rcc.c \
 Modules/Src/tim.c \
@@ -77,6 +75,7 @@ Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_adc.c \
 ../../HALAL/Src/Debug/debug_uart.c \
 ../../HALAL/Src/Radio/radio_uart.c \
 ../../HALAL/Src/StateEstimation/state_estimation_uart.c \
+../../HALAL/Src/FlashChip/fake_flash_chip.c \
 ../../HALAL/Src/Storage/storage_usb.c \
 ../../HALAL/Src/Storage/usbh_diskio.c \
 ../../HALAL/Src/Isr/uart_isr.c \
@@ -101,6 +100,7 @@ Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_adc.c \
 ../../RocketLib/Telemetry/Src/telemetry.c \
 ../../RocketLib/Utils/Src/log.c \
 ../../RocketLib/Utils/Src/util.c \
+../../RocketLib/Utils/Src/fs_wrapper.c \
 ../../FreeRTOS-Kernel/Src/croutine.c \
 ../../FreeRTOS-Kernel/Src/event_groups.c \
 ../../FreeRTOS-Kernel/Src/list.c \

@@ -1,18 +1,24 @@
-/* Note that this is not an actual HALAL module, it just acts as a library for other ADC HALAL modules */
+/**
+ * @file adc_internal.c
+ * @brief Helper functions to make it easier to initialize HAL ADC modules.
+ * 
+ * Note that this is NOT a HALAL module itself, rather it is provided to make creating ADC HALAL modules easier.
+ * This file also handles adc interrupts and sends the data to HALAL_adc_convert_callback 
+ */
 
 #include "adc_internal.h"
 #include "adc_isr.h"
 #include "util.h"
 
 uint8_t n_handles = 0;
-HALAL_ADCInternal adcs[HALAL_ADC_MAX_N_MODULES];
+HALAL_ADCInternal adcs[HALAL_ADC_INTERNAL_MAX_N_MODULES];
 
 uint8_t adc_internal_init(HALAL_ADCInternalInit *init, HALAL_ADCInternalHandle *handle) {
-    if (n_handles >= HALAL_ADC_MAX_N_MODULES) {
+    if (n_handles >= HALAL_ADC_INTERNAL_MAX_N_MODULES) {
         return RET_FAILURE;
     }
 
-    if (init->n_channels >= HALAL_ADC_MAX_N_CHANNELS) {
+    if (init->n_channels >= HALAL_ADC_INTERNAL_MAX_N_MODULES) {
         return RET_FAILURE;
     }
 

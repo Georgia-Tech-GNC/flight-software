@@ -11,8 +11,6 @@
 HCD_HandleTypeDef hcd_usb_host = {0};
 USBH_HandleTypeDef usb_host = {0};
 
-TIM_HandleTypeDef usb_process_tim = {0};
-
 static void usb_host_user_process(USBH_HandleTypeDef *phost, uint8_t id);
 static void usb_host_process_task(void *args);
 
@@ -120,14 +118,10 @@ USBH_StatusTypeDef USBH_LL_DriverVBUS(USBH_HandleTypeDef *phost, uint8_t state) 
     if (phost->id == HOST_FS) {
         GPIO_PinState pin_state = (state == 1) ? GPIO_PIN_SET : GPIO_PIN_RESET;
    
-        HAL_GPIO_WritePin(GPIOG, GPIO_PIN_6, pin_state);
+        HAL_GPIO_WritePin(HALAL_STORAGE_USB_VBUS_PORT, HALAL_STORAGE_USB_VBUS_PIN, pin_state);
     }
  
     HAL_Delay(200);
 
     return USBH_OK;
-}
-
-void HALAL_STORAGE_USB_TIM_ISR() {
-    HAL_TIM_IRQHandler(&usb_process_tim);
 }

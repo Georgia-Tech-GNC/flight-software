@@ -14,7 +14,7 @@
  * - Sam
  */
 uint8_t HALAL_adc_init(void) {
-    HALAL_ADCInternalInit adc_inits[HALAL_ADC_MAX_N_MODULES] = {0};
+    HALAL_ADCInternalInit adc_inits[HALAL_ADC_INTERNAL_MAX_N_MODULES];
     HALAL_ADCInternalInit *adc_init;
 
 #ifdef HALAL_ADC_JET_VANES_USE_ADC1

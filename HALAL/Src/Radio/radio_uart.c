@@ -69,6 +69,6 @@ void HALAL_RADIO_UART_ISR() {
 }
 
 void radio_uart_rx_event_isr(uint16_t size, BaseType_t *xHigherPriorityTaskWoken) {
-    xStreamBufferSendFromISR(g_telemetry_rx_sb_handle, radio_uart_rx_buf, size, xHigherPriorityTaskWoken);
+    HALAL_radio_callback(radio_uart_rx_buf, size, xHigherPriorityTaskWoken);
     HAL_UARTEx_ReceiveToIdle_IT(&radio_uart, radio_uart_rx_buf, sizeof(radio_uart_rx_buf));
 }

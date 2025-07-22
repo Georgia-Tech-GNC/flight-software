@@ -33,6 +33,10 @@ int main(void) {
   rocket_start();
 }
 
+void HALAL_radio_callback(uint8_t *radio_data, size_t size, BaseType_t *xHigherPriorityTaskWoken) {
+  xStreamBufferSendFromISR(g_telemetry_rx_sb_handle, radio_data, size, xHigherPriorityTaskWoken);
+}
+
 void HALAL_adc_convert_callback(uint32_t channel_uuid, uint16_t adc_value, BaseType_t *xHigherPriorityTaskWoken) {
   if (xSemaphoreTakeFromISR(g_state_mutex_handle, xHigherPriorityTaskWoken) == pdPASS) {
     set_adc_value(&g_current_state, (JetVanesADCChannel) channel_uuid, adc_value);

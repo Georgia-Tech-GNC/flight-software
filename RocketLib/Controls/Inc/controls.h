@@ -14,6 +14,9 @@
 
 #include "arm_math.h"
 
+_Static_assert(sizeof(float) == 4); // Does it really matter that floats are exactly 32 bits?
+typedef float float32_t;
+
 typedef struct { 
 
     float time_since_launch; //Update at every time step

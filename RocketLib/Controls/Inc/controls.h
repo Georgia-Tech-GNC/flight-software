@@ -12,9 +12,7 @@
 #ifndef __CONTROLS_H__
 #define __CONTROLS_H__
 
-#include "arm_math.h"
-
-_Static_assert(sizeof(float) == 4); // Does it really matter that floats are exactly 32 bits?
+_Static_assert(sizeof(float) == 4);
 typedef float float32_t;
 
 typedef struct { 

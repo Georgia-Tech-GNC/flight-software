@@ -63,13 +63,9 @@ void reference_selector(controller *ctrl){
     float base_x0[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
     if (t > 13) {
-        for (int i = 0; i < 9; i++) {
-            ctrl->x0[i] = base_x0[i];
-        }
+        memcpy(ctrl->x0, base_x0, 9 * sizeof(float32_t));
     } else {
-        for (int i = 0; i < 9; i++) {
-            ctrl->x0[i] = ref_state_data[t].state[i]; // time corresponds 1:1 to index
-        }
+        memcpy(ctrl->x0, ref_state_data[t].state, 9 * sizeof(float32_t)); // time corresponds 1:1 to index
     } 
 }
 
@@ -112,10 +108,8 @@ void initialize_controls(controller *ctrl) {
 
     ctrl->current_thrust = 0.0;
 
-    float32_t thrust_curve[15] = {2125.0, 1650.0, 1530.0, 1520.0, 1490.0, 1350.0, 1285.0, 1150.0, 990.0, 760.0, 610.0, 400.0, 270.0, 150.0, 0.0};
-    for (int i = 0; i < 15; i++) {
-        ctrl->thrust_curve[i] = thrust_curve[i];
-    }
+    static const float32_t thrust_curve[15] = {2125.0, 1650.0, 1530.0, 1520.0, 1490.0, 1350.0, 1285.0, 1150.0, 990.0, 760.0, 610.0, 400.0, 270.0, 150.0, 0.0};
+    memcpy(ctrl->thrust_curve, thrust_curve, 15 * sizeof(float32_t));
 
     ctrl->time_since_launch = 0.0;
 }
@@ -137,24 +131,11 @@ void compute_controls(controller *ctrl) {
         del_x[i] = ctrl->x[i] - ctrl->x0[i];
     }
 
-    for (int j = 0; j < 4; j++) {
-        if (j == 0) {
-            for (int i = 0; i < 9; i++) {
-                roll += ctrl->K[j*9 + i] * del_x[i];
-            }
-        } else if (j == 1) {
-            for (int i = 0; i < 9; i++) {
-                pitch += ctrl->K[j*9 + i] * del_x[i];
-            }
-        } else if (j == 2) {
-            for (int i = 0; i < 9; i++) {
-                yaw += ctrl->K[j*9 + i] * del_x[i];
-            }
-        } else if (j == 3) {
-            for (int i = 0; i < 9; i++) {
-                thrust += ctrl->K[j*9 + i] * del_x[i];
-            }
-        }
+    for (int i = 0; i < 9; i++) {
+        roll   += ctrl->K[0*9 + i] * del_x[i];
+        pitch  += ctrl->K[1*9 + i] * del_x[i];
+        yaw    += ctrl->K[2*9 + i] * del_x[i];
+        thrust += ctrl->K[3*9 + i] * del_x[i];
     }
 
     ctrl->M_roll = roll;
@@ -245,11 +226,9 @@ void sideforce_to_vane_angle(controller *ctrl){ //TODO: UPDATE BASED ON ACTUAL S
  * @note Turn a vane by x degrees --> Turn the servo by (8/5)*x degrees according to the gear ratio in servo drivetrain
 */
 void vane_angle_to_servo_angle(controller *ctrl){
-
-    ctrl->servo_deflections[0] = ctrl->vane_deflections[0]*(8.0/5.0); //roll servo 1
-    ctrl->servo_deflections[1] = ctrl->vane_deflections[1]*(8.0/5.0); //roll servo 2
-    ctrl->servo_deflections[2] = ctrl->vane_deflections[2]*(8.0/5.0); //yaw servo 1
-    ctrl->servo_deflections[3] = ctrl->vane_deflections[3]*(8.0/5.0); //yaw servo 2
+    for (int i = 0; i < 4; i++) {
+        ctrl->servo_deflections[i] = ctrl->vane_deflections[i]*(8.0/5.0); // roll servo i
+    }
 }
 
 /**
@@ -265,9 +244,7 @@ void run_controls(controller *ctrl, float *state, float elapsed_time){
     ctrl->time_since_launch = elapsed_time;
 
     // Update state estimate
-    for (int i = 0; i < 9; i++) {
-        ctrl->x[i] = state[i];
-    }
+    memcpy(ctrl->x, state, 9 * sizeof(float));
 
     reference_selector(ctrl); // Update the reference state
     LQR_gain_selector(ctrl); // Update the LQR gain matrix

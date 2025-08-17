@@ -28,13 +28,13 @@ void state_tx_task(void *args) {
     RocketStateStruct local_state;
 
     /* Wait for start notification */
-    await_notification(BEGIN_STATE_TX_NOTIFICATION_BIT, portMAX_DELAY);
+    await_notification(BEGIN_STATE_TX_NOTIFICATION_BIT);
 
     uint8_t start_msg_id = get_start_msg_id();
     uint8_t end_msg_id = get_end_msg_id();
 
     while (1) {
-        await_notification(SEND_STATE_NOTIFICATION_BIT, portMAX_DELAY);
+        await_notification(SEND_STATE_NOTIFICATION_BIT);
 
         memcpy_state(&local_state);
 

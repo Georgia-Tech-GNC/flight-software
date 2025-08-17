@@ -33,7 +33,7 @@ void flash_fs(FSFile *file, size_t n_states);
  * @param args Unused
  */
 void state_flash_task(void *args) {
-    await_notification_indexed(READY_NOTIFICATION_INDEX, FS_READY_NOTIFICATION_BIT, portMAX_DELAY);
+    await_notification_indexed(READY_NOTIFICATION_INDEX, FS_READY_NOTIFICATION_BIT);
 
     if (fs_mount()) {
         log_printf(LOG_INFO, "File system mounted");
@@ -61,7 +61,7 @@ void state_flash_task(void *args) {
 
     while (1) {
         /* Wait for next notification */
-        uint32_t notification_value = await_notification_indexed(FLASH_NOTIFICATION_INDEX, FLASH_STATE_NOTIFICATION_BIT | FLASH_FS_NOTIFICATION_BIT, portMAX_DELAY);
+        uint32_t notification_value = await_notification_indexed(FLASH_NOTIFICATION_INDEX, FLASH_STATE_NOTIFICATION_BIT | FLASH_FS_NOTIFICATION_BIT);
 
         /* Flash state to file system */
         if (notification_value & FLASH_FS_NOTIFICATION_BIT) {
@@ -78,9 +78,8 @@ void state_flash_task(void *args) {
         /* Write state to flash chip */
         if (notification_value & FLASH_STATE_NOTIFICATION_BIT) {
             uint8_t state_bytes[sizeof(RocketStateStruct)];
-            size_t bytes_copied = 0;
 
-            if (memcpy_state_bytes(state_bytes, sizeof(RocketStateStruct), &bytes_copied)) {
+            if (memcpy_state_bytes(state_bytes, sizeof(RocketStateStruct))) {
                 HALAL_flash_write_page(n_states, state_bytes, 1);
                 n_states ++;
             } else {

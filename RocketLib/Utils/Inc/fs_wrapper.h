@@ -19,7 +19,7 @@ typedef struct {
 uint8_t fs_mount(void);
 uint8_t fs_init_file(FSFile *file, const char *file_path);
 uint8_t fs_open_file(FSFile *file, uint8_t mode);
-uint8_t fs_write_file(FSFile *file, uint16_t start_addr, uint8_t *data, size_t len);
+uint8_t fs_write_file(FSFile *file, uint16_t start_addr, const uint8_t *data, size_t len);
 uint8_t fs_read_file(FSFile *file, uint16_t start_addr, uint8_t *data, size_t len);
 uint8_t fs_close_file(FSFile *file);
 uint8_t fs_delete_file(FSFile *file);

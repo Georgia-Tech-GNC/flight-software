@@ -11,8 +11,6 @@
 JetVanesRocketState g_current_state = {0};
 
 void jet_vanes_task(void *args) {
-    uint16_t iters = 0;
-
     while (1) {
         HALAL_adc_convert();
 

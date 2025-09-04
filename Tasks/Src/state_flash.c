@@ -11,6 +11,7 @@
 #include "util.h"
 #include "fs_wrapper.h"
 #include "halal.h"
+#include <string.h>
 
 /* Private defines */
 #define CSV_LINE_SIZE 2048
@@ -33,7 +34,7 @@ void flash_fs(FSFile *file, size_t n_states);
  * @param args Unused
  */
 void state_flash_task(void *args) {
-    await_notification_indexed(READY_NOTIFICATION_INDEX, FS_READY_NOTIFICATION_BIT);
+    await_notification(FS_READY_NOTIFICATION_BIT);
 
     if (fs_mount()) {
         log_printf(LOG_INFO, "File system mounted");
@@ -61,7 +62,7 @@ void state_flash_task(void *args) {
 
     while (1) {
         /* Wait for next notification */
-        uint32_t notification_value = await_notification_indexed(FLASH_NOTIFICATION_INDEX, FLASH_STATE_NOTIFICATION_BIT | FLASH_FS_NOTIFICATION_BIT);
+        uint32_t notification_value = await_notification(FLASH_STATE_NOTIFICATION_BIT | FLASH_FS_NOTIFICATION_BIT);
 
         /* Flash state to file system */
         if (notification_value & FLASH_FS_NOTIFICATION_BIT) {
@@ -77,14 +78,14 @@ void state_flash_task(void *args) {
         }
         /* Write state to flash chip */
         if (notification_value & FLASH_STATE_NOTIFICATION_BIT) {
-            uint8_t state_bytes[sizeof(RocketStateStruct)];
+            RocketStateStruct current_state;
 
-            if (memcpy_state_bytes(state_bytes, sizeof(RocketStateStruct))) {
-                HALAL_flash_write_page(n_states, state_bytes, 1);
+            if (memcpy_state(&current_state) == RET_SUCCESS) {
+                HALAL_flash_write_page(n_states, (uint8_t *) &current_state, sizeof(RocketStateStruct));
                 n_states ++;
             } else {
                 log_printf(LOG_ERROR, "Failed to copy state bytes");
-            } 
+            }
         }
     }
 }

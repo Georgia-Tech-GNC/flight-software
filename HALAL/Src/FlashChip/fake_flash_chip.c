@@ -14,12 +14,14 @@ uint8_t HALAL_flash_init(void) {
     return RET_SUCCESS;
 }
 
-uint8_t HALAL_flash_write_page(size_t page, uint8_t *data, size_t n_pages) {
+uint8_t HALAL_flash_write_page(size_t page, uint8_t *data, size_t size) {
+    size_t n_pages = size / HALAL_FAKE_FLASH_CHIP_PAGE_SIZE;
+
     if (page >= HALAL_FAKE_FLASH_CHIP_N_PAGES || page + n_pages >= HALAL_FAKE_FLASH_CHIP_N_PAGES) {
         return RET_FAILURE;
     }
 
-    memcpy(fake_flash_chip + page * HALAL_FAKE_FLASH_CHIP_PAGE_SIZE, data, n_pages * HALAL_FAKE_FLASH_CHIP_PAGE_SIZE);
+    memcpy(fake_flash_chip + page * HALAL_FAKE_FLASH_CHIP_PAGE_SIZE, data, size);
 
     return RET_SUCCESS;
 }

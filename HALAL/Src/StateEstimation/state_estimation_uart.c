@@ -10,6 +10,8 @@
 #include "state_flash.h"
 #include "state_tx.h"
 
+#include <string.h>
+
 UART_HandleTypeDef state_estimation_uart = {0};
 
 uint8_t state_uart_rx_buf[HALAL_STATE_ESTIMATION_PACKET_SIZE];
@@ -87,10 +89,10 @@ void state_estimation_uart_rx_event_isr(uint16_t size, BaseType_t *xHigherPriori
 
     /* If a full packet is recieved, update the rocket state */
     if (state_bytes_received == HALAL_STATE_ESTIMATION_PACKET_SIZE) {
-        HALAL_state_estimation_callback(state_bytes, HALAL_STATE_ESTIMATION_PACKET_SIZE);
+        HALAL_state_estimation_callback(state_bytes, HALAL_STATE_ESTIMATION_PACKET_SIZE, xHigherPriorityTaskWoken);
 
         xTaskNotifyFromISR(g_state_tx_task_handle, SEND_STATE_NOTIFICATION_BIT, eSetBits, xHigherPriorityTaskWoken);
-        xTaskNotifyIndexedFromISR(g_state_flash_task_handle, FLASH_NOTIFICATION_INDEX, FLASH_STATE_NOTIFICATION_BIT, eSetBits, xHigherPriorityTaskWoken);
+        xTaskNotifyFromISR(g_state_flash_task_handle, FLASH_STATE_NOTIFICATION_BIT, eSetBits, xHigherPriorityTaskWoken);
         
         state_bytes_received = 0;
     }

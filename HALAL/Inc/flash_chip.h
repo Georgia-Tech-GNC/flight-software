@@ -10,7 +10,7 @@
 #endif
 
 uint8_t HALAL_flash_init(void);
-uint8_t HALAL_flash_write_page(size_t page, uint8_t *data, size_t n_pages);
+uint8_t HALAL_flash_write_page(size_t page, uint8_t *data, size_t size);
 uint8_t HALAL_flash_read_page(size_t page, uint8_t *data, size_t n_pages);
 uint8_t HALAL_flash_erase_page(size_t page, size_t n_pages);
 

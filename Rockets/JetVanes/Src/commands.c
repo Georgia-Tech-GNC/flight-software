@@ -5,6 +5,7 @@
 #include "rtos_globals.h"
 #include "state_tx.h"
 #include "state_flash.h"
+#include "state_estimation.h"
 
 static uint8_t command_idle_to_ground(void);
 static uint8_t command_flash_sd_card(void);
@@ -15,9 +16,9 @@ uint8_t process_command(RocketCommandID command_id) {
             return command_idle_to_ground();
         case ROCKET_FLASH_SD_CARD_COMMAND_ID:
             return command_flash_sd_card();
+        default:
+            return RET_FAILURE;
     }
-
-    return RET_FAILURE;
 }
 
 static uint8_t command_idle_to_ground(void) {
@@ -28,7 +29,7 @@ static uint8_t command_idle_to_ground(void) {
 }
 
 static uint8_t command_flash_sd_card(void) {
-    xTaskNotifyIndexed(g_state_flash_task_handle, FLASH_NOTIFICATION_INDEX, FLASH_FS_NOTIFICATION_BIT, eSetBits);
+    xTaskNotify(g_state_flash_task_handle, FLASH_FS_NOTIFICATION_BIT, eSetBits);
 
     return RET_SUCCESS;
 }

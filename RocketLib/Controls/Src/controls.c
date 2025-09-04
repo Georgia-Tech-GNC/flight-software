@@ -12,6 +12,7 @@
 #include "reference_data.h"
 #include <math.h>
 #include <stdio.h>
+#include <string.h>
 
 /**
  * @brief Takes into account current state estimate and time since launch and returns closest matching LQR Gain

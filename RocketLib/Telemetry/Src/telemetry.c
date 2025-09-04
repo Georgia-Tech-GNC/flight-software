@@ -2,6 +2,7 @@
 #include "halal.h"
 #include "radio.h"
 #include "util.h"
+#include "packet_encode.h"
 
 /**
  * Transmit a telemetry packet over uart

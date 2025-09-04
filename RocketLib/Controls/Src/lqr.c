@@ -1,1 +1,0 @@
-/* LQR controller implementation */

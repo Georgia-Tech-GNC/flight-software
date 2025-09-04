@@ -37,7 +37,6 @@
 *.i*86
 *.x86_64
 *.hex
-*/build
 
 # Debug files
 *.dSYM/
@@ -55,9 +54,5 @@ Mkfile.old
 dkms.conf
 
 # Directories
-MainMCU/Core/.vscode/
-MainMCU/MCU-h725zgt6/build/
-MainMCU/Nucleo-F429ZI/.vscode/
-MainMCU/Nucleo-F429ZI/build/
-MainMCU/Nucleo-H723ZG/.vscode/
-MainMCU/Nucleo-H723ZG/build/
+**/build
+Doc/

@@ -134,18 +134,6 @@ enum lis3mdl_err {
     LIS3MDL_ERR_GENERAL,
 };
 
-struct lis3mdl_device {
-    uint8_t temp_enable;
-    uint8_t data_rate;
-    uint8_t self_test;
-    uint8_t full_scale;
-    uint8_t z_axis_mode;
-    uint8_t endianness;
-    SPI_HandleTypeDef *spi_handle;
-    GPIO_TypeDef *cs_pin;
-    uint16_t cs_pin_port;
-};
-
 enum lis3mdl_err lis3mdl_initialize(struct lis3mdl_device *device);
 enum lis3mdl_err lis3mdl_write_hard_iron(struct lis3mdl_device *device, double *hard_iron_offset);
 enum lis3mdl_err lis3mdl_read_hard_iron(struct lis3mdl_device *device, double *hard_iron_offset);

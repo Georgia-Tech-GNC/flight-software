@@ -129,22 +129,22 @@
 
 /* LIS3MSL DEFINES */
 
-enum lis3mdl_err {
-    LIS3MDL_ERR_OK,
-    LIS3MDL_ERR_GENERAL,
+enum magnetometer_err {
+    MAG_ERR_OK,
+    MAG_ERR_GENERAL,
 };
 
-enum lis3mdl_err lis3mdl_initialize(struct lis3mdl_device *device);
-enum lis3mdl_err lis3mdl_write_hard_iron(struct lis3mdl_device *device, double *hard_iron_offset);
-enum lis3mdl_err lis3mdl_read_hard_iron(struct lis3mdl_device *device, double *hard_iron_offset);
-enum lis3mdl_err lis3mdl_sensitivity_get(struct lis3mdl_device *device, double *sensitivity);
-enum lis3mdl_err lis3mdl_read_temp(struct lis3mdl_device *device, double *temp);
+enum magnetometer_err magnetometer_initialize(struct lis3mdl_device *device);
+enum magnetometer_err magnetometer_write_hard_iron(struct lis3mdl_device *device, double *hard_iron_offset);
+enum magnetometer_err magnetometer_read_hard_iron(struct lis3mdl_device *device, double *hard_iron_offset);
+enum magnetometer_err magnetometer_sensitivity_get(struct lis3mdl_device *device, double *sensitivity);
+enum magnetometer_err magnetometer_read_temp(struct lis3mdl_device *device, double *temp);
 
-enum lis3mdl_err lis3mdl_read_mag(struct lis3mdl_device *device, double *mag_reading);
+enum magnetometer_err magnetometer_read_mag(struct lis3mdl_device *device, double *mag_reading);
 
-enum lis3mdl_err lis3mdl_write_register(struct lis3mdl_device *device, uint8_t reg, uint8_t data);
-enum lis3mdl_err lis3mdl_read_register(struct lis3mdl_device *device, uint8_t reg, uint8_t *data);
-enum lis3mdl_err lis3mdl_write_multiple_registers(struct lis3mdl_device *device, uint8_t start_reg, uint8_t bytes, uint8_t *data);
-enum lis3mdl_err lis3mdl_read_multiple_registers(struct lis3mdl_device *device, uint8_t start_reg, uint8_t bytes, uint8_t *data);
+enum magnetometer_err magnetometer_write_register(struct lis3mdl_device *device, uint8_t reg, uint8_t data);
+enum magnetometer_err magnetometer_read_register(struct lis3mdl_device *device, uint8_t reg, uint8_t *data);
+enum magnetometer_err magnetometer_write_multiple_registers(struct lis3mdl_device *device, uint8_t start_reg, uint8_t bytes, uint8_t *data);
+enum magnetometer_err magnetometer_read_multiple_registers(struct lis3mdl_device *device, uint8_t start_reg, uint8_t bytes, uint8_t *data);
 
 #endif /* __LIS3MDL_H__ */

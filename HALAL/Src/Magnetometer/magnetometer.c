@@ -7,15 +7,15 @@
  * @returns if the LIS3MDL is ok
 */
 
-enum lis3mdl_err lis3mdl_initialize(struct lis3mdl_device *device) {
-    lis3mdl_write_register(LIS3MDL_REG_CTRL3, LIS3MDL_CONTINUOUS_CONVERSION);
+enum magnetometer_err magnetometer_initialize(struct lis3mdl_device *device) {
+    magnetometer_write_register(MAG_REG_CTRL3, MAG_CONTINUOUS_CONVERSION);
     uint8_t ctrl_reg_1 = HALAL_MAGNETOMETER_TEMP_ENABLE | HALAL_MAGNETOMETER_DATA_RATE | HALAL_MAGNETOMETER_SELF_TEST;
-    lis3mdl_write_register(LIS3MDL_REG_CTRL1, ctrl_reg_1);
+    magnetometer_write_register(MAG_REG_CTRL1, ctrl_reg_1);
     uint8_t ctrl_reg_2 = HALAL_MAGNETOMETER_FULL_SCALE;
-    lis3mdl_write_register(LIS3MDL_REG_CTRL2, ctrl_reg_2);
+    magnetometer_write_register(MAG_REG_CTRL2, ctrl_reg_2);
     uint8_t ctrl_reg_4 = HALAL_MAGNETOMETER_Z_AXIS_MODE | HALAL_MAGNETOMETER_ENDIANNESS;
-    lis3mdl_write_register(LIS3MDL_REG_CTRL4, ctrl_reg_4);
-    return LIS3MDL_ERR_OK;
+    magnetometer_write_register(MAG_REG_CTRL4, ctrl_reg_4);
+    return MAG_ERR_OK;
 }
 
 /**
@@ -27,18 +27,18 @@ enum lis3mdl_err lis3mdl_initialize(struct lis3mdl_device *device) {
  * @warning: no error checking is performed. Make sure to allocate appropriate array for inputs
 */
 
-enum lis3mdl_err lis3mdl_read_mag(double *mag_reading) {
+enum magnetometer_err magnetometer_read_mag(double *mag_reading) {
     uint8_t mag_read_buf[6];
     double sensitivity = 0;
-    lis3mdl_read_multiple_registers(LIS3MDL_REG_OUT_X_L, 6, mag_read_buf);
+    magnetometer_read_multiple_registers(MAG_REG_OUT_X_L, 6, mag_read_buf);
     int16_t x_reading = (mag_read_buf[1] << 8) | mag_read_buf[0]; 
     int16_t y_reading = (mag_read_buf[3] << 8) | mag_read_buf[1]; 
     int16_t z_reading = (mag_read_buf[5] << 8) | mag_read_buf[2]; 
-    lis3mdl_sensitivity_get(&sensitivity);
+    magnetometer_sensitivity_get(&sensitivity);
     mag_reading[0] = (double) x_reading / sensitivity;
     mag_reading[1] = (double) y_reading / sensitivity;
     mag_reading[2] = (double) z_reading / sensitivity;
-    return LIS3MDL_ERR_OK;
+    return MAG_ERR_OK;
 }
 
 /**
@@ -49,12 +49,12 @@ enum lis3mdl_err lis3mdl_read_mag(double *mag_reading) {
  * @warning This function only works if LIS3MDL_TEMP_EN is written to LIS3MDL_REG_CTRL_1 during initialization
 */
 
-enum lis3mdl_err lis3mdl_read_temp(double *temp) {
+enum magnetometer_err magnetometer_read_temp(double *temp) {
     uint8_t temp_read_buff[2];
-    lis3mdl_read_multiple_registers(LIS3MDL_REG_TEMP_OUT_L, 2, temp_read_buff);
+    magnetometer_read_multiple_registers(MAG_REG_TEMP_OUT_L, 2, temp_read_buff);
     int16_t temp_reading = (temp_read_buff[1] << 8) | temp_read_buff[0];
     *temp = (double) temp_reading / 8.0f + 25.0f;
-    return LIS3MDL_ERR_OK;
+    return MAG_ERR_OK;
 }
 
 /**
@@ -65,14 +65,14 @@ enum lis3mdl_err lis3mdl_read_temp(double *temp) {
  * @warning: No error checking
 */
 
-enum lis3mdl_err lis3mdl_write_hard_iron(double *hard_iron_offset) {
+enum magnetometer_err magnetometer_write_hard_iron(double *hard_iron_offset) {
     int16_t hard_iron_ints[3];
     double sensitivity = 0;
-    lis3mdl_sensitivity_get(&sensitivity);
+    magnetometer_sensitivity_get(&sensitivity);
     hard_iron_ints[0] = hard_iron_offset[0] * sensitivity;
     hard_iron_ints[1] = hard_iron_offset[1] * sensitivity;
     hard_iron_ints[2] = hard_iron_offset[2] * sensitivity;
-    return LIS3MDL_ERR_OK;
+    return MAG_ERR_OK;
 }
 
 /**
@@ -84,7 +84,7 @@ enum lis3mdl_err lis3mdl_write_hard_iron(double *hard_iron_offset) {
  * @warning this function determines the sensitivity based off the settings in the device structure. If these settings 
  * do not match what is actually contained in the LIS3MDL_REG_CTRL2 register the sensitivty may be inaccurate. 
 */
-enum lis3mdl_err lis3mdl_sensitivity_get(double *sensitivity) {
+enum magnetometer_err magnetometer_sensitivity_get(double *sensitivity) {
     switch (HALAL_MAGNETOMETER_FULL_SCALE) {
         case LIS3MDL_FS_4Gauss:
             *sensitivity = 6842.0f;
@@ -99,9 +99,9 @@ enum lis3mdl_err lis3mdl_sensitivity_get(double *sensitivity) {
             *sensitivity = 1711.0f;
             break;
         default:
-            return LIS3MDL_ERR_GENERAL;
+            return MAG_ERR_GENERAL;
     }
-    return LIS3MDL_ERR_OK;
+    return MAG_ERR_OK;
 }
 
 /** 
@@ -113,12 +113,12 @@ enum lis3mdl_err lis3mdl_sensitivity_get(double *sensitivity) {
  * @param data data to write to register
 */
 
-enum lis3mdl_err lis3mdl_write_register(uint8_t reg, uint8_t data) {
+enum magnetometer_err magnetometer_write_register(uint8_t reg, uint8_t data) {
     uint8_t transmit_buf[2] = {reg, data};
     HAL_GPIO_WritePin((GPIO_TypeDef *)HALAL_MAGNETOMETER_CS_PIN_PORT, (uint16_t)HALAL_MAGNETOMETER_CS_PIN, GPIO_PIN_RESET);
     HAL_SPI_Transmit((SPI_HandleTypeDef *)HALAL_MAGNETOMETER_SPI_HANDLE, transmit_buf, 2, HAL_MAX_DELAY);
     HAL_GPIO_WritePin((GPIO_TypeDef *)HALAL_MAGNETOMETER_CS_PIN_PORT, (uint16_t)HALAL_MAGNETOMETER_CS_PIN, GPIO_PIN_SET);
-    return LIS3MDL_ERR_OK;
+    return MAG_ERR_OK;
 }
 
 /**
@@ -129,14 +129,14 @@ enum lis3mdl_err lis3mdl_write_register(uint8_t reg, uint8_t data) {
  * @param reg register to read 
  * @param data pointer to buffer to store read byte
 */
-enum lis3mdl_err lis3mdl_read_register(uint8_t reg, uint8_t *data) {
+enum magnetometer_err magnetometer_read_register(uint8_t reg, uint8_t *data) {
     uint8_t transmit_buf[2] = {0x80 | reg, 0x00};
     uint8_t receive_buf[2];
     HAL_GPIO_WritePin((GPIO_TypeDef *)HALAL_MAGNETOMETER_CS_PIN_PORT, (uint16_t)HALAL_MAGNETOMETER_CS_PIN, GPIO_PIN_RESET);
     HAL_SPI_TransmitReceive((SPI_HandleTypeDef *)HALAL_MAGNETOMETER_SPI_HANDLE, transmit_buf, receive_buf, 2, HAL_MAX_DELAY);
     HAL_GPIO_WritePin((GPIO_TypeDef *)HALAL_MAGNETOMETER_CS_PIN_PORT, (uint16_t)HALAL_MAGNETOMETER_CS_PIN, GPIO_PIN_SET);
     *data = receive_buf[1];
-    return LIS3MDL_ERR_OK;
+    return MAG_ERR_OK;
 }
 
 /** 
@@ -150,7 +150,7 @@ enum lis3mdl_err lis3mdl_read_register(uint8_t reg, uint8_t *data) {
  * @param data pointer to buffer with data to write 
  * @warning no error checking is performed. Make sure to allocate appropriate buffer sizes for all inputs. 
 **/
-enum lis3mdl_err lis3mdl_write_multiple_registers(uint8_t start_reg, uint8_t bytes, uint8_t *data) {
+enum magnetometer_err magnetometer_write_multiple_registers(uint8_t start_reg, uint8_t bytes, uint8_t *data) {
     uint8_t transmit_buf[bytes + 1];
     for (int i = 1; i <= bytes; i ++) {
         transmit_buf[i] = data[i - 1];
@@ -159,7 +159,7 @@ enum lis3mdl_err lis3mdl_write_multiple_registers(uint8_t start_reg, uint8_t byt
     HAL_GPIO_WritePin((GPIO_TypeDef *)HALAL_MAGNETOMETER_CS_PIN_PORT, (uint16_t)HALAL_MAGNETOMETER_CS_PIN, GPIO_PIN_RESET);
     HAL_SPI_Transmit((SPI_HandleTypeDef *)HALAL_MAGNETOMETER_SPI_HANDLE, transmit_buf, bytes + 1, HAL_MAX_DELAY);
     HAL_GPIO_WritePin((GPIO_TypeDef *)HALAL_MAGNETOMETER_CS_PIN_PORT, (uint16_t)HALAL_MAGNETOMETER_CS_PIN, GPIO_PIN_SET);
-    return LIS3MDL_ERR_OK;
+    return MAG_ERR_OK;
 }
 
 /** 
@@ -175,7 +175,7 @@ enum lis3mdl_err lis3mdl_write_multiple_registers(uint8_t start_reg, uint8_t byt
 */
 
 
-enum lis3mdl_err lis3mdl_read_multiple_registers(uint8_t start_reg, uint8_t bytes, uint8_t *data) {
+enum magnetometer_err magnetometer_read_multiple_registers(uint8_t start_reg, uint8_t bytes, uint8_t *data) {
     // TODO: error handling
     uint8_t transmit_buf[bytes + 1];
     uint8_t receive_buf[bytes + 1];
@@ -189,5 +189,5 @@ enum lis3mdl_err lis3mdl_read_multiple_registers(uint8_t start_reg, uint8_t byte
     for (int i = 0; i < bytes; i++) {
         data[i] = receive_buf[i + 1];
     }
-    return LIS3MDL_ERR_OK;
+    return MAG_ERR_OK;
 }

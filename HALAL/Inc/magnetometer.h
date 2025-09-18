@@ -134,17 +134,17 @@ enum magnetometer_err {
     MAG_ERR_GENERAL,
 };
 
-enum magnetometer_err magnetometer_initialize();
-enum magnetometer_err magnetometer_write_hard_iron(double *hard_iron_offset);
-enum magnetometer_err magnetometer_read_hard_iron(double *hard_iron_offset);
-enum magnetometer_err magnetometer_sensitivity_get(double *sensitivity);
-enum magnetometer_err magnetometer_read_temp(double *temp);
+enum magnetometer_err HALAL_magnetometer_initialize();
+enum magnetometer_err HALAL_magnetometer_write_hard_iron(double *hard_iron_offset);
+enum magnetometer_err HALAL_magnetometer_read_hard_iron(double *hard_iron_offset);
+enum magnetometer_err HALAL_magnetometer_sensitivity_get(double *sensitivity);
+enum magnetometer_err HALAL_magnetometer_read_temp(double *temp);
 
-enum magnetometer_err magnetometer_read_mag(double *mag_reading);
+enum magnetometer_err HALAL_magnetometer_read_mag(double *mag_reading);
 
-enum magnetometer_err magnetometer_write_register(uint8_t reg, uint8_t data);
-enum magnetometer_err magnetometer_read_register(uint8_t reg, uint8_t *data);
-enum magnetometer_err magnetometer_write_multiple_registers(uint8_t start_reg, uint8_t bytes, uint8_t *data);
-enum magnetometer_err magnetometer_read_multiple_registers(uint8_t start_reg, uint8_t bytes, uint8_t *data);
+enum magnetometer_err HALAL_magnetometer_write_register(uint8_t reg, uint8_t data);
+enum magnetometer_err HALAL_magnetometer_read_register(uint8_t reg, uint8_t *data);
+enum magnetometer_err HALAL_magnetometer_write_multiple_registers(uint8_t start_reg, uint8_t bytes, uint8_t *data);
+enum magnetometer_err HALAL_magnetometer_read_multiple_registers(uint8_t start_reg, uint8_t bytes, uint8_t *data);
 
 #endif /* __LIS3MDL_H__ */

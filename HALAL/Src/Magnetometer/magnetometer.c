@@ -1,10 +1,10 @@
 #include "magnetometer.h"
 
 /**
- * @brief initializes LIS3MDL magnetometer
- * This function initializes the LIS3MDL magnetometer based on settings in device structure
- * @param device: device poitner to lis3mdl_device struct
- * @returns if the LIS3MDL is ok
+ * @brief initializes magnetometer
+ * This function initializes the magnetometer based on settings in device structure
+ * @param device: device pointer to lis3mdl_device struct
+ * @returns if the magnetometer is ok
 */
 
 enum magnetometer_err magnetometer_initialize() {
@@ -19,11 +19,10 @@ enum magnetometer_err magnetometer_initialize() {
 }
 
 /**
- * @brief read magnetic field vector from LIS3MDL device
- * This function reads magnetic field from LIS3MDL and converts the value into double precision.
+ * @brief read magnetic field vector from device
+ * This function reads magnetic field from device and converts the value into double precision.
  * This stores the vector into a provided array. Magnetic field is represented in Gauss.
- * @param device: Pointer to lis3mdl structure
- * @param mag_reading: pionter to 3-element doubly array to store magnetic field reading in Gauss. 
+ * @param mag_reading: pointer to 3-element doubly array to store magnetic field reading in Gauss.
  * @warning: no error checking is performed. Make sure to allocate appropriate array for inputs
 */
 
@@ -42,9 +41,8 @@ enum magnetometer_err magnetometer_read_mag(double *mag_reading) {
 }
 
 /**
- * @brief read temperature from LIS3MDL device
- * This function reads temperature sensor on LIS3MDL device and converts it double precision in degrees C
- * @param device: Pointer to device structure
+ * @brief read temperature from device
+ * This function reads temperature sensor on device and converts it double precision in degrees C
  * @param temp: Pointer to double to store measured temperature in degrees C
  * @warning This function only works if LIS3MDL_TEMP_EN is written to LIS3MDL_REG_CTRL_1 during initialization
 */
@@ -58,9 +56,8 @@ enum magnetometer_err magnetometer_read_temp(double *temp) {
 }
 
 /**
- * @brief write hard iron offset to LIS3MDL
- * This function writes a user-supplied hard-iron offset to LIS3MDL to provide more accurate outputs
- * @param device: Pointer to device structure
+ * @brief write hard iron offset to device
+ * This function writes a user-supplied hard-iron offset to device to provide more accurate outputs
  * @param hard_iron_offset: Pointer to 3-element double array having hard-iron offset in Gauss
  * @warning: No error checking
 */
@@ -76,12 +73,12 @@ enum magnetometer_err magnetometer_write_hard_iron(double *hard_iron_offset) {
 }
 
 /**
- * @brief get the sensitivity of the LIS3MDL device 
- * 
- * This function determines the sensitivity of the LIS3MDL based on the setting contained in the device structure 
- * @param sensitivity pointer to a double to store the determined sensitivity 
- * @warning this function determines the sensitivity based off the settings in the device structure. If these settings 
- * do not match what is actually contained in the LIS3MDL_REG_CTRL2 register the sensitivty may be inaccurate. 
+ * @brief get the sensitivity of the device
+ *
+ * This function determines the sensitivity of the device based on the setting contained in the device structure
+ * @param sensitivity pointer to a double to store the determined sensitivity
+ * @warning this function determines the sensitivity based off the settings in the device structure. If these settings
+ * do not match what is actually contained in the LIS3MDL_REG_CTRL2 register the sensitivty may be inaccurate.
 */
 enum magnetometer_err magnetometer_sensitivity_get(double *sensitivity) {
     switch (HALAL_MAGNETOMETER_FULL_SCALE) {
@@ -104,9 +101,9 @@ enum magnetometer_err magnetometer_sensitivity_get(double *sensitivity) {
 }
 
 /** 
- * @brief Write to a single LIS3MDL register 
+ * @brief Write to a single register 
  * 
- * This function performs a single register write on a LIS2MDL device though the STM32 SPI HAL.
+ * This function performs a single register write on a device though the STM32 SPI HAL.
  * @param reg register to write to 
  * @param data data to write to register
 */
@@ -120,9 +117,9 @@ enum magnetometer_err magnetometer_write_register(uint8_t reg, uint8_t data) {
 }
 
 /**
- * @brief Read a single LIS3MDL register 
+ * @brief Read a single register
  * 
- * This function performs a single register read on a LIS3MDL device through the STM32 SPI HAL.
+ * This function performs a single register read on a device through the STM32 SPI HAL.
  * @param reg register to read 
  * @param data pointer to buffer to store read byte
 */
@@ -137,10 +134,10 @@ enum magnetometer_err magnetometer_read_register(uint8_t reg, uint8_t *data) {
 }
 
 /** 
- * @brief Write to multile LIS3MDL registers
+ * @brief Write to multiple registers
  * 
- * This function perfomrs a multiple-write on an LIS3MDL device through the STM32 SPI HAL. The function takes in the first register
- * and uses the auto-incrementation function of the LIS3MDL to write to consecutive registers
+ * This function perfomrs a multiple-write on a device through the STM32 SPI HAL. The function takes in the first register
+ * and uses the auto-incrementation function of the device to write to consecutive registers
  * @param start_reg first register to write to  
  * @param bytes number of bytes to write 
  * @param data pointer to buffer with data to write 
@@ -159,10 +156,10 @@ enum magnetometer_err magnetometer_write_multiple_registers(uint8_t start_reg, u
 }
 
 /** 
- * @brief Read multiple LIS3MDL registers
+ * @brief Read multiple registers
  * 
- * This function performs a mulitple-read on an LIS3MDL device through the STM32 SPI HAL. The function takes in the 
- * first register and uses the auto-incrementation function of the LIS3MDL to read consecutive registers.
+ * This function performs a mulitple-read on a device through the STM32 SPI HAL. The function takes in the 
+ * first register and uses the auto-incrementation function of the device to read consecutive registers.
  * @param start_reg first register to read
  * @param bytes number of consecutive registers to read
  * @param data pointer to buffer to store read bytes

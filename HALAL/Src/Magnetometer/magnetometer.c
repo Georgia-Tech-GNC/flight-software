@@ -7,7 +7,7 @@
  * @returns if the LIS3MDL is ok
 */
 
-enum magnetometer_err magnetometer_initialize(struct lis3mdl_device *device) {
+enum magnetometer_err magnetometer_initialize() {
     magnetometer_write_register(MAG_REG_CTRL3, MAG_CONTINUOUS_CONVERSION);
     uint8_t ctrl_reg_1 = HALAL_MAGNETOMETER_TEMP_ENABLE | HALAL_MAGNETOMETER_DATA_RATE | HALAL_MAGNETOMETER_SELF_TEST;
     magnetometer_write_register(MAG_REG_CTRL1, ctrl_reg_1);
@@ -79,7 +79,6 @@ enum magnetometer_err magnetometer_write_hard_iron(double *hard_iron_offset) {
  * @brief get the sensitivity of the LIS3MDL device 
  * 
  * This function determines the sensitivity of the LIS3MDL based on the setting contained in the device structure 
- * @param device pointer to a lis3mdl_device structure 
  * @param sensitivity pointer to a double to store the determined sensitivity 
  * @warning this function determines the sensitivity based off the settings in the device structure. If these settings 
  * do not match what is actually contained in the LIS3MDL_REG_CTRL2 register the sensitivty may be inaccurate. 
@@ -108,7 +107,6 @@ enum magnetometer_err magnetometer_sensitivity_get(double *sensitivity) {
  * @brief Write to a single LIS3MDL register 
  * 
  * This function performs a single register write on a LIS2MDL device though the STM32 SPI HAL.
- * @param device pointer to a lis3mdl_device structure 
  * @param reg register to write to 
  * @param data data to write to register
 */
@@ -125,7 +123,6 @@ enum magnetometer_err magnetometer_write_register(uint8_t reg, uint8_t data) {
  * @brief Read a single LIS3MDL register 
  * 
  * This function performs a single register read on a LIS3MDL device through the STM32 SPI HAL.
- * @param device pointer to a lis3mdl_device structure 
  * @param reg register to read 
  * @param data pointer to buffer to store read byte
 */
@@ -144,7 +141,6 @@ enum magnetometer_err magnetometer_read_register(uint8_t reg, uint8_t *data) {
  * 
  * This function perfomrs a multiple-write on an LIS3MDL device through the STM32 SPI HAL. The function takes in the first register
  * and uses the auto-incrementation function of the LIS3MDL to write to consecutive registers
- * @param device pointer to a lis3mdl_device structure 
  * @param start_reg first register to write to  
  * @param bytes number of bytes to write 
  * @param data pointer to buffer with data to write 
@@ -167,7 +163,6 @@ enum magnetometer_err magnetometer_write_multiple_registers(uint8_t start_reg, u
  * 
  * This function performs a mulitple-read on an LIS3MDL device through the STM32 SPI HAL. The function takes in the 
  * first register and uses the auto-incrementation function of the LIS3MDL to read consecutive registers.
- * @param device pointer to a lis3mdl_device structure 
  * @param start_reg first register to read
  * @param bytes number of consecutive registers to read
  * @param data pointer to buffer to store read bytes

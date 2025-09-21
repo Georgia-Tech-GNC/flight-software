@@ -1,5 +1,121 @@
 #include "magnetometer.h"
 
+
+/* LIS3MDL Register Map */
+#define LIS3MDL_REG_OFFSET_X_L_M        0x05
+#define LIS3MDL_REG_OFFSET_X_H_M        0x06
+#define LIS3MDL_REG_OFFSET_Y_L_M        0x07
+#define LIS3MDL_REG_OFFSET_Y_H_M        0x08
+#define LIS3MDL_REG_OFFSET_Z_L_M        0x09
+#define LIS3MDL_REG_OFFSET_Z_H_M        0x0A
+
+#define LIS3MDL_REG_WHO_AM_I            0x0F
+
+#define LIS3MDL_REG_CTRL1               0x20
+#define LIS3MDL_REG_CTRL2               0x21
+#define LIS3MDL_REG_CTRL3               0x22
+#define LIS3MDL_REG_CTRL4               0x23
+#define LIS3MDL_REG_CTRL5               0x24
+
+#define LIS3MDL_REG_REG                 0x27
+#define LIS3MDL_REG_OUT_X_L             0x28
+#define LIS3MDL_REG_OUT_X_H             0x29
+#define LIS3MDL_REG_OUT_Y_L             0x2A
+#define LIS3MDL_REG_OUT_Y_H             0x2B
+#define LIS3MDL_REG_OUT_Z_L             0x2C
+#define LIS3MDL_REG_OUT_Z_H             0x2D
+#define LIS3MDL_REG_TEMP_OUT_L          0x2E
+#define LIS3MDL_REG_TEMP_OUT_H          0x2F
+
+#define LIS3MDL_REG_INT_CFG             0x30
+#define LIS3MDL_REG_INT_SRC             0x31
+#define LIS3MDL_REG_THS_L               0x32
+#define LIS3MDL_REG_THS_H               0x33
+
+/* LIS3MDL CTRL_REG1 Configuration Map */
+#define LIS3MDL_TEMP_EN                 0b10000000
+#define LIS3MDL_TEMP_DIS                0b00000000
+
+#define LIS3MDL_LP_1000Hz               0b00000010
+#define LIS3MDL_MP_560Hz                0b00100010
+#define LIS3MDL_HP_300Hz                0b01000010
+#define LIS3MDL_UHP_155Hz               0b01100010
+
+#define LIS3MDL_LP_0Hz625               0b00000000
+#define LIS3MDL_LP_1Hz25                0b00000100
+#define LIS3MDL_LP_2Hz5                 0b00001000
+#define LIS3MDL_LP_5Hz                  0b00001100
+#define LIS3MDL_LP_10Hz                 0b00010000
+#define LIS3MDL_LP_20Hz                 0b00010100
+#define LIS3MDL_LP_40Hz                 0b00011000
+#define LIS3MDL_LP_80Hz                 0b00011100
+
+#define LIS3MDL_MP_0Hz625               0b00100000
+#define LIS3MDL_MP_1Hz25                0b00100100
+#define LIS3MDL_MP_2Hz5                 0b00101000
+#define LIS3MDL_MP_5Hz                  0b00101100
+#define LIS3MDL_MP_10Hz                 0b00110000
+#define LIS3MDL_MP_20Hz                 0b00110100
+#define LIS3MDL_MP_40Hz                 0b00111000
+#define LIS3MDL_MP_80Hz                 0b00111100
+
+#define LIS3MDL_HP_0Hz625               0b01000000
+#define LIS3MDL_HP_1Hz25                0b01000100
+#define LIS3MDL_HP_2Hz5                 0b01001000
+#define LIS3MDL_HP_5Hz                  0b01001100
+#define LIS3MDL_HP_10Hz                 0b01010000
+#define LIS3MDL_HP_20Hz                 0b01010100
+#define LIS3MDL_HP_40Hz                 0b01011000
+#define LIS3MDL_HP_80Hz                 0b01011100
+
+#define LIS3MDL_UHP_0Hz625              0b01100000
+#define LIS3MDL_UHP_1Hz25               0b01100100
+#define LIS3MDL_UHP_2Hz5                0b01101000
+#define LIS3MDL_UHP_5Hz                 0b01101100
+#define LIS3MDL_UHP_10Hz                0b01110000
+#define LIS3MDL_UHP_20Hz                0b01110100
+#define LIS3MDL_UHP_40Hz                0b01111000
+#define LIS3MDL_UHP_80Hz                0b01111100
+
+#define LIS3MDL_SELF_TEST_EN            0b00000001
+#define LIS3MDL_SELF_TEST_DIS           0b00000000
+
+/* LIS3MDL CTRL_REG2 Configuration Map */
+#define LIS3MDL_FS_4Gauss               0b00000000
+#define LIS3MDL_FS_8Gauss               0b00100000
+#define LIS3MDL_FS_12Gauss              0b01000000
+#define LIS3MDL_FS_16Gauss              0b01100000
+
+// https://community.st.com/t5/mems-sensors/lis3mdl-understanding-reboot-and-soft-rst/td-p/362844
+#define LIS3MDL_REBOOT_MEMORY           0b00001000
+#define LIS3MDL_SOFT_RST                0b00000100
+
+/* LIS3MDL CTRL_REG3 Configuration Map */
+#define LIS3MDL_LOW_POWER               0b00100000
+#define LIS3MDL_SPI_4_WIRE              0b00000000
+#define LIS3MDL_SPI_3_WIRE              0b00000100
+
+#define LIS3MDL_CONTINUOUS_CONVERSION   0b00000000
+#define LIS3MDL_SINGLE_CONVERSION       0b00000001
+#define LIS3MDL_POWER_DOWN              0b00000010
+
+/* LIS3MDL CTRL_REG4 Configuration Map */
+#define LIS3MDL_Z_LP                    0b00000000
+#define LIS3MDL_Z_MP                    0b00000100
+#define LIS3MDL_Z_HP                    0b00001000
+#define LIS3MDL_Z_UHP                   0b00001100
+
+#define LIS3MDL_LITTLE_ENDIAN           0b00000000
+#define LIS3MDL_BIG_ENDIAN              0b00000010
+
+/* LIS3MDL CTRL_REG5 Configuration Map */
+#define LIS3MDL_FAST_READ_EN            0b10000000
+#define LIS3MDL_FAST_READ_DIS           0b00000000
+#define LIS3MDL_BLOCK_UPDATE_EN         0b01000000
+#define LIS3MDL_BLOCK_UPDATE_DIS        0b00000000
+
+/* LIS3MSL DEFINES */
+
 /**
  * @brief initializes magnetometer
  * This function initializes the magnetometer based on settings in device structure
@@ -8,13 +124,13 @@
 */
 
 enum magnetometer_err HALAL_magnetometer_initialize() {
-    HALAL_magnetometer_write_register(MAG_REG_CTRL3, MAG_CONTINUOUS_CONVERSION);
+    lis3mdl_write_register(MAG_REG_CTRL3, MAG_CONTINUOUS_CONVERSION);
     uint8_t ctrl_reg_1 = HALAL_MAGNETOMETER_TEMP_ENABLE | HALAL_MAGNETOMETER_DATA_RATE | HALAL_MAGNETOMETER_SELF_TEST;
-    HALAL_magnetometer_write_register(MAG_REG_CTRL1, ctrl_reg_1);
+    lis3mdl_write_register(MAG_REG_CTRL1, ctrl_reg_1);
     uint8_t ctrl_reg_2 = HALAL_MAGNETOMETER_FULL_SCALE;
-    HALAL_magnetometer_write_register(MAG_REG_CTRL2, ctrl_reg_2);
+    lis3mdl_write_register(MAG_REG_CTRL2, ctrl_reg_2);
     uint8_t ctrl_reg_4 = HALAL_MAGNETOMETER_Z_AXIS_MODE | HALAL_MAGNETOMETER_ENDIANNESS;
-    HALAL_magnetometer_write_register(MAG_REG_CTRL4, ctrl_reg_4);
+    lis3mdl_write_register(MAG_REG_CTRL4, ctrl_reg_4);
     return MAG_ERR_OK;
 }
 
@@ -29,7 +145,7 @@ enum magnetometer_err HALAL_magnetometer_initialize() {
 enum magnetometer_err HALAL_magnetometer_read_mag(double *mag_reading) {
     uint8_t mag_read_buf[6];
     double sensitivity = 0;
-    HALAL_magnetometer_read_multiple_registers(MAG_REG_OUT_X_L, 6, mag_read_buf);
+    list3mdl_read_multiple_registers(MAG_REG_OUT_X_L, 6, mag_read_buf);
     int16_t x_reading = (mag_read_buf[1] << 8) | mag_read_buf[0]; 
     int16_t y_reading = (mag_read_buf[3] << 8) | mag_read_buf[1]; 
     int16_t z_reading = (mag_read_buf[5] << 8) | mag_read_buf[2]; 
@@ -49,7 +165,7 @@ enum magnetometer_err HALAL_magnetometer_read_mag(double *mag_reading) {
 
 enum magnetometer_err HALAL_magnetometer_read_temp(double *temp) {
     uint8_t temp_read_buff[2];
-    HALAL_magnetometer_read_multiple_registers(MAG_REG_TEMP_OUT_L, 2, temp_read_buff);
+    list3mdl_read_multiple_registers(MAG_REG_TEMP_OUT_L, 2, temp_read_buff);
     int16_t temp_reading = (temp_read_buff[1] << 8) | temp_read_buff[0];
     *temp = (double) temp_reading / 8.0f + 25.0f;
     return MAG_ERR_OK;
@@ -108,7 +224,7 @@ enum magnetometer_err HALAL_magnetometer_sensitivity_get(double *sensitivity) {
  * @param data data to write to register
 */
 
-enum magnetometer_err HALAL_magnetometer_write_register(uint8_t reg, uint8_t data) {
+enum magnetometer_err lis3mdl_write_register(uint8_t reg, uint8_t data) {
     uint8_t transmit_buf[2] = {reg, data};
     HAL_GPIO_WritePin((GPIO_TypeDef *)HALAL_MAGNETOMETER_CS_PIN_PORT, (uint16_t)HALAL_MAGNETOMETER_CS_PIN, GPIO_PIN_RESET);
     HAL_SPI_Transmit((SPI_HandleTypeDef *)HALAL_MAGNETOMETER_SPI_HANDLE, transmit_buf, 2, HAL_MAX_DELAY);
@@ -123,7 +239,7 @@ enum magnetometer_err HALAL_magnetometer_write_register(uint8_t reg, uint8_t dat
  * @param reg register to read 
  * @param data pointer to buffer to store read byte
 */
-enum magnetometer_err HALAL_magnetometer_read_register(uint8_t reg, uint8_t *data) {
+enum magnetometer_err lis3mdl_read_register(uint8_t reg, uint8_t *data) {
     uint8_t transmit_buf[2] = {0x80 | reg, 0x00};
     uint8_t receive_buf[2];
     HAL_GPIO_WritePin((GPIO_TypeDef *)HALAL_MAGNETOMETER_CS_PIN_PORT, (uint16_t)HALAL_MAGNETOMETER_CS_PIN, GPIO_PIN_RESET);
@@ -143,7 +259,7 @@ enum magnetometer_err HALAL_magnetometer_read_register(uint8_t reg, uint8_t *dat
  * @param data pointer to buffer with data to write 
  * @warning no error checking is performed. Make sure to allocate appropriate buffer sizes for all inputs. 
 **/
-enum magnetometer_err HALAL_magnetometer_write_multiple_registers(uint8_t start_reg, uint8_t bytes, uint8_t *data) {
+enum magnetometer_err lis3mdl_write_multiple_registers(uint8_t start_reg, uint8_t bytes, uint8_t *data) {
     uint8_t transmit_buf[bytes + 1];
     for (int i = 1; i <= bytes; i ++) {
         transmit_buf[i] = data[i - 1];
@@ -167,7 +283,7 @@ enum magnetometer_err HALAL_magnetometer_write_multiple_registers(uint8_t start_
 */
 
 
-enum magnetometer_err HALAL_magnetometer_read_multiple_registers(uint8_t start_reg, uint8_t bytes, uint8_t *data) {
+enum magnetometer_err list3mdl_read_multiple_registers(uint8_t start_reg, uint8_t bytes, uint8_t *data) {
     // TODO: error handling
     uint8_t transmit_buf[bytes + 1];
     uint8_t receive_buf[bytes + 1];

@@ -5,6 +5,8 @@
 
 #include "jet_vanes.h"
 
+#pragma GCC diagnostic warning "-Wint-conversion"
+#pragma GCC diagnostic warning "-Wincompatible-pointer-types"
 
 /* 
  * YES, I AM AWARE THAT THIS CODE IS ATROCIOUS. 

@@ -10,19 +10,26 @@ endif()
 
 set(CMAKE_PROJECT_NAME flight_software)
 
-set(SUPPORTED_BOARDS F429ZI)
+set(SUPPORTED_BOARDS F429ZI H723ZG)
 option(TARGET_F429ZI "Compile target for the F429ZI board" OFF)
+option(TARGET_H723ZG "Compile target for the H723ZG board" OFF)
+
 
 set(SUPPORTED_ROCKETS JET_VANES)
 option(ROCKET_JET_VANES "Compile programs associated with the Jet Vanes rocket" OFF)
 
-if(NOT TARGET_F429ZI)
+if(NOT (TARGET_F429ZI OR TARGET_H723ZG))
     message(FATAL_ERROR
         "Please select at least one target to compile by passing TARGET_<BOARD>=ON\n"
         "Supported boards: ${SUPPORTED_BOARDS}"
     )
 endif()
-# TODO: Once we add more targets, make sure that we only select at most one of them
+if(TARGET_F429ZI AND TARGET_H723ZG) 
+    message(FATAL_ERROR
+        "Please select only one target to compile by passing TARGET_<BOARD>=ON\n"
+        "Supported boards: ${SUPPORTED_BOARDS}. Do not select more than one."
+    )
+endif()
 
 if(NOT ROCKET_JET_VANES)
     message(FATAL_ERROR
@@ -55,6 +62,31 @@ if (TARGET_F429ZI)
 
     # Set openocd configuration
     set(OPENOCD_CFG_FILE "./Targets/Nucleo-F429ZI/openocd.cfg")
+    cmake_path(ABSOLUTE_PATH OPENOCD_CFG_FILE NORMALIZE)
+endif()
+
+if (TARGET_H723ZG)
+    # Include toolchain file
+    include("Targets/Nucleo-H723ZG/cmake/gcc-arm-none-eabi.cmake")
+
+    # Enable compile command to ease indexing with e.g. clangd
+    set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
+
+    # Enable CMake support for ASM and C languages
+    project(${CMAKE_PROJECT_NAME} C ASM)
+    enable_language(C ASM)
+
+    # Core project settings
+    message("Build type: " ${CMAKE_BUILD_TYPE})
+
+    # Create an executable object type
+    add_executable(${CMAKE_PROJECT_NAME})
+
+    # Add STM32CubeMX generated sources
+    add_subdirectory(Targets/Nucleo-H723ZG/cmake/stm32cubemx)
+
+    # Set openocd configuration
+    set(OPENOCD_CFG_FILE "./Targets/Nucleo-H723ZG/openocd.cfg")
     cmake_path(ABSOLUTE_PATH OPENOCD_CFG_FILE NORMALIZE)
 endif()
 

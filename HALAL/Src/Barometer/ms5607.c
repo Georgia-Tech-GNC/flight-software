@@ -128,6 +128,9 @@ uint8_t HALAL_barometer_read(int32_t *pressure) {
         SENS -= SENS2;
     }
     *pressure = ((((int64_t) uncomp_pressure * SENS) >> 21) - OFF) >> 15;
+    // temperature = TEMP
+
+    return RET_SUCCESS;
 }
 
 static uint32_t read_adc(uint8_t command, enum osr_factors osr) {

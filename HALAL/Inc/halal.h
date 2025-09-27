@@ -28,6 +28,10 @@
     #include "flash_chip.h"
 #endif
 
+#ifdef HALAL_BAROMETER_MODULE_ENABLED
+    #include "barometer.h"
+#endif
+
 uint8_t HALAL_init(void);
 
 /* HALAL Weak function definitions */

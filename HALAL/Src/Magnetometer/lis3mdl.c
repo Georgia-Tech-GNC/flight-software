@@ -122,17 +122,16 @@ SPI_HandleTypeDef mag_spi = {0};
 
 magnetometer_err HALAL_magnetometer_initialize() {
     mag_spi.Instance = HALAL_MAGNETOMETER_SPI;
-    mag_spi.Init.Mode = SPI_MODE_MASTER;
     mag_spi.Init.Direction = SPI_DIRECTION_2LINES;
-    mag_spi.Init.DataSize = HALAL_MAGNETOMETER_SPI_DATA_SIZE;
-    mag_spi.Init.CLKPolarity = SPI_POLARITY_LOW;
-    mag_spi.Init.CLKPhase = SPI_PHASE_1EDGE;
-    mag_spi.Init.NSS = HALAL_MAGNETOMETER_SPI_NSS;
-    mag_spi.Init.BaudRatePrescaler = HALAL_MAGNETOMETER_SPI_BAUDRATE_PRESCALER;
+    mag_spi.Init.DataSize = SPI_DATASIZE_16BIT;
+    mag_spi.Init.CLKPolarity = SPI_POLARITY_HIGH;
+    mag_spi.Init.CLKPhase = SPI_PHASE_2EDGE;
+    mag_spi.Init.NSS = SPI_NSS_SOFT;
+    mag_spi.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
     mag_spi.Init.FirstBit = SPI_FIRSTBIT_MSB;
     mag_spi.Init.TIMode = SPI_TIMODE_DISABLE;
     mag_spi.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
-    mag_spi.Init.CRCPolynomial = HALAL_MAGNETOMETER_SPI_CRC_POLYNOMIAL;
+    mag_spi.Init.CRCPolynomial = 0x0;
 
     GPIO_InitTypeDef gpio_init = {0};
 

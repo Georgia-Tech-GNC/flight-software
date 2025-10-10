@@ -1,7 +1,4 @@
 #include "magnetometer.h"
-#include <stm32f4xx_hal_spi.h>
-#include <nucleo_f429zi_halal.h>
-
 
 /* LIS3MDL Register Map */
 #define LIS3MDL_REG_OFFSET_X_L_M        0x05
@@ -116,14 +113,10 @@
 #define LIS3MDL_BLOCK_UPDATE_EN         0b01000000
 #define LIS3MDL_BLOCK_UPDATE_DIS        0b00000000
 
-/* LIS3MSL DEFINES */
-
 SPI_HandleTypeDef mag_spi = {0};
 
 /**
  * @brief initializes magnetometer
- * This function initializes the magnetometer based on settings in device structure
- * @param device: device pointer to lis3mdl_device struct
  * @returns if the magnetometer is ok
 */
 
@@ -131,16 +124,38 @@ magnetometer_err HALAL_magnetometer_initialize() {
     mag_spi.Instance = HALAL_MAGNETOMETER_SPI;
     mag_spi.Init.Mode = SPI_MODE_MASTER;
     mag_spi.Init.Direction = SPI_DIRECTION_2LINES;
-    mag_spi.Init.DataSize = SPI_DATASIZE_4BIT;
+    mag_spi.Init.DataSize = HALAL_MAGNETOMETER_SPI_DATA_SIZE;
     mag_spi.Init.CLKPolarity = SPI_POLARITY_LOW;
     mag_spi.Init.CLKPhase = SPI_PHASE_1EDGE;
-    mag_spi.Init.NSS = SPI_NSS_HARD_OUTPUT;
-    mag_spi.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+    mag_spi.Init.NSS = HALAL_MAGNETOMETER_SPI_NSS;
+    mag_spi.Init.BaudRatePrescaler = HALAL_MAGNETOMETER_SPI_BAUDRATE_PRESCALER;
     mag_spi.Init.FirstBit = SPI_FIRSTBIT_MSB;
     mag_spi.Init.TIMode = SPI_TIMODE_DISABLE;
     mag_spi.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
-    mag_spi.Init.CRCPolynomial = 0x0;
-    HAL_SPI_Init(&mag_spi);
+    mag_spi.Init.CRCPolynomial = HALAL_MAGNETOMETER_SPI_CRC_POLYNOMIAL;
+
+    GPIO_InitTypeDef gpio_init = {0};
+
+    gpio_init.Pin = HALAL_MAGNETOMETER_GPIO_PIN_CS;
+    gpio_init.Mode = GPIO_MODE_AF_PP;
+    gpio_init.Pull = GPIO_NOPULL;
+    gpio_init.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    gpio_init.Alternate = HALAL_MAGNETOMETER_GPIO_PIN_ALT;
+
+    HAL_GPIO_Init(HALAL_MAGNETOMETER_GPIO_PIN_CS, &gpio_init);
+
+    gpio_init.Pin = HALAL_MAGNETOMETER_GPIO_PIN_SPC;
+    HAL_GPIO_Init(HALAL_MAGNETOMETER_GPIO_PIN_SPC, &gpio_init);
+
+    gpio_init.Pin = HALAL_MAGNETOMETER_GPIO_PIN_SDI;
+    HAL_GPIO_Init(HALAL_MAGNETOMETER_GPIO_PIN_SDI, &gpio_init);
+
+    gpio_init.Pin = HALAL_MAGNETOMETER_GPIO_PIN_SDO;
+    HAL_GPIO_Init(HALAL_MAGNETOMETER_GPIO_PIN_SDO, &gpio_init);
+
+    if (HAL_SPI_Init(&mag_spi) != HAL_OK) {
+        return RET_FAILURE;
+    }
 
     lis3mdl_write_register(MAG_REG_CTRL3, MAG_CONTINUOUS_CONVERSION);
     uint8_t ctrl_reg_1 = HALAL_MAGNETOMETER_TEMP_ENABLE | HALAL_MAGNETOMETER_DATA_RATE | HALAL_MAGNETOMETER_SELF_TEST;

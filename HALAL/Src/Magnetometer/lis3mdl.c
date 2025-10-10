@@ -139,12 +139,12 @@ magnetometer_err HALAL_magnetometer_initialize() {
 
     GPIO_InitTypeDef gpio_init = {0};
 
-    gpio_init.Pin = HALAL_MAGNETOMETER_GPIO_PIN_CS;
     gpio_init.Mode = GPIO_MODE_AF_PP;
     gpio_init.Pull = GPIO_NOPULL;
     gpio_init.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
     gpio_init.Alternate = HALAL_MAGNETOMETER_GPIO_PIN_ALT;
 
+    gpio_init.Pin = HALAL_MAGNETOMETER_GPIO_PIN_CS;
     HAL_GPIO_Init(HALAL_MAGNETOMETER_GPIO_PIN_CS, &gpio_init);
 
     gpio_init.Pin = HALAL_MAGNETOMETER_GPIO_PIN_SPC;

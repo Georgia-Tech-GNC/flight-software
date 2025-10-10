@@ -1,4 +1,5 @@
 #include "magnetometer.h"
+#include <stm32f4xx_hal_spi.h>
 
 
 /* LIS3MDL Register Map */
@@ -116,6 +117,8 @@
 
 /* LIS3MSL DEFINES */
 
+SPI_HandleTypeDef mag_spi = {0};
+
 /**
  * @brief initializes magnetometer
  * This function initializes the magnetometer based on settings in device structure
@@ -123,7 +126,9 @@
  * @returns if the magnetometer is ok
 */
 
-magnetometer_err HALAL_magnetometer_initialize() {
+enum magnetometer_err HALAL_magnetometer_initialize() {
+    HAL_SPI_Init(&mag_spi);
+
     lis3mdl_write_register(MAG_REG_CTRL3, MAG_CONTINUOUS_CONVERSION);
     uint8_t ctrl_reg_1 = HALAL_MAGNETOMETER_TEMP_ENABLE | HALAL_MAGNETOMETER_DATA_RATE | HALAL_MAGNETOMETER_SELF_TEST;
     lis3mdl_write_register(MAG_REG_CTRL1, ctrl_reg_1);
@@ -142,7 +147,7 @@ magnetometer_err HALAL_magnetometer_initialize() {
  * @warning: no error checking is performed. Make sure to allocate appropriate array for inputs
 */
 
-magnetometer_err HALAL_magnetometer_read_mag(double *mag_reading) {
+enum magnetometer_err HALAL_magnetometer_read_mag(double *mag_reading) {
     uint8_t mag_read_buf[6];
     double sensitivity = 0;
     list3mdl_read_multiple_registers(MAG_REG_OUT_X_L, 6, mag_read_buf);
@@ -163,7 +168,7 @@ magnetometer_err HALAL_magnetometer_read_mag(double *mag_reading) {
  * @warning This function only works if LIS3MDL_TEMP_EN is written to LIS3MDL_REG_CTRL_1 during initialization
 */
 
-magnetometer_err HALAL_magnetometer_read_temp(double *temp) {
+enum magnetometer_err HALAL_magnetometer_read_temp(double *temp) {
     uint8_t temp_read_buff[2];
     list3mdl_read_multiple_registers(MAG_REG_TEMP_OUT_L, 2, temp_read_buff);
     int16_t temp_reading = (temp_read_buff[1] << 8) | temp_read_buff[0];
@@ -178,7 +183,7 @@ magnetometer_err HALAL_magnetometer_read_temp(double *temp) {
  * @warning: No error checking
 */
 
-magnetometer_err HALAL_magnetometer_write_hard_iron(double *hard_iron_offset) {
+enum magnetometer_err HALAL_magnetometer_write_hard_iron(double *hard_iron_offset) {
     int16_t hard_iron_ints[3];
     double sensitivity = 0;
     HALAL_magnetometer_sensitivity_get(&sensitivity);
@@ -196,7 +201,7 @@ magnetometer_err HALAL_magnetometer_write_hard_iron(double *hard_iron_offset) {
  * @warning this function determines the sensitivity based off the settings in the device structure. If these settings
  * do not match what is actually contained in the LIS3MDL_REG_CTRL2 register the sensitivty may be inaccurate.
 */
-magnetometer_err HALAL_magnetometer_sensitivity_get(double *sensitivity) {
+enum magnetometer_err HALAL_magnetometer_sensitivity_get(double *sensitivity) {
     switch (HALAL_MAGNETOMETER_FULL_SCALE) {
         case LIS3MDL_FS_4Gauss:
             *sensitivity = 6842.0f;
@@ -224,10 +229,10 @@ magnetometer_err HALAL_magnetometer_sensitivity_get(double *sensitivity) {
  * @param data data to write to register
 */
 
-magnetometer_err lis3mdl_write_register(uint8_t reg, uint8_t data) {
+enum magnetometer_err lis3mdl_write_register(uint8_t reg, uint8_t data) {
     uint8_t transmit_buf[2] = {reg, data};
     HAL_GPIO_WritePin((GPIO_TypeDef *)HALAL_MAGNETOMETER_CS_PIN_PORT, (uint16_t)HALAL_MAGNETOMETER_CS_PIN, GPIO_PIN_RESET);
-    HAL_SPI_Transmit((SPI_HandleTypeDef *)HALAL_MAGNETOMETER_SPI_HANDLE, transmit_buf, 2, HAL_MAX_DELAY);
+    HAL_SPI_Transmit(&mag_spi, transmit_buf, 2, HAL_MAX_DELAY);
     HAL_GPIO_WritePin((GPIO_TypeDef *)HALAL_MAGNETOMETER_CS_PIN_PORT, (uint16_t)HALAL_MAGNETOMETER_CS_PIN, GPIO_PIN_SET);
     return MAG_ERR_OK;
 }
@@ -239,11 +244,11 @@ magnetometer_err lis3mdl_write_register(uint8_t reg, uint8_t data) {
  * @param reg register to read 
  * @param data pointer to buffer to store read byte
 */
-magnetometer_err lis3mdl_read_register(uint8_t reg, uint8_t *data) {
+enum magnetometer_err lis3mdl_read_register(uint8_t reg, uint8_t *data) {
     uint8_t transmit_buf[2] = {0x80 | reg, 0x00};
     uint8_t receive_buf[2];
     HAL_GPIO_WritePin((GPIO_TypeDef *)HALAL_MAGNETOMETER_CS_PIN_PORT, (uint16_t)HALAL_MAGNETOMETER_CS_PIN, GPIO_PIN_RESET);
-    HAL_SPI_TransmitReceive((SPI_HandleTypeDef *)HALAL_MAGNETOMETER_SPI_HANDLE, transmit_buf, receive_buf, 2, HAL_MAX_DELAY);
+    HAL_SPI_TransmitReceive(&mag_spi, transmit_buf, receive_buf, 2, HAL_MAX_DELAY);
     HAL_GPIO_WritePin((GPIO_TypeDef *)HALAL_MAGNETOMETER_CS_PIN_PORT, (uint16_t)HALAL_MAGNETOMETER_CS_PIN, GPIO_PIN_SET);
     *data = receive_buf[1];
     return MAG_ERR_OK;
@@ -259,14 +264,14 @@ magnetometer_err lis3mdl_read_register(uint8_t reg, uint8_t *data) {
  * @param data pointer to buffer with data to write 
  * @warning no error checking is performed. Make sure to allocate appropriate buffer sizes for all inputs. 
 **/
-magnetometer_err lis3mdl_write_multiple_registers(uint8_t start_reg, uint8_t bytes, uint8_t *data) {
+enum magnetometer_err lis3mdl_write_multiple_registers(uint8_t start_reg, uint8_t bytes, uint8_t *data) {
     uint8_t transmit_buf[bytes + 1];
     for (int i = 1; i <= bytes; i ++) {
         transmit_buf[i] = data[i - 1];
     }
     transmit_buf[0] = 0x40 | start_reg;
     HAL_GPIO_WritePin((GPIO_TypeDef *)HALAL_MAGNETOMETER_CS_PIN_PORT, (uint16_t)HALAL_MAGNETOMETER_CS_PIN, GPIO_PIN_RESET);
-    HAL_SPI_Transmit((SPI_HandleTypeDef *)HALAL_MAGNETOMETER_SPI_HANDLE, transmit_buf, bytes + 1, HAL_MAX_DELAY);
+    HAL_SPI_Transmit(&mag_spi, transmit_buf, bytes + 1, HAL_MAX_DELAY);
     HAL_GPIO_WritePin((GPIO_TypeDef *)HALAL_MAGNETOMETER_CS_PIN_PORT, (uint16_t)HALAL_MAGNETOMETER_CS_PIN, GPIO_PIN_SET);
     return MAG_ERR_OK;
 }
@@ -282,8 +287,7 @@ magnetometer_err lis3mdl_write_multiple_registers(uint8_t start_reg, uint8_t byt
  * @warning no error checking is performed. Make sure to allocate appropriate buffer sizes for all inputs. 
 */
 
-
-magnetometer_err list3mdl_read_multiple_registers(uint8_t start_reg, uint8_t bytes, uint8_t *data) {
+enum magnetometer_err lis3mdl_read_multiple_registers(uint8_t start_reg, uint8_t bytes, uint8_t *data) {
     // TODO: error handling
     uint8_t transmit_buf[bytes + 1];
     uint8_t receive_buf[bytes + 1];
@@ -292,7 +296,7 @@ magnetometer_err list3mdl_read_multiple_registers(uint8_t start_reg, uint8_t byt
     }
     transmit_buf[0] = 0xC0 | start_reg;
     HAL_GPIO_WritePin((GPIO_TypeDef *)HALAL_MAGNETOMETER_CS_PIN_PORT, (uint16_t)HALAL_MAGNETOMETER_CS_PIN, GPIO_PIN_RESET);
-    HAL_SPI_TransmitReceive((SPI_HandleTypeDef *)HALAL_MAGNETOMETER_SPI_HANDLE, transmit_buf, receive_buf, bytes + 1, HAL_MAX_DELAY);
+    HAL_SPI_TransmitReceive(&mag_spi, transmit_buf, receive_buf, bytes + 1, HAL_MAX_DELAY);
     HAL_GPIO_WritePin((GPIO_TypeDef *)HALAL_MAGNETOMETER_CS_PIN_PORT, (uint16_t)HALAL_MAGNETOMETER_CS_PIN, GPIO_PIN_SET);
     for (int i = 0; i < bytes; i++) {
         data[i] = receive_buf[i + 1];

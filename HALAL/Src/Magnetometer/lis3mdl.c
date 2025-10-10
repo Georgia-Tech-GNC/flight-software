@@ -121,6 +121,7 @@ SPI_HandleTypeDef mag_spi = {0};
 */
 
 magnetometer_err HALAL_magnetometer_initialize() {
+    // Config SPI
     mag_spi.Instance = HALAL_MAGNETOMETER_SPI;
     mag_spi.Init.Direction = SPI_DIRECTION_2LINES;
     mag_spi.Init.DataSize = SPI_DATASIZE_16BIT;
@@ -137,6 +138,7 @@ magnetometer_err HALAL_magnetometer_initialize() {
         return RET_FAILURE;
     }
 
+    // Config GPIO
     GPIO_InitTypeDef gpio_init = {0};
 
     gpio_init.Mode = GPIO_MODE_AF_PP;
@@ -156,6 +158,7 @@ magnetometer_err HALAL_magnetometer_initialize() {
     gpio_init.Pin = HALAL_MAGNETOMETER_GPIO_PIN_SDO;
     HAL_GPIO_Init(HALAL_MAGNETOMETER_GPIO_PIN_SDO, &gpio_init);
 
+    // Write config registers
     lis3mdl_write_register(MAG_REG_CTRL3, MAG_CONTINUOUS_CONVERSION);
     uint8_t ctrl_reg_1 = HALAL_MAGNETOMETER_TEMP_ENABLE | HALAL_MAGNETOMETER_DATA_RATE | HALAL_MAGNETOMETER_SELF_TEST;
     lis3mdl_write_register(MAG_REG_CTRL1, ctrl_reg_1);

@@ -133,6 +133,10 @@ magnetometer_err HALAL_magnetometer_initialize() {
     mag_spi.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
     mag_spi.Init.CRCPolynomial = 0x0;
 
+    if (HAL_SPI_Init(&mag_spi) != HAL_OK) {
+        return RET_FAILURE;
+    }
+
     GPIO_InitTypeDef gpio_init = {0};
 
     gpio_init.Pin = HALAL_MAGNETOMETER_GPIO_PIN_CS;
@@ -151,10 +155,6 @@ magnetometer_err HALAL_magnetometer_initialize() {
 
     gpio_init.Pin = HALAL_MAGNETOMETER_GPIO_PIN_SDO;
     HAL_GPIO_Init(HALAL_MAGNETOMETER_GPIO_PIN_SDO, &gpio_init);
-
-    if (HAL_SPI_Init(&mag_spi) != HAL_OK) {
-        return RET_FAILURE;
-    }
 
     lis3mdl_write_register(MAG_REG_CTRL3, MAG_CONTINUOUS_CONVERSION);
     uint8_t ctrl_reg_1 = HALAL_MAGNETOMETER_TEMP_ENABLE | HALAL_MAGNETOMETER_DATA_RATE | HALAL_MAGNETOMETER_SELF_TEST;

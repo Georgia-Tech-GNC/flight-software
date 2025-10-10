@@ -75,7 +75,7 @@ uint8_t adc_internal_init(HALAL_ADCInternalInit *init, HALAL_ADCInternalHandle *
         gpio_init.Pin = channel->gpio_pin;
         gpio_init.Mode = GPIO_MODE_ANALOG;
         gpio_init.Pull = GPIO_NOPULL;
-        HAL_GPIO_Init(channel->gpio_port, &gpio_init);
+        HAL_GPIO_Init((GPIO_TypeDef*) channel->gpio_port, &gpio_init);
 
         if (HAL_ADC_ConfigChannel(hal_adc, &adc_channel) != HAL_OK) {
             return RET_FAILURE;
@@ -87,7 +87,7 @@ uint8_t adc_internal_init(HALAL_ADCInternalInit *init, HALAL_ADCInternalHandle *
 
     DMA_HandleTypeDef *hal_dma = &adc->hal_dma;
 
-    hal_dma->Instance = init->dma_instance;
+    hal_dma->Instance = (DMA_Stream_TypeDef*) init->dma_instance;
     hal_dma->Init.Channel = init->dma_channel;
     hal_dma->Init.Direction = DMA_PERIPH_TO_MEMORY;
     hal_dma->Init.PeriphInc = DMA_PINC_DISABLE;
@@ -140,7 +140,7 @@ void ADC_IRQHandler(void) {
 uint8_t adc_internal_convert(HALAL_ADCInternalHandle handle) {
     HALAL_ADCInternal *adc = &adcs[handle];
 
-    if (HAL_ADC_Start_DMA(&adc->hal_adc, adc->channel_values, adc->n_channels) != HAL_OK) {
+    if (HAL_ADC_Start_DMA(&adc->hal_adc, (uint32_t*) adc->channel_values, adc->n_channels) != HAL_OK) {
         return RET_FAILURE;
     }
 

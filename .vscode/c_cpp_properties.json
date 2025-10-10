@@ -22,7 +22,12 @@
                 "${workspaceFolder}/Targets/Nucleo-F429ZI/Drivers/CMSIS/Core/Include",
                 "${workspaceFolder}/Targets/Nucleo-F429ZI/Drivers/STM32F4xx_HAL_Driver/Inc",
                 "${workspaceFolder}/Tasks/Inc",
-                "${workspaceFolder}/FreeRTOS-Kernel/Inc"
+                "${workspaceFolder}/FreeRTOS-Kernel/Inc",
+                "${workspaceFolder}/Archive/MainMCU/MCU-h725zgt6/Drivers/STM32H7xx_HAL_Driver/Inc",
+                "${workspaceFolder}/Archive/MainMCU/MCU-h725zgt6/Drivers/CMSIS/DSP/Include",
+                "${workspaceFolder}/Archive/MainMCU/MCU-h725zgt6/Core/Inc",
+                "${workspaceFolder}/Archive/MainMCU/MCU-h725zgt6/Drivers/CMSIS/Device/ST/STM32H7xx/Include",
+                "${workspaceFolder}/Archive/MainMCU/Core/Include"
             ],
             "defines": [
                 "_DEBUG",

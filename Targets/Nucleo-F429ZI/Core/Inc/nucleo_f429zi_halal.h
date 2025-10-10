@@ -157,4 +157,10 @@
 #define HALAL_ADC_JET_VANES_SERVO_4_GPIO_PIN       GPIO_PIN_1
 #define HALAL_ADC_JET_VANES_SERVO_4_GPIO_PORT      GPIOC
 
+#define ADIS_DEVICE_CS_PIN                         GPIO_PIN_0
+#define ADIS_DEVICE_CS_PIN_PORT                    0
+#define HIGH_REG                                   0.0
+#define LOW_REG                                    0.0
+#define DATA_SIZE_IN_BITS                          8
+
 #endif

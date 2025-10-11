@@ -115,6 +115,22 @@
 
 SPI_HandleTypeDef mag_spi = {0};
 
+/** 
+ * @brief Write to a single register 
+ * 
+ * This function performs a single register write on a device though the STM32 SPI HAL.
+ * @param reg register to write to 
+ * @param data data to write to register
+*/
+
+magnetometer_err lis3mdl_write_register(uint8_t reg, uint8_t data) {
+    uint8_t transmit_buf[2] = {reg, data};
+    HAL_GPIO_WritePin(*HALAL_MAGNETOMETER_GPIO_PIN_CS_PORT, (uint16_t)HALAL_MAGNETOMETER_GPIO_PIN_CS, GPIO_PIN_RESET);
+    HAL_SPI_Transmit(&mag_spi, transmit_buf, 2, HAL_MAX_DELAY);
+    HAL_GPIO_WritePin(*HALAL_MAGNETOMETER_GPIO_PIN_CS_PORT, (uint16_t)HALAL_MAGNETOMETER_GPIO_PIN_CS, GPIO_PIN_SET);
+    return MAG_ERR_OK;
+}
+
 /**
  * @brief initializes magnetometer
  * @returns if the magnetometer is ok
@@ -251,22 +267,6 @@ magnetometer_err HALAL_magnetometer_sensitivity_get(double *sensitivity) {
     return MAG_ERR_OK;
 }
 
-/** 
- * @brief Write to a single register 
- * 
- * This function performs a single register write on a device though the STM32 SPI HAL.
- * @param reg register to write to 
- * @param data data to write to register
-*/
-
-magnetometer_err lis3mdl_write_register(uint8_t reg, uint8_t data) {
-    uint8_t transmit_buf[2] = {reg, data};
-    HAL_GPIO_WritePin((GPIO_TypeDef *)HALAL_MAGNETOMETER_CS_PIN_PORT, (uint16_t)HALAL_MAGNETOMETER_CS_PIN, GPIO_PIN_RESET);
-    HAL_SPI_Transmit(&mag_spi, transmit_buf, 2, HAL_MAX_DELAY);
-    HAL_GPIO_WritePin((GPIO_TypeDef *)HALAL_MAGNETOMETER_CS_PIN_PORT, (uint16_t)HALAL_MAGNETOMETER_CS_PIN, GPIO_PIN_SET);
-    return MAG_ERR_OK;
-}
-
 /**
  * @brief Read a single register
  * 
@@ -277,9 +277,9 @@ magnetometer_err lis3mdl_write_register(uint8_t reg, uint8_t data) {
 magnetometer_err lis3mdl_read_register(uint8_t reg, uint8_t *data) {
     uint8_t transmit_buf[2] = {0x80 | reg, 0x00};
     uint8_t receive_buf[2];
-    HAL_GPIO_WritePin((GPIO_TypeDef *)HALAL_MAGNETOMETER_CS_PIN_PORT, (uint16_t)HALAL_MAGNETOMETER_CS_PIN, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(*HALAL_MAGNETOMETER_GPIO_PIN_CS_PORT, (uint16_t)HALAL_MAGNETOMETER_GPIO_PIN_CS, GPIO_PIN_RESET);
     HAL_SPI_TransmitReceive(&mag_spi, transmit_buf, receive_buf, 2, HAL_MAX_DELAY);
-    HAL_GPIO_WritePin((GPIO_TypeDef *)HALAL_MAGNETOMETER_CS_PIN_PORT, (uint16_t)HALAL_MAGNETOMETER_CS_PIN, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(*HALAL_MAGNETOMETER_GPIO_PIN_CS_PORT, (uint16_t)HALAL_MAGNETOMETER_GPIO_PIN_CS, GPIO_PIN_SET);
     *data = receive_buf[1];
     return MAG_ERR_OK;
 }
@@ -300,9 +300,9 @@ magnetometer_err lis3mdl_write_multiple_registers(uint8_t start_reg, uint8_t byt
         transmit_buf[i] = data[i - 1];
     }
     transmit_buf[0] = 0x40 | start_reg;
-    HAL_GPIO_WritePin((GPIO_TypeDef *)HALAL_MAGNETOMETER_CS_PIN_PORT, (uint16_t)HALAL_MAGNETOMETER_CS_PIN, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(*HALAL_MAGNETOMETER_GPIO_PIN_CS_PORT, (uint16_t)HALAL_MAGNETOMETER_GPIO_PIN_CS, GPIO_PIN_RESET);
     HAL_SPI_Transmit(&mag_spi, transmit_buf, bytes + 1, HAL_MAX_DELAY);
-    HAL_GPIO_WritePin((GPIO_TypeDef *)HALAL_MAGNETOMETER_CS_PIN_PORT, (uint16_t)HALAL_MAGNETOMETER_CS_PIN, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(*HALAL_MAGNETOMETER_GPIO_PIN_CS_PORT, (uint16_t)HALAL_MAGNETOMETER_GPIO_PIN_CS, GPIO_PIN_SET);
     return MAG_ERR_OK;
 }
 
@@ -325,9 +325,9 @@ magnetometer_err lis3mdl_read_multiple_registers(uint8_t start_reg, uint8_t byte
         transmit_buf[i] = 0x00;
     }
     transmit_buf[0] = 0xC0 | start_reg;
-    HAL_GPIO_WritePin((GPIO_TypeDef *)HALAL_MAGNETOMETER_CS_PIN_PORT, (uint16_t)HALAL_MAGNETOMETER_CS_PIN, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(*HALAL_MAGNETOMETER_GPIO_PIN_CS_PORT, (uint16_t)HALAL_MAGNETOMETER_GPIO_PIN_CS, GPIO_PIN_RESET);
     HAL_SPI_TransmitReceive(&mag_spi, transmit_buf, receive_buf, bytes + 1, HAL_MAX_DELAY);
-    HAL_GPIO_WritePin((GPIO_TypeDef *)HALAL_MAGNETOMETER_CS_PIN_PORT, (uint16_t)HALAL_MAGNETOMETER_CS_PIN, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(*HALAL_MAGNETOMETER_GPIO_PIN_CS_PORT, (uint16_t)HALAL_MAGNETOMETER_GPIO_PIN_CS, GPIO_PIN_SET);
     for (int i = 0; i < bytes; i++) {
         data[i] = receive_buf[i + 1];
     }

@@ -1,4 +1,5 @@
 #include "magnetometer.h"
+#include "halal.h"
 
 /* LIS3MDL Register Map */
 #define LIS3MDL_REG_OFFSET_X_L_M        0x05

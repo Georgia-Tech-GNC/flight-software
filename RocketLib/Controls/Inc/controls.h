@@ -12,7 +12,7 @@
 #ifndef __CONTROLS_H__
 #define __CONTROLS_H__
 
-_Static_assert(sizeof(float) == 4);
+_Static_assert(sizeof(float) == 4, "Invalid float size");
 typedef float float32_t;
 
 typedef struct { 

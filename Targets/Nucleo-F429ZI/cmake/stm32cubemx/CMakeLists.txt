@@ -15,7 +15,6 @@ target_compile_definitions(stm32cubemx INTERFACE
 
 target_include_directories(stm32cubemx INTERFACE
     ../../Core/Inc 
-    ../../Modules/Inc 
     ../../Drivers/STM32F4xx_HAL_Driver/Inc 
     ../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy 
     ../../Drivers/CMSIS/Device/ST/STM32F4xx/Include 
@@ -31,9 +30,6 @@ target_sources(stm32cubemx INTERFACE
     ../../Core/Src/syscalls.c 
     ../../Core/Src/sysmem.c 
     ../../Core/Src/system_stm32f4xx.c 
-    ../../Modules/Src/gpio.c 
-    ../../Modules/Src/rcc.c 
-    ../../Modules/Src/tim.c 
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c 
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.c 
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c 
@@ -59,6 +55,7 @@ target_sources(stm32cubemx INTERFACE
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c 
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c 
     ../../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_adc.c 
+    ../../startup_stm32f429xx.s
 )
 
 target_link_directories(stm32cubemx INTERFACE

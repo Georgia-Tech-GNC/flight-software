@@ -10,6 +10,8 @@
 extern USBH_HandleTypeDef usb_host;
 
 DSTATUS HALAL_storage_initialize(BYTE lun) {
+    UNUSED(lun);
+
     return RES_OK;
 }
 

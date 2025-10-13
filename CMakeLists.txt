@@ -119,6 +119,9 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     HALAL/Src/halal.c     
+    HALAL/Src/hal_timebase.c
+    HALAL/Src/Rcc/rcc_nucleo_f429zi.c
+    HALAL/Src/Timebase/timebase_tim.c
     HALAL/Src/Adc/adc_internal.c     
     HALAL/Src/Adc/adc_jet_vanes.c     
     HALAL/Src/Debug/debug_uart.c     
@@ -128,7 +131,8 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     HALAL/Src/Storage/storage_usb.c     
     HALAL/Src/Storage/usbh_diskio.c     
     HALAL/Src/Isr/uart_isr.c     
-    HALAL/Src/Isr/adc_isr.c     
+    HALAL/Src/Isr/adc_isr.c
+    HALAL/Src/Isr/tim_isr.c  
     RocketLib/USBHost/Class/MSC/Src/usbh_msc_bot.c     
     RocketLib/USBHost/Class/MSC/Src/usbh_msc_scsi.c     
     RocketLib/USBHost/Class/MSC/Src/usbh_msc.c     
@@ -191,5 +195,5 @@ add_custom_target(flash
     DEPENDS ./flight_software.elf
     COMMENT "Starting OpenOCD Server..."
     COMMAND ${CMAKE_COMMAND} -E echo ${OPENOCD_CFG_FILE_GLOBAL}
-    COMMAND openocd -s /usr/share/openocd/scripts -f ${OPENOCD_CFG_FILE} -c "program ./flight_software.elf verify reset exit" VERBATIM
+    COMMAND sudo openocd -s /usr/share/openocd/scripts -f ${OPENOCD_CFG_FILE} -c "program ./flight_software.elf verify reset exit" VERBATIM
 )

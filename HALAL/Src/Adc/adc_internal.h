@@ -14,13 +14,13 @@ typedef struct {
     uint32_t channel;       ///< ADC channel ID as defined by the HAL
     uint32_t sampling_time; ///< Sampling time as defined by the HAL
     uint32_t gpio_pin;      ///< GPIO pin as defined by the HAL
-    uint32_t gpio_port;     ///< GPIO port as defined by the HAL
+    GPIO_TypeDef *gpio_port;     ///< GPIO port as defined by the HAL
 } HALAL_ADCInternalChannelInit;
 
 ///Initialization struct of a HALAL internal ADC module.
 typedef struct {
     ADC_TypeDef *instance;                                                      ///< Base address of the ADC module as defined by the HAL
-    DMA_TypeDef *dma_instance;                                                  ///< Base address of the DMA module as defined by the HAL
+    DMA_Stream_TypeDef *dma_instance;                                                  ///< Base address of the DMA module as defined by the HAL
     IRQn_Type dma_irq;                                                          ///< IRQ number as defined by the HAL
     uint32_t dma_channel;                                                       ///< DMA channel ID as defined by the HAL
     uint32_t resolution;                                                        ///< ADC resolution as defined by the HAL
@@ -34,7 +34,7 @@ typedef struct {
     ADC_HandleTypeDef hal_adc;                                    ///< HAL ADC handle
     DMA_HandleTypeDef hal_dma;                                    ///< HAL DMA handle
     uint16_t channel_uuids[HALAL_ADC_INTERNAL_MAX_N_CHANNELS];    ///< Array of channel UUIDs
-    uint16_t channel_values[HALAL_ADC_INTERNAL_MAX_N_CHANNELS];   ///< Array of channel values
+    uint32_t channel_values[HALAL_ADC_INTERNAL_MAX_N_CHANNELS];   ///< Array of channel values
     uint8_t n_channels;                                           ///< Number of channels in the module
 } HALAL_ADCInternal;
 

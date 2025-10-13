@@ -1,6 +1,5 @@
 #include "sd_diskio.h"
 #include "fatfs_sd.h"
-#include "target.h"
 #include "diskio.h"
 #include "fatfs_sd.h"
 #include "stdint.h"

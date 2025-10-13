@@ -19,10 +19,14 @@ uint8_t rocket_init(void) {
     g_jet_vanes_task_handle = xTaskCreateStatic(jet_vanes_task, "jet_vanes_task", 4096, NULL, 1, jet_vanes_task_stack, &jet_vanes_task_buff);
     if (g_jet_vanes_task_handle == NULL) return 0;
     
+    log_printf(LOG_INFO, "Jet Vanes rocket initialized");
+
     return 1;
 }
 
 uint8_t rocket_start(void) {
+    log_printf(LOG_INFO, "Starting rocket OS");
+
     vTaskStartScheduler();
 
     return 1;

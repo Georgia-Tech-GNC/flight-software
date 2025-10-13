@@ -8,7 +8,6 @@
 #include "stddef.h"
 #include "lib.h"
 #include "log.h"
-#include "target.h"
 #include "util.h"
 #include "packet_encode.h"
 
@@ -23,6 +22,8 @@ uint8_t telemetry_send_message(uint8_t *payload, uint8_t payload_size, uint8_t m
  * @param args Unused
  */
 void state_tx_task(void *args) {
+    UNUSED(args);
+
     uint8_t payload_buf[TELEMETRY_MAX_PAYLOAD_SIZE];
 
     RocketStateStruct local_state;

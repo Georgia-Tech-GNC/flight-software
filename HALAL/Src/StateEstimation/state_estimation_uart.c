@@ -62,7 +62,7 @@ uint8_t HALAL_state_estimation_start(void) {
         return RET_FAILURE;
     }
 
-    if (HAL_UART_Transmit(&state_estimation_uart, "GO", 2, HAL_MAX_DELAY) != HAL_OK) {
+    if (HAL_UART_Transmit(&state_estimation_uart, (const uint8_t *) "GO", 2, HAL_MAX_DELAY) != HAL_OK) {
         return RET_FAILURE;
     }
 

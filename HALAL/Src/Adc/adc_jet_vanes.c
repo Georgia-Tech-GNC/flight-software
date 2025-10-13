@@ -5,9 +5,6 @@
 
 #include "jet_vanes.h"
 
-#pragma GCC diagnostic warning "-Wint-conversion"
-#pragma GCC diagnostic warning "-Wincompatible-pointer-types"
-
 /* 
  * YES, I AM AWARE THAT THIS CODE IS ATROCIOUS. 
  * We need to use some kind of template generation along with a real JSON config file for these ADCs 
@@ -169,7 +166,6 @@ uint8_t HALAL_adc_init(void) {
 
 #ifdef HALAL_ADC_JET_VANES_USE_ADC3
     if (!adc_internal_init(&adc_inits[HALAL_ADC_INTERNAL_3], &dummy)) {
-        log_printf(LOG_ERROR, "dawdjoiwa");
         return RET_FAILURE;
     }
 #endif

@@ -21,7 +21,7 @@ sudo apt update && sudo apt upgrade -y
 Installating specific packages
 
 ```
-sudo apt install make gcc gcc-arm-eabi-none
+sudo apt install make gcc gcc-arm-none-eabi
 ```
 
 ## Usage

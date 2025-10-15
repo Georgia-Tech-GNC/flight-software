@@ -55,10 +55,15 @@ uint8_t HALAL_init(void) {
     if (!HALAL_module_init(HALAL_flash_init, "flash chip")) return RET_FAILURE;
 #endif
 
+#ifdef HALAL_MAGNETOMETER_MODULE_ENABLED
+    if (!HALAL_module_init(HALAL_magnetometer_initialize, "magnetometer")) return RET_FAILURE;
+#endif
+
     return RET_SUCCESS;
 }
 
 static uint8_t HALAL_module_init(uint8_t (*init_function)(), const char *module_name) {
+    log_printf(LOG_INFO, "Initializing HALAL %s module...", module_name);
     if (init_function()) {
         log_printf(LOG_INFO, "HALAL %s module initialized", module_name);
         return RET_SUCCESS;

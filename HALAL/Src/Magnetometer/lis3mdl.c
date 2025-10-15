@@ -114,23 +114,13 @@
 #define LIS3MDL_BLOCK_UPDATE_EN         0b01000000
 #define LIS3MDL_BLOCK_UPDATE_DIS        0b00000000
 
-SPI_HandleTypeDef mag_spi = {0};
+static SPI_HandleTypeDef mag_spi = {0};
 
-/** 
- * @brief Write to a single register 
- * 
- * This function performs a single register write on a device though the STM32 SPI HAL.
- * @param reg register to write to 
- * @param data data to write to register
-*/
-
-magnetometer_err lis3mdl_write_register(uint8_t reg, uint8_t data) {
-    uint8_t transmit_buf[2] = {reg, data};
-    HAL_GPIO_WritePin(*HALAL_MAGNETOMETER_GPIO_PIN_CS_PORT, (uint16_t)HALAL_MAGNETOMETER_GPIO_PIN_CS, GPIO_PIN_RESET);
-    HAL_SPI_Transmit(&mag_spi, transmit_buf, 2, HAL_MAX_DELAY);
-    HAL_GPIO_WritePin(*HALAL_MAGNETOMETER_GPIO_PIN_CS_PORT, (uint16_t)HALAL_MAGNETOMETER_GPIO_PIN_CS, GPIO_PIN_SET);
-    return MAG_ERR_OK;
-}
+static magnetometer_err lis3mdl_get_sensitivity(double *sensitivity);
+static magnetometer_err lis3mdl_read_register(uint8_t reg, uint8_t *data);
+static magnetometer_err lis3mdl_write_multiple_registers(uint8_t start_reg, uint8_t bytes, uint8_t *data);
+static magnetometer_err lis3mdl_read_multiple_registers(uint8_t start_reg, uint8_t bytes, uint8_t *data);
+static magnetometer_err lis3mdl_write_register(uint8_t reg, uint8_t data);
 
 /**
  * @brief initializes magnetometer
@@ -138,8 +128,8 @@ magnetometer_err lis3mdl_write_register(uint8_t reg, uint8_t data) {
 */
 
 magnetometer_err HALAL_magnetometer_initialize() {
-    // Config SPI
-    mag_spi.Instance = HALAL_MAGNETOMETER_SPI;
+    mag_spi.Instance = HALAL_MAGNETOMETER_LIS3MDL_SPI_MODULE;
+    mag_spi.Init.Mode = SPI_MODE_MASTER;
     mag_spi.Init.Direction = SPI_DIRECTION_2LINES;
     mag_spi.Init.DataSize = SPI_DATASIZE_16BIT;
     mag_spi.Init.CLKPolarity = SPI_POLARITY_HIGH;
@@ -151,38 +141,20 @@ magnetometer_err HALAL_magnetometer_initialize() {
     mag_spi.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
     mag_spi.Init.CRCPolynomial = 0x0;
 
+    HALAL_MAGNETOMETER_LIS3MDL_SPI_CLK_EN();
+
     if (HAL_SPI_Init(&mag_spi) != HAL_OK) {
-        return RET_FAILURE;
+        return MAG_ERR_GENERAL;
     }
 
-    // Config GPIO
-    GPIO_InitTypeDef gpio_init = {0};
-
-    gpio_init.Mode = GPIO_MODE_AF_PP;
-    gpio_init.Pull = GPIO_NOPULL;
-    gpio_init.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-    gpio_init.Alternate = HALAL_MAGNETOMETER_GPIO_PIN_ALT;
-
-    gpio_init.Pin = HALAL_MAGNETOMETER_GPIO_PIN_CS;
-    HAL_GPIO_Init(HALAL_MAGNETOMETER_GPIO_PIN_CS, &gpio_init);
-
-    gpio_init.Pin = HALAL_MAGNETOMETER_GPIO_PIN_SPC;
-    HAL_GPIO_Init(HALAL_MAGNETOMETER_GPIO_PIN_SPC, &gpio_init);
-
-    gpio_init.Pin = HALAL_MAGNETOMETER_GPIO_PIN_SDI;
-    HAL_GPIO_Init(HALAL_MAGNETOMETER_GPIO_PIN_SDI, &gpio_init);
-
-    gpio_init.Pin = HALAL_MAGNETOMETER_GPIO_PIN_SDO;
-    HAL_GPIO_Init(HALAL_MAGNETOMETER_GPIO_PIN_SDO, &gpio_init);
-
     // Write config registers
-    lis3mdl_write_register(MAG_REG_CTRL3, MAG_CONTINUOUS_CONVERSION);
-    uint8_t ctrl_reg_1 = HALAL_MAGNETOMETER_TEMP_ENABLE | HALAL_MAGNETOMETER_DATA_RATE | HALAL_MAGNETOMETER_SELF_TEST;
-    lis3mdl_write_register(MAG_REG_CTRL1, ctrl_reg_1);
-    uint8_t ctrl_reg_2 = HALAL_MAGNETOMETER_FULL_SCALE;
-    lis3mdl_write_register(MAG_REG_CTRL2, ctrl_reg_2);
-    uint8_t ctrl_reg_4 = HALAL_MAGNETOMETER_Z_AXIS_MODE | HALAL_MAGNETOMETER_ENDIANNESS;
-    lis3mdl_write_register(MAG_REG_CTRL4, ctrl_reg_4);
+    lis3mdl_write_register(LIS3MDL_REG_CTRL3, LIS3MDL_CONTINUOUS_CONVERSION);
+    uint8_t ctrl_reg_1 = HALAL_MAGNETOMETER_LIS3MDL_TEMP_ENABLE | HALAL_MAGNETOMETER_LIS3MDL_SELF_TEST;
+    lis3mdl_write_register(LIS3MDL_REG_CTRL1, ctrl_reg_1);
+    uint8_t ctrl_reg_2 = HALAL_MAGNETOMETER_LIS3MDL_FULL_SCALE;
+    lis3mdl_write_register(LIS3MDL_REG_CTRL2, ctrl_reg_2);
+    uint8_t ctrl_reg_4 = HALAL_MAGNETOMETER_LIS3MDL_Z_AXIS_MODE | HALAL_MAGNETOMETER_LIS3MDL_ENDIANNESS;
+    lis3mdl_write_register(LIS3MDL_REG_CTRL4, ctrl_reg_4);
     return MAG_ERR_OK;
 }
 
@@ -197,11 +169,11 @@ magnetometer_err HALAL_magnetometer_initialize() {
 magnetometer_err HALAL_magnetometer_read_mag(double *mag_reading) {
     uint8_t mag_read_buf[6];
     double sensitivity = 0;
-    list3mdl_read_multiple_registers(MAG_REG_OUT_X_L, 6, mag_read_buf);
+    lis3mdl_read_multiple_registers(LIS3MDL_REG_OUT_X_L, 6, mag_read_buf);
     int16_t x_reading = (mag_read_buf[1] << 8) | mag_read_buf[0]; 
     int16_t y_reading = (mag_read_buf[3] << 8) | mag_read_buf[1]; 
     int16_t z_reading = (mag_read_buf[5] << 8) | mag_read_buf[2]; 
-    HALAL_magnetometer_sensitivity_get(&sensitivity);
+    lis3mdl_get_sensitivity(&sensitivity);
     mag_reading[0] = (double) x_reading / sensitivity;
     mag_reading[1] = (double) y_reading / sensitivity;
     mag_reading[2] = (double) z_reading / sensitivity;
@@ -217,7 +189,7 @@ magnetometer_err HALAL_magnetometer_read_mag(double *mag_reading) {
 
 magnetometer_err HALAL_magnetometer_read_temp(double *temp) {
     uint8_t temp_read_buff[2];
-    list3mdl_read_multiple_registers(MAG_REG_TEMP_OUT_L, 2, temp_read_buff);
+    lis3mdl_read_multiple_registers(LIS3MDL_REG_TEMP_OUT_L, 2, temp_read_buff);
     int16_t temp_reading = (temp_read_buff[1] << 8) | temp_read_buff[0];
     *temp = (double) temp_reading / 8.0f + 25.0f;
     return MAG_ERR_OK;
@@ -233,7 +205,7 @@ magnetometer_err HALAL_magnetometer_read_temp(double *temp) {
 magnetometer_err HALAL_magnetometer_write_hard_iron(double *hard_iron_offset) {
     int16_t hard_iron_ints[3];
     double sensitivity = 0;
-    HALAL_magnetometer_sensitivity_get(&sensitivity);
+    lis3mdl_get_sensitivity(&sensitivity);
     hard_iron_ints[0] = hard_iron_offset[0] * sensitivity;
     hard_iron_ints[1] = hard_iron_offset[1] * sensitivity;
     hard_iron_ints[2] = hard_iron_offset[2] * sensitivity;
@@ -248,8 +220,8 @@ magnetometer_err HALAL_magnetometer_write_hard_iron(double *hard_iron_offset) {
  * @warning this function determines the sensitivity based off the settings in the device structure. If these settings
  * do not match what is actually contained in the LIS3MDL_REG_CTRL2 register the sensitivty may be inaccurate.
 */
-magnetometer_err HALAL_magnetometer_sensitivity_get(double *sensitivity) {
-    switch (HALAL_MAGNETOMETER_FULL_SCALE) {
+magnetometer_err lis3mdl_get_sensitivity(double *sensitivity) {
+    switch (HALAL_MAGNETOMETER_LIS3MDL_FULL_SCALE) {
         case LIS3MDL_FS_4Gauss:
             *sensitivity = 6842.0f;
             break;
@@ -275,12 +247,16 @@ magnetometer_err HALAL_magnetometer_sensitivity_get(double *sensitivity) {
  * @param reg register to read 
  * @param data pointer to buffer to store read byte
 */
-magnetometer_err lis3mdl_read_register(uint8_t reg, uint8_t *data) {
+static magnetometer_err lis3mdl_read_register(uint8_t reg, uint8_t *data) {
     uint8_t transmit_buf[2] = {0x80 | reg, 0x00};
     uint8_t receive_buf[2];
-    HAL_GPIO_WritePin(*HALAL_MAGNETOMETER_GPIO_PIN_CS_PORT, (uint16_t)HALAL_MAGNETOMETER_GPIO_PIN_CS, GPIO_PIN_RESET);
-    HAL_SPI_TransmitReceive(&mag_spi, transmit_buf, receive_buf, 2, HAL_MAX_DELAY);
-    HAL_GPIO_WritePin(*HALAL_MAGNETOMETER_GPIO_PIN_CS_PORT, (uint16_t)HALAL_MAGNETOMETER_GPIO_PIN_CS, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(HALAL_MAGNETOMETER_LIS3MDL_SPI_CS_PORT, (uint16_t)HALAL_MAGNETOMETER_LIS3MDL_SPI_CS_PIN, GPIO_PIN_RESET);
+
+    if (HAL_SPI_TransmitReceive(&mag_spi, transmit_buf, receive_buf, 2, HALAL_MAGNETOMETER_LIS3MDL_SPI_TIMEOUT_MS) != HAL_OK) {
+        return MAG_ERR_GENERAL;
+    }
+
+    HAL_GPIO_WritePin(HALAL_MAGNETOMETER_LIS3MDL_SPI_CS_PORT, (uint16_t)HALAL_MAGNETOMETER_LIS3MDL_SPI_CS_PIN, GPIO_PIN_SET);
     *data = receive_buf[1];
     return MAG_ERR_OK;
 }
@@ -295,15 +271,19 @@ magnetometer_err lis3mdl_read_register(uint8_t reg, uint8_t *data) {
  * @param data pointer to buffer with data to write 
  * @warning no error checking is performed. Make sure to allocate appropriate buffer sizes for all inputs. 
 **/
-magnetometer_err lis3mdl_write_multiple_registers(uint8_t start_reg, uint8_t bytes, uint8_t *data) {
+static magnetometer_err lis3mdl_write_multiple_registers(uint8_t start_reg, uint8_t bytes, uint8_t *data) {
     uint8_t transmit_buf[bytes + 1];
     for (int i = 1; i <= bytes; i ++) {
         transmit_buf[i] = data[i - 1];
     }
     transmit_buf[0] = 0x40 | start_reg;
-    HAL_GPIO_WritePin(*HALAL_MAGNETOMETER_GPIO_PIN_CS_PORT, (uint16_t)HALAL_MAGNETOMETER_GPIO_PIN_CS, GPIO_PIN_RESET);
-    HAL_SPI_Transmit(&mag_spi, transmit_buf, bytes + 1, HAL_MAX_DELAY);
-    HAL_GPIO_WritePin(*HALAL_MAGNETOMETER_GPIO_PIN_CS_PORT, (uint16_t)HALAL_MAGNETOMETER_GPIO_PIN_CS, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(HALAL_MAGNETOMETER_LIS3MDL_SPI_CS_PORT, (uint16_t)HALAL_MAGNETOMETER_LIS3MDL_SPI_CS_PIN, GPIO_PIN_RESET);
+    
+    if (HAL_SPI_Transmit(&mag_spi, transmit_buf, bytes + 1, HALAL_MAGNETOMETER_LIS3MDL_SPI_TIMEOUT_MS) != HAL_OK) {
+        return MAG_ERR_GENERAL;
+    }
+    
+    HAL_GPIO_WritePin(HALAL_MAGNETOMETER_LIS3MDL_SPI_CS_PORT, (uint16_t)HALAL_MAGNETOMETER_LIS3MDL_SPI_CS_PIN, GPIO_PIN_SET);
     return MAG_ERR_OK;
 }
 
@@ -318,7 +298,7 @@ magnetometer_err lis3mdl_write_multiple_registers(uint8_t start_reg, uint8_t byt
  * @warning no error checking is performed. Make sure to allocate appropriate buffer sizes for all inputs. 
 */
 
-magnetometer_err lis3mdl_read_multiple_registers(uint8_t start_reg, uint8_t bytes, uint8_t *data) {
+static magnetometer_err lis3mdl_read_multiple_registers(uint8_t start_reg, uint8_t bytes, uint8_t *data) {
     // TODO: error handling
     uint8_t transmit_buf[bytes + 1];
     uint8_t receive_buf[bytes + 1];
@@ -326,11 +306,31 @@ magnetometer_err lis3mdl_read_multiple_registers(uint8_t start_reg, uint8_t byte
         transmit_buf[i] = 0x00;
     }
     transmit_buf[0] = 0xC0 | start_reg;
-    HAL_GPIO_WritePin(*HALAL_MAGNETOMETER_GPIO_PIN_CS_PORT, (uint16_t)HALAL_MAGNETOMETER_GPIO_PIN_CS, GPIO_PIN_RESET);
-    HAL_SPI_TransmitReceive(&mag_spi, transmit_buf, receive_buf, bytes + 1, HAL_MAX_DELAY);
-    HAL_GPIO_WritePin(*HALAL_MAGNETOMETER_GPIO_PIN_CS_PORT, (uint16_t)HALAL_MAGNETOMETER_GPIO_PIN_CS, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(HALAL_MAGNETOMETER_LIS3MDL_SPI_CS_PORT, (uint16_t)HALAL_MAGNETOMETER_LIS3MDL_SPI_CS_PIN, GPIO_PIN_RESET);
+
+    if (HAL_SPI_TransmitReceive(&mag_spi, transmit_buf, receive_buf, bytes + 1, HALAL_MAGNETOMETER_LIS3MDL_SPI_TIMEOUT_MS) != HAL_OK) {
+        return MAG_ERR_GENERAL;
+    }
+    
+    HAL_GPIO_WritePin(HALAL_MAGNETOMETER_LIS3MDL_SPI_CS_PORT, (uint16_t)HALAL_MAGNETOMETER_LIS3MDL_SPI_CS_PIN, GPIO_PIN_SET);
     for (int i = 0; i < bytes; i++) {
         data[i] = receive_buf[i + 1];
     }
+    return MAG_ERR_OK;
+}
+
+/** 
+ * @brief Write to a single register 
+ * 
+ * This function performs a single register write on a device though the STM32 SPI HAL.
+ * @param reg register to write to 
+ * @param data data to write to register
+*/
+
+static magnetometer_err lis3mdl_write_register(uint8_t reg, uint8_t data) {
+    uint8_t transmit_buf[2] = {reg, data};
+    HAL_GPIO_WritePin(HALAL_MAGNETOMETER_LIS3MDL_SPI_CS_PORT, (uint16_t)HALAL_MAGNETOMETER_LIS3MDL_SPI_CS_PIN, GPIO_PIN_RESET);
+    HAL_SPI_Transmit(&mag_spi, transmit_buf, 2, HALAL_MAGNETOMETER_LIS3MDL_SPI_TIMEOUT_MS);
+    HAL_GPIO_WritePin(HALAL_MAGNETOMETER_LIS3MDL_SPI_CS_PORT, (uint16_t)HALAL_MAGNETOMETER_LIS3MDL_SPI_CS_PIN, GPIO_PIN_SET);
     return MAG_ERR_OK;
 }

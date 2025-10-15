@@ -120,13 +120,14 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     HALAL/Src/halal.c     
     HALAL/Src/hal_timebase.c
-    HALAL/Src/Rcc/rcc_nucleo_h723zg.c
+    HALAL/Src/Rcc/rcc_nucleo_f429zi.c
     HALAL/Src/Timebase/timebase_tim.c
     HALAL/Src/Adc/adc_internal.c     
     HALAL/Src/Adc/adc_jet_vanes.c     
     HALAL/Src/Debug/debug_uart.c     
     HALAL/Src/Radio/radio_uart.c     
     HALAL/Src/StateEstimation/state_estimation_uart.c     
+    HALAL/Src/Magnetometer/lis3mdl.c
     HALAL/Src/FlashChip/fake_flash_chip.c     
     HALAL/Src/Storage/storage_usb.c     
     HALAL/Src/Storage/usbh_diskio.c     

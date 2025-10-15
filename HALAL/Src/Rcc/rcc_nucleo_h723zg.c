@@ -74,6 +74,13 @@ uint8_t HALAL_rcc_init(void) {
         return RET_FAILURE;
     }
 
+
+    periph_clk_init.PeriphClockSelection = RCC_PERIPHCLK_SPI4;
+    periph_clk_init.Spi45ClockSelection = RCC_SPI45CLKSOURCE_D2PCLK1;
+    
+    if (HAL_RCCEx_PeriphCLKConfig(&periph_clk_init) != HAL_OK) {
+        return RET_FAILURE;
+    }
     __HAL_RCC_GPIOA_CLK_ENABLE();
     __HAL_RCC_GPIOB_CLK_ENABLE();
     __HAL_RCC_GPIOC_CLK_ENABLE();

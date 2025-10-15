@@ -19,6 +19,7 @@ StackType_t usb_process_task_stack[1024];
 StaticTask_t usb_process_task_buff;
 
 uint8_t HALAL_storage_init(void) {
+
     if (USBH_Init(&usb_host, usb_host_user_process, HOST_FS) != USBH_OK) {
         return RET_FAILURE;
     }
@@ -38,12 +39,16 @@ uint8_t HALAL_storage_init(void) {
 }
 
 void usb_host_process_task(void *args) {
+    UNUSED(args);
+
     while (1) {
         USBH_Process(&usb_host);
     }
 }
 
 static void usb_host_user_process(USBH_HandleTypeDef *host, uint8_t id) {
+    UNUSED(host);
+
     switch(id) {
         case HOST_USER_CLASS_ACTIVE:
             xTaskNotify(g_state_flash_task_handle, FS_READY_NOTIFICATION_BIT, eSetBits);
@@ -54,38 +59,47 @@ static void usb_host_user_process(USBH_HandleTypeDef *host, uint8_t id) {
 void HAL_HCD_MspInit(HCD_HandleTypeDef* hcdHandle) {
     GPIO_InitTypeDef gpio_init = {0};
 
-    if (hcdHandle->Instance == USB_OTG_FS) {
-        __HAL_RCC_USB_OTG_FS_CLK_ENABLE();
+    if (hcdHandle->Instance == HALAL_STORAGE_USB_INSTANCE) {
+#ifdef TARGET_NUCLEO_H723ZG
+        HAL_PWREx_EnableUSBVoltageDetector();
+#endif
+        
+        HALAL_STORAGE_USB_CLK_ENABLE();
+
+        gpio_init.Pin = HALAL_STORAGE_USB_VBUS_EN_PIN;
+        gpio_init.Mode = GPIO_MODE_OUTPUT_PP;
+        gpio_init.Pull = GPIO_NOPULL;
+        gpio_init.Speed = GPIO_SPEED_FREQ_LOW;
+        HAL_GPIO_Init(HALAL_STORAGE_USB_VBUS_EN_PORT, &gpio_init);
 
         gpio_init.Pin = HALAL_STORAGE_USB_VBUS_PIN;
-        gpio_init.Mode = GPIO_MODE_INPUT;
-        gpio_init.Pull = GPIO_NOPULL;
-
         HAL_GPIO_Init(HALAL_STORAGE_USB_VBUS_PORT, &gpio_init);
+
+        HAL_GPIO_WritePin(HALAL_STORAGE_USB_VBUS_EN_PORT, HALAL_STORAGE_USB_VBUS_EN_PIN, HALAL_STORAGE_USB_VBUS_EN_STATE);
 
         gpio_init.Pin = HALAL_STORAGE_USB_DM_PIN;
         gpio_init.Mode = GPIO_MODE_AF_PP;
         gpio_init.Pull = GPIO_NOPULL;
         gpio_init.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-        gpio_init.Alternate = GPIO_AF10_OTG_FS;
+        gpio_init.Alternate = HALAL_STORAGE_USB_AF;
 
         HAL_GPIO_Init(HALAL_STORAGE_USB_DM_PORT, &gpio_init);
 
         gpio_init.Pin = HALAL_STORAGE_USB_DP_PIN;
         
         HAL_GPIO_Init(HALAL_STORAGE_USB_DP_PORT, &gpio_init);
-
-        gpio_init.Pin = HALAL_STORAGE_USB_DM_PIN;
-        gpio_init.Mode = GPIO_MODE_OUTPUT_PP;
-        gpio_init.Pull = GPIO_NOPULL;
+        
+        gpio_init.Pin = HALAL_STORAGE_USB_ID_PIN;
         gpio_init.Speed = GPIO_SPEED_FREQ_LOW;
+        
+        HAL_GPIO_Init(HALAL_STORAGE_USB_ID_PORT, &gpio_init);
 
-        HAL_NVIC_SetPriority(OTG_FS_IRQn, 5, 0);
-        HAL_NVIC_EnableIRQ(OTG_FS_IRQn);
+        HAL_NVIC_SetPriority(HALAL_STORAGE_USB_IRQn, 5, 0);
+        HAL_NVIC_EnableIRQ(HALAL_STORAGE_USB_IRQn);
     }
 }
 
-void OTG_FS_IRQHandler(void) {
+void HALAL_STORAGE_USB_ISR(void) {
     HAL_HCD_IRQHandler(&hcd_usb_host);
 }
 
@@ -94,9 +108,9 @@ USBH_StatusTypeDef USBH_LL_Init(USBH_HandleTypeDef *phost) {
         hcd_usb_host.pData = phost;
         phost->pData = &hcd_usb_host;
         
-        hcd_usb_host.Instance = USB_OTG_FS;
+        hcd_usb_host.Instance = HALAL_STORAGE_USB_INSTANCE;
         hcd_usb_host.Init.Host_channels = 8;
-        hcd_usb_host.Init.speed = HCD_SPEED_FULL;
+        hcd_usb_host.Init.speed = HALAL_STORAGE_USB_SPEED;
         hcd_usb_host.Init.dma_enable = DISABLE;
         hcd_usb_host.Init.phy_itface = HCD_PHY_EMBEDDED;
         hcd_usb_host.Init.Sof_enable = DISABLE;
@@ -115,6 +129,8 @@ USBH_StatusTypeDef USBH_LL_Init(USBH_HandleTypeDef *phost) {
 }
 
 USBH_StatusTypeDef USBH_LL_DriverVBUS(USBH_HandleTypeDef *phost, uint8_t state) {
+    log_printf(LOG_INFO, "Setting VBUS %d", state);
+    
     if (phost->id == HOST_FS) {
         GPIO_PinState pin_state = (state == 1) ? GPIO_PIN_SET : GPIO_PIN_RESET;
    

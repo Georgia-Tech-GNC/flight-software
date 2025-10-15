@@ -43,4 +43,6 @@ uint8_t HALAL_flash_erase_page(size_t page, size_t n_pages) {
     }
 
     memset(fake_flash_chip + page * HALAL_FAKE_FLASH_CHIP_PAGE_SIZE, 0, n_pages * HALAL_FAKE_FLASH_CHIP_PAGE_SIZE);
+
+    return RET_SUCCESS;
 }

@@ -1,7 +1,6 @@
 #include "fs_wrapper.h"
 #include "ff.h"
 
-#include "target.h"
 #include "log.h"
 #include "util.h"
 #include <string.h>

@@ -18,18 +18,20 @@ uint8_t adc_internal_init(HALAL_ADCInternalInit *init, HALAL_ADCInternalHandle *
         return RET_FAILURE;
     }
 
-    if (init->n_channels >= HALAL_ADC_INTERNAL_MAX_N_MODULES) {
+    n_handles ++;
+
+    if (init->n_channels >= HALAL_ADC_INTERNAL_MAX_N_CHANNELS) {
         return RET_FAILURE;
     }
 
     if (init->instance == ADC1) {
-        __HAL_RCC_ADC1_CLK_ENABLE();
+        HALAL_ADC_INTERNAL_ADC1_CLK_EN();
         *handle = HALAL_ADC_INTERNAL_1;
     } else if (init->instance == ADC2) {
-        __HAL_RCC_ADC2_CLK_ENABLE();
+        HALAL_ADC_INTERNAL_ADC2_CLK_EN();
         *handle = HALAL_ADC_INTERNAL_2;
     } else if (init->instance == ADC3) {
-        __HAL_RCC_ADC3_CLK_ENABLE();
+        HALAL_ADC_INTERNAL_ADC3_CLK_EN();
         *handle = HALAL_ADC_INTERNAL_3;
     } else {
         return RET_FAILURE;
@@ -54,9 +56,7 @@ uint8_t adc_internal_init(HALAL_ADCInternalInit *init, HALAL_ADCInternalHandle *
     hal_adc->Init.DiscontinuousConvMode = DISABLE;
     hal_adc->Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
     hal_adc->Init.ExternalTrigConv = ADC_SOFTWARE_START;
-    hal_adc->Init.DataAlign = ADC_DATAALIGN_RIGHT;
     hal_adc->Init.NbrOfConversion = init->n_channels;
-    hal_adc->Init.DMAContinuousRequests = DISABLE;
     hal_adc->Init.EOCSelection = ADC_EOC_SEQ_CONV;
 
     if (HAL_ADC_Init(hal_adc) != HAL_OK) {
@@ -75,7 +75,7 @@ uint8_t adc_internal_init(HALAL_ADCInternalInit *init, HALAL_ADCInternalHandle *
         gpio_init.Pin = channel->gpio_pin;
         gpio_init.Mode = GPIO_MODE_ANALOG;
         gpio_init.Pull = GPIO_NOPULL;
-        HAL_GPIO_Init((GPIO_TypeDef*) channel->gpio_port, &gpio_init);
+        HAL_GPIO_Init(channel->gpio_port, &gpio_init);
 
         if (HAL_ADC_ConfigChannel(hal_adc, &adc_channel) != HAL_OK) {
             return RET_FAILURE;
@@ -87,8 +87,13 @@ uint8_t adc_internal_init(HALAL_ADCInternalInit *init, HALAL_ADCInternalHandle *
 
     DMA_HandleTypeDef *hal_dma = &adc->hal_dma;
 
-    hal_dma->Instance = (DMA_Stream_TypeDef*) init->dma_instance;
+    hal_dma->Instance = init->dma_instance;
+#ifdef TARGET_NUCLEO_F429ZI
     hal_dma->Init.Channel = init->dma_channel;
+#endif
+#ifdef TARGET_NUCLEO_H723ZG
+    hal_dma->Init.Request = init->dma_channel;
+#endif
     hal_dma->Init.Direction = DMA_PERIPH_TO_MEMORY;
     hal_dma->Init.PeriphInc = DMA_PINC_DISABLE;
     hal_dma->Init.MemInc = DMA_MINC_ENABLE;
@@ -140,7 +145,7 @@ void ADC_IRQHandler(void) {
 uint8_t adc_internal_convert(HALAL_ADCInternalHandle handle) {
     HALAL_ADCInternal *adc = &adcs[handle];
 
-    if (HAL_ADC_Start_DMA(&adc->hal_adc, (uint32_t*) adc->channel_values, adc->n_channels) != HAL_OK) {
+    if (HAL_ADC_Start_DMA(&adc->hal_adc, adc->channel_values, adc->n_channels) != HAL_OK) {
         return RET_FAILURE;
     }
 

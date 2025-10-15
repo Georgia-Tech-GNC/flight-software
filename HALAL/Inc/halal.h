@@ -8,6 +8,11 @@
     #include "nucleo_f429zi_halal.h"
 #endif
 
+#ifdef TARGET_NUCLEO_H723ZG
+    #include "stm32h7xx_hal.h"
+    #include "nucleo_h723zg_halal.h"
+#endif
+
 #ifdef HALAL_ADC_MODULE_ENABLED
     #include "adc.h"
 #endif
@@ -31,7 +36,7 @@
 uint8_t HALAL_init(void);
 
 /* HALAL Weak function definitions */
-void __attribute__((weak)) HALAL_adc_convert_callback(uint32_t channel_uuid, uint16_t adc_value, BaseType_t *xHigherPriorityTaskWoken);
+void __attribute__((weak)) HALAL_adc_convert_callback(uint32_t channel_uuid, uint32_t adc_value, BaseType_t *xHigherPriorityTaskWoken);
 void __attribute__((weak)) HALAL_state_estimation_callback(uint8_t *state_estimation_bytes, size_t size, BaseType_t *xHigherPriorityTaskWoken);
 void __attribute__((weak)) HALAL_radio_callback(uint8_t *radio_bytes, size_t size, BaseType_t *xHigherPriorityTaskWoken);
 

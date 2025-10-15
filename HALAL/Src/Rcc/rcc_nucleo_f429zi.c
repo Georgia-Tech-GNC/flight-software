@@ -1,8 +1,8 @@
 #include "rcc.h"
-#include "stm32f4xx_hal.h"
+#include "halal.h"
 #include "util.h"
 
-uint8_t rcc_init(void) {
+uint8_t HALAL_rcc_init(void) {
     RCC_OscInitTypeDef RCC_OscInitStruct = {0};
     RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
@@ -32,6 +32,14 @@ uint8_t rcc_init(void) {
     if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5) != HAL_OK) {
         return RET_FAILURE;
     }
+
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    __HAL_RCC_GPIOB_CLK_ENABLE();
+    __HAL_RCC_GPIOC_CLK_ENABLE();
+    __HAL_RCC_GPIOD_CLK_ENABLE();
+    __HAL_RCC_GPIOE_CLK_ENABLE();
+    __HAL_RCC_GPIOF_CLK_ENABLE();
+    __HAL_RCC_GPIOG_CLK_ENABLE();
 
     return RET_SUCCESS;
 }

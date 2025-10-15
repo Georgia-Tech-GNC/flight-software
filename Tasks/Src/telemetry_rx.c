@@ -21,6 +21,8 @@ void rx_process_byte(uint8_t byte, uint8_t *packet_buffer, uint8_t *extracted_bu
  * @param args Unused
  */
 void telemetry_rx_task(void *args) {
+    UNUSED(args);
+
     /* Buffer to hold received bytes before they are processed */
     uint8_t bytes_to_process[TELEMETRY_RX_MAX_PROCESS_SIZE];
 

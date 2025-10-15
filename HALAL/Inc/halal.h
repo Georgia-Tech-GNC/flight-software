@@ -33,6 +33,10 @@
     #include "flash_chip.h"
 #endif
 
+#ifdef HALAL_MAGNETOMETER_MODULE_ENABLED
+    #include "magnetometer.h"
+#endif
+
 uint8_t HALAL_init(void);
 
 /* HALAL Weak function definitions */

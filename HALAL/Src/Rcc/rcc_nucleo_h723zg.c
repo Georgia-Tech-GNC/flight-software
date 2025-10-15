@@ -71,7 +71,7 @@ uint8_t HALAL_rcc_init(void) {
     periph_clk_init.UsbClockSelection = RCC_USBCLKSOURCE_HSI48;
     
     if (HAL_RCCEx_PeriphCLKConfig(&periph_clk_init) != HAL_OK) {
-        Error_Handler();
+        return RET_FAILURE;
     }
 
     __HAL_RCC_GPIOA_CLK_ENABLE();

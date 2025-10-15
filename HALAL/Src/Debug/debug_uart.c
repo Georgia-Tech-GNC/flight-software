@@ -42,7 +42,7 @@ uint8_t HALAL_debug_init(void) {
 }
 
 uint8_t HALAL_debug_write(const char *msg, size_t len, uint32_t timeout) {
-    if (HAL_UART_Transmit(&debug_uart, msg, len, timeout) == HAL_OK) {
+    if (HAL_UART_Transmit(&debug_uart, (const uint8_t *) msg, len, timeout) == HAL_OK) {
         return RET_SUCCESS;
     }
 

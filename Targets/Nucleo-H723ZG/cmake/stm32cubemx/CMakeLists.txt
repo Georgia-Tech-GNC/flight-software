@@ -25,8 +25,6 @@ target_include_directories(stm32cubemx INTERFACE
 
 target_sources(stm32cubemx INTERFACE
     ../../Core/Src/main.c
-    ../../Core/Src/stm32h7xx_it.c
-    ../../Core/Src/stm32h7xx_hal_msp.c
     ../../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_cortex.c
     ../../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rcc.c
     ../../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rcc_ex.c
@@ -34,6 +32,9 @@ target_sources(stm32cubemx INTERFACE
     ../../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash_ex.c
     ../../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_gpio.c
     ../../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_hsem.c
+    ../../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc.c
+    ../../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_adc_ex.c
+    ../../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_hcd.c
     ../../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma.c
     ../../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma_ex.c
     ../../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_mdma.c
@@ -42,6 +43,8 @@ target_sources(stm32cubemx INTERFACE
     ../../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal.c
     ../../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_i2c.c
     ../../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_i2c_ex.c
+    ../../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_spi.c
+    ../../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_spi_ex.c
     ../../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_exti.c
     ../../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_eth.c
     ../../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_eth_ex.c
@@ -49,9 +52,11 @@ target_sources(stm32cubemx INTERFACE
     ../../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_tim_ex.c
     ../../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart.c
     ../../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart_ex.c
+    ../../Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_usb.c
     ../../Core/Src/system_stm32h7xx.c
     ../../Core/Src/sysmem.c
     ../../Core/Src/syscalls.c
+    ../../Core/Src/port.c
     ../../startup_stm32h723xx.s
 )
 

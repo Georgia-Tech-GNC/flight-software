@@ -10,6 +10,10 @@
 #define TRUE 1
 #define FALSE 0
 
+#ifndef UNUSED
+#define UNUSED(x) ((void)(x))
+#endif
+
 uint32_t await_notification_indexed(uint32_t index, uint32_t mask);
 uint32_t await_notification(uint32_t mask);
 uint8_t memcpy_state(RocketStateStruct *rocket_state);

@@ -34,6 +34,12 @@ void flash_fs(FSFile *file, size_t n_states);
  * @param args Unused
  */
 void state_flash_task(void *args) {
+    UNUSED(args);
+
+    vTaskDelay(100);
+
+    log_printf(LOG_INFO, "Awaiting filesystem");
+
     await_notification(FS_READY_NOTIFICATION_BIT);
 
     if (fs_mount()) {

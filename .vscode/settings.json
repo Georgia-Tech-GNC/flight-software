@@ -1,0 +1,7 @@
+{
+  "files.associations": {
+    "stdint.h": "c",
+    "radio.h": "c",
+    "stm32f4xx_hal_spi.h": "c"
+  }
+}

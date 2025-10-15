@@ -54,10 +54,10 @@ uint8_t get_end_msg_id(void) {
 }
 
 uint8_t packet_encode(uint8_t message_id, JetVanesRocketState *rocket_state, uint8_t *payload_buf, size_t payload_buf_size, size_t *bytes_written) {
-    int msg_size = get_msg_size(message_id);
+    size_t msg_size = get_msg_size(message_id);
 
-    rocket_assert(msg_size > 0, "Encode valid packet");
-    rocket_assert(msg_size <= payload_buf_size, "Encode packet size less than buffer size");
+    if (!rocket_assert(msg_size > 0, "Encode valid packet")) return RET_FAILURE;
+    if (!rocket_assert(msg_size <= payload_buf_size, "Encode packet size less than buffer size")) return RET_FAILURE;
 
 	*bytes_written = get_msg_size(message_id);
     
@@ -91,9 +91,7 @@ uint8_t packet_encode(uint8_t message_id, JetVanesRocketState *rocket_state, uin
 uint8_t csv_encode(JetVanesRocketState *rocket_state, char *csv_line, size_t csv_line_size, size_t *bytes_written) {
     size_t len = 0;
 
-	if (!rocket_assert(csv_line_size >= CSV_LINE_LEN + 1, "CSV line buffer size")) {
-		return RET_FAILURE;
-	}
+	if (!rocket_assert(csv_line_size >= CSV_LINE_LEN + 1, "CSV line buffer size")) return RET_FAILURE;
     
     len += snprintf(csv_line + len, CSV_CELL_MAX_LEN, "%lu,", (uint32_t) rocket_state->launch_timestamp);
     len += snprintf(csv_line + len, CSV_CELL_MAX_LEN, "%lu,", (uint32_t) (rocket_state->state_vector.timestamp));
@@ -179,6 +177,8 @@ void set_adc_value(JetVanesRocketState *rocket_state, JetVanesADCChannel channel
 }
 
 uint8_t update_rocket_state(RocketStateStruct *rocket_state, uint8_t *state_estimation_bytes, size_t size) {
+	if (!rocket_assert(size == 114, "Correct state estimation struct size")) return RET_FAILURE;
+	
 	uint8_t *serial_buffer = state_estimation_bytes + 37;
 	uint8_t *sensors_buffer = state_estimation_bytes;
 

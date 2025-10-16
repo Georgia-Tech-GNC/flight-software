@@ -30,8 +30,10 @@ uint8_t HALAL_init(void) {
     if (!HALAL_module_init(HALAL_debug_init, "debug")) return RET_FAILURE;
 #endif
 
+    uint8_t status = RET_SUCCESS;
+
 #ifdef HALAL_STORAGE_MODULE_ENABLED
-    if (!HALAL_module_init(HALAL_storage_init, "storage")) return RET_FAILURE;
+    if (!HALAL_module_init(HALAL_storage_init, "storage")) status = RET_FAILURE;
     if (FATFS_LinkDriver(&diskio_driver, "") == 0) {
         log_printf(LOG_INFO, "FATFS driver linked");
     } else {
@@ -40,30 +42,30 @@ uint8_t HALAL_init(void) {
 #endif
 
 #ifdef HALAL_RADIO_MODULE_ENABLED
-    if (!HALAL_module_init(HALAL_radio_init, "radio")) return RET_FAILURE;
+    if (!HALAL_module_init(HALAL_radio_init, "radio")) status = RET_FAILURE;
 #endif
 
 #ifdef HALAL_STATE_ESTIMATION_MODULE_ENABLED
-    if (!HALAL_module_init(HALAL_state_estimation_init, "state estimation")) return RET_FAILURE;
+    if (!HALAL_module_init(HALAL_state_estimation_init, "state estimation")) status = RET_FAILURE;
 #endif
 
 #ifdef HALAL_ADC_MODULE_ENABLED
-    if (!HALAL_module_init(HALAL_adc_init, "ADC")) return RET_FAILURE;
+    if (!HALAL_module_init(HALAL_adc_init, "ADC")) status = RET_FAILURE;
 #endif
 
 #ifdef HALAL_FLASH_CHIP_MODULE_ENABLED
-    if (!HALAL_module_init(HALAL_flash_init, "flash chip")) return RET_FAILURE;
+    if (!HALAL_module_init(HALAL_flash_init, "flash chip")) status = RET_FAILURE;
 #endif
 
 #ifdef HALAL_BAROMETER_MODULE_ENABLED
-    if (!HALAL_module_init(HALAL_barometer_init, "barometer")) return RET_FAILURE;
+    if (!HALAL_module_init(HALAL_barometer_init, "barometer")) status = RET_FAILURE;
 #endif
 
 #ifdef HALAL_MAGNETOMETER_MODULE_ENABLED
-    if (!HALAL_module_init(HALAL_magnetometer_initialize, "magnetometer")) return RET_FAILURE;
+    if (!HALAL_module_init(HALAL_magnetometer_initialize, "magnetometer")) status = RET_FAILURE;
 #endif
 
-    return RET_SUCCESS;
+    return status;
 }
 
 static uint8_t HALAL_module_init(uint8_t (*init_function)(), const char *module_name) {

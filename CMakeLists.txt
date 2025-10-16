@@ -128,6 +128,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     HALAL/Src/Radio/radio_uart.c     
     HALAL/Src/StateEstimation/state_estimation_uart.c     
     HALAL/Src/Magnetometer/lis3mdl.c
+    HALAL/Src/Barometer/ms5607.c
     HALAL/Src/FlashChip/fake_flash_chip.c     
     HALAL/Src/Storage/storage_usb.c     
     HALAL/Src/Storage/usbh_diskio.c     

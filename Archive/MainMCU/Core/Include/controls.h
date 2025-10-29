@@ -41,7 +41,7 @@ typedef struct {
         //Thrust at each second from t = 0 to t = 14, i.e., thrust_curve = {T(0.0), T(1.0), T(2.0), T(3.0), etc.}
     float current_thrust;
 
-} controller;
+} Controller;
 
 // Structure to hold LQR gain data for a given time and state
 #ifndef LQRGainSet_DEFINED
@@ -70,14 +70,14 @@ extern const ReferenceState ref_state_data[]; // Declare the array of reference 
 
 extern const int num_ref_state_entries; // Declare the number of entries in the reference state array
 
-void LQR_gain_selector(controller *ctrl);
-void reference_selector(controller *ctrl);
-void compute_controls(controller *ctrl);
-void update_yaw_moment_arm(controller *ctrl);
-void moment_to_sideforce(controller *ctrl);
-void sideforce_to_vane_angle(controller *ctrl);
-void vane_angle_to_servo_angle(controller *ctrl);
-void initialize_controls(controller *ctrl);
-void run_controls(controller *ctrl, float *state, float elapsed_time);
+void LQR_gain_selector(Controller *ctrl);
+void reference_selector(Controller *ctrl);
+void compute_controls(Controller *ctrl);
+void update_yaw_moment_arm(Controller *ctrl);
+void moment_to_sideforce(Controller *ctrl);
+void sideforce_to_vane_angle(Controller *ctrl);
+void vane_angle_to_servo_angle(Controller *ctrl);
+void initialize_controls(Controller *ctrl);
+void run_controls(Controller *ctrl, float *state, float elapsed_time);
 
 #endif

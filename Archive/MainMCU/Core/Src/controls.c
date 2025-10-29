@@ -19,7 +19,7 @@
  * @return closest matching LQR gain
  * @note
 */
-void LQR_gain_selector(controller *ctrl){
+void LQR_gain_selector(Controller *ctrl){
     int t = (int)round(ctrl->time_since_launch);
     float q3 = ctrl->x[8];
     float airspeed = sqrt(ctrl->x[0] * ctrl->x[0] + ctrl->x[1] * ctrl->x[1] + ctrl->x[2] * ctrl->x[2]);
@@ -58,7 +58,7 @@ void LQR_gain_selector(controller *ctrl){
  * @return correct reference state
  * @note
 */
-void reference_selector(controller *ctrl){
+void reference_selector(Controller *ctrl){
     int t = (int)round(ctrl->time_since_launch);
     float base_x0[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
@@ -76,10 +76,10 @@ void reference_selector(controller *ctrl){
 /**
  * @brief Initializes the control struct with all default values
  * @param ctrl Takes controller struct, but uses all variables in the struct
- * @return Initializes all variables in the controller struct
+ * @return Initializes all variables in the Controller struct
  * @note 
 */
-void initialize_controls(controller *ctrl) {
+void initialize_controls(Controller *ctrl) {
     for (int i = 0; i < 9; i++) {
         ctrl->x[i] = 0.0;
         ctrl->x0[i] = 0.0;
@@ -126,7 +126,7 @@ void initialize_controls(controller *ctrl) {
  * @return Updates the control moments in the controller struct
  * @note 
 */
-void compute_controls(controller *ctrl) {
+void compute_controls(Controller *ctrl) {
     float del_x[9] = {0};
     float roll = 0.0;
     float pitch = 0.0;
@@ -169,7 +169,7 @@ void compute_controls(controller *ctrl) {
  * @return Updates yaw_moment_arm variable in controller struct
  * @note Uses linear interpolation
 */
-void update_yaw_moment_arm(controller *ctrl){
+void update_yaw_moment_arm(Controller *ctrl){
     float yaw_moment_arm_0 = 0.967; //initial yaw moment arm, m
     float yaw_moment_arm_f = 1.06; //final yaw moment arm, m
     
@@ -185,7 +185,7 @@ void update_yaw_moment_arm(controller *ctrl){
  * @return Updates values of forces 1-D array, forces = [F_roll, F_pitch]
  * @note Uses the fact that M = F*d
 */
-void moment_to_sideforce(controller *ctrl){
+void moment_to_sideforce(Controller *ctrl){
     ctrl->forces[0] = ctrl->M_roll/ctrl->roll_moment_arm;
     ctrl->forces[1] = ctrl->M_yaw/ctrl->yaw_moment_arm;
 }
@@ -197,7 +197,7 @@ void moment_to_sideforce(controller *ctrl){
  * @return Updates vane_deflections 1-D array [roll1, roll2, yaw1, yaw2]
  * @note Sign conventions for vanes are important here!
 */
-void sideforce_to_vane_angle(controller *ctrl){ //TODO: UPDATE BASED ON ACTUAL SIDEFORCE MODEL
+void sideforce_to_vane_angle(Controller *ctrl){ //TODO: UPDATE BASED ON ACTUAL SIDEFORCE MODEL
     int rounded_down_second = (int)floor(ctrl->time_since_launch);
 
     if (ctrl->time_since_launch >= 13.8){ //If more than 13.8 seconds has passed since launch, assume no thrust
@@ -244,7 +244,7 @@ void sideforce_to_vane_angle(controller *ctrl){ //TODO: UPDATE BASED ON ACTUAL S
  * @return Updates the servo_deflections 1-D array
  * @note Turn a vane by x degrees --> Turn the servo by (8/5)*x degrees according to the gear ratio in servo drivetrain
 */
-void vane_angle_to_servo_angle(controller *ctrl){
+void vane_angle_to_servo_angle(Controller *ctrl){
 
     ctrl->servo_deflections[0] = ctrl->vane_deflections[0]*(8.0/5.0); //roll servo 1
     ctrl->servo_deflections[1] = ctrl->vane_deflections[1]*(8.0/5.0); //roll servo 2
@@ -260,7 +260,7 @@ void vane_angle_to_servo_angle(controller *ctrl){
  * @return
  * @note
 */
-void run_controls(controller *ctrl, float *state, float elapsed_time){
+void run_controls(Controller *ctrl, float *state, float elapsed_time){
     // Update time since launch
     ctrl->time_since_launch = elapsed_time;
 

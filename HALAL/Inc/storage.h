@@ -5,7 +5,6 @@
 #include "ff_gen_drv.h"
 
 uint8_t HALAL_storage_init(void);
-uint8_t HALAL_storage_start(void);
 
 DSTATUS HALAL_storage_initialize(BYTE);
 DSTATUS HALAL_storage_status(BYTE);

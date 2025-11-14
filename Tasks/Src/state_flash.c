@@ -38,9 +38,11 @@ void state_flash_task(void *args) {
 
     vTaskDelay(100);
 
+#ifdef HALAL_STORAGE_USB_MODULE_ENABLED
     log_printf(LOG_INFO, "Awaiting filesystem");
 
     await_notification(FS_READY_NOTIFICATION_BIT);
+#endif
 
     if (fs_mount()) {
         log_printf(LOG_INFO, "File system mounted");

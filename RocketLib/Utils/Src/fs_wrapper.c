@@ -134,7 +134,10 @@ uint8_t fs_write_file(FSFile *file, uint16_t start_addr, const uint8_t *data, si
         size_t write_size = (remaining > FS_MAX_READ_WRITE_SIZE) ? FS_MAX_READ_WRITE_SIZE : remaining;
 
         UINT bytes_written;
-        if (f_write(&file->fil, data + offset, write_size, &bytes_written) != FR_OK) {
+        FRESULT status = f_write(&file->fil, data + offset, write_size, &bytes_written);
+
+        if (status != FR_OK) {
+            log_printf(LOG_ERROR, "Failed to write to file: %d\n", status);
             return RET_FAILURE;
         }
     }

@@ -12,12 +12,18 @@
 
 #include "imu.h"
 #include "stm32h7xx.h"
-#include "stm32f4xx_hal_gpio.h"
 #include "arm_math.h"
-#include "stm32h7xx_hal_spi.h"
 #include "nucleo_f429zi_halal.h"
 #include <stdint.h>
 #include <stdbool.h>
+#ifdef STM32H7xx_HAL_SPI_H
+    #include "stm32h7xx_hal_gpio.h"
+#endif
+#include "stm32h7xx_hal_spi.h"
+#ifdef STM32H7xx_HAL_SPI_H
+    #include "stm32f4xx_hal_gpio.h"
+#endif
+
 
 typedef __int32 int32_t;
 typedef unsigned __int32 uint32_t;
@@ -85,16 +91,8 @@ typedef enum {
 typedef enum Determinants{
     ADIS_GYRO,
     ADIS_ACCEL,
-    ADIS_GYRO_32,
-    ADIS_ACCEL_32,
-    ADIS_GYRO_32_ALL,
-    ADIS_ACCEL_32_ALL,
     ADIS_DELTA_ANGLE,
     ADIS_DELTA_VEL,
-    ADIS_DELTA_ANGLE_32,
-    ADIS_DELTA_VEL_32,
-    ADIS_DELTA_ANGLE_32_ALL,
-    ADIS_DELTA_VEL_32_ALL
 };
 
 typedef struct {
@@ -108,6 +106,12 @@ typedef struct {
     double y_accl_out;
     double z_accl_out;
     double temp_out;
+    double x_delta_ang_out;
+    double y_delta_ang_out;
+    double z_delta_ang_out;
+    double x_delta_vel_out;
+    double y_delta_vel_out;
+    double z_delta_vel_out;
 } ADIS16500_Data;
 
 struct ADIS_BurstData {
@@ -126,6 +130,7 @@ struct ADIS_Device {
 
 struct ADIS_Device device;
 struct ADIS_BurstData burstData;
+ADIS16500_Data adis_data;
 float32_t accel_readings[3];
 float32_t gyro_readings[3];
 
@@ -153,6 +158,32 @@ int16_t imu_read_register(uint8_t addr) {
 	return (rxbuf[1] << 8) | (rxbuf[0] & 0xFF);
 }
 
+void HALAL_imu_init() {
+    device.cs_pin = (GPIO_TypeDef*)ADIS_DEVICE_CS_PIN;
+    device.cs_pin_port = ADIS_DEVICE_CS_PIN_PORT ;
+    device.spi_handle = (SPI_HandleTypeDef*)device.spi_handle; // Assuming hspi1 is defined and initialized elsewhere
+
+    GPIO_InitTypeDef gpio_init = {0};
+    gpio_init.Pin = device.cs_pin_port;
+    gpio_init.Mode = GPIO_MODE_OUTPUT_PP;
+    gpio_init.Pull = GPIO_NOPULL;
+    gpio_init.Speed = GPIO_SPEED_FREQ_LOW;
+    gpio_init.Alternate = 0;
+  
+    HAL_GPIO_Init(device.cs_pin, &gpio_init);
+
+    // Set CS pin high
+    HAL_GPIO_WritePin(device.cs_pin, device.cs_pin_port, GPIO_PIN_SET);
+
+    // Initialize DWT for microsecond delay
+    DWT_Init();
+}
+
+void imu_read_and_transmite() {
+    imu_read_specific(DETERMINANT, DATA_SIZE_IN_BITS);
+}
+
+
 /**
  * @brief writes a value to a register, given the value
  * @param device instance of ADIS IMU device
@@ -167,14 +198,14 @@ void imu_write_register(uint8_t addr, uint16_t value) {
 	uint8_t lower_word[2] = {low_word >> 8, low_word & 0xFF};
 
 	/* Writing words to SPI channel */
-	HAL_GPIO_WritePin((GPIO_TypeDef*) device.cs_pin, (uint16_t) device.cs_pin_port, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin((GPIO_TypeDef*)device.cs_pin, (uint16_t)device.cs_pin_port, GPIO_PIN_RESET);
 	HAL_SPI_Transmit((SPI_HandleTypeDef*)device.spi_handle, upper_word, 2, HAL_MAX_DELAY);
-	HAL_GPIO_WritePin((GPIO_TypeDef*) device.cs_pin, (uint16_t) device.cs_pin_port, GPIO_PIN_SET);
+	HAL_GPIO_WritePin((GPIO_TypeDef*)device.cs_pin, (uint16_t).cs_pin_port, GPIO_PIN_SET);
 	delay_us(5);
 
-	HAL_GPIO_WritePin((GPIO_TypeDef*) device.cs_pin, (uint16_t) device.cs_pin_port, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin((GPIO_TypeDef*)device.cs_pin, (uint16_t)device.cs_pin_port, GPIO_PIN_RESET);
 	HAL_SPI_Transmit((SPI_HandleTypeDef*)device.spi_handle, lower_word, 2, HAL_MAX_DELAY);
-	HAL_GPIO_WritePin((GPIO_TypeDef*) device.cs_pin, (uint16_t) device.cs_pin_port, GPIO_PIN_SET);
+	HAL_GPIO_WritePin((GPIO_TypeDef*)device.cs_pin, (uint16_t).cs_pin_port, GPIO_PIN_SET);
 	delay_us(5);
 
 }
@@ -186,31 +217,47 @@ void imu_write_register(uint8_t addr, uint16_t value) {
  * @return Value at the address
  * @note The gyroscope readings are in degrees per second
  */
-void imu_read_specific(enum Determinants determinant, float32_t readings[3]) {
+void imu_read_specific(enum Determinants determinant, int32_t dataSize) {
     if(determinant == ADIS_GYRO) {
-        adis_read_gyro(readings);
+        switch(dataSize) {
+            case 8 :
+                imu_read_gyro();
+                break;
+            case 32 :
+                imu_read_gyro_32bit();
+                imu_read_gyro_32bit_all();
+                break;
+        }
     } else if(determinant == ADIS_ACCEL) {
-        adis_read_accel(readings);
-    } else if(determinant == ADIS_GYRO_32) {
-        adis_read_gyro_32bit(LOW_REG, HIGH_REG);
-    } else if(determinant == ADIS_ACCEL_32) {
-        adis_read_gyro_32bit(LOW_REG, HIGH_REG);
-    } else if(determinant == ADIS_GYRO_32_ALL){
-        adis_read_gyro_32bit_all(readings);
-    } else if(determinant == ADIS_ACCEL_32_ALL) {
-        adis_read_gyro_32bit_all(readings);
+        switch(dataSize) {
+            case 8 :
+                imu_read_accel();
+                break;
+            case 32 :
+                imu_read_accel_32bit();
+                imu_read_accel_32bit_all();
+                break;
+        }
     } else if(determinant == ADIS_DELTA_ANGLE) {
-        adis_read_delta_angle(readings);
-    } else if(determinant == ADIS_DELTA_VEL)  {
-        adis_read_delta_vel(readings);
-    } else if(determinant == ADIS_DELTA_ANGLE_32) {
-        adis_read_delta_angle_32bit(LOW_REG, HIGH_REG);
-    } else if(determinant == ADIS_DELTA_VEL_32) {
-        adis_read_delta_vel_32bit(LOW_REG, HIGH_REG);
-    } else if(determinant == ADIS_DELTA_ANGLE_32_ALL) {
-        adis_read_delta_angle_32bit_all(readings);
-    } else if(determinant == ADIS_DELTA_VEL_32_ALL) {
-        adis_read_delta_vel_32bit_all(readings);
+        switch(dataSize) {
+            case 8 :
+                imu_read_delta_angle();
+                break;
+            case 32 :
+                imu_read_delta_angle_32bit();
+                imu_read_delta_angle_32bit_all();
+                break;
+        }
+    } else if(determinant == ADIS_DELTA_VEL) {
+        switch(dataSize) {
+            case 8 :
+                imu_read_delta_vel();
+                break;
+            case 32 :
+                imu_read_delta_vel_32bit();
+                imu_read_delta_vel_32bit_all();
+                break;
+        }
     }
    
 }
@@ -221,10 +268,10 @@ void imu_read_specific(enum Determinants determinant, float32_t readings[3]) {
  * @param gyro_readings Array to store the gyroscope readings (x, y, z)
  * @note The gyroscope readings are in degrees per second
  */
-void imu_read_gyro(float32_t gyro_readings[3]) {
-    gyro_readings[0] = (float32_t)(adis_read_register(ADIS_X_GYRO_OUT)) * 0.1f;
-    gyro_readings[1] = (float32_t)(adis_read_register(ADIS_Y_GYRO_OUT)) * 0.1f;
-    gyro_readings[2] = (float32_t)(adis_read_register(ADIS_Z_GYRO_OUT)) * 0.1f;
+void imu_read_gyro() {
+    adis_data.x_gyro_out = (float32_t)(adis_read_register(ADIS_X_GYRO_OUT)) * 0.1f;
+    adis_data.y_gyro_out = (float32_t)(adis_read_register(ADIS_Y_GYRO_OUT)) * 0.1f;
+    adis_data.z_gyro_out = (float32_t)(adis_read_register(ADIS_Z_GYRO_OUT)) * 0.1f;
 }
 
 /**
@@ -233,10 +280,10 @@ void imu_read_gyro(float32_t gyro_readings[3]) {
  * @param accel_readings Array to store the accelerometer readings (x, y, z)
  * @note The accelerometer readings are in g-forces
  */
-void imu_read_accel(float32_t accel_readings[3]) {
-    accel_readings[0] = (float32_t) (adis_read_register(ADIS_X_ACCL_OUT)) * 0.01225f;
-    accel_readings[1] = (float32_t) (adis_read_register(ADIS_Y_ACCL_OUT)) * 0.01225f;
-    accel_readings[2] = (float32_t) (adis_read_register(ADIS_Z_ACCL_OUT)) * 0.01225f;
+void imu_read_accel() {
+    adis_data.x_accl_out = (float32_t) (adis_read_register(ADIS_X_ACCL_OUT)) * 0.01225f;
+    adis_data.y_accl_out = (float32_t) (adis_read_register(ADIS_Y_ACCL_OUT)) * 0.01225f;
+    adis_data.z_accl_out = (float32_t) (adis_read_register(ADIS_Z_ACCL_OUT)) * 0.01225f;
 }
 
 
@@ -330,9 +377,9 @@ void imu_parse_burst(uint16_t *raw_data) {
  * @param high_reg Address of the higher register (e.g. ADIS_X_GYRO_OUT)
  * @return 32-bit gyroscope reading
  */
-int32_t imu_read_gyro_32bit(uint8_t low_reg, uint8_t high_reg) {
-    int32_t high_word = (int32_t)adis_read_register(high_reg);
-    int32_t low_word = (int32_t)adis_read_register(low_reg);
+int32_t imu_read_gyro_32bit() {
+    int32_t high_word = (int32_t)adis_read_register(HIGH_REG);
+    int32_t low_word = (int32_t)adis_read_register(LOW_REG);
     return (high_word << 16) | (low_word & 0xFFFF);
 }
 
@@ -343,9 +390,9 @@ int32_t imu_read_gyro_32bit(uint8_t low_reg, uint8_t high_reg) {
  * @param high_reg Address of the higher register (e.g. ADIS_X_ACCL_OUT)
  * @return 32-bit accelerometer reading
  */
-int32_t imu_read_accel_32bit(uint8_t low_reg, uint8_t high_reg) {
-    int32_t high_word = (int32_t)adis_read_register(high_reg);
-    int32_t low_word = (int32_t)adis_read_register(low_reg);
+int32_t imu_read_accel_32bit() {
+    int32_t high_word = (int32_t)adis_read_register(HIGH_REG);
+    int32_t low_word = (int32_t)adis_read_register(LOW_REG);
     return (high_word << 16) | (low_word & 0xFFFF);
 }
 
@@ -355,13 +402,13 @@ int32_t imu_read_accel_32bit(uint8_t low_reg, uint8_t high_reg) {
  * @param gyro_readings Array to store the gyroscope readings (x, y, z)
  * @note The gyroscope readings are in degrees per second with full 32-bit precision
  */
-void imu_read_gyro_32bit_all(float32_t gyro_readings[3]) {
+void imu_read_gyro_32bit_all() {
     int32_t raw_x = adis_read_gyro_32bit(ADIS_X_GYRO_LOW, ADIS_X_GYRO_OUT);
     int32_t raw_y = adis_read_gyro_32bit(ADIS_Y_GYRO_LOW, ADIS_Y_GYRO_OUT);
     int32_t raw_z = adis_read_gyro_32bit(ADIS_Z_GYRO_LOW, ADIS_Z_GYRO_OUT);
-    gyro_readings[0] = (float32_t)raw_x * 0.1f / 65536.0f;  
-    gyro_readings[1] = (float32_t)raw_y * 0.1f / 65536.0f;
-    gyro_readings[2] = (float32_t)raw_z * 0.1f / 65536.0f;
+    adis_data.x_gyro_out = (float32_t)raw_x * 0.1f / 65536.0f;  
+    adis_data.y_gyro_out = (float32_t)raw_y * 0.1f / 65536.0f;
+    adis_data.z_gyro_out = (float32_t)raw_z * 0.1f / 65536.0f;
 }
 
 /**
@@ -370,13 +417,13 @@ void imu_read_gyro_32bit_all(float32_t gyro_readings[3]) {
  * @param accel_readings Array to store the accelerometer readings (x, y, z)
  * @note The accelerometer readings are in g-forces with full 32-bit precision
  */
-void imu_read_accel_32bit_all(float32_t accel_readings[3]) {
+void imu_read_accel_32bit_all() {
     int32_t raw_x = adis_read_accel_32bit(ADIS_X_ACCL_LOW, ADIS_X_ACCL_OUT);
     int32_t raw_y = adis_read_accel_32bit(ADIS_Y_ACCL_LOW, ADIS_Y_ACCL_OUT);
     int32_t raw_z = adis_read_accel_32bit(ADIS_Z_ACCL_LOW, ADIS_Z_ACCL_OUT);
-    accel_readings[0] = (float32_t)raw_x * 0.01225f / 65536.0f; 
-    accel_readings[1] = (float32_t)raw_y * 0.01225f / 65536.0f;
-    accel_readings[2] = (float32_t)raw_z * 0.01225f / 65536.0f;
+    adis_data.x_accl_out = (float32_t)raw_x * 0.01225f / 65536.0f; 
+    adis_data.y_accl_out = (float32_t)raw_y * 0.01225f / 65536.0f;
+    adis_data.z_accl_out = (float32_t)raw_z * 0.01225f / 65536.0f;
 }
 
 /**
@@ -385,16 +432,16 @@ void imu_read_accel_32bit_all(float32_t accel_readings[3]) {
  * @param delta_angle Array to store the delta angle readings (x, y, z)
  * @note Delta angle readings are in degrees
  */
-void imu_read_delta_angle(float32_t delta_angle[3]) {
+void imu_read_delta_angle() {
     // Read high words only for 16-bit precision
     int16_t x = adis_read_register(ADIS_X_DELTANG_OUT);
     int16_t y = adis_read_register(ADIS_Y_DELTANG_OUT);
     int16_t z = adis_read_register(ADIS_Z_DELTANG_OUT);
     
     // Scale by ΔθMAX/2^15 where ΔθMAX = ±2160°
-    delta_angle[0] = (float32_t)x * (2160.0f / 32768.0f);
-    delta_angle[1] = (float32_t)y * (2160.0f / 32768.0f);
-    delta_angle[2] = (float32_t)z * (2160.0f / 32768.0f);
+    adis_data.x_delta_ang_out = (float32_t)x * (2160.0f / 32768.0f);
+    adis_data.y_delta_ang_out = (float32_t)y * (2160.0f / 32768.0f);
+    adis_data.z_delta_ang_out = (float32_t)z * (2160.0f / 32768.0f);
 }
 
 /**
@@ -403,16 +450,16 @@ void imu_read_delta_angle(float32_t delta_angle[3]) {
  * @param delta_vel Array to store the delta velocity readings (x, y, z)
  * @note Delta velocity readings are in m/sec
  */
-void imu_read_delta_vel(float32_t delta_vel[3]) {
+void imu_read_delta_vel() {
     // Read high words only for 16-bit precision
     int16_t x = adis_read_register(ADIS_X_DELTVEL_OUT);
     int16_t y = adis_read_register(ADIS_Y_DELTVEL_OUT);
     int16_t z = adis_read_register(ADIS_Z_DELTVEL_OUT);
     
     // Scale by ±400 m/sec range over 16 bits
-    delta_vel[0] = (float32_t)x * (400.0f / 32768.0f);
-    delta_vel[1] = (float32_t)y * (400.0f / 32768.0f);
-    delta_vel[2] = (float32_t)z * (400.0f / 32768.0f);
+    adis_data.x_delta_vel_out = (float32_t)x * (400.0f / 32768.0f);
+    adis_data.y_delta_vel_out = (float32_t)y * (400.0f / 32768.0f);
+    adis_data.z_delta_vel_out = (float32_t)z * (400.0f / 32768.0f);
 }
 
 /**
@@ -422,9 +469,9 @@ void imu_read_delta_vel(float32_t delta_vel[3]) {
  * @param high_reg Address of the higher register
  * @return 32-bit delta angle reading
  */
-int32_t imu_read_delta_angle_32bit(uint8_t low_reg, uint8_t high_reg) {
-    int32_t high_word = (int32_t)adis_read_register(high_reg);
-    int32_t low_word = (int32_t)adis_read_register(low_reg);
+int32_t imu_read_delta_angle_32bit() {
+    int32_t high_word = (int32_t)adis_read_register(HIGH_REG);
+    int32_t low_word = (int32_t)adis_read_register(LOW_REG);
     return (high_word << 16) | (low_word & 0xFFFF);
 }
 
@@ -435,9 +482,9 @@ int32_t imu_read_delta_angle_32bit(uint8_t low_reg, uint8_t high_reg) {
  * @param high_reg Address of the higher register
  * @return 32-bit delta velocity reading
  */
-int32_t imu_read_delta_vel_32bit(uint8_t low_reg, uint8_t high_reg) {
-    int32_t high_word = (int32_t)adis_read_register(high_reg);
-    int32_t low_word = (int32_t)adis_read_register(low_reg);
+int32_t imu_read_delta_vel_32bit() {
+    int32_t high_word = (int32_t)adis_read_register(HIGH_REG);
+    int32_t low_word = (int32_t)adis_read_register(LOW_REG);
     return (high_word << 16) | (low_word & 0xFFFF);
 }
 
@@ -447,15 +494,15 @@ int32_t imu_read_delta_vel_32bit(uint8_t low_reg, uint8_t high_reg) {
  * @param delta_angle Array to store the delta angle readings (x, y, z)
  * @note Delta angle readings are in degrees with full 32-bit precision
  */
-void imu_read_delta_angle_32bit_all(float32_t delta_angle[3]) {
+void imu_read_delta_angle_32bit_all() {
     int32_t x = adis_read_delta_angle_32bit(ADIS_X_DELTANG_LOW, ADIS_X_DELTANG_OUT);
     int32_t y = adis_read_delta_angle_32bit(ADIS_Y_DELTANG_LOW, ADIS_Y_DELTANG_OUT);
     int32_t z = adis_read_delta_angle_32bit(ADIS_Z_DELTANG_LOW, ADIS_Z_DELTANG_OUT);
 
     // Scale by ΔθMAX/2^31 where ΔθMAX = ±2160°
-    delta_angle[0] = (float32_t)x * (2160.0f / 2147483648.0f);
-    delta_angle[1] = (float32_t)y * (2160.0f / 2147483648.0f);
-    delta_angle[2] = (float32_t)z * (2160.0f / 2147483648.0f);
+    adis_data.x_delta_ang_out = (float32_t)x * (2160.0f / 2147483648.0f);
+    adis_data.y_delta_ang_out = (float32_t)y * (2160.0f / 2147483648.0f);
+    adis_data.z_delta_ang_out = (float32_t)z * (2160.0f / 2147483648.0f);
 }
 
 /**
@@ -464,11 +511,11 @@ void imu_read_delta_angle_32bit_all(float32_t delta_angle[3]) {
  * @param delta_vel Array to store the delta velocity readings (x, y, z)
  * @note Delta velocity readings are in m/sec with full 32-bit precision
  */
-void imu_read_delta_vel_32bit_all(float32_t delta_vel[3]) {
+void imu_read_delta_vel_32bit_all() {
     int32_t x = adis_read_delta_vel_32bit(ADIS_X_DELTVEL_LOW, ADIS_X_DELTVEL_OUT);
     int32_t y = adis_read_delta_vel_32bit(ADIS_Y_DELTVEL_LOW, ADIS_Y_DELTVEL_OUT);
     int32_t z = adis_read_delta_vel_32bit(ADIS_Z_DELTVEL_LOW, ADIS_Z_DELTVEL_OUT);
-    delta_vel[0] = (float32_t)x * (400.0f / 2147483648.0f);
-    delta_vel[1] = (float32_t)y * (400.0f / 2147483648.0f);
-    delta_vel[2] = (float32_t)z * (400.0f / 2147483648.0f);
+    adis_data.x_delta_vel_out = (float32_t)x * (400.0f / 2147483648.0f);
+    adis_data.y_delta_vel_out = (float32_t)y * (400.0f / 2147483648.0f);
+    adis_data.z_delta_vel_out = (float32_t)z * (400.0f / 2147483648.0f);
 }

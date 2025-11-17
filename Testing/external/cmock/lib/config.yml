@@ -1,0 +1,18 @@
+:cmock:
+  :mock_path: ../../../../Mocks/test/mocks             # where mocks are generated
+  :mock_prefix: Mock                  # prefix for generated mocks
+  :verbosity: 2                       # 0 = silent, 3 = very detailed
+  :plugins:                          # enable useful plugins
+    - expect
+    - expect_any_args
+    - return_thru_ptr
+    - callback
+  :treat_as:
+    uint8: HEX8                       # display format for specific types
+    uint16: HEX16
+  :includes:                          # extra includes in generated mocks
+    - "stdint.h"
+    - "stdbool.h"
+  :strippables:                       # macros to remove from headers before parsing
+    - "STATIC"
+    - "INLINE"

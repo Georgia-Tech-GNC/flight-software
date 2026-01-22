@@ -10,87 +10,59 @@ endif()
 
 set(CMAKE_PROJECT_NAME flight_software)
 
-set(SUPPORTED_BOARDS F429ZI H723ZG)
-option(TARGET_F429ZI "Compile target for the F429ZI board" OFF)
-option(TARGET_H723ZG "Compile target for the H723ZG board" OFF)
+#[[###########################################################################################
+
+DEFINE CONFIGURATION OPTIONS
+
+###########################################################################################]]
+# Target STM Chip
+set(TARGET_BOARD "F429ZI" CACHE STRING "Target STM chip architecture (see targets directory for implementations)")
+set_property(CACHE TARGET_BOARD PROPERTY STRINGS "F429ZI" "H723ZG")
+
+# Target Rocket
+set(TARGET_ROCKET "Jet Vanes" CACHE STRING "Target rocket script (see rockets directory for implementations)")
+set_property(CACHE TARGET_ROCKET PROPERTY STRINGS "Jet Vanes")
 
 
-set(SUPPORTED_ROCKETS JET_VANES)
-option(ROCKET_JET_VANES "Compile programs associated with the Jet Vanes rocket" OFF)
+#[[###########################################################################################
 
-if(NOT (TARGET_F429ZI OR TARGET_H723ZG))
-    message(FATAL_ERROR
-        "Please select at least one target to compile by passing TARGET_<BOARD>=ON\n"
-        "Supported boards: ${SUPPORTED_BOARDS}"
-    )
-endif()
-if(TARGET_F429ZI AND TARGET_H723ZG) 
-    message(FATAL_ERROR
-        "Please select only one target to compile by passing TARGET_<BOARD>=ON\n"
-        "Supported boards: ${SUPPORTED_BOARDS}. Do not select more than one."
-    )
-endif()
+Link cmake modules for targeted board architecture
 
-if(NOT ROCKET_JET_VANES)
-    message(FATAL_ERROR
-        "Please select at least one rocket to compile by passing ROCKET_<ROCKET>=ON\n"
-        "Supported boards: ${SUPPORTED_ROCKETS}"
-    )
-endif()
-# TODO: Once we add more targets, make sure that we only select at most one of them
-
-
-if (TARGET_F429ZI)
-    # Include toolchain file
+###########################################################################################]]
+# For each target board, include toolchain file, add STM32CubeMX generated sources, and set openocd configuration
+if (TARGET_BOARD STREQUAL "F429ZI")
+    message("Selected target board: F429zi")
     include("Targets/Nucleo-F429ZI/cmake/gcc-arm-none-eabi.cmake")
-
-    # Enable compile command to ease indexing with e.g. clangd
-    set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
-
-    # Enable CMake support for ASM and C languages
-    project(${CMAKE_PROJECT_NAME} C ASM)
-    enable_language(C ASM)
-
-    # Core project settings
-    message("Build type: " ${CMAKE_BUILD_TYPE})
-
-    # Create an executable object type
-    add_executable(${CMAKE_PROJECT_NAME})
-
-    # Add STM32CubeMX generated sources
     add_subdirectory(Targets/Nucleo-F429ZI/cmake/stm32cubemx)
-
-    # Set openocd configuration
     set(OPENOCD_CFG_FILE "./Targets/Nucleo-F429ZI/openocd.cfg")
-    cmake_path(ABSOLUTE_PATH OPENOCD_CFG_FILE NORMALIZE)
 endif()
 
-if (TARGET_H723ZG)
-    # Include toolchain file
+if (TARGET_BOARD STREQUAL "H723ZG")
+    message("Selected target board: H723zg")
     include("Targets/Nucleo-H723ZG/cmake/gcc-arm-none-eabi.cmake")
-
-    # Enable compile command to ease indexing with e.g. clangd
-    set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
-
-    # Enable CMake support for ASM and C languages
-    project(${CMAKE_PROJECT_NAME} C ASM)
-    enable_language(C ASM)
-
-    # Core project settings
-    message("Build type: " ${CMAKE_BUILD_TYPE})
-
-    # Create an executable object type
-    add_executable(${CMAKE_PROJECT_NAME})
-
-    # Add STM32CubeMX generated sources
     add_subdirectory(Targets/Nucleo-H723ZG/cmake/stm32cubemx)
-
-    # Set openocd configuration
     set(OPENOCD_CFG_FILE "./Targets/Nucleo-H723ZG/openocd.cfg")
-    cmake_path(ABSOLUTE_PATH OPENOCD_CFG_FILE NORMALIZE)
 endif()
 
-if (ROCKET_JET_VANES)
+# Enable compile command to ease indexing with e.g. clangd
+set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
+# Enable CMake support for ASM and C languages
+project(${CMAKE_PROJECT_NAME} C ASM)
+enable_language(C ASM)
+# Core project settings
+message("Build type: " ${CMAKE_BUILD_TYPE})
+# Create an executable object type
+add_executable(${CMAKE_PROJECT_NAME})
+cmake_path(ABSOLUTE_PATH OPENOCD_CFG_FILE NORMALIZE)
+
+
+#[[###########################################################################################
+
+Link cmake modules for targeted rocket
+
+###########################################################################################]]
+
+if (TARGET_ROCKET STREQUAL "Jet Vanes")
     # Add Jet Vanes-specific sources
     target_sources(${CMAKE_PROJECT_NAME} PRIVATE
         Rockets/JetVanes/Src/commands.c     
@@ -108,7 +80,6 @@ if (ROCKET_JET_VANES)
     target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
         RocketStateStruct=JetVanesRocketState
     )
-
 endif()
 
 # Link directories setup

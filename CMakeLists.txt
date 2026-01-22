@@ -17,11 +17,24 @@ DEFINE CONFIGURATION OPTIONS
 ###########################################################################################]]
 # Target STM Chip
 set(TARGET_BOARD "F429ZI" CACHE STRING "Target STM chip architecture (see targets directory for implementations)")
-set_property(CACHE TARGET_BOARD PROPERTY STRINGS "F429ZI" "H723ZG")
+set_property(CACHE TARGET_BOARD PROPERTY STRINGS "F429ZI" "H723ZG" "H723ZG-dummy")
 
 # Target Rocket
 set(TARGET_ROCKET "Jet Vanes" CACHE STRING "Target rocket script (see rockets directory for implementations)")
-set_property(CACHE TARGET_ROCKET PROPERTY STRINGS "Jet Vanes")
+set_property(CACHE TARGET_ROCKET PROPERTY STRINGS "Jet Vanes" "Testbed")
+
+
+#[[###########################################################################################
+
+Link source files and include directories for HALAL
+
+###########################################################################################]]
+# List of toggle-able HALAL drivers
+option (DRIVER_BMP280 "Include the BMP280 barometer driver")
+option (DRIVER_DEBUG_UART "Include the debug uart driver")
+option (DRIVER_RADIO_UART "Include the radio uart driver")
+option (DRIVER_LIS3MDL "Include the LIS3MDL magnetometer driver")
+option (DRIVER_SD_CARD "Include the SD Card driver")
 
 
 #[[###########################################################################################
@@ -44,6 +57,13 @@ if (TARGET_BOARD STREQUAL "H723ZG")
     set(OPENOCD_CFG_FILE "./Targets/Nucleo-H723ZG/openocd.cfg")
 endif()
 
+if (TARGET_BOARD STREQUAL "H723ZG-dummy")
+    message("Selected target board: H723zg-dummy")
+    include("Targets/Nucleo-H723ZG-dummy/cmake/gcc-arm-none-eabi.cmake")
+    add_subdirectory(Targets/Nucleo-H723ZG-dummy/cmake/stm32cubemx)
+    set(OPENOCD_CFG_FILE "./Targets/Nucleo-H723ZG-dummy/openocd.cfg")
+endif()
+
 # Enable compile command to ease indexing with e.g. clangd
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 # Enable CMake support for ASM and C languages
@@ -61,7 +81,6 @@ cmake_path(ABSOLUTE_PATH OPENOCD_CFG_FILE NORMALIZE)
 Link cmake modules for targeted rocket
 
 ###########################################################################################]]
-
 if (TARGET_ROCKET STREQUAL "Jet Vanes")
     # Add Jet Vanes-specific sources
     target_sources(${CMAKE_PROJECT_NAME} PRIVATE
@@ -82,28 +101,56 @@ if (TARGET_ROCKET STREQUAL "Jet Vanes")
     )
 endif()
 
+if (TARGET_ROCKET STREQUAL "Testbed")
+    # Add Jet Vanes-specific sources
+    target_sources(${CMAKE_PROJECT_NAME} PRIVATE
+        Rockets/Testbed/Src/rocket.c     
+    )
+
+    # Add Jet Vanes-specific includes
+    target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
+        Rockets/Testbed/Inc 
+    )    
+endif()
+
 # Link directories setup
 target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined library search paths
 )
 
+
+#[[###########################################################################################
+
+Link source files and include directories for FreeRTOS
+
+###########################################################################################]]
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE FreeRTOS-Kernel/Inc)
+target_sources(${CMAKE_PROJECT_NAME} PRIVATE
+    FreeRTOS-Kernel/Src/croutine.c     
+    FreeRTOS-Kernel/Src/event_groups.c     
+    FreeRTOS-Kernel/Src/list.c     
+    FreeRTOS-Kernel/Src/queue.c     
+    FreeRTOS-Kernel/Src/stream_buffer.c     
+    FreeRTOS-Kernel/Src/tasks.c     
+    FreeRTOS-Kernel/Src/timers.c          
+)
+
+#[[###########################################################################################
+
+Link source files and include directories for RocketLib
+
+###########################################################################################]]
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE 
+    RocketLib/USBHost/Class/MSC/Inc 
+    RocketLib/USBHost/Core/Inc 
+    RocketLib/Controls/Inc 
+    RocketLib/Utils/Inc 
+    RocketLib/FatFs/src 
+    RocketLib/Telemetry/Inc 
+)
+
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
-    HALAL/Src/halal.c     
-    HALAL/Src/hal_timebase.c
-    HALAL/Src/Rcc/rcc_nucleo_f429zi.c
-    HALAL/Src/Timebase/timebase_tim.c
-    HALAL/Src/Adc/adc_internal.c     
-    HALAL/Src/Adc/adc_jet_vanes.c     
-    HALAL/Src/Debug/debug_uart.c     
-    HALAL/Src/Radio/radio_uart.c     
-    HALAL/Src/StateEstimation/state_estimation_uart.c     
-    HALAL/Src/Magnetometer/lis3mdl.c
-    HALAL/Src/FlashChip/fake_flash_chip.c     
-    HALAL/Src/Storage/storage_sd_spi.c    
-    HALAL/Src/Isr/uart_isr.c     
-    HALAL/Src/Isr/adc_isr.c
-    HALAL/Src/Isr/tim_isr.c  
     RocketLib/USBHost/Class/MSC/Src/usbh_msc_bot.c     
     RocketLib/USBHost/Class/MSC/Src/usbh_msc_scsi.c     
     RocketLib/USBHost/Class/MSC/Src/usbh_msc.c     
@@ -125,18 +172,41 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     RocketLib/Utils/Src/log.c     
     RocketLib/Utils/Src/util.c     
     RocketLib/Utils/Src/fs_wrapper.c     
-    FreeRTOS-Kernel/Src/croutine.c     
-    FreeRTOS-Kernel/Src/event_groups.c     
-    FreeRTOS-Kernel/Src/list.c     
-    FreeRTOS-Kernel/Src/queue.c     
-    FreeRTOS-Kernel/Src/stream_buffer.c     
-    FreeRTOS-Kernel/Src/tasks.c     
-    FreeRTOS-Kernel/Src/timers.c     
-    Tasks/Src/init_tasks.c     
+)
+
+
+# Add sources to executable
+target_sources(${CMAKE_PROJECT_NAME} PRIVATE
+    HALAL/Src/halal.c     
+    HALAL/Src/Rcc/rcc_nucleo_h723zg.c
+    HALAL/Src/Debug/debug_uart.c   
+)
+
+#[[
+Tasks/Src/init_tasks.c     
     Tasks/Src/state_flash.c     
     Tasks/Src/state_tx.c     
-    Tasks/Src/telemetry_rx.c         
-)
+    Tasks/Src/telemetry_rx.c       
+ HALAL/Src/Radio/radio_uart.c  
+    HALAL/Src/Debug/debug_uart.c   
+    HALAL/Src/FlashChip/fake_flash_chip.c    
+    HALAL/Src/Rcc/rcc_nucleo_f429zi.c
+    HALAL/Src/Adc/adc_internal.c     
+    HALAL/Src/Adc/adc_jet_vanes.c    
+HALAL/Src/hal_timebase.c
+    HALAL/Src/Timebase/timebase_tim.c
+    HALAL/Src/Adc/adc_internal.c     
+    HALAL/Src/Adc/adc_jet_vanes.c     
+    
+       
+    HALAL/Src/StateEstimation/state_estimation_uart.c     
+    HALAL/Src/Magnetometer/lis3mdl.c
+    HALAL/Src/FlashChip/fake_flash_chip.c     
+    HALAL/Src/Storage/storage_sd_spi.c    
+    HALAL/Src/Isr/uart_isr.c     
+    HALAL/Src/Isr/adc_isr.c
+    HALAL/Src/Isr/tim_isr.c  
+]]
 
 # Add include paths
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
@@ -144,15 +214,7 @@ target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     HALAL/Src/Adc/ 
     HALAL/Src/Isr/ 
     Tasks/Inc 
-    FreeRTOS-Kernel/Inc 
-    RocketLib/USBHost/Class/MSC/Inc 
-    RocketLib/USBHost/Core/Inc 
-    RocketLib/Controls/Inc 
-    RocketLib/Utils/Inc 
-    RocketLib/FatFs/src 
-    RocketLib/Telemetry/Inc 
     Rockets/Inc 
-    Targets/Inc 
 )
 
 # Add linked libraries
@@ -162,6 +224,11 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
     # Add user defined libraries
 )
 
+#[[###########################################################################################
+
+Flash target (runnable with `cmake --build . --target flash` from the build directory)
+
+###########################################################################################]]
 add_custom_target(flash
     DEPENDS ./flight_software.elf
     COMMENT "Starting OpenOCD Server..."

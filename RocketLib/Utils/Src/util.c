@@ -1,7 +1,6 @@
 #include "util.h"
 
 #include <string.h>
-#include "lib.h"
 #include "log.h"
 #include "rocket.h"
 #include "rtos_globals.h"
@@ -22,6 +21,7 @@ uint32_t await_notification(uint32_t mask) {
     return notification_value;
 }
 
+#ifdef RocketStateStruct
 /** 
  * @brief Acquires the global state mutex and copies the current rocket state into the provided buffer 
  * @param rocket_state_buffer the buffer where the current rocket state should be copied to.
@@ -37,6 +37,7 @@ uint8_t memcpy_state(RocketStateStruct *rocket_state) {
 
     return RET_FAILURE;
 }
+#endif
 
 /** 
  * @brief A "soft" assertion that prints the provided message via log_printf if the assertion value is false.

@@ -9,7 +9,6 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 set(CMAKE_PROJECT_NAME flight_software)
-
 #[[###########################################################################################
 
 DEFINE CONFIGURATION OPTIONS
@@ -35,7 +34,6 @@ option (DRIVER_DEBUG_UART "Include the debug uart driver")
 option (DRIVER_RADIO_UART "Include the radio uart driver")
 option (DRIVER_LIS3MDL "Include the LIS3MDL magnetometer driver")
 option (DRIVER_SD_CARD "Include the SD Card driver")
-
 
 #[[###########################################################################################
 
@@ -75,6 +73,17 @@ message("Build type: " ${CMAKE_BUILD_TYPE})
 add_executable(${CMAKE_PROJECT_NAME})
 cmake_path(ABSOLUTE_PATH OPENOCD_CFG_FILE NORMALIZE)
 
+#[[###########################################################################################
+
+Link HALAL modules
+
+###########################################################################################]]
+
+if (DRIVER_BMP280) 
+    message("Specified BMP280 driver")
+    target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE HALAL/barometer)
+    target_sources(${CMAKE_PROJECT_NAME} PRIVATE HALAL/barometer/bmp280.c)
+endif()
 
 #[[###########################################################################################
 
@@ -102,7 +111,7 @@ if (TARGET_ROCKET STREQUAL "Jet Vanes")
 endif()
 
 if (TARGET_ROCKET STREQUAL "Testbed")
-    # Add Jet Vanes-specific sources
+    # Add Jet Vanes-specific sources 
     target_sources(${CMAKE_PROJECT_NAME} PRIVATE
         Rockets/Testbed/Src/rocket.c     
     )

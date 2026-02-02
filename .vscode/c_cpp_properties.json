@@ -1,20 +1,19 @@
 {
     "configurations": [
         {
-            "name": "Win32",
+            "name": "Mac",
             "includePath": [
-                "${workspaceFolder}/**",
-                "${workspaceFolder}/StateEstimation/Drivers/CMSIS/DSP/Include",
-                "${workspaceFolder}/StateEstimation/Core/Inc",
-                "${workspaceFolder}/StateEstimation/Drivers/CMSIS/Include",
-                "${workspaceFolder}/StateEstimation/Core/Inc"
+                "${workspaceFolder}/Targets/MCU-h725zgt6/**",
+                "${workspaceFolder}/Extensions/fatfs/**",
+                "${workspaceFolder}/RocketLib/**"
             ],
             "defines": [
                 "_DEBUG",
                 "UNICODE",
-                "_UNICODE"
+                "_UNICODE",
+                "STM32H725xx"
             ],
-            "compilerPath": "C:\\MinGW\\bin/gcc.exe"
+            "compilerPath": "/usr/bin/clang"
         }
     ],
     "version": 4

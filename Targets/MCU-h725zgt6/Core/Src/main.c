@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "rocketlib.h"
 #include "fatfs.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -96,7 +97,9 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+  if (HAL_Init() != HAL_OK) {
+    while (1) { }
+  }
 
   /* USER CODE BEGIN Init */
 
@@ -126,19 +129,8 @@ int main(void)
   MX_TIM2_Init();
   MX_TIM4_Init();
   MX_TIM3_Init();
-  /* USER CODE BEGIN 2 */
-
-  /* USER CODE END 2 */
-
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
-  while (1)
-  {
-    /* USER CODE END WHILE */
-
-    /* USER CODE BEGIN 3 */
-  }
-  /* USER CODE END 3 */
+  
+  run_rocket_code();
 }
 
 /**

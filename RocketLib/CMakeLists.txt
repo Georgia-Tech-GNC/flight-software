@@ -9,8 +9,10 @@ inherited from the base CMakeLists.txt file as well.
 #]]####################################################################
 
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE 
-    ./include
+    utilities
+    core
 )
 
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
+    core/rocketlib.c
 )

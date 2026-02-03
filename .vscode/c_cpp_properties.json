@@ -6,7 +6,8 @@
                 "${workspaceFolder}/Targets/MCU-h725zgt6/**",
                 "${workspaceFolder}/Extensions/fatfs/**",
                 "${workspaceFolder}/RocketLib/**",
-                "${workspaceFolder}/FreeRTOS-Kernel/**"
+                "${workspaceFolder}/FreeRTOS-Kernel/**",
+                "${workspaceFolder}/Extensions/fatfs/**"
             ],
             "defines": [
                 "_DEBUG",

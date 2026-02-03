@@ -47,3 +47,22 @@ PART 3: SUBDIRECTORY INCLUSIONS (FreeRTOS, RocketLib, etc.)
 add_subdirectory(RocketLib)
 add_subdirectory(Extensions)
 add_subdirectory(FreeRTOS-Kernel)
+
+#[[##########################################################
+PART 4: Doxygen and documentation support
+#]]##########################################################
+find_package(Doxygen)
+option(BUILD_DOXYGEN "Build doxygen documentation" ${DOXYGEN_FOUND})
+if (BUILD_DOXYGEN)
+    if (NOT DOXYGEN_FOUND)
+        message(SEND_ERROR "Doxygen not found. Install doxygen or \
+        turn off the BUILD_DOCUMENTATION flag")
+    endif()
+    configure_file(Doxyfile docs/Doxyfile @ONLY)
+    add_custom_target(docs ALL
+        COMMAND ${DOXYGEN_EXECUTABLE} docs/Doxyfile
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        COMMENT "Generating API documentation with Doxygen"
+        VERBATIM 
+    )
+endif()

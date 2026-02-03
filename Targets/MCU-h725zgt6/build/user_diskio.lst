@@ -1,0 +1,278 @@
+ARM GAS  /var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccNQKwqj.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 1
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"user_diskio.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "../../Extensions/fatfs/user_diskio.c"
+  19              		.section	.text.USER_initialize,"ax",%progbits
+  20              		.align	1
+  21              		.weak	USER_initialize
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	USER_initialize:
+  27              	.LVL0:
+  28              	.LFB350:
+   1:../../Extensions/fatfs/user_diskio.c **** /* USER CODE BEGIN Header */
+   2:../../Extensions/fatfs/user_diskio.c **** /**
+   3:../../Extensions/fatfs/user_diskio.c ****  ******************************************************************************
+   4:../../Extensions/fatfs/user_diskio.c ****   * @file    user_diskio.c
+   5:../../Extensions/fatfs/user_diskio.c ****   * @brief   This file includes a diskio driver skeleton to be completed by the user.
+   6:../../Extensions/fatfs/user_diskio.c ****   ******************************************************************************
+   7:../../Extensions/fatfs/user_diskio.c ****   * @attention
+   8:../../Extensions/fatfs/user_diskio.c ****   *
+   9:../../Extensions/fatfs/user_diskio.c ****   * Copyright (c) 2024 STMicroelectronics.
+  10:../../Extensions/fatfs/user_diskio.c ****   * All rights reserved.
+  11:../../Extensions/fatfs/user_diskio.c ****   *
+  12:../../Extensions/fatfs/user_diskio.c ****   * This software is licensed under terms that can be found in the LICENSE file
+  13:../../Extensions/fatfs/user_diskio.c ****   * in the root directory of this software component.
+  14:../../Extensions/fatfs/user_diskio.c ****   * If no LICENSE file comes with this software, it is provided AS-IS.
+  15:../../Extensions/fatfs/user_diskio.c ****   *
+  16:../../Extensions/fatfs/user_diskio.c ****   ******************************************************************************
+  17:../../Extensions/fatfs/user_diskio.c ****   */
+  18:../../Extensions/fatfs/user_diskio.c ****  /* USER CODE END Header */
+  19:../../Extensions/fatfs/user_diskio.c **** 
+  20:../../Extensions/fatfs/user_diskio.c **** #ifdef USE_OBSOLETE_USER_CODE_SECTION_0
+  21:../../Extensions/fatfs/user_diskio.c **** /*
+  22:../../Extensions/fatfs/user_diskio.c ****  * Warning: the user section 0 is no more in use (starting from CubeMx version 4.16.0)
+  23:../../Extensions/fatfs/user_diskio.c ****  * To be suppressed in the future.
+  24:../../Extensions/fatfs/user_diskio.c ****  * Kept to ensure backward compatibility with previous CubeMx versions when
+  25:../../Extensions/fatfs/user_diskio.c ****  * migrating projects.
+  26:../../Extensions/fatfs/user_diskio.c ****  * User code previously added there should be copied in the new user sections before
+  27:../../Extensions/fatfs/user_diskio.c ****  * the section contents can be deleted.
+  28:../../Extensions/fatfs/user_diskio.c ****  */
+  29:../../Extensions/fatfs/user_diskio.c **** /* USER CODE BEGIN 0 */
+  30:../../Extensions/fatfs/user_diskio.c **** /* USER CODE END 0 */
+ARM GAS  /var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccNQKwqj.s 			page 2
+
+
+  31:../../Extensions/fatfs/user_diskio.c **** #endif
+  32:../../Extensions/fatfs/user_diskio.c **** 
+  33:../../Extensions/fatfs/user_diskio.c **** /* USER CODE BEGIN DECL */
+  34:../../Extensions/fatfs/user_diskio.c **** 
+  35:../../Extensions/fatfs/user_diskio.c **** /* Includes ------------------------------------------------------------------*/
+  36:../../Extensions/fatfs/user_diskio.c **** #include <string.h>
+  37:../../Extensions/fatfs/user_diskio.c **** #include "ff_gen_drv.h"
+  38:../../Extensions/fatfs/user_diskio.c **** #include "utils.h"
+  39:../../Extensions/fatfs/user_diskio.c **** 
+  40:../../Extensions/fatfs/user_diskio.c **** /* Private typedef -----------------------------------------------------------*/
+  41:../../Extensions/fatfs/user_diskio.c **** /* Private define ------------------------------------------------------------*/
+  42:../../Extensions/fatfs/user_diskio.c ****    
+  43:../../Extensions/fatfs/user_diskio.c **** /* Private variables ---------------------------------------------------------*/
+  44:../../Extensions/fatfs/user_diskio.c **** /* Disk status */
+  45:../../Extensions/fatfs/user_diskio.c **** static volatile DSTATUS Stat = STA_NOINIT;
+  46:../../Extensions/fatfs/user_diskio.c **** 
+  47:../../Extensions/fatfs/user_diskio.c **** /* USER CODE END DECL */
+  48:../../Extensions/fatfs/user_diskio.c **** 
+  49:../../Extensions/fatfs/user_diskio.c **** /* Private function weak definitions prototypes -----------------------------------------------*/
+  50:../../Extensions/fatfs/user_diskio.c **** 
+  51:../../Extensions/fatfs/user_diskio.c **** DSTATUS __attribute__((weak)) USER_initialize (BYTE pdrv) {
+  29              		.loc 1 51 59 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              		@ link register save eliminated.
+  52:../../Extensions/fatfs/user_diskio.c ****     UNUSED(pdrv);
+  34              		.loc 1 52 5 view .LVU1
+  53:../../Extensions/fatfs/user_diskio.c ****     return 1;
+  35              		.loc 1 53 5 view .LVU2
+  54:../../Extensions/fatfs/user_diskio.c **** }
+  36              		.loc 1 54 1 is_stmt 0 view .LVU3
+  37 0000 0120     		movs	r0, #1
+  38              	.LVL1:
+  39              		.loc 1 54 1 view .LVU4
+  40 0002 7047     		bx	lr
+  41              		.cfi_endproc
+  42              	.LFE350:
+  44              		.section	.text.USER_status,"ax",%progbits
+  45              		.align	1
+  46              		.weak	USER_status
+  47              		.syntax unified
+  48              		.thumb
+  49              		.thumb_func
+  51              	USER_status:
+  52              	.LVL2:
+  53              	.LFB351:
+  55:../../Extensions/fatfs/user_diskio.c **** 
+  56:../../Extensions/fatfs/user_diskio.c **** DSTATUS __attribute__((weak)) USER_status (BYTE pdrv) {
+  54              		.loc 1 56 55 is_stmt 1 view -0
+  55              		.cfi_startproc
+  56              		@ args = 0, pretend = 0, frame = 0
+  57              		@ frame_needed = 0, uses_anonymous_args = 0
+  58              		@ link register save eliminated.
+  57:../../Extensions/fatfs/user_diskio.c ****     UNUSED(pdrv);
+  59              		.loc 1 57 5 view .LVU6
+  58:../../Extensions/fatfs/user_diskio.c ****     return 1;
+ARM GAS  /var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccNQKwqj.s 			page 3
+
+
+  60              		.loc 1 58 5 view .LVU7
+  59:../../Extensions/fatfs/user_diskio.c **** }
+  61              		.loc 1 59 1 is_stmt 0 view .LVU8
+  62 0000 0120     		movs	r0, #1
+  63              	.LVL3:
+  64              		.loc 1 59 1 view .LVU9
+  65 0002 7047     		bx	lr
+  66              		.cfi_endproc
+  67              	.LFE351:
+  69              		.section	.text.USER_read,"ax",%progbits
+  70              		.align	1
+  71              		.weak	USER_read
+  72              		.syntax unified
+  73              		.thumb
+  74              		.thumb_func
+  76              	USER_read:
+  77              	.LVL4:
+  78              	.LFB352:
+  60:../../Extensions/fatfs/user_diskio.c **** 
+  61:../../Extensions/fatfs/user_diskio.c **** DRESULT __attribute__((weak)) USER_read (BYTE pdrv, BYTE *buff, DWORD sector, UINT count) {
+  79              		.loc 1 61 91 is_stmt 1 view -0
+  80              		.cfi_startproc
+  81              		@ args = 0, pretend = 0, frame = 0
+  82              		@ frame_needed = 0, uses_anonymous_args = 0
+  83              		@ link register save eliminated.
+  62:../../Extensions/fatfs/user_diskio.c ****     UNUSED(pdrv);
+  84              		.loc 1 62 5 view .LVU11
+  63:../../Extensions/fatfs/user_diskio.c ****     UNUSED(buff);
+  85              		.loc 1 63 5 view .LVU12
+  64:../../Extensions/fatfs/user_diskio.c ****     UNUSED(sector);
+  86              		.loc 1 64 5 view .LVU13
+  65:../../Extensions/fatfs/user_diskio.c ****     UNUSED(count);
+  87              		.loc 1 65 5 view .LVU14
+  66:../../Extensions/fatfs/user_diskio.c ****     return 1;
+  88              		.loc 1 66 5 view .LVU15
+  67:../../Extensions/fatfs/user_diskio.c **** }
+  89              		.loc 1 67 1 is_stmt 0 view .LVU16
+  90 0000 0120     		movs	r0, #1
+  91              	.LVL5:
+  92              		.loc 1 67 1 view .LVU17
+  93 0002 7047     		bx	lr
+  94              		.cfi_endproc
+  95              	.LFE352:
+  97              		.section	.text.USER_write,"ax",%progbits
+  98              		.align	1
+  99              		.weak	USER_write
+ 100              		.syntax unified
+ 101              		.thumb
+ 102              		.thumb_func
+ 104              	USER_write:
+ 105              	.LVL6:
+ 106              	.LFB353:
+  68:../../Extensions/fatfs/user_diskio.c **** 
+  69:../../Extensions/fatfs/user_diskio.c **** #if _USE_WRITE == 1
+  70:../../Extensions/fatfs/user_diskio.c ****     DRESULT __attribute__((weak)) USER_write (BYTE pdrv, const BYTE *buff, DWORD sector, UINT count
+ 107              		.loc 1 70 102 is_stmt 1 view -0
+ 108              		.cfi_startproc
+ARM GAS  /var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccNQKwqj.s 			page 4
+
+
+ 109              		@ args = 0, pretend = 0, frame = 0
+ 110              		@ frame_needed = 0, uses_anonymous_args = 0
+ 111              		@ link register save eliminated.
+  71:../../Extensions/fatfs/user_diskio.c ****         UNUSED(pdrv);
+ 112              		.loc 1 71 9 view .LVU19
+  72:../../Extensions/fatfs/user_diskio.c ****         UNUSED(buff);
+ 113              		.loc 1 72 9 view .LVU20
+  73:../../Extensions/fatfs/user_diskio.c ****         UNUSED(sector);
+ 114              		.loc 1 73 9 view .LVU21
+  74:../../Extensions/fatfs/user_diskio.c ****         UNUSED(count);
+ 115              		.loc 1 74 9 view .LVU22
+  75:../../Extensions/fatfs/user_diskio.c ****         return 1;
+ 116              		.loc 1 75 9 view .LVU23
+  76:../../Extensions/fatfs/user_diskio.c ****     }
+ 117              		.loc 1 76 5 is_stmt 0 view .LVU24
+ 118 0000 0120     		movs	r0, #1
+ 119              	.LVL7:
+ 120              		.loc 1 76 5 view .LVU25
+ 121 0002 7047     		bx	lr
+ 122              		.cfi_endproc
+ 123              	.LFE353:
+ 125              		.section	.text.USER_ioctl,"ax",%progbits
+ 126              		.align	1
+ 127              		.weak	USER_ioctl
+ 128              		.syntax unified
+ 129              		.thumb
+ 130              		.thumb_func
+ 132              	USER_ioctl:
+ 133              	.LVL8:
+ 134              	.LFB354:
+  77:../../Extensions/fatfs/user_diskio.c **** #endif /* _USE_WRITE == 1 */
+  78:../../Extensions/fatfs/user_diskio.c **** 
+  79:../../Extensions/fatfs/user_diskio.c **** #if _USE_IOCTL == 1
+  80:../../Extensions/fatfs/user_diskio.c ****     DRESULT __attribute__((weak)) USER_ioctl (BYTE pdrv, BYTE cmd, void *buff) {
+ 135              		.loc 1 80 80 is_stmt 1 view -0
+ 136              		.cfi_startproc
+ 137              		@ args = 0, pretend = 0, frame = 0
+ 138              		@ frame_needed = 0, uses_anonymous_args = 0
+ 139              		@ link register save eliminated.
+  81:../../Extensions/fatfs/user_diskio.c ****         UNUSED(pdrv);
+ 140              		.loc 1 81 9 view .LVU27
+  82:../../Extensions/fatfs/user_diskio.c ****         UNUSED(cmd);
+ 141              		.loc 1 82 9 view .LVU28
+  83:../../Extensions/fatfs/user_diskio.c ****         UNUSED(buff);
+ 142              		.loc 1 83 9 view .LVU29
+  84:../../Extensions/fatfs/user_diskio.c ****         return 1;
+ 143              		.loc 1 84 9 view .LVU30
+  85:../../Extensions/fatfs/user_diskio.c ****     }
+ 144              		.loc 1 85 5 is_stmt 0 view .LVU31
+ 145 0000 0120     		movs	r0, #1
+ 146              	.LVL9:
+ 147              		.loc 1 85 5 view .LVU32
+ 148 0002 7047     		bx	lr
+ 149              		.cfi_endproc
+ 150              	.LFE354:
+ 152              		.global	USER_Driver
+ 153              		.section	.data.USER_Driver,"aw"
+ARM GAS  /var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccNQKwqj.s 			page 5
+
+
+ 154              		.align	2
+ 157              	USER_Driver:
+ 158 0000 00000000 		.word	USER_initialize
+ 159 0004 00000000 		.word	USER_status
+ 160 0008 00000000 		.word	USER_read
+ 161 000c 00000000 		.word	USER_write
+ 162 0010 00000000 		.word	USER_ioctl
+ 163              		.section	.data.Stat,"aw"
+ 166              	Stat:
+ 167 0000 01       		.byte	1
+ 168              		.text
+ 169              	.Letext0:
+ 170              		.file 2 "../../Extensions/fatfs/src/integer.h"
+ 171              		.file 3 "../../Extensions/fatfs/src/diskio.h"
+ 172              		.file 4 "../../Extensions/fatfs/src/ff_gen_drv.h"
+ARM GAS  /var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccNQKwqj.s 			page 6
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 user_diskio.c
+/var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccNQKwqj.s:20     .text.USER_initialize:00000000 $t
+/var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccNQKwqj.s:26     .text.USER_initialize:00000000 USER_initialize
+/var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccNQKwqj.s:45     .text.USER_status:00000000 $t
+/var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccNQKwqj.s:51     .text.USER_status:00000000 USER_status
+/var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccNQKwqj.s:70     .text.USER_read:00000000 $t
+/var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccNQKwqj.s:76     .text.USER_read:00000000 USER_read
+/var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccNQKwqj.s:98     .text.USER_write:00000000 $t
+/var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccNQKwqj.s:104    .text.USER_write:00000000 USER_write
+/var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccNQKwqj.s:126    .text.USER_ioctl:00000000 $t
+/var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccNQKwqj.s:132    .text.USER_ioctl:00000000 USER_ioctl
+/var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccNQKwqj.s:157    .data.USER_Driver:00000000 USER_Driver
+/var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccNQKwqj.s:154    .data.USER_Driver:00000000 $d
+/var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccNQKwqj.s:166    .data.Stat:00000000 Stat
+
+NO UNDEFINED SYMBOLS

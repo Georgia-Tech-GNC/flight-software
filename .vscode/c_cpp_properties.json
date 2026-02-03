@@ -5,7 +5,8 @@
             "includePath": [
                 "${workspaceFolder}/Targets/MCU-h725zgt6/**",
                 "${workspaceFolder}/Extensions/fatfs/**",
-                "${workspaceFolder}/RocketLib/**"
+                "${workspaceFolder}/RocketLib/**",
+                "${workspaceFolder}/FreeRTOS-Kernel/**"
             ],
             "defines": [
                 "_DEBUG",

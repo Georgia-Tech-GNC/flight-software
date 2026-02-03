@@ -1,0 +1,1352 @@
+ARM GAS  /var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 1
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"ccsbcs.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "../../Extensions/fatfs/src/option/ccsbcs.c"
+  19              		.section	.text.ff_convert,"ax",%progbits
+  20              		.align	1
+  21              		.global	ff_convert
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	ff_convert:
+  27              	.LVL0:
+  28              	.LFB350:
+   1:../../Extensions/fatfs/src/option/ccsbcs.c **** /*------------------------------------------------------------------------*/
+   2:../../Extensions/fatfs/src/option/ccsbcs.c **** /* Unicode - Local code bidirectional converter  (C)ChaN, 2015            */
+   3:../../Extensions/fatfs/src/option/ccsbcs.c **** /* (SBCS code pages)                                                      */
+   4:../../Extensions/fatfs/src/option/ccsbcs.c **** /*------------------------------------------------------------------------*/
+   5:../../Extensions/fatfs/src/option/ccsbcs.c **** /*  437   U.S.
+   6:../../Extensions/fatfs/src/option/ccsbcs.c **** /   720   Arabic
+   7:../../Extensions/fatfs/src/option/ccsbcs.c **** /   737   Greek
+   8:../../Extensions/fatfs/src/option/ccsbcs.c **** /   771   KBL
+   9:../../Extensions/fatfs/src/option/ccsbcs.c **** /   775   Baltic
+  10:../../Extensions/fatfs/src/option/ccsbcs.c **** /   850   Latin 1
+  11:../../Extensions/fatfs/src/option/ccsbcs.c **** /   852   Latin 2
+  12:../../Extensions/fatfs/src/option/ccsbcs.c **** /   855   Cyrillic
+  13:../../Extensions/fatfs/src/option/ccsbcs.c **** /   857   Turkish
+  14:../../Extensions/fatfs/src/option/ccsbcs.c **** /   860   Portuguese
+  15:../../Extensions/fatfs/src/option/ccsbcs.c **** /   861   Icelandic
+  16:../../Extensions/fatfs/src/option/ccsbcs.c **** /   862   Hebrew
+  17:../../Extensions/fatfs/src/option/ccsbcs.c **** /   863   Canadian French
+  18:../../Extensions/fatfs/src/option/ccsbcs.c **** /   864   Arabic
+  19:../../Extensions/fatfs/src/option/ccsbcs.c **** /   865   Nordic
+  20:../../Extensions/fatfs/src/option/ccsbcs.c **** /   866   Russian
+  21:../../Extensions/fatfs/src/option/ccsbcs.c **** /   869   Greek 2
+  22:../../Extensions/fatfs/src/option/ccsbcs.c **** */
+  23:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+  24:../../Extensions/fatfs/src/option/ccsbcs.c **** #include "../ff.h"
+  25:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+  26:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+  27:../../Extensions/fatfs/src/option/ccsbcs.c **** #if _CODE_PAGE == 437
+  28:../../Extensions/fatfs/src/option/ccsbcs.c **** #define _TBLDEF 1
+  29:../../Extensions/fatfs/src/option/ccsbcs.c **** static
+  30:../../Extensions/fatfs/src/option/ccsbcs.c **** const WCHAR Tbl[] = {	/*  CP437(0x80-0xFF) to Unicode conversion table */
+ARM GAS  /var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s 			page 2
+
+
+  31:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00C7, 0x00FC, 0x00E9, 0x00E2, 0x00E4, 0x00E0, 0x00E5, 0x00E7, 0x00EA, 0x00EB, 0x00E8, 0x00EF, 0x
+  32:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00C9, 0x00E6, 0x00C6, 0x00F4, 0x00F6, 0x00F2, 0x00FB, 0x00F9, 0x00FF, 0x00D6, 0x00DC, 0x00A2, 0x
+  33:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00E1, 0x00ED, 0x00F3, 0x00FA, 0x00F1, 0x00D1, 0x00AA, 0x00BA, 0x00BF, 0x2310, 0x00AC, 0x00BD, 0x
+  34:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2591, 0x2592, 0x2593, 0x2502, 0x2524, 0x2561, 0x2562, 0x2556, 0x2555, 0x2563, 0x2551, 0x2557, 0x
+  35:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2514, 0x2534, 0x252C, 0x251C, 0x2500, 0x253C, 0x255E, 0x255F, 0x255A, 0x2554, 0x2569, 0x2566, 0x
+  36:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2568, 0x2564, 0x2565, 0x2559, 0x2558, 0x2552, 0x2553, 0x256B, 0x256A, 0x2518, 0x250C, 0x2588, 0x
+  37:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x03B1, 0x00DF, 0x0393, 0x03C0, 0x03A3, 0x03C3, 0x00B5, 0x03C4, 0x03A6, 0x0398, 0x03A9, 0x03B4, 0x
+  38:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2261, 0x00B1, 0x2265, 0x2264, 0x2320, 0x2321, 0x00F7, 0x2248, 0x00B0, 0x2219, 0x00B7, 0x221A, 0x
+  39:../../Extensions/fatfs/src/option/ccsbcs.c **** };
+  40:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+  41:../../Extensions/fatfs/src/option/ccsbcs.c **** #elif _CODE_PAGE == 720
+  42:../../Extensions/fatfs/src/option/ccsbcs.c **** #define _TBLDEF 1
+  43:../../Extensions/fatfs/src/option/ccsbcs.c **** static
+  44:../../Extensions/fatfs/src/option/ccsbcs.c **** const WCHAR Tbl[] = {	/*  CP720(0x80-0xFF) to Unicode conversion table */
+  45:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x0000, 0x0000, 0x00E9, 0x00E2, 0x0000, 0x00E0, 0x0000, 0x00E7, 0x00EA, 0x00EB, 0x00E8, 0x00EF, 0x
+  46:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x0000, 0x0651, 0x0652, 0x00F4, 0x00A4, 0x0640, 0x00FB, 0x00F9, 0x0621, 0x0622, 0x0623, 0x0624, 0x
+  47:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x0628, 0x0629, 0x062A, 0x062B, 0x062C, 0x062D, 0x062E, 0x062F, 0x0630, 0x0631, 0x0632, 0x0633, 0x
+  48:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2591, 0x2592, 0x2593, 0x2502, 0x2524, 0x2561, 0x2562, 0x2556, 0x2555, 0x2563, 0x2551, 0x2557, 0x
+  49:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2514, 0x2534, 0x252C, 0x251C, 0x2500, 0x253C, 0x255E, 0x255F, 0x255A, 0x2554, 0x2569, 0x2566, 0x
+  50:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2568, 0x2564, 0x2565, 0x2559, 0x2558, 0x2552, 0x2553, 0x256B, 0x256A, 0x2518, 0x250C, 0x2588, 0x
+  51:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x0636, 0x0637, 0x0638, 0x0639, 0x063A, 0x0641, 0x00B5, 0x0642, 0x0643, 0x0644, 0x0645, 0x0646, 0x
+  52:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2261, 0x064B, 0x064C, 0x064D, 0x064E, 0x064F, 0x0650, 0x2248, 0x00B0, 0x2219, 0x00B7, 0x221A, 0x
+  53:../../Extensions/fatfs/src/option/ccsbcs.c **** };
+  54:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+  55:../../Extensions/fatfs/src/option/ccsbcs.c **** #elif _CODE_PAGE == 737
+  56:../../Extensions/fatfs/src/option/ccsbcs.c **** #define _TBLDEF 1
+  57:../../Extensions/fatfs/src/option/ccsbcs.c **** static
+  58:../../Extensions/fatfs/src/option/ccsbcs.c **** const WCHAR Tbl[] = {	/*  CP737(0x80-0xFF) to Unicode conversion table */
+  59:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x0391, 0x0392, 0x0393, 0x0394, 0x0395, 0x0396, 0x0397, 0x0398, 0x0399, 0x039A, 0x039B, 0x039C, 0x
+  60:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x03A1, 0x03A3, 0x03A4, 0x03A5, 0x03A6, 0x03A7, 0x03A8, 0x03A9, 0x03B1, 0x03B2, 0x03B3, 0x03B4, 0x
+  61:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x03B9, 0x03BA, 0x03BB, 0x03BC, 0x03BD, 0x03BE, 0x03BF, 0x03C0, 0x03C1, 0x03C3, 0x03C2, 0x03C4, 0x
+  62:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2591, 0x2592, 0x2593, 0x2502, 0x2524, 0x2561, 0x2562, 0x2556, 0x2555, 0x2563, 0x2551, 0x2557, 0x
+  63:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2514, 0x2534, 0x252C, 0x251C, 0x2500, 0x253C, 0x255E, 0x255F, 0x255A, 0x2554, 0x2569, 0x2566, 0x
+  64:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2568, 0x2564, 0x2565, 0x2559, 0x2558, 0x2552, 0x2553, 0x256B, 0x256A, 0x2518, 0x250C, 0x2588, 0x
+  65:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x03C9, 0x03AC, 0x03AD, 0x03AE, 0x03CA, 0x03AF, 0x03CC, 0x03CD, 0x03CB, 0x03CE, 0x0386, 0x0388, 0x
+  66:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x038F, 0x00B1, 0x2265, 0x2264, 0x03AA, 0x03AB, 0x00F7, 0x2248, 0x00B0, 0x2219, 0x00B7, 0x221A, 0x
+  67:../../Extensions/fatfs/src/option/ccsbcs.c **** };
+  68:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+  69:../../Extensions/fatfs/src/option/ccsbcs.c **** #elif _CODE_PAGE == 771
+  70:../../Extensions/fatfs/src/option/ccsbcs.c **** #define _TBLDEF 1
+  71:../../Extensions/fatfs/src/option/ccsbcs.c **** static
+  72:../../Extensions/fatfs/src/option/ccsbcs.c **** const WCHAR Tbl[] = {	/*  CP771(0x80-0xFF) to Unicode conversion table */
+  73:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x0410, 0x0411, 0x0412, 0x0413, 0x0414, 0x0415, 0x0416, 0x0417, 0x0418, 0x0419, 0x041A, 0x041B, 0x
+  74:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x0420, 0x0421, 0x0422, 0x0423, 0x0424, 0x0425, 0x0426, 0x0427, 0x0428, 0x0429, 0x042A, 0x042B, 0x
+  75:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x0430, 0x0431, 0x0432, 0x0433, 0x0434, 0x0435, 0x0436, 0x0437, 0x0438, 0x0439, 0x043A, 0x043B, 0x
+  76:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2591, 0x2592, 0x2593, 0x2502, 0x2524, 0x2561, 0x2562, 0x2556, 0x2555, 0x2563, 0x2551, 0x2557, 0x
+  77:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2514, 0x2534, 0x252C, 0x251C, 0x2500, 0x253C, 0x255E, 0x255F, 0x255A, 0x2554, 0x2569, 0x2566, 0x
+  78:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2568, 0x2564, 0x2565, 0x2559, 0x2558, 0x2552, 0x2553, 0x256B, 0x256A, 0x2518, 0x250C, 0x2588, 0x
+  79:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x0440, 0x0441, 0x0442, 0x0443, 0x0444, 0x0445, 0x0446, 0x0447, 0x0448, 0x0449, 0x044A, 0x044B, 0x
+  80:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x0118, 0x0119, 0x0116, 0x0117, 0x012E, 0x012F, 0x0160, 0x0161, 0x0172, 0x0173, 0x016A, 0x016B, 0x
+  81:../../Extensions/fatfs/src/option/ccsbcs.c **** };
+  82:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+  83:../../Extensions/fatfs/src/option/ccsbcs.c **** #elif _CODE_PAGE == 775
+  84:../../Extensions/fatfs/src/option/ccsbcs.c **** #define _TBLDEF 1
+  85:../../Extensions/fatfs/src/option/ccsbcs.c **** static
+  86:../../Extensions/fatfs/src/option/ccsbcs.c **** const WCHAR Tbl[] = {	/*  CP775(0x80-0xFF) to Unicode conversion table */
+  87:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x0106, 0x00FC, 0x00E9, 0x0101, 0x00E4, 0x0123, 0x00E5, 0x0107, 0x0142, 0x0113, 0x0156, 0x0157, 0x
+ARM GAS  /var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s 			page 3
+
+
+  88:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00C9, 0x00E6, 0x00C6, 0x014D, 0x00F6, 0x0122, 0x00A2, 0x015A, 0x015B, 0x00D6, 0x00DC, 0x00F8, 0x
+  89:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x0100, 0x012A, 0x00F3, 0x017B, 0x017C, 0x017A, 0x201D, 0x00A6, 0x00A9, 0x00AE, 0x00AC, 0x00BD, 0x
+  90:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2591, 0x2592, 0x2593, 0x2502, 0x2524, 0x0104, 0x010C, 0x0118, 0x0116, 0x2563, 0x2551, 0x2557, 0x
+  91:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2514, 0x2534, 0x252C, 0x251C, 0x2500, 0x253C, 0x0172, 0x016A, 0x255A, 0x2554, 0x2569, 0x2566, 0x
+  92:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x0105, 0x010D, 0x0119, 0x0117, 0x012F, 0x0161, 0x0173, 0x016B, 0x017E, 0x2518, 0x250C, 0x2588, 0x
+  93:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00D3, 0x00DF, 0x014C, 0x0143, 0x00F5, 0x00D5, 0x00B5, 0x0144, 0x0136, 0x0137, 0x013B, 0x013C, 0x
+  94:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00AD, 0x00B1, 0x201C, 0x00BE, 0x00B6, 0x00A7, 0x00F7, 0x201E, 0x00B0, 0x2219, 0x00B7, 0x00B9, 0x
+  95:../../Extensions/fatfs/src/option/ccsbcs.c **** };
+  96:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+  97:../../Extensions/fatfs/src/option/ccsbcs.c **** #elif _CODE_PAGE == 850
+  98:../../Extensions/fatfs/src/option/ccsbcs.c **** #define _TBLDEF 1
+  99:../../Extensions/fatfs/src/option/ccsbcs.c **** static
+ 100:../../Extensions/fatfs/src/option/ccsbcs.c **** const WCHAR Tbl[] = {	/*  CP850(0x80-0xFF) to Unicode conversion table */
+ 101:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00C7, 0x00FC, 0x00E9, 0x00E2, 0x00E4, 0x00E0, 0x00E5, 0x00E7, 0x00EA, 0x00EB, 0x00E8, 0x00EF, 0x
+ 102:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00C9, 0x00E6, 0x00C6, 0x00F4, 0x00F6, 0x00F2, 0x00FB, 0x00F9, 0x00FF, 0x00D6, 0x00DC, 0x00F8, 0x
+ 103:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00E1, 0x00ED, 0x00F3, 0x00FA, 0x00F1, 0x00D1, 0x00AA, 0x00BA, 0x00BF, 0x00AE, 0x00AC, 0x00BD, 0x
+ 104:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2591, 0x2592, 0x2593, 0x2502, 0x2524, 0x00C1, 0x00C2, 0x00C0, 0x00A9, 0x2563, 0x2551, 0x2557, 0x
+ 105:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2514, 0x2534, 0x252C, 0x251C, 0x2500, 0x253C, 0x00E3, 0x00C3, 0x255A, 0x2554, 0x2569, 0x2566, 0x
+ 106:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00F0, 0x00D0, 0x00CA, 0x00CB, 0x00C8, 0x0131, 0x00CD, 0x00CE, 0x00CF, 0x2518, 0x250C, 0x2588, 0x
+ 107:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00D3, 0x00DF, 0x00D4, 0x00D2, 0x00F5, 0x00D5, 0x00B5, 0x00FE, 0x00DE, 0x00DA, 0x00DB, 0x00D9, 0x
+ 108:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00AD, 0x00B1, 0x2017, 0x00BE, 0x00B6, 0x00A7, 0x00F7, 0x00B8, 0x00B0, 0x00A8, 0x00B7, 0x00B9, 0x
+ 109:../../Extensions/fatfs/src/option/ccsbcs.c **** };
+ 110:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+ 111:../../Extensions/fatfs/src/option/ccsbcs.c **** #elif _CODE_PAGE == 852
+ 112:../../Extensions/fatfs/src/option/ccsbcs.c **** #define _TBLDEF 1
+ 113:../../Extensions/fatfs/src/option/ccsbcs.c **** static
+ 114:../../Extensions/fatfs/src/option/ccsbcs.c **** const WCHAR Tbl[] = {	/*  CP852(0x80-0xFF) to Unicode conversion table */
+ 115:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00C7, 0x00FC, 0x00E9, 0x00E2, 0x00E4, 0x016F, 0x0107, 0x00E7, 0x0142, 0x00EB, 0x0150, 0x0151, 0x
+ 116:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00C9, 0x0139, 0x013A, 0x00F4, 0x00F6, 0x013D, 0x013E, 0x015A, 0x015B, 0x00D6, 0x00DC, 0x0164, 0x
+ 117:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00E1, 0x00ED, 0x00F3, 0x00FA, 0x0104, 0x0105, 0x017D, 0x017E, 0x0118, 0x0119, 0x00AC, 0x017A, 0x
+ 118:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2591, 0x2592, 0x2593, 0x2502, 0x2524, 0x00C1, 0x00C2, 0x011A, 0x015E, 0x2563, 0x2551, 0x2557, 0x
+ 119:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2514, 0x2534, 0x252C, 0x251C, 0x2500, 0x253C, 0x0102, 0x0103, 0x255A, 0x2554, 0x2569, 0x2566, 0x
+ 120:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x0111, 0x0110, 0x010E, 0x00CB, 0x010F, 0x0147, 0x00CD, 0x00CE, 0x011B, 0x2518, 0x250C, 0x2588, 0x
+ 121:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00D3, 0x00DF, 0x00D4, 0x0143, 0x0144, 0x0148, 0x0160, 0x0161, 0x0154, 0x00DA, 0x0155, 0x0170, 0x
+ 122:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00AD, 0x02DD, 0x02DB, 0x02C7, 0x02D8, 0x00A7, 0x00F7, 0x00B8, 0x00B0, 0x00A8, 0x02D9, 0x0171, 0x
+ 123:../../Extensions/fatfs/src/option/ccsbcs.c **** };
+ 124:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+ 125:../../Extensions/fatfs/src/option/ccsbcs.c **** #elif _CODE_PAGE == 855
+ 126:../../Extensions/fatfs/src/option/ccsbcs.c **** #define _TBLDEF 1
+ 127:../../Extensions/fatfs/src/option/ccsbcs.c **** static
+ 128:../../Extensions/fatfs/src/option/ccsbcs.c **** const WCHAR Tbl[] = {	/*  CP855(0x80-0xFF) to Unicode conversion table */
+ 129:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x0452, 0x0402, 0x0453, 0x0403, 0x0451, 0x0401, 0x0454, 0x0404, 0x0455, 0x0405, 0x0456, 0x0406, 0x
+ 130:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x0459, 0x0409, 0x045A, 0x040A, 0x045B, 0x040B, 0x045C, 0x040C, 0x045E, 0x040E, 0x045F, 0x040F, 0x
+ 131:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x0430, 0x0410, 0x0431, 0x0411, 0x0446, 0x0426, 0x0434, 0x0414, 0x0435, 0x0415, 0x0444, 0x0424, 0x
+ 132:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2591, 0x2592, 0x2593, 0x2502, 0x2524, 0x0445, 0x0425, 0x0438, 0x0418, 0x2563, 0x2551, 0x2557, 0x
+ 133:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2514, 0x2534, 0x252C, 0x251C, 0x2500, 0x253C, 0x043A, 0x041A, 0x255A, 0x2554, 0x2569, 0x2566, 0x
+ 134:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x043B, 0x041B, 0x043C, 0x041C, 0x043D, 0x041D, 0x043E, 0x041E, 0x043F, 0x2518, 0x250C, 0x2588, 0x
+ 135:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x042F, 0x0440, 0x0420, 0x0441, 0x0421, 0x0442, 0x0422, 0x0443, 0x0423, 0x0436, 0x0416, 0x0432, 0x
+ 136:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00AD, 0x044B, 0x042B, 0x0437, 0x0417, 0x0448, 0x0428, 0x044D, 0x042D, 0x0449, 0x0429, 0x0447, 0x
+ 137:../../Extensions/fatfs/src/option/ccsbcs.c **** };
+ 138:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+ 139:../../Extensions/fatfs/src/option/ccsbcs.c **** #elif _CODE_PAGE == 857
+ 140:../../Extensions/fatfs/src/option/ccsbcs.c **** #define _TBLDEF 1
+ 141:../../Extensions/fatfs/src/option/ccsbcs.c **** static
+ 142:../../Extensions/fatfs/src/option/ccsbcs.c **** const WCHAR Tbl[] = {	/*  CP857(0x80-0xFF) to Unicode conversion table */
+ 143:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00C7, 0x00FC, 0x00E9, 0x00E2, 0x00E4, 0x00E0, 0x00E5, 0x00E7, 0x00EA, 0x00EB, 0x00E8, 0x00EF, 0x
+ 144:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00C9, 0x00E6, 0x00C6, 0x00F4, 0x00F6, 0x00F2, 0x00FB, 0x00F9, 0x0130, 0x00D6, 0x00DC, 0x00F8, 0x
+ARM GAS  /var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s 			page 4
+
+
+ 145:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00E1, 0x00ED, 0x00F3, 0x00FA, 0x00F1, 0x00D1, 0x011E, 0x011F, 0x00BF, 0x00AE, 0x00AC, 0x00BD, 0x
+ 146:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2591, 0x2592, 0x2593, 0x2502, 0x2524, 0x00C1, 0x00C2, 0x00C0, 0x00A9, 0x2563, 0x2551, 0x2557, 0x
+ 147:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2514, 0x2534, 0x252C, 0x251C, 0x2500, 0x253C, 0x00E3, 0x00C3, 0x255A, 0x2554, 0x2569, 0x2566, 0x
+ 148:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00BA, 0x00AA, 0x00CA, 0x00CB, 0x00C8, 0x0000, 0x00CD, 0x00CE, 0x00CF, 0x2518, 0x250C, 0x2588, 0x
+ 149:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00D3, 0x00DF, 0x00D4, 0x00D2, 0x00F5, 0x00D5, 0x00B5, 0x0000, 0x00D7, 0x00DA, 0x00DB, 0x00D9, 0x
+ 150:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00AD, 0x00B1, 0x0000, 0x00BE, 0x00B6, 0x00A7, 0x00F7, 0x00B8, 0x00B0, 0x00A8, 0x00B7, 0x00B9, 0x
+ 151:../../Extensions/fatfs/src/option/ccsbcs.c **** };
+ 152:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+ 153:../../Extensions/fatfs/src/option/ccsbcs.c **** #elif _CODE_PAGE == 860
+ 154:../../Extensions/fatfs/src/option/ccsbcs.c **** #define _TBLDEF 1
+ 155:../../Extensions/fatfs/src/option/ccsbcs.c **** static
+ 156:../../Extensions/fatfs/src/option/ccsbcs.c **** const WCHAR Tbl[] = {	/*  CP860(0x80-0xFF) to Unicode conversion table */
+ 157:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00C7, 0x00FC, 0x00E9, 0x00E2, 0x00E3, 0x00E0, 0x00C1, 0x00E7, 0x00EA, 0x00CA, 0x00E8, 0x00CD, 0x
+ 158:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00C9, 0x00C0, 0x00C8, 0x00F4, 0x00F5, 0x00F2, 0x00DA, 0x00F9, 0x00CC, 0x00D5, 0x00DC, 0x00A2, 0x
+ 159:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00E1, 0x00ED, 0x00F3, 0x00FA, 0x00F1, 0x00D1, 0x00AA, 0x00BA, 0x00BF, 0x00D2, 0x00AC, 0x00BD, 0x
+ 160:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2591, 0x2592, 0x2593, 0x2502, 0x2524, 0x2561, 0x2562, 0x2556, 0x2555, 0x2563, 0x2551, 0x2557, 0x
+ 161:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2514, 0x2534, 0x252C, 0x251C, 0x2500, 0x253C, 0x255E, 0x255F, 0x255A, 0x2554, 0x2569, 0x2566, 0x
+ 162:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2568, 0x2564, 0x2565, 0x2559, 0x2558, 0x2552, 0x2553, 0x256B, 0x256A, 0x2518, 0x250C, 0x2588, 0x
+ 163:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x03B1, 0x00DF, 0x0393, 0x03C0, 0x03A3, 0x03C3, 0x00B5, 0x03C4, 0x03A6, 0x0398, 0x03A9, 0x03B4, 0x
+ 164:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2261, 0x00B1, 0x2265, 0x2264, 0x2320, 0x2321, 0x00F7, 0x2248, 0x00B0, 0x2219, 0x00B7, 0x221A, 0x
+ 165:../../Extensions/fatfs/src/option/ccsbcs.c **** };
+ 166:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+ 167:../../Extensions/fatfs/src/option/ccsbcs.c **** #elif _CODE_PAGE == 861
+ 168:../../Extensions/fatfs/src/option/ccsbcs.c **** #define _TBLDEF 1
+ 169:../../Extensions/fatfs/src/option/ccsbcs.c **** static
+ 170:../../Extensions/fatfs/src/option/ccsbcs.c **** const WCHAR Tbl[] = {	/*  CP861(0x80-0xFF) to Unicode conversion table */
+ 171:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00C7, 0x00FC, 0x00E9, 0x00E2, 0x00E4, 0x00E0, 0x00E6, 0x00E7, 0x00EA, 0x00EB, 0x00E8, 0x00D0, 0x
+ 172:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00C9, 0x00E6, 0x00C6, 0x00F4, 0x00F6, 0x00FE, 0x00FB, 0x00DD, 0x00FD, 0x00D6, 0x00DC, 0x00F8, 0x
+ 173:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00E1, 0x00ED, 0x00F3, 0x00FA, 0x00C1, 0x00CD, 0x00D3, 0x00DA, 0x00BF, 0x2310, 0x00AC, 0x00BD, 0x
+ 174:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2591, 0x2592, 0x2593, 0x2502, 0x2524, 0x2561, 0x2562, 0x2556, 0x2555, 0x2563, 0x2551, 0x2557, 0x
+ 175:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2514, 0x2534, 0x252C, 0x251C, 0x2500, 0x253C, 0x255E, 0x255F, 0x255A, 0x2554, 0x2569, 0x2566, 0x
+ 176:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2568, 0x2564, 0x2565, 0x2559, 0x2558, 0x2552, 0x2553, 0x256B, 0x256A, 0x2518, 0x250C, 0x2588, 0x
+ 177:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x03B1, 0x00DF, 0x0393, 0x03C0, 0x03A3, 0x03C3, 0x00B5, 0x03C4, 0x03A6, 0x0398, 0x03A9, 0x03B4, 0x
+ 178:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2261, 0x00B1, 0x2265, 0x2264, 0x2320, 0x2321, 0x00F7, 0x2248, 0x00B0, 0x2219, 0x00B7, 0x221A, 0x
+ 179:../../Extensions/fatfs/src/option/ccsbcs.c **** };
+ 180:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+ 181:../../Extensions/fatfs/src/option/ccsbcs.c **** #elif _CODE_PAGE == 862
+ 182:../../Extensions/fatfs/src/option/ccsbcs.c **** #define _TBLDEF 1
+ 183:../../Extensions/fatfs/src/option/ccsbcs.c **** static
+ 184:../../Extensions/fatfs/src/option/ccsbcs.c **** const WCHAR Tbl[] = {	/*  CP862(0x80-0xFF) to Unicode conversion table */
+ 185:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x05D0, 0x05D1, 0x05D2, 0x05D3, 0x05D4, 0x05D5, 0x05D6, 0x05D7, 0x05D8, 0x05D9, 0x05DA, 0x05DB, 0x
+ 186:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x05E0, 0x05E1, 0x05E2, 0x05E3, 0x05E4, 0x05E5, 0x05E6, 0x05E7, 0x05E8, 0x05E9, 0x05EA, 0x00A2, 0x
+ 187:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00E1, 0x00ED, 0x00F3, 0x00FA, 0x00F1, 0x00D1, 0x00AA, 0x00BA, 0x00BF, 0x2310, 0x00AC, 0x00BD, 0x
+ 188:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2591, 0x2592, 0x2593, 0x2502, 0x2524, 0x2561, 0x2562, 0x2556, 0x2555, 0x2563, 0x2551, 0x2557, 0x
+ 189:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2514, 0x2534, 0x252C, 0x251C, 0x2500, 0x253C, 0x255E, 0x255F, 0x255A, 0x2554, 0x2569, 0x2566, 0x
+ 190:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2568, 0x2564, 0x2565, 0x2559, 0x2558, 0x2552, 0x2553, 0x256B, 0x256A, 0x2518, 0x250C, 0x2588, 0x
+ 191:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x03B1, 0x00DF, 0x0393, 0x03C0, 0x03A3, 0x03C3, 0x00B5, 0x03C4, 0x03A6, 0x0398, 0x03A9, 0x03B4, 0x
+ 192:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2261, 0x00B1, 0x2265, 0x2264, 0x2320, 0x2321, 0x00F7, 0x2248, 0x00B0, 0x2219, 0x00B7, 0x221A, 0x
+ 193:../../Extensions/fatfs/src/option/ccsbcs.c **** };
+ 194:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+ 195:../../Extensions/fatfs/src/option/ccsbcs.c **** #elif _CODE_PAGE == 863
+ 196:../../Extensions/fatfs/src/option/ccsbcs.c **** #define _TBLDEF 1
+ 197:../../Extensions/fatfs/src/option/ccsbcs.c **** static
+ 198:../../Extensions/fatfs/src/option/ccsbcs.c **** const WCHAR Tbl[] = {	/*  CP863(0x80-0xFF) to Unicode conversion table */
+ 199:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00C7, 0x00FC, 0x00E9, 0x00E2, 0x00C2, 0x00E0, 0x00B6, 0x00E7, 0x00EA, 0x00EB, 0x00E8, 0x00EF, 0x
+ 200:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00C9, 0x00C8, 0x00CA, 0x00F4, 0x00CB, 0x00CF, 0x00FB, 0x00F9, 0x00A4, 0x00D4, 0x00DC, 0x00A2, 0x
+ 201:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00A6, 0x00B4, 0x00F3, 0x00FA, 0x00A8, 0x00BB, 0x00B3, 0x00AF, 0x00CE, 0x3210, 0x00AC, 0x00BD, 0x
+ARM GAS  /var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s 			page 5
+
+
+ 202:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2591, 0x2592, 0x2593, 0x2502, 0x2524, 0x2561, 0x2562, 0x2556, 0x2555, 0x2563, 0x2551, 0x2557, 0x
+ 203:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2514, 0x2534, 0x252C, 0x251C, 0x2500, 0x253C, 0x255E, 0x255F, 0x255A, 0x2554, 0x2569, 0x2566, 0x
+ 204:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2568, 0x2564, 0x2565, 0x2559, 0x2558, 0x2552, 0x2553, 0x256B, 0x256A, 0x2518, 0x250C, 0x2588, 0x
+ 205:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x03B1, 0x00DF, 0x0393, 0x03C0, 0x03A3, 0x03C3, 0x00B5, 0x03C4, 0x03A6, 0x0398, 0x03A9, 0x03B4, 0x
+ 206:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2261, 0x00B1, 0x2265, 0x2264, 0x2320, 0x2321, 0x00F7, 0x2248, 0x00B0, 0x2219, 0x00B7, 0x221A, 0x
+ 207:../../Extensions/fatfs/src/option/ccsbcs.c **** };
+ 208:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+ 209:../../Extensions/fatfs/src/option/ccsbcs.c **** #elif _CODE_PAGE == 864
+ 210:../../Extensions/fatfs/src/option/ccsbcs.c **** #define _TBLDEF 1
+ 211:../../Extensions/fatfs/src/option/ccsbcs.c **** static
+ 212:../../Extensions/fatfs/src/option/ccsbcs.c **** const WCHAR Tbl[] = {	/*  CP864(0x80-0xFF) to Unicode conversion table */
+ 213:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00B0, 0x00B7, 0x2219, 0x221A, 0x2592, 0x2500, 0x2502, 0x253C, 0x2524, 0x252C, 0x251C, 0x2534, 0x
+ 214:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x03B2, 0x221E, 0x03C6, 0x00B1, 0x00BD, 0x00BC, 0x2248, 0x00AB, 0x00BB, 0xFEF7, 0xFEF8, 0x0000, 0x
+ 215:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00A0, 0x00AD, 0xFE82, 0x00A3, 0x00A4, 0xFE84, 0x0000, 0x20AC, 0xFE8E, 0xFE8F, 0xFE95, 0xFE99, 0x
+ 216:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x0660, 0x0661, 0x0662, 0x0663, 0x0664, 0x0665, 0x0666, 0x0667, 0x0668, 0x0669, 0xFED1, 0x061B, 0x
+ 217:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00A2, 0xFE80, 0xFE81, 0xFE83, 0xFE85, 0xFECA, 0xFE8B, 0xFE8D, 0xFE91, 0xFE93, 0xFE97, 0xFE9B, 0x
+ 218:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0xFEAB, 0xFEAD, 0xFEAF, 0xFEB3, 0xFEB7, 0xFEBB, 0xFEBF, 0xFEC1, 0xFEC5, 0xFECB, 0xFECF, 0x00A6, 0x
+ 219:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x0640, 0xFED3, 0xFED7, 0xFEDB, 0xFEDF, 0xFEE3, 0xFEE7, 0xFEEB, 0xFEED, 0xFEEF, 0xFEF3, 0xFEBD, 0x
+ 220:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0xFE7D, 0x0651, 0xFEE5, 0xFEE9, 0xFEEC, 0xFEF0, 0xFEF2, 0xFED0, 0xFED5, 0xFEF5, 0xFEF6, 0xFEDD, 0x
+ 221:../../Extensions/fatfs/src/option/ccsbcs.c **** };
+ 222:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+ 223:../../Extensions/fatfs/src/option/ccsbcs.c **** #elif _CODE_PAGE == 865
+ 224:../../Extensions/fatfs/src/option/ccsbcs.c **** #define _TBLDEF 1
+ 225:../../Extensions/fatfs/src/option/ccsbcs.c **** static
+ 226:../../Extensions/fatfs/src/option/ccsbcs.c **** const WCHAR Tbl[] = {	/*  CP865(0x80-0xFF) to Unicode conversion table */
+ 227:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00C7, 0x00FC, 0x00E9, 0x00E2, 0x00E4, 0x00E0, 0x00E5, 0x00E7, 0x00EA, 0x00EB, 0x00E8, 0x00EF, 0x
+ 228:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00C5, 0x00E6, 0x00C6, 0x00F4, 0x00F6, 0x00F2, 0x00FB, 0x00F9, 0x00FF, 0x00D6, 0x00DC, 0x00F8, 0x
+ 229:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00E1, 0x00ED, 0x00F3, 0x00FA, 0x00F1, 0x00D1, 0x00AA, 0x00BA, 0x00BF, 0x2310, 0x00AC, 0x00BD, 0x
+ 230:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2591, 0x2592, 0x2593, 0x2502, 0x2524, 0x2561, 0x2562, 0x2556, 0x2555, 0x2563, 0x2551, 0x2557, 0x
+ 231:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2514, 0x2534, 0x252C, 0x251C, 0x2500, 0x253C, 0x255E, 0x255F, 0x255A, 0x2554, 0x2569, 0x2566, 0x
+ 232:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2568, 0x2564, 0x2565, 0x2559, 0x2558, 0x2552, 0x2553, 0x256B, 0x256A, 0x2518, 0x250C, 0x2588, 0x
+ 233:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x03B1, 0x00DF, 0x0393, 0x03C0, 0x03A3, 0x03C3, 0x00B5, 0x03C4, 0x03A6, 0x0398, 0x03A9, 0x03B4, 0x
+ 234:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2261, 0x00B1, 0x2265, 0x2264, 0x2320, 0x2321, 0x00F7, 0x2248, 0x00B0, 0x2219, 0x00B7, 0x221A, 0x
+ 235:../../Extensions/fatfs/src/option/ccsbcs.c **** };
+ 236:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+ 237:../../Extensions/fatfs/src/option/ccsbcs.c **** #elif _CODE_PAGE == 866
+ 238:../../Extensions/fatfs/src/option/ccsbcs.c **** #define _TBLDEF 1
+ 239:../../Extensions/fatfs/src/option/ccsbcs.c **** static
+ 240:../../Extensions/fatfs/src/option/ccsbcs.c **** const WCHAR Tbl[] = {	/*  CP866(0x80-0xFF) to Unicode conversion table */
+ 241:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x0410, 0x0411, 0x0412, 0x0413, 0x0414, 0x0415, 0x0416, 0x0417, 0x0418, 0x0419, 0x041A, 0x041B, 0x
+ 242:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x0420, 0x0421, 0x0422, 0x0423, 0x0424, 0x0425, 0x0426, 0x0427, 0x0428, 0x0429, 0x042A, 0x042B, 0x
+ 243:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x0430, 0x0431, 0x0432, 0x0433, 0x0434, 0x0435, 0x0436, 0x0437, 0x0438, 0x0439, 0x043A, 0x043B, 0x
+ 244:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2591, 0x2592, 0x2593, 0x2502, 0x2524, 0x2561, 0x2562, 0x2556, 0x2555, 0x2563, 0x2551, 0x2557, 0x
+ 245:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2514, 0x2534, 0x252C, 0x251C, 0x2500, 0x253C, 0x255E, 0x255F, 0x255A, 0x2554, 0x2569, 0x2566, 0x
+ 246:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2568, 0x2564, 0x2565, 0x2559, 0x2558, 0x2552, 0x2553, 0x256B, 0x256A, 0x2518, 0x250C, 0x2588, 0x
+ 247:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x0440, 0x0441, 0x0442, 0x0443, 0x0444, 0x0445, 0x0446, 0x0447, 0x0448, 0x0449, 0x044A, 0x044B, 0x
+ 248:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x0401, 0x0451, 0x0404, 0x0454, 0x0407, 0x0457, 0x040E, 0x045E, 0x00B0, 0x2219, 0x00B7, 0x221A, 0x
+ 249:../../Extensions/fatfs/src/option/ccsbcs.c **** };
+ 250:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+ 251:../../Extensions/fatfs/src/option/ccsbcs.c **** #elif _CODE_PAGE == 869
+ 252:../../Extensions/fatfs/src/option/ccsbcs.c **** #define _TBLDEF 1
+ 253:../../Extensions/fatfs/src/option/ccsbcs.c **** static
+ 254:../../Extensions/fatfs/src/option/ccsbcs.c **** const WCHAR Tbl[] = {	/*  CP869(0x80-0xFF) to Unicode conversion table */
+ 255:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00B7, 0x00B7, 0x00B7, 0x00B7, 0x00B7, 0x00B7, 0x0386, 0x00B7, 0x00B7, 0x00AC, 0x00A6, 0x2018, 0x
+ 256:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x038A, 0x03AA, 0x038C, 0x00B7, 0x00B7, 0x038E, 0x03AB, 0x00A9, 0x038F, 0x00B2, 0x00B3, 0x03AC, 0x
+ 257:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x03CA, 0x0390, 0x03CC, 0x03CD, 0x0391, 0x0392, 0x0393, 0x0394, 0x0395, 0x0396, 0x0397, 0x00BD, 0x
+ 258:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2591, 0x2592, 0x2593, 0x2502, 0x2524, 0x039A, 0x039B, 0x039C, 0x039D, 0x2563, 0x2551, 0x2557, 0x
+ARM GAS  /var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s 			page 6
+
+
+ 259:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x2514, 0x2534, 0x252C, 0x251C, 0x2500, 0x253C, 0x0A30, 0x03A1, 0x255A, 0x2554, 0x2569, 0x2566, 0x
+ 260:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x03A4, 0x03A5, 0x03A6, 0x03A7, 0x03A8, 0x03A9, 0x03B1, 0x03B2, 0x03B3, 0x2518, 0x250C, 0x2588, 0x
+ 261:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x03B6, 0x03B7, 0x03B8, 0x03B9, 0x03BA, 0x03BB, 0x03BC, 0x03BD, 0x03BE, 0x03BF, 0x03C0, 0x03C1, 0x
+ 262:../../Extensions/fatfs/src/option/ccsbcs.c **** 	0x00AD, 0x00B1, 0x03C5, 0x03C6, 0x03C7, 0x00A7, 0x03C8, 0x0385, 0x00B0, 0x00A8, 0x03C9, 0x03CB, 0x
+ 263:../../Extensions/fatfs/src/option/ccsbcs.c **** };
+ 264:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+ 265:../../Extensions/fatfs/src/option/ccsbcs.c **** #endif
+ 266:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+ 267:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+ 268:../../Extensions/fatfs/src/option/ccsbcs.c **** #if !_TBLDEF || !_USE_LFN
+ 269:../../Extensions/fatfs/src/option/ccsbcs.c **** #error This file is not needed at current configuration. Remove from the project.
+ 270:../../Extensions/fatfs/src/option/ccsbcs.c **** #endif
+ 271:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+ 272:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+ 273:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+ 274:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+ 275:../../Extensions/fatfs/src/option/ccsbcs.c **** WCHAR ff_convert (	/* Converted character, Returns zero on error */
+ 276:../../Extensions/fatfs/src/option/ccsbcs.c **** 	WCHAR	chr,	/* Character code to be converted */
+ 277:../../Extensions/fatfs/src/option/ccsbcs.c **** 	UINT	dir		/* 0: Unicode to OEM code, 1: OEM code to Unicode */
+ 278:../../Extensions/fatfs/src/option/ccsbcs.c **** )
+ 279:../../Extensions/fatfs/src/option/ccsbcs.c **** {
+  29              		.loc 1 279 1 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              		@ link register save eliminated.
+ 280:../../Extensions/fatfs/src/option/ccsbcs.c **** 	WCHAR c;
+  34              		.loc 1 280 2 view .LVU1
+ 281:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+ 282:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+ 283:../../Extensions/fatfs/src/option/ccsbcs.c **** 	if (chr < 0x80) {	/* ASCII */
+  35              		.loc 1 283 2 view .LVU2
+  36              		.loc 1 283 5 is_stmt 0 view .LVU3
+  37 0000 7F28     		cmp	r0, #127
+  38 0002 17D9     		bls	.L2
+ 284:../../Extensions/fatfs/src/option/ccsbcs.c **** 		c = chr;
+ 285:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+ 286:../../Extensions/fatfs/src/option/ccsbcs.c **** 	} else {
+ 287:../../Extensions/fatfs/src/option/ccsbcs.c **** 		if (dir) {		/* OEM code to Unicode */
+  39              		.loc 1 287 3 is_stmt 1 view .LVU4
+  40              		.loc 1 287 6 is_stmt 0 view .LVU5
+  41 0004 31B1     		cbz	r1, .L6
+ 288:../../Extensions/fatfs/src/option/ccsbcs.c **** 			c = (chr >= 0x100) ? 0 : Tbl[chr - 0x80];
+  42              		.loc 1 288 4 is_stmt 1 view .LVU6
+  43              		.loc 1 288 6 is_stmt 0 view .LVU7
+  44 0006 FF28     		cmp	r0, #255
+  45 0008 13D8     		bhi	.L7
+  46              		.loc 1 288 37 discriminator 1 view .LVU8
+  47 000a 8038     		subs	r0, r0, #128
+  48              	.LVL1:
+  49              		.loc 1 288 6 discriminator 1 view .LVU9
+  50 000c 0A4B     		ldr	r3, .L8
+  51 000e 33F81000 		ldrh	r0, [r3, r0, lsl #1]
+  52              	.LVL2:
+  53              		.loc 1 288 6 discriminator 1 view .LVU10
+  54 0012 7047     		bx	lr
+  55              	.LVL3:
+ARM GAS  /var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s 			page 7
+
+
+  56              	.L6:
+ 289:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+ 290:../../Extensions/fatfs/src/option/ccsbcs.c **** 		} else {		/* Unicode to OEM code */
+ 291:../../Extensions/fatfs/src/option/ccsbcs.c **** 			for (c = 0; c < 0x80; c++) {
+  57              		.loc 1 291 11 view .LVU11
+  58 0014 0023     		movs	r3, #0
+  59              	.L3:
+  60              	.LVL4:
+  61              		.loc 1 291 18 is_stmt 1 discriminator 1 view .LVU12
+  62 0016 7F2B     		cmp	r3, #127
+  63 0018 07D8     		bhi	.L4
+ 292:../../Extensions/fatfs/src/option/ccsbcs.c **** 				if (chr == Tbl[c]) break;
+  64              		.loc 1 292 5 view .LVU13
+  65              		.loc 1 292 19 is_stmt 0 view .LVU14
+  66 001a 074A     		ldr	r2, .L8
+  67 001c 32F81320 		ldrh	r2, [r2, r3, lsl #1]
+  68              		.loc 1 292 8 view .LVU15
+  69 0020 8242     		cmp	r2, r0
+  70 0022 02D0     		beq	.L4
+ 291:../../Extensions/fatfs/src/option/ccsbcs.c **** 				if (chr == Tbl[c]) break;
+  71              		.loc 1 291 27 is_stmt 1 discriminator 2 view .LVU16
+  72 0024 0133     		adds	r3, r3, #1
+  73              	.LVL5:
+ 291:../../Extensions/fatfs/src/option/ccsbcs.c **** 				if (chr == Tbl[c]) break;
+  74              		.loc 1 291 27 is_stmt 0 discriminator 2 view .LVU17
+  75 0026 9BB2     		uxth	r3, r3
+  76              	.LVL6:
+ 291:../../Extensions/fatfs/src/option/ccsbcs.c **** 				if (chr == Tbl[c]) break;
+  77              		.loc 1 291 27 discriminator 2 view .LVU18
+  78 0028 F5E7     		b	.L3
+  79              	.L4:
+ 293:../../Extensions/fatfs/src/option/ccsbcs.c **** 			}
+ 294:../../Extensions/fatfs/src/option/ccsbcs.c **** 			c = (c + 0x80) & 0xFF;
+  80              		.loc 1 294 4 is_stmt 1 view .LVU19
+  81              		.loc 1 294 11 is_stmt 0 view .LVU20
+  82 002a 03F18000 		add	r0, r3, #128
+  83              	.LVL7:
+  84              		.loc 1 294 6 view .LVU21
+  85 002e C0B2     		uxtb	r0, r0
+  86              	.LVL8:
+  87              		.loc 1 294 6 view .LVU22
+  88 0030 7047     		bx	lr
+  89              	.LVL9:
+  90              	.L7:
+ 288:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+  91              		.loc 1 288 6 discriminator 2 view .LVU23
+  92 0032 0020     		movs	r0, #0
+  93              	.LVL10:
+  94              	.L2:
+ 295:../../Extensions/fatfs/src/option/ccsbcs.c **** 		}
+ 296:../../Extensions/fatfs/src/option/ccsbcs.c **** 	}
+ 297:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+ 298:../../Extensions/fatfs/src/option/ccsbcs.c **** 	return c;
+  95              		.loc 1 298 2 is_stmt 1 view .LVU24
+ 299:../../Extensions/fatfs/src/option/ccsbcs.c **** }
+  96              		.loc 1 299 1 is_stmt 0 view .LVU25
+  97 0034 7047     		bx	lr
+ARM GAS  /var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s 			page 8
+
+
+  98              	.L9:
+  99 0036 00BF     		.align	2
+ 100              	.L8:
+ 101 0038 00000000 		.word	Tbl
+ 102              		.cfi_endproc
+ 103              	.LFE350:
+ 105              		.section	.text.ff_wtoupper,"ax",%progbits
+ 106              		.align	1
+ 107              		.global	ff_wtoupper
+ 108              		.syntax unified
+ 109              		.thumb
+ 110              		.thumb_func
+ 112              	ff_wtoupper:
+ 113              	.LVL11:
+ 114              	.LFB351:
+ 300:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+ 301:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+ 302:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+ 303:../../Extensions/fatfs/src/option/ccsbcs.c **** WCHAR ff_wtoupper (	/* Returns upper converted character */
+ 304:../../Extensions/fatfs/src/option/ccsbcs.c **** 	WCHAR chr		/* Unicode character to be upper converted (BMP only) */
+ 305:../../Extensions/fatfs/src/option/ccsbcs.c **** )
+ 306:../../Extensions/fatfs/src/option/ccsbcs.c **** {
+ 115              		.loc 1 306 1 is_stmt 1 view -0
+ 116              		.cfi_startproc
+ 117              		@ args = 0, pretend = 0, frame = 0
+ 118              		@ frame_needed = 0, uses_anonymous_args = 0
+ 307:../../Extensions/fatfs/src/option/ccsbcs.c **** 	/* Compressed upper conversion table */
+ 308:../../Extensions/fatfs/src/option/ccsbcs.c **** 	static const WCHAR cvt1[] = {	/* U+0000 - U+0FFF */
+ 119              		.loc 1 308 2 view .LVU27
+ 309:../../Extensions/fatfs/src/option/ccsbcs.c **** 		/* Basic Latin */
+ 310:../../Extensions/fatfs/src/option/ccsbcs.c **** 		0x0061,0x031A,
+ 311:../../Extensions/fatfs/src/option/ccsbcs.c **** 		/* Latin-1 Supplement */
+ 312:../../Extensions/fatfs/src/option/ccsbcs.c **** 		0x00E0,0x0317,  0x00F8,0x0307,  0x00FF,0x0001,0x0178,
+ 313:../../Extensions/fatfs/src/option/ccsbcs.c **** 		/* Latin Extended-A */
+ 314:../../Extensions/fatfs/src/option/ccsbcs.c **** 		0x0100,0x0130,  0x0132,0x0106,  0x0139,0x0110,  0x014A,0x012E,  0x0179,0x0106,
+ 315:../../Extensions/fatfs/src/option/ccsbcs.c **** 		/* Latin Extended-B */
+ 316:../../Extensions/fatfs/src/option/ccsbcs.c **** 		0x0180,0x004D,0x0243,0x0181,0x0182,0x0182,0x0184,0x0184,0x0186,0x0187,0x0187,0x0189,0x018A,0x018B
+ 317:../../Extensions/fatfs/src/option/ccsbcs.c **** 		0x01CD,0x0110,  0x01DD,0x0001,0x018E,  0x01DE,0x0112,  0x01F3,0x0003,0x01F1,0x01F4,0x01F4,  0x01F
+ 318:../../Extensions/fatfs/src/option/ccsbcs.c **** 		0x0222,0x0112,  0x023A,0x0009,0x2C65,0x023B,0x023B,0x023D,0x2C66,0x023F,0x0240,0x0241,0x0241,  0x
+ 319:../../Extensions/fatfs/src/option/ccsbcs.c **** 		/* IPA Extensions */
+ 320:../../Extensions/fatfs/src/option/ccsbcs.c **** 		0x0253,0x0040,0x0181,0x0186,0x0255,0x0189,0x018A,0x0258,0x018F,0x025A,0x0190,0x025C,0x025D,0x025E
+ 321:../../Extensions/fatfs/src/option/ccsbcs.c **** 		/* Greek, Coptic */
+ 322:../../Extensions/fatfs/src/option/ccsbcs.c **** 		0x037B,0x0003,0x03FD,0x03FE,0x03FF,  0x03AC,0x0004,0x0386,0x0388,0x0389,0x038A,  0x03B1,0x0311,
+ 323:../../Extensions/fatfs/src/option/ccsbcs.c **** 		0x03C2,0x0002,0x03A3,0x03A3,  0x03C4,0x0308,  0x03CC,0x0003,0x038C,0x038E,0x038F,  0x03D8,0x0118,
+ 324:../../Extensions/fatfs/src/option/ccsbcs.c **** 		0x03F2,0x000A,0x03F9,0x03F3,0x03F4,0x03F5,0x03F6,0x03F7,0x03F7,0x03F9,0x03FA,0x03FA,
+ 325:../../Extensions/fatfs/src/option/ccsbcs.c **** 		/* Cyrillic */
+ 326:../../Extensions/fatfs/src/option/ccsbcs.c **** 		0x0430,0x0320,  0x0450,0x0710,  0x0460,0x0122,  0x048A,0x0136,  0x04C1,0x010E,  0x04CF,0x0001,0x0
+ 327:../../Extensions/fatfs/src/option/ccsbcs.c **** 		/* Armenian */
+ 328:../../Extensions/fatfs/src/option/ccsbcs.c **** 		0x0561,0x0426,
+ 329:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+ 330:../../Extensions/fatfs/src/option/ccsbcs.c **** 		0x0000
+ 331:../../Extensions/fatfs/src/option/ccsbcs.c **** 	};
+ 332:../../Extensions/fatfs/src/option/ccsbcs.c **** 	static const WCHAR cvt2[] = {	/* U+1000 - U+FFFF */
+ 120              		.loc 1 332 2 view .LVU28
+ 333:../../Extensions/fatfs/src/option/ccsbcs.c **** 		/* Phonetic Extensions */
+ 334:../../Extensions/fatfs/src/option/ccsbcs.c **** 		0x1D7D,0x0001,0x2C63,
+ 335:../../Extensions/fatfs/src/option/ccsbcs.c **** 		/* Latin Extended Additional */
+ARM GAS  /var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s 			page 9
+
+
+ 336:../../Extensions/fatfs/src/option/ccsbcs.c **** 		0x1E00,0x0196,  0x1EA0,0x015A,
+ 337:../../Extensions/fatfs/src/option/ccsbcs.c **** 		/* Greek Extended */
+ 338:../../Extensions/fatfs/src/option/ccsbcs.c **** 		0x1F00,0x0608,  0x1F10,0x0606,  0x1F20,0x0608,  0x1F30,0x0608,  0x1F40,0x0606,
+ 339:../../Extensions/fatfs/src/option/ccsbcs.c **** 		0x1F51,0x0007,0x1F59,0x1F52,0x1F5B,0x1F54,0x1F5D,0x1F56,0x1F5F,  0x1F60,0x0608,
+ 340:../../Extensions/fatfs/src/option/ccsbcs.c **** 		0x1F70,0x000E,0x1FBA,0x1FBB,0x1FC8,0x1FC9,0x1FCA,0x1FCB,0x1FDA,0x1FDB,0x1FF8,0x1FF9,0x1FEA,0x1FEB
+ 341:../../Extensions/fatfs/src/option/ccsbcs.c **** 		0x1F80,0x0608,  0x1F90,0x0608,  0x1FA0,0x0608,  0x1FB0,0x0004,0x1FB8,0x1FB9,0x1FB2,0x1FBC,
+ 342:../../Extensions/fatfs/src/option/ccsbcs.c **** 		0x1FCC,0x0001,0x1FC3,  0x1FD0,0x0602,  0x1FE0,0x0602,  0x1FE5,0x0001,0x1FEC,  0x1FF2,0x0001,0x1FF
+ 343:../../Extensions/fatfs/src/option/ccsbcs.c **** 		/* Letterlike Symbols */
+ 344:../../Extensions/fatfs/src/option/ccsbcs.c **** 		0x214E,0x0001,0x2132,
+ 345:../../Extensions/fatfs/src/option/ccsbcs.c **** 		/* Number forms */
+ 346:../../Extensions/fatfs/src/option/ccsbcs.c **** 		0x2170,0x0210,  0x2184,0x0001,0x2183,
+ 347:../../Extensions/fatfs/src/option/ccsbcs.c **** 		/* Enclosed Alphanumerics */
+ 348:../../Extensions/fatfs/src/option/ccsbcs.c **** 		0x24D0,0x051A,  0x2C30,0x042F,
+ 349:../../Extensions/fatfs/src/option/ccsbcs.c **** 		/* Latin Extended-C */
+ 350:../../Extensions/fatfs/src/option/ccsbcs.c **** 		0x2C60,0x0102,  0x2C67,0x0106, 0x2C75,0x0102,
+ 351:../../Extensions/fatfs/src/option/ccsbcs.c **** 		/* Coptic */
+ 352:../../Extensions/fatfs/src/option/ccsbcs.c **** 		0x2C80,0x0164,
+ 353:../../Extensions/fatfs/src/option/ccsbcs.c **** 		/* Georgian Supplement */
+ 354:../../Extensions/fatfs/src/option/ccsbcs.c **** 		0x2D00,0x0826,
+ 355:../../Extensions/fatfs/src/option/ccsbcs.c **** 		/* Full-width */
+ 356:../../Extensions/fatfs/src/option/ccsbcs.c **** 		0xFF41,0x031A,
+ 357:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+ 358:../../Extensions/fatfs/src/option/ccsbcs.c **** 		0x0000
+ 359:../../Extensions/fatfs/src/option/ccsbcs.c **** 	};
+ 360:../../Extensions/fatfs/src/option/ccsbcs.c **** 	const WCHAR *p;
+ 121              		.loc 1 360 2 view .LVU29
+ 361:../../Extensions/fatfs/src/option/ccsbcs.c **** 	WCHAR bc, nc, cmd;
+ 122              		.loc 1 361 2 view .LVU30
+ 362:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+ 363:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+ 364:../../Extensions/fatfs/src/option/ccsbcs.c **** 	p = chr < 0x1000 ? cvt1 : cvt2;
+ 123              		.loc 1 364 2 view .LVU31
+ 124              		.loc 1 364 26 is_stmt 0 view .LVU32
+ 125 0000 B0F5805F 		cmp	r0, #4096
+ 126 0004 07D2     		bcs	.L26
+ 127              		.loc 1 364 26 discriminator 1 view .LVU33
+ 128 0006 244B     		ldr	r3, .L36
+ 129              	.L30:
+ 130              	.LVL12:
+ 365:../../Extensions/fatfs/src/option/ccsbcs.c **** 	for (;;) {
+ 131              		.loc 1 365 2 is_stmt 1 view .LVU34
+ 366:../../Extensions/fatfs/src/option/ccsbcs.c **** 		bc = *p++;								/* Get block base */
+ 132              		.loc 1 366 3 view .LVU35
+ 133              		.loc 1 366 6 is_stmt 0 view .LVU36
+ 134 0008 1988     		ldrh	r1, [r3]
+ 135              	.LVL13:
+ 367:../../Extensions/fatfs/src/option/ccsbcs.c **** 		if (!bc || chr < bc) break;
+ 136              		.loc 1 367 3 is_stmt 1 view .LVU37
+ 137              		.loc 1 367 6 is_stmt 0 view .LVU38
+ 138 000a 4A1E     		subs	r2, r1, #1
+ 139 000c 92B2     		uxth	r2, r2
+ 140 000e 9042     		cmp	r0, r2
+ 141 0010 40D9     		bls	.L34
+ 306:../../Extensions/fatfs/src/option/ccsbcs.c **** 	/* Compressed upper conversion table */
+ 142              		.loc 1 306 1 view .LVU39
+ 143 0012 10B5     		push	{r4, lr}
+ 144              	.LCFI0:
+ARM GAS  /var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s 			page 10
+
+
+ 145              		.cfi_def_cfa_offset 8
+ 146              		.cfi_offset 4, -8
+ 147              		.cfi_offset 14, -4
+ 148 0014 07E0     		b	.L32
+ 149              	.LVL14:
+ 150              	.L26:
+ 151              	.LCFI1:
+ 152              		.cfi_def_cfa_offset 0
+ 153              		.cfi_restore 4
+ 154              		.cfi_restore 14
+ 364:../../Extensions/fatfs/src/option/ccsbcs.c **** 	for (;;) {
+ 155              		.loc 1 364 26 discriminator 2 view .LVU40
+ 156 0016 214B     		ldr	r3, .L36+4
+ 157 0018 F6E7     		b	.L30
+ 158              	.LVL15:
+ 159              	.L27:
+ 160              	.LCFI2:
+ 161              		.cfi_def_cfa_offset 8
+ 162              		.cfi_offset 4, -8
+ 163              		.cfi_offset 14, -4
+ 368:../../Extensions/fatfs/src/option/ccsbcs.c **** 		nc = *p++; cmd = nc >> 8; nc &= 0xFF;	/* Get processing command and block size */
+ 164              		.loc 1 368 10 view .LVU41
+ 165 001a 7346     		mov	r3, lr
+ 166              	.LVL16:
+ 167              	.L24:
+ 365:../../Extensions/fatfs/src/option/ccsbcs.c **** 		bc = *p++;								/* Get block base */
+ 168              		.loc 1 365 2 is_stmt 1 view .LVU42
+ 366:../../Extensions/fatfs/src/option/ccsbcs.c **** 		if (!bc || chr < bc) break;
+ 169              		.loc 1 366 3 view .LVU43
+ 366:../../Extensions/fatfs/src/option/ccsbcs.c **** 		if (!bc || chr < bc) break;
+ 170              		.loc 1 366 6 is_stmt 0 view .LVU44
+ 171 001c 1988     		ldrh	r1, [r3]
+ 172              	.LVL17:
+ 367:../../Extensions/fatfs/src/option/ccsbcs.c **** 		nc = *p++; cmd = nc >> 8; nc &= 0xFF;	/* Get processing command and block size */
+ 173              		.loc 1 367 3 is_stmt 1 view .LVU45
+ 367:../../Extensions/fatfs/src/option/ccsbcs.c **** 		nc = *p++; cmd = nc >> 8; nc &= 0xFF;	/* Get processing command and block size */
+ 174              		.loc 1 367 6 is_stmt 0 view .LVU46
+ 175 001e 4A1E     		subs	r2, r1, #1
+ 176              	.LVL18:
+ 367:../../Extensions/fatfs/src/option/ccsbcs.c **** 		nc = *p++; cmd = nc >> 8; nc &= 0xFF;	/* Get processing command and block size */
+ 177              		.loc 1 367 6 view .LVU47
+ 178 0020 92B2     		uxth	r2, r2
+ 179 0022 9042     		cmp	r0, r2
+ 180 0024 19D9     		bls	.L12
+ 181              	.LVL19:
+ 182              	.L32:
+ 183              		.loc 1 368 3 is_stmt 1 view .LVU48
+ 184              		.loc 1 368 10 is_stmt 0 view .LVU49
+ 185 0026 03F1040E 		add	lr, r3, #4
+ 186              	.LVL20:
+ 187              		.loc 1 368 6 view .LVU50
+ 188 002a 5B88     		ldrh	r3, [r3, #2]
+ 189              	.LVL21:
+ 190              		.loc 1 368 14 is_stmt 1 view .LVU51
+ 191              		.loc 1 368 18 is_stmt 0 view .LVU52
+ 192 002c 1A0A     		lsrs	r2, r3, #8
+ 193              	.LVL22:
+ARM GAS  /var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s 			page 11
+
+
+ 194              		.loc 1 368 29 is_stmt 1 view .LVU53
+ 195              		.loc 1 368 32 is_stmt 0 view .LVU54
+ 196 002e DBB2     		uxtb	r3, r3
+ 197              	.LVL23:
+ 369:../../Extensions/fatfs/src/option/ccsbcs.c **** 		if (chr < bc + nc) {	/* In the block? */
+ 198              		.loc 1 369 3 is_stmt 1 view .LVU55
+ 199              		.loc 1 369 16 is_stmt 0 view .LVU56
+ 200 0030 03EB010C 		add	ip, r3, r1
+ 201              		.loc 1 369 6 view .LVU57
+ 202 0034 6045     		cmp	r0, ip
+ 203 0036 04DB     		blt	.L35
+ 370:../../Extensions/fatfs/src/option/ccsbcs.c **** 			switch (cmd) {
+ 371:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 0:	chr = p[chr - bc]; break;		/* Table conversion */
+ 372:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 1:	chr -= (chr - bc) & 1; break;	/* Case pairs */
+ 373:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 2: chr -= 16; break;				/* Shift -16 */
+ 374:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 3:	chr -= 32; break;				/* Shift -32 */
+ 375:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 4:	chr -= 48; break;				/* Shift -48 */
+ 376:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 5:	chr -= 26; break;				/* Shift -26 */
+ 377:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 6:	chr += 8; break;				/* Shift +8 */
+ 378:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 7: chr -= 80; break;				/* Shift -80 */
+ 379:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 8:	chr -= 0x1C60; break;			/* Shift -0x1C60 */
+ 380:../../Extensions/fatfs/src/option/ccsbcs.c **** 			}
+ 381:../../Extensions/fatfs/src/option/ccsbcs.c **** 			break;
+ 382:../../Extensions/fatfs/src/option/ccsbcs.c **** 		}
+ 383:../../Extensions/fatfs/src/option/ccsbcs.c **** 		if (!cmd) p += nc;
+ 204              		.loc 1 383 3 is_stmt 1 view .LVU58
+ 205              		.loc 1 383 6 is_stmt 0 view .LVU59
+ 206 0038 002A     		cmp	r2, #0
+ 207 003a EED1     		bne	.L27
+ 208              		.loc 1 383 13 is_stmt 1 discriminator 1 view .LVU60
+ 209              		.loc 1 383 15 is_stmt 0 discriminator 1 view .LVU61
+ 210 003c 0EEB4303 		add	r3, lr, r3, lsl #1
+ 211              	.LVL24:
+ 212              		.loc 1 383 15 discriminator 1 view .LVU62
+ 213 0040 ECE7     		b	.L24
+ 214              	.LVL25:
+ 215              	.L35:
+ 370:../../Extensions/fatfs/src/option/ccsbcs.c **** 			switch (cmd) {
+ 216              		.loc 1 370 4 is_stmt 1 view .LVU63
+ 217 0042 082A     		cmp	r2, #8
+ 218 0044 09D8     		bhi	.L12
+ 219 0046 DFE802F0 		tbb	[pc, r2]
+ 220              	.LVL26:
+ 221              	.L15:
+ 222 004a 05       		.byte	(.L23-.L15)/2
+ 223 004b 09       		.byte	(.L22-.L15)/2
+ 224 004c 0F       		.byte	(.L21-.L15)/2
+ 225 004d 12       		.byte	(.L20-.L15)/2
+ 226 004e 15       		.byte	(.L19-.L15)/2
+ 227 004f 18       		.byte	(.L18-.L15)/2
+ 228 0050 1B       		.byte	(.L17-.L15)/2
+ 229 0051 1E       		.byte	(.L16-.L15)/2
+ 230 0052 21       		.byte	(.L14-.L15)/2
+ 231 0053 00       		.p2align 1
+ 232              	.L23:
+ 371:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 1:	chr -= (chr - bc) & 1; break;	/* Case pairs */
+ 233              		.loc 1 371 12 view .LVU64
+ARM GAS  /var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s 			page 12
+
+
+ 371:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 1:	chr -= (chr - bc) & 1; break;	/* Case pairs */
+ 234              		.loc 1 371 24 is_stmt 0 view .LVU65
+ 235 0054 441A     		subs	r4, r0, r1
+ 371:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 1:	chr -= (chr - bc) & 1; break;	/* Case pairs */
+ 236              		.loc 1 371 16 view .LVU66
+ 237 0056 3EF81400 		ldrh	r0, [lr, r4, lsl #1]
+ 238              	.LVL27:
+ 371:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 1:	chr -= (chr - bc) & 1; break;	/* Case pairs */
+ 239              		.loc 1 371 31 is_stmt 1 view .LVU67
+ 240              	.L12:
+ 384:../../Extensions/fatfs/src/option/ccsbcs.c **** 	}
+ 385:../../Extensions/fatfs/src/option/ccsbcs.c **** 
+ 386:../../Extensions/fatfs/src/option/ccsbcs.c **** 	return chr;
+ 241              		.loc 1 386 2 view .LVU68
+ 387:../../Extensions/fatfs/src/option/ccsbcs.c **** }
+ 242              		.loc 1 387 1 is_stmt 0 view .LVU69
+ 243 005a 10BD     		pop	{r4, pc}
+ 244              	.LVL28:
+ 245              	.L22:
+ 372:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 2: chr -= 16; break;				/* Shift -16 */
+ 246              		.loc 1 372 12 is_stmt 1 view .LVU70
+ 372:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 2: chr -= 16; break;				/* Shift -16 */
+ 247              		.loc 1 372 30 is_stmt 0 view .LVU71
+ 248 005c 431A     		subs	r3, r0, r1
+ 249 005e 03F00103 		and	r3, r3, #1
+ 372:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 2: chr -= 16; break;				/* Shift -16 */
+ 250              		.loc 1 372 16 view .LVU72
+ 251 0062 C01A     		subs	r0, r0, r3
+ 252              	.LVL29:
+ 372:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 2: chr -= 16; break;				/* Shift -16 */
+ 253              		.loc 1 372 16 view .LVU73
+ 254 0064 80B2     		uxth	r0, r0
+ 255              	.LVL30:
+ 372:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 2: chr -= 16; break;				/* Shift -16 */
+ 256              		.loc 1 372 35 is_stmt 1 view .LVU74
+ 257 0066 F8E7     		b	.L12
+ 258              	.L21:
+ 373:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 3:	chr -= 32; break;				/* Shift -32 */
+ 259              		.loc 1 373 12 view .LVU75
+ 373:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 3:	chr -= 32; break;				/* Shift -32 */
+ 260              		.loc 1 373 16 is_stmt 0 view .LVU76
+ 261 0068 1038     		subs	r0, r0, #16
+ 262              	.LVL31:
+ 373:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 3:	chr -= 32; break;				/* Shift -32 */
+ 263              		.loc 1 373 16 view .LVU77
+ 264 006a 80B2     		uxth	r0, r0
+ 265              	.LVL32:
+ 373:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 3:	chr -= 32; break;				/* Shift -32 */
+ 266              		.loc 1 373 23 is_stmt 1 view .LVU78
+ 267 006c F5E7     		b	.L12
+ 268              	.L20:
+ 374:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 4:	chr -= 48; break;				/* Shift -48 */
+ 269              		.loc 1 374 12 view .LVU79
+ 374:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 4:	chr -= 48; break;				/* Shift -48 */
+ 270              		.loc 1 374 16 is_stmt 0 view .LVU80
+ 271 006e 2038     		subs	r0, r0, #32
+ 272              	.LVL33:
+ARM GAS  /var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s 			page 13
+
+
+ 374:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 4:	chr -= 48; break;				/* Shift -48 */
+ 273              		.loc 1 374 16 view .LVU81
+ 274 0070 80B2     		uxth	r0, r0
+ 275              	.LVL34:
+ 374:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 4:	chr -= 48; break;				/* Shift -48 */
+ 276              		.loc 1 374 23 is_stmt 1 view .LVU82
+ 277 0072 F2E7     		b	.L12
+ 278              	.L19:
+ 375:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 5:	chr -= 26; break;				/* Shift -26 */
+ 279              		.loc 1 375 12 view .LVU83
+ 375:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 5:	chr -= 26; break;				/* Shift -26 */
+ 280              		.loc 1 375 16 is_stmt 0 view .LVU84
+ 281 0074 3038     		subs	r0, r0, #48
+ 282              	.LVL35:
+ 375:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 5:	chr -= 26; break;				/* Shift -26 */
+ 283              		.loc 1 375 16 view .LVU85
+ 284 0076 80B2     		uxth	r0, r0
+ 285              	.LVL36:
+ 375:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 5:	chr -= 26; break;				/* Shift -26 */
+ 286              		.loc 1 375 23 is_stmt 1 view .LVU86
+ 287 0078 EFE7     		b	.L12
+ 288              	.L18:
+ 376:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 6:	chr += 8; break;				/* Shift +8 */
+ 289              		.loc 1 376 12 view .LVU87
+ 376:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 6:	chr += 8; break;				/* Shift +8 */
+ 290              		.loc 1 376 16 is_stmt 0 view .LVU88
+ 291 007a 1A38     		subs	r0, r0, #26
+ 292              	.LVL37:
+ 376:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 6:	chr += 8; break;				/* Shift +8 */
+ 293              		.loc 1 376 16 view .LVU89
+ 294 007c 80B2     		uxth	r0, r0
+ 295              	.LVL38:
+ 376:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 6:	chr += 8; break;				/* Shift +8 */
+ 296              		.loc 1 376 23 is_stmt 1 view .LVU90
+ 297 007e ECE7     		b	.L12
+ 298              	.L17:
+ 377:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 7: chr -= 80; break;				/* Shift -80 */
+ 299              		.loc 1 377 12 view .LVU91
+ 377:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 7: chr -= 80; break;				/* Shift -80 */
+ 300              		.loc 1 377 16 is_stmt 0 view .LVU92
+ 301 0080 0830     		adds	r0, r0, #8
+ 302              	.LVL39:
+ 377:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 7: chr -= 80; break;				/* Shift -80 */
+ 303              		.loc 1 377 16 view .LVU93
+ 304 0082 80B2     		uxth	r0, r0
+ 305              	.LVL40:
+ 377:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 7: chr -= 80; break;				/* Shift -80 */
+ 306              		.loc 1 377 22 is_stmt 1 view .LVU94
+ 307 0084 E9E7     		b	.L12
+ 308              	.L16:
+ 378:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 8:	chr -= 0x1C60; break;			/* Shift -0x1C60 */
+ 309              		.loc 1 378 12 view .LVU95
+ 378:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 8:	chr -= 0x1C60; break;			/* Shift -0x1C60 */
+ 310              		.loc 1 378 16 is_stmt 0 view .LVU96
+ 311 0086 5038     		subs	r0, r0, #80
+ 312              	.LVL41:
+ 378:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 8:	chr -= 0x1C60; break;			/* Shift -0x1C60 */
+ARM GAS  /var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s 			page 14
+
+
+ 313              		.loc 1 378 16 view .LVU97
+ 314 0088 80B2     		uxth	r0, r0
+ 315              	.LVL42:
+ 378:../../Extensions/fatfs/src/option/ccsbcs.c **** 			case 8:	chr -= 0x1C60; break;			/* Shift -0x1C60 */
+ 316              		.loc 1 378 23 is_stmt 1 view .LVU98
+ 317 008a E6E7     		b	.L12
+ 318              	.L14:
+ 379:../../Extensions/fatfs/src/option/ccsbcs.c **** 			}
+ 319              		.loc 1 379 12 view .LVU99
+ 379:../../Extensions/fatfs/src/option/ccsbcs.c **** 			}
+ 320              		.loc 1 379 16 is_stmt 0 view .LVU100
+ 321 008c A0F5E350 		sub	r0, r0, #7264
+ 322              	.LVL43:
+ 379:../../Extensions/fatfs/src/option/ccsbcs.c **** 			}
+ 323              		.loc 1 379 16 view .LVU101
+ 324 0090 80B2     		uxth	r0, r0
+ 325              	.LVL44:
+ 379:../../Extensions/fatfs/src/option/ccsbcs.c **** 			}
+ 326              		.loc 1 379 27 is_stmt 1 view .LVU102
+ 327 0092 E2E7     		b	.L12
+ 328              	.LVL45:
+ 329              	.L34:
+ 330              	.LCFI3:
+ 331              		.cfi_def_cfa_offset 0
+ 332              		.cfi_restore 4
+ 333              		.cfi_restore 14
+ 386:../../Extensions/fatfs/src/option/ccsbcs.c **** }
+ 334              		.loc 1 386 2 view .LVU103
+ 335              		.loc 1 387 1 is_stmt 0 view .LVU104
+ 336 0094 7047     		bx	lr
+ 337              	.L37:
+ 338 0096 00BF     		.align	2
+ 339              	.L36:
+ 340 0098 00000000 		.word	cvt1.1
+ 341 009c 00000000 		.word	cvt2.0
+ 342              		.cfi_endproc
+ 343              	.LFE351:
+ 345              		.section	.rodata.cvt2.0,"a"
+ 346              		.align	2
+ 349              	cvt2.0:
+ 350 0000 7D1D     		.short	7549
+ 351 0002 0100     		.short	1
+ 352 0004 632C     		.short	11363
+ 353 0006 001E     		.short	7680
+ 354 0008 9601     		.short	406
+ 355 000a A01E     		.short	7840
+ 356 000c 5A01     		.short	346
+ 357 000e 001F     		.short	7936
+ 358 0010 0806     		.short	1544
+ 359 0012 101F     		.short	7952
+ 360 0014 0606     		.short	1542
+ 361 0016 201F     		.short	7968
+ 362 0018 0806     		.short	1544
+ 363 001a 301F     		.short	7984
+ 364 001c 0806     		.short	1544
+ 365 001e 401F     		.short	8000
+ 366 0020 0606     		.short	1542
+ARM GAS  /var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s 			page 15
+
+
+ 367 0022 511F     		.short	8017
+ 368 0024 0700     		.short	7
+ 369 0026 591F     		.short	8025
+ 370 0028 521F     		.short	8018
+ 371 002a 5B1F     		.short	8027
+ 372 002c 541F     		.short	8020
+ 373 002e 5D1F     		.short	8029
+ 374 0030 561F     		.short	8022
+ 375 0032 5F1F     		.short	8031
+ 376 0034 601F     		.short	8032
+ 377 0036 0806     		.short	1544
+ 378 0038 701F     		.short	8048
+ 379 003a 0E00     		.short	14
+ 380 003c BA1F     		.short	8122
+ 381 003e BB1F     		.short	8123
+ 382 0040 C81F     		.short	8136
+ 383 0042 C91F     		.short	8137
+ 384 0044 CA1F     		.short	8138
+ 385 0046 CB1F     		.short	8139
+ 386 0048 DA1F     		.short	8154
+ 387 004a DB1F     		.short	8155
+ 388 004c F81F     		.short	8184
+ 389 004e F91F     		.short	8185
+ 390 0050 EA1F     		.short	8170
+ 391 0052 EB1F     		.short	8171
+ 392 0054 FA1F     		.short	8186
+ 393 0056 FB1F     		.short	8187
+ 394 0058 801F     		.short	8064
+ 395 005a 0806     		.short	1544
+ 396 005c 901F     		.short	8080
+ 397 005e 0806     		.short	1544
+ 398 0060 A01F     		.short	8096
+ 399 0062 0806     		.short	1544
+ 400 0064 B01F     		.short	8112
+ 401 0066 0400     		.short	4
+ 402 0068 B81F     		.short	8120
+ 403 006a B91F     		.short	8121
+ 404 006c B21F     		.short	8114
+ 405 006e BC1F     		.short	8124
+ 406 0070 CC1F     		.short	8140
+ 407 0072 0100     		.short	1
+ 408 0074 C31F     		.short	8131
+ 409 0076 D01F     		.short	8144
+ 410 0078 0206     		.short	1538
+ 411 007a E01F     		.short	8160
+ 412 007c 0206     		.short	1538
+ 413 007e E51F     		.short	8165
+ 414 0080 0100     		.short	1
+ 415 0082 EC1F     		.short	8172
+ 416 0084 F21F     		.short	8178
+ 417 0086 0100     		.short	1
+ 418 0088 FC1F     		.short	8188
+ 419 008a 4E21     		.short	8526
+ 420 008c 0100     		.short	1
+ 421 008e 3221     		.short	8498
+ 422 0090 7021     		.short	8560
+ 423 0092 1002     		.short	528
+ARM GAS  /var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s 			page 16
+
+
+ 424 0094 8421     		.short	8580
+ 425 0096 0100     		.short	1
+ 426 0098 8321     		.short	8579
+ 427 009a D024     		.short	9424
+ 428 009c 1A05     		.short	1306
+ 429 009e 302C     		.short	11312
+ 430 00a0 2F04     		.short	1071
+ 431 00a2 602C     		.short	11360
+ 432 00a4 0201     		.short	258
+ 433 00a6 672C     		.short	11367
+ 434 00a8 0601     		.short	262
+ 435 00aa 752C     		.short	11381
+ 436 00ac 0201     		.short	258
+ 437 00ae 802C     		.short	11392
+ 438 00b0 6401     		.short	356
+ 439 00b2 002D     		.short	11520
+ 440 00b4 2608     		.short	2086
+ 441 00b6 41FF     		.short	-191
+ 442 00b8 1A03     		.short	794
+ 443 00ba 0000     		.short	0
+ 444              		.section	.rodata.cvt1.1,"a"
+ 445              		.align	2
+ 448              	cvt1.1:
+ 449 0000 6100     		.short	97
+ 450 0002 1A03     		.short	794
+ 451 0004 E000     		.short	224
+ 452 0006 1703     		.short	791
+ 453 0008 F800     		.short	248
+ 454 000a 0703     		.short	775
+ 455 000c FF00     		.short	255
+ 456 000e 0100     		.short	1
+ 457 0010 7801     		.short	376
+ 458 0012 0001     		.short	256
+ 459 0014 3001     		.short	304
+ 460 0016 3201     		.short	306
+ 461 0018 0601     		.short	262
+ 462 001a 3901     		.short	313
+ 463 001c 1001     		.short	272
+ 464 001e 4A01     		.short	330
+ 465 0020 2E01     		.short	302
+ 466 0022 7901     		.short	377
+ 467 0024 0601     		.short	262
+ 468 0026 8001     		.short	384
+ 469 0028 4D00     		.short	77
+ 470 002a 4302     		.short	579
+ 471 002c 8101     		.short	385
+ 472 002e 8201     		.short	386
+ 473 0030 8201     		.short	386
+ 474 0032 8401     		.short	388
+ 475 0034 8401     		.short	388
+ 476 0036 8601     		.short	390
+ 477 0038 8701     		.short	391
+ 478 003a 8701     		.short	391
+ 479 003c 8901     		.short	393
+ 480 003e 8A01     		.short	394
+ 481 0040 8B01     		.short	395
+ 482 0042 8B01     		.short	395
+ARM GAS  /var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s 			page 17
+
+
+ 483 0044 8D01     		.short	397
+ 484 0046 8E01     		.short	398
+ 485 0048 8F01     		.short	399
+ 486 004a 9001     		.short	400
+ 487 004c 9101     		.short	401
+ 488 004e 9101     		.short	401
+ 489 0050 9301     		.short	403
+ 490 0052 9401     		.short	404
+ 491 0054 F601     		.short	502
+ 492 0056 9601     		.short	406
+ 493 0058 9701     		.short	407
+ 494 005a 9801     		.short	408
+ 495 005c 9801     		.short	408
+ 496 005e 3D02     		.short	573
+ 497 0060 9B01     		.short	411
+ 498 0062 9C01     		.short	412
+ 499 0064 9D01     		.short	413
+ 500 0066 2002     		.short	544
+ 501 0068 9F01     		.short	415
+ 502 006a A001     		.short	416
+ 503 006c A001     		.short	416
+ 504 006e A201     		.short	418
+ 505 0070 A201     		.short	418
+ 506 0072 A401     		.short	420
+ 507 0074 A401     		.short	420
+ 508 0076 A601     		.short	422
+ 509 0078 A701     		.short	423
+ 510 007a A701     		.short	423
+ 511 007c A901     		.short	425
+ 512 007e AA01     		.short	426
+ 513 0080 AB01     		.short	427
+ 514 0082 AC01     		.short	428
+ 515 0084 AC01     		.short	428
+ 516 0086 AE01     		.short	430
+ 517 0088 AF01     		.short	431
+ 518 008a AF01     		.short	431
+ 519 008c B101     		.short	433
+ 520 008e B201     		.short	434
+ 521 0090 B301     		.short	435
+ 522 0092 B301     		.short	435
+ 523 0094 B501     		.short	437
+ 524 0096 B501     		.short	437
+ 525 0098 B701     		.short	439
+ 526 009a B801     		.short	440
+ 527 009c B801     		.short	440
+ 528 009e BA01     		.short	442
+ 529 00a0 BB01     		.short	443
+ 530 00a2 BC01     		.short	444
+ 531 00a4 BC01     		.short	444
+ 532 00a6 BE01     		.short	446
+ 533 00a8 F701     		.short	503
+ 534 00aa C001     		.short	448
+ 535 00ac C101     		.short	449
+ 536 00ae C201     		.short	450
+ 537 00b0 C301     		.short	451
+ 538 00b2 C401     		.short	452
+ 539 00b4 C501     		.short	453
+ARM GAS  /var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s 			page 18
+
+
+ 540 00b6 C401     		.short	452
+ 541 00b8 C701     		.short	455
+ 542 00ba C801     		.short	456
+ 543 00bc C701     		.short	455
+ 544 00be CA01     		.short	458
+ 545 00c0 CB01     		.short	459
+ 546 00c2 CA01     		.short	458
+ 547 00c4 CD01     		.short	461
+ 548 00c6 1001     		.short	272
+ 549 00c8 DD01     		.short	477
+ 550 00ca 0100     		.short	1
+ 551 00cc 8E01     		.short	398
+ 552 00ce DE01     		.short	478
+ 553 00d0 1201     		.short	274
+ 554 00d2 F301     		.short	499
+ 555 00d4 0300     		.short	3
+ 556 00d6 F101     		.short	497
+ 557 00d8 F401     		.short	500
+ 558 00da F401     		.short	500
+ 559 00dc F801     		.short	504
+ 560 00de 2801     		.short	296
+ 561 00e0 2202     		.short	546
+ 562 00e2 1201     		.short	274
+ 563 00e4 3A02     		.short	570
+ 564 00e6 0900     		.short	9
+ 565 00e8 652C     		.short	11365
+ 566 00ea 3B02     		.short	571
+ 567 00ec 3B02     		.short	571
+ 568 00ee 3D02     		.short	573
+ 569 00f0 662C     		.short	11366
+ 570 00f2 3F02     		.short	575
+ 571 00f4 4002     		.short	576
+ 572 00f6 4102     		.short	577
+ 573 00f8 4102     		.short	577
+ 574 00fa 4602     		.short	582
+ 575 00fc 0A01     		.short	266
+ 576 00fe 5302     		.short	595
+ 577 0100 4000     		.short	64
+ 578 0102 8101     		.short	385
+ 579 0104 8601     		.short	390
+ 580 0106 5502     		.short	597
+ 581 0108 8901     		.short	393
+ 582 010a 8A01     		.short	394
+ 583 010c 5802     		.short	600
+ 584 010e 8F01     		.short	399
+ 585 0110 5A02     		.short	602
+ 586 0112 9001     		.short	400
+ 587 0114 5C02     		.short	604
+ 588 0116 5D02     		.short	605
+ 589 0118 5E02     		.short	606
+ 590 011a 5F02     		.short	607
+ 591 011c 9301     		.short	403
+ 592 011e 6102     		.short	609
+ 593 0120 6202     		.short	610
+ 594 0122 9401     		.short	404
+ 595 0124 6402     		.short	612
+ 596 0126 6502     		.short	613
+ARM GAS  /var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s 			page 19
+
+
+ 597 0128 6602     		.short	614
+ 598 012a 6702     		.short	615
+ 599 012c 9701     		.short	407
+ 600 012e 9601     		.short	406
+ 601 0130 6A02     		.short	618
+ 602 0132 622C     		.short	11362
+ 603 0134 6C02     		.short	620
+ 604 0136 6D02     		.short	621
+ 605 0138 6E02     		.short	622
+ 606 013a 9C01     		.short	412
+ 607 013c 7002     		.short	624
+ 608 013e 7102     		.short	625
+ 609 0140 9D01     		.short	413
+ 610 0142 7302     		.short	627
+ 611 0144 7402     		.short	628
+ 612 0146 9F01     		.short	415
+ 613 0148 7602     		.short	630
+ 614 014a 7702     		.short	631
+ 615 014c 7802     		.short	632
+ 616 014e 7902     		.short	633
+ 617 0150 7A02     		.short	634
+ 618 0152 7B02     		.short	635
+ 619 0154 7C02     		.short	636
+ 620 0156 642C     		.short	11364
+ 621 0158 7E02     		.short	638
+ 622 015a 7F02     		.short	639
+ 623 015c A601     		.short	422
+ 624 015e 8102     		.short	641
+ 625 0160 8202     		.short	642
+ 626 0162 A901     		.short	425
+ 627 0164 8402     		.short	644
+ 628 0166 8502     		.short	645
+ 629 0168 8602     		.short	646
+ 630 016a 8702     		.short	647
+ 631 016c AE01     		.short	430
+ 632 016e 4402     		.short	580
+ 633 0170 B101     		.short	433
+ 634 0172 B201     		.short	434
+ 635 0174 4502     		.short	581
+ 636 0176 8D02     		.short	653
+ 637 0178 8E02     		.short	654
+ 638 017a 8F02     		.short	655
+ 639 017c 9002     		.short	656
+ 640 017e 9102     		.short	657
+ 641 0180 B701     		.short	439
+ 642 0182 7B03     		.short	891
+ 643 0184 0300     		.short	3
+ 644 0186 FD03     		.short	1021
+ 645 0188 FE03     		.short	1022
+ 646 018a FF03     		.short	1023
+ 647 018c AC03     		.short	940
+ 648 018e 0400     		.short	4
+ 649 0190 8603     		.short	902
+ 650 0192 8803     		.short	904
+ 651 0194 8903     		.short	905
+ 652 0196 8A03     		.short	906
+ 653 0198 B103     		.short	945
+ARM GAS  /var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s 			page 20
+
+
+ 654 019a 1103     		.short	785
+ 655 019c C203     		.short	962
+ 656 019e 0200     		.short	2
+ 657 01a0 A303     		.short	931
+ 658 01a2 A303     		.short	931
+ 659 01a4 C403     		.short	964
+ 660 01a6 0803     		.short	776
+ 661 01a8 CC03     		.short	972
+ 662 01aa 0300     		.short	3
+ 663 01ac 8C03     		.short	908
+ 664 01ae 8E03     		.short	910
+ 665 01b0 8F03     		.short	911
+ 666 01b2 D803     		.short	984
+ 667 01b4 1801     		.short	280
+ 668 01b6 F203     		.short	1010
+ 669 01b8 0A00     		.short	10
+ 670 01ba F903     		.short	1017
+ 671 01bc F303     		.short	1011
+ 672 01be F403     		.short	1012
+ 673 01c0 F503     		.short	1013
+ 674 01c2 F603     		.short	1014
+ 675 01c4 F703     		.short	1015
+ 676 01c6 F703     		.short	1015
+ 677 01c8 F903     		.short	1017
+ 678 01ca FA03     		.short	1018
+ 679 01cc FA03     		.short	1018
+ 680 01ce 3004     		.short	1072
+ 681 01d0 2003     		.short	800
+ 682 01d2 5004     		.short	1104
+ 683 01d4 1007     		.short	1808
+ 684 01d6 6004     		.short	1120
+ 685 01d8 2201     		.short	290
+ 686 01da 8A04     		.short	1162
+ 687 01dc 3601     		.short	310
+ 688 01de C104     		.short	1217
+ 689 01e0 0E01     		.short	270
+ 690 01e2 CF04     		.short	1231
+ 691 01e4 0100     		.short	1
+ 692 01e6 C004     		.short	1216
+ 693 01e8 D004     		.short	1232
+ 694 01ea 4401     		.short	324
+ 695 01ec 6105     		.short	1377
+ 696 01ee 2604     		.short	1062
+ 697 01f0 0000     		.short	0
+ 698              		.section	.rodata.Tbl,"a"
+ 699              		.align	2
+ 702              	Tbl:
+ 703 0000 C700     		.short	199
+ 704 0002 FC00     		.short	252
+ 705 0004 E900     		.short	233
+ 706 0006 E200     		.short	226
+ 707 0008 E400     		.short	228
+ 708 000a E000     		.short	224
+ 709 000c E500     		.short	229
+ 710 000e E700     		.short	231
+ 711 0010 EA00     		.short	234
+ 712 0012 EB00     		.short	235
+ARM GAS  /var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s 			page 21
+
+
+ 713 0014 E800     		.short	232
+ 714 0016 EF00     		.short	239
+ 715 0018 EE00     		.short	238
+ 716 001a EC00     		.short	236
+ 717 001c C400     		.short	196
+ 718 001e C500     		.short	197
+ 719 0020 C900     		.short	201
+ 720 0022 E600     		.short	230
+ 721 0024 C600     		.short	198
+ 722 0026 F400     		.short	244
+ 723 0028 F600     		.short	246
+ 724 002a F200     		.short	242
+ 725 002c FB00     		.short	251
+ 726 002e F900     		.short	249
+ 727 0030 FF00     		.short	255
+ 728 0032 D600     		.short	214
+ 729 0034 DC00     		.short	220
+ 730 0036 F800     		.short	248
+ 731 0038 A300     		.short	163
+ 732 003a D800     		.short	216
+ 733 003c D700     		.short	215
+ 734 003e 9201     		.short	402
+ 735 0040 E100     		.short	225
+ 736 0042 ED00     		.short	237
+ 737 0044 F300     		.short	243
+ 738 0046 FA00     		.short	250
+ 739 0048 F100     		.short	241
+ 740 004a D100     		.short	209
+ 741 004c AA00     		.short	170
+ 742 004e BA00     		.short	186
+ 743 0050 BF00     		.short	191
+ 744 0052 AE00     		.short	174
+ 745 0054 AC00     		.short	172
+ 746 0056 BD00     		.short	189
+ 747 0058 BC00     		.short	188
+ 748 005a A100     		.short	161
+ 749 005c AB00     		.short	171
+ 750 005e BB00     		.short	187
+ 751 0060 9125     		.short	9617
+ 752 0062 9225     		.short	9618
+ 753 0064 9325     		.short	9619
+ 754 0066 0225     		.short	9474
+ 755 0068 2425     		.short	9508
+ 756 006a C100     		.short	193
+ 757 006c C200     		.short	194
+ 758 006e C000     		.short	192
+ 759 0070 A900     		.short	169
+ 760 0072 6325     		.short	9571
+ 761 0074 5125     		.short	9553
+ 762 0076 5725     		.short	9559
+ 763 0078 5D25     		.short	9565
+ 764 007a A200     		.short	162
+ 765 007c A500     		.short	165
+ 766 007e 1025     		.short	9488
+ 767 0080 1425     		.short	9492
+ 768 0082 3425     		.short	9524
+ 769 0084 2C25     		.short	9516
+ARM GAS  /var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s 			page 22
+
+
+ 770 0086 1C25     		.short	9500
+ 771 0088 0025     		.short	9472
+ 772 008a 3C25     		.short	9532
+ 773 008c E300     		.short	227
+ 774 008e C300     		.short	195
+ 775 0090 5A25     		.short	9562
+ 776 0092 5425     		.short	9556
+ 777 0094 6925     		.short	9577
+ 778 0096 6625     		.short	9574
+ 779 0098 6025     		.short	9568
+ 780 009a 5025     		.short	9552
+ 781 009c 6C25     		.short	9580
+ 782 009e A400     		.short	164
+ 783 00a0 F000     		.short	240
+ 784 00a2 D000     		.short	208
+ 785 00a4 CA00     		.short	202
+ 786 00a6 CB00     		.short	203
+ 787 00a8 C800     		.short	200
+ 788 00aa 3101     		.short	305
+ 789 00ac CD00     		.short	205
+ 790 00ae CE00     		.short	206
+ 791 00b0 CF00     		.short	207
+ 792 00b2 1825     		.short	9496
+ 793 00b4 0C25     		.short	9484
+ 794 00b6 8825     		.short	9608
+ 795 00b8 8425     		.short	9604
+ 796 00ba A600     		.short	166
+ 797 00bc CC00     		.short	204
+ 798 00be 8025     		.short	9600
+ 799 00c0 D300     		.short	211
+ 800 00c2 DF00     		.short	223
+ 801 00c4 D400     		.short	212
+ 802 00c6 D200     		.short	210
+ 803 00c8 F500     		.short	245
+ 804 00ca D500     		.short	213
+ 805 00cc B500     		.short	181
+ 806 00ce FE00     		.short	254
+ 807 00d0 DE00     		.short	222
+ 808 00d2 DA00     		.short	218
+ 809 00d4 DB00     		.short	219
+ 810 00d6 D900     		.short	217
+ 811 00d8 FD00     		.short	253
+ 812 00da DD00     		.short	221
+ 813 00dc AF00     		.short	175
+ 814 00de B400     		.short	180
+ 815 00e0 AD00     		.short	173
+ 816 00e2 B100     		.short	177
+ 817 00e4 1720     		.short	8215
+ 818 00e6 BE00     		.short	190
+ 819 00e8 B600     		.short	182
+ 820 00ea A700     		.short	167
+ 821 00ec F700     		.short	247
+ 822 00ee B800     		.short	184
+ 823 00f0 B000     		.short	176
+ 824 00f2 A800     		.short	168
+ 825 00f4 B700     		.short	183
+ 826 00f6 B900     		.short	185
+ARM GAS  /var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s 			page 23
+
+
+ 827 00f8 B300     		.short	179
+ 828 00fa B200     		.short	178
+ 829 00fc A025     		.short	9632
+ 830 00fe A000     		.short	160
+ 831              		.text
+ 832              	.Letext0:
+ 833              		.file 2 "../../Extensions/fatfs/src/option/../integer.h"
+ARM GAS  /var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s 			page 24
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 ccsbcs.c
+/var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s:20     .text.ff_convert:00000000 $t
+/var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s:26     .text.ff_convert:00000000 ff_convert
+/var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s:101    .text.ff_convert:00000038 $d
+/var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s:702    .rodata.Tbl:00000000 Tbl
+/var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s:106    .text.ff_wtoupper:00000000 $t
+/var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s:112    .text.ff_wtoupper:00000000 ff_wtoupper
+/var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s:222    .text.ff_wtoupper:0000004a $d
+/var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s:340    .text.ff_wtoupper:00000098 $d
+/var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s:448    .rodata.cvt1.1:00000000 cvt1.1
+/var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s:349    .rodata.cvt2.0:00000000 cvt2.0
+/var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s:346    .rodata.cvt2.0:00000000 $d
+/var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s:445    .rodata.cvt1.1:00000000 $d
+/var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s:699    .rodata.Tbl:00000000 $d
+/var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s:231    .text.ff_wtoupper:00000053 $d
+/var/folders/cy/8kgpsxf90rz6cg1g85ws44fm0000gn/T//ccTjsSA0.s:231    .text.ff_wtoupper:00000054 $t
+
+NO UNDEFINED SYMBOLS

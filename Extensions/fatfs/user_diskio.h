@@ -28,6 +28,9 @@
 
 /* USER CODE BEGIN 0 */
 
+/** This struct is used internally by the FatFs driver and includes 
+ * function pointers to the user fatfs driver code.
+ */
 extern Diskio_drvTypeDef  USER_Driver;
 
 /**

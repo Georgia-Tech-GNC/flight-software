@@ -130,7 +130,7 @@ int main(void)
   MX_TIM4_Init();
   MX_TIM3_Init();
   
-  run_rocket_code();
+  run_rocket_os();
 }
 
 /**

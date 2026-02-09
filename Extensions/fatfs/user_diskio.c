@@ -2,7 +2,8 @@
 /**
  ******************************************************************************
   * @file    user_diskio.c
-  * @brief   This file includes a diskio driver skeleton to be completed by the user.
+  * @brief   User code that wants to use the FatFs extension should override the weak
+  *          function definitions in this file.
   ******************************************************************************
   * @attention
   *
@@ -47,7 +48,6 @@ static volatile DSTATUS Stat = STA_NOINIT;
 /* USER CODE END DECL */
 
 /* Private function weak definitions prototypes -----------------------------------------------*/
-
 DSTATUS __attribute__((weak)) USER_initialize (BYTE pdrv) {
     UNUSED(pdrv);
     return 1;

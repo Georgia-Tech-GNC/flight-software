@@ -7,7 +7,8 @@
                 "${workspaceFolder}/Extensions/fatfs/**",
                 "${workspaceFolder}/RocketLib/**",
                 "${workspaceFolder}/FreeRTOS-Kernel/**",
-                "${workspaceFolder}/Extensions/fatfs/**"
+                "${workspaceFolder}/Extensions/fatfs/**",
+                "${workspaceFolder}/Drivers/include/**"
             ],
             "defines": [
                 "_DEBUG",

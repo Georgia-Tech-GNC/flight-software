@@ -7,6 +7,7 @@
 
 #include "utils.h"
 
+
 /** Entry point for all user code 
  * 
  * This method is called by main.c once the HAL has been successfully initialized.
@@ -39,6 +40,40 @@
  * code execution will immediately halt and no further actions will be taken.
 */
 void run_rocket_os();
+
+
+/** The very first method run by the rocket OS
+ * 
+ * Immediately following this call (assuming it is successful), it will be assumed 
+ * that any calls to debug(const char *restrict format, ...) are valid. 
+ * As such, this function should do the minimum amount of work required to initialize
+ * the debug output. Additional initialization steps should go in the initialize_rocket()
+ * method.
+ * 
+ * Note that it is also guaranteed that this method will be called prior to the execution 
+ * of any user code.
+ * 
+ * @return Returns STATUS_OK if the debug interface has been initialized, and any other 
+ *         status otherwise. Note that returning anything other than STATUS_OK will cause 
+ *         the rocket to halt.
+ */
+status_t initialize_debug();
+
+
+/** General purpose rocket initialization function
+ * 
+ * This method will be called immediately after initialize_debug(), and should be used
+ * for all other initialization tasks, including the process of setting up user drivers
+ * and initialization FreeRTOS tasks. Following the execution of this method, assuming
+ * it returns succesfully, the FreeRTOS scheduler will start and control of program 
+ * execution will not be yielded back to the user except through tasks scheduled in this 
+ * method.
+ * 
+ * @return Returns STATUS_OK if initialization was successful, and any other status 
+ *         otherwise. Note that returning anything other than STATUS_OK will cause the 
+ *         rocket to halt (and no tasks will be scheduled).
+ */
+status_t initialize_rocket();
 
 
 /** General purpose debug command.

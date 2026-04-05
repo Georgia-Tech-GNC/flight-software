@@ -27,17 +27,22 @@ uint8_t uart4_rx_rb_data[512];
 struct ublox_gnss_cfg_val cfg[10];
 
 void update_sensors(Sensors *sensors, UART_HandleTypeDef *huart) {
-    float32_t accel_readings[3];
+    
+    //float32_t accel_readings[3];
     float32_t gyro_readings[3];
-    double mag_readings[3];
+    //double mag_readings[3];
+
+    /*
     adis_read_accel(&imu_device, accel_readings);
     sensors->accel_x = -1.0 * accel_readings[0];
     sensors->accel_y = -1.0 * accel_readings[1];
     sensors->accel_z = accel_readings[2];
+    */
     adis_read_gyro(&imu_device, gyro_readings);
     sensors->gyro_x = -1.0 * gyro_readings[0] * PI / 180;
     sensors->gyro_y = -1.0 * gyro_readings[1] * PI / 180;
     sensors->gyro_z = gyro_readings[2] * PI / 180;
+    /*
     MS5607Update();
     uint32_t bytes_to_read = ring_buffer_get_full(&uart4_rx_rb);
     if (bytes_to_read) {
@@ -71,6 +76,7 @@ void update_sensors(Sensors *sensors, UART_HandleTypeDef *huart) {
             }
         }
     }
+    */
 }
 
 void sensors_init(Sensors *sensors) {

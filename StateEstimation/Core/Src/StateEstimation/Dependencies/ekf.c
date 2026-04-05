@@ -555,13 +555,19 @@ void run_ekf(ExtKalmanFilter *ekf, Sensors *sensors, UART_HandleTypeDef *huart, 
         len = snprintf(buffer, sizeof(buffer), "x[%d]: %f\r\n", i, ekf->x_n.pData[i]);
         //HAL_UART_Transmit(huart, (uint8_t*)buffer, len, HAL_MAX_DELAY);
     }
-    make_measurement(ekf, huart);
-    GPS2Flat(sensors, ekf, 0);
-    observation_function(ekf, huart);
-    observation_jacobian(ekf, huart);
-    kalman_gain(ekf, huart);
-    update_state(ekf, huart);
-    update_covariance(ekf, huart);
+
+    // TODO: GPS FIX
+    if (0) {
+        make_measurement(ekf, huart);
+        GPS2Flat(sensors, ekf, 0);
+        observation_function(ekf, huart);
+        observation_jacobian(ekf, huart);
+        kalman_gain(ekf, huart);
+        update_state(ekf, huart);
+        update_covariance(ekf, huart);
+    }
+    //else 
+    // 
 
     state_transition_function(ekf, huart);
     state_transition_jacobian(ekf, huart);

@@ -58,6 +58,9 @@ uint8_t launched;
 
 /* Private variables ---------------------------------------------------------*/
 
+
+TIM_HandleTypeDef htim2;
+
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -74,7 +77,7 @@ static void MX_USART2_UART_Init(void);
 static void MX_USB_OTG_HS_PCD_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_UART4_Init(void);
-void print_rocket_attitude(rocket_attitude *rocket_atd, UART_HandleTypeDef *huart);
+static void MX_TIM2_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -122,6 +125,7 @@ int main(void)
   MX_USB_OTG_HS_PCD_Init();
   MX_USART3_UART_Init();
   MX_UART4_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
   DWT_Init();
   sensors_init(&sensors);
@@ -137,121 +141,50 @@ int main(void)
   HAL_UART_Receive_IT(&huart2, signal_received, 2);
   prev_global_time = global_time;
   HAL_Delay(500);
-  
+
+	float dead_x = 0;
+	float dead_y = 0;
+	float dead_z = 0;
+
+	char debug[128];
+
+	// Very empirically calculated IMU biases:
+	// x: 0.003073188398
+	// y: 0.006937632379
+	// z: 0.001217117898
+
+	HAL_TIM_Base_Start(&htim2);
+	__HAL_TIM_SET_COUNTER(&htim2, 0);
+
+	int last_timer_val = 0;
+	int last_print = 0;
+	int iters = 0;
+
   while (1)
   {
-    /* USER CODE END WHILE */
+		update_sensors(&sensors, &huart3);
 
-    /* USER CODE BEGIN 3 */
-    update_sensors(&sensors, &huart3);
-    /* State Machine */
-    if (first_time) {
-      prev_global_time = start;
-      first_time = 0;
-    }
-    switch (state_machine) {
-        case IDLE: {
-            if (!ready_message_printed) {
-                HAL_UART_Transmit(&huart3, "Ready to run EKF. Type 'GO' to start.\r\n", 
-                                  sizeof("Ready to run EKF. Type 'GO' to start.\r\n"), HAL_MAX_DELAY);
-                ready_message_printed = 1;
-            }
-            char debug[128];
-            int debug_len = sprintf(debug, "GPS: lat=%f, lon=%f, height=%f\r\n", 
-                              sensors.gps_x, sensors.gps_y, sensors.gps_z);
-            //HAL_UART_Transmit(&huart3, (uint8_t*)debug, debug_len, HAL_MAX_DELAY);
-            GPS2FlatGround(&sensors, &gekf, 1);
-            debug_len = sprintf(debug, "FLAT: x=%f, y=%f, z=%f\r\n",
-            gekf.gps_flat[0], gekf.gps_flat[1], gekf.gps_flat[2]);
-            //HAL_UART_Transmit(&huart3, (uint8_t*)debug, debug_len, HAL_MAX_DELAY);
-            debug_len = sprintf(debug, "ACCEL: x=%f, y=%f, z=%f\r\n",
-            sensors.accel_x, sensors.accel_y, sensors.accel_z);
-            //HAL_UART_Transmit(&huart3, (uint8_t*)debug, debug_len, HAL_MAX_DELAY);
-            debug_len = sprintf(debug, "GYRO: x=%f, y=%f, z=%f\r\n",
-                              sensors.gyro_x, sensors.gyro_y, sensors.gyro_z);
-            //HAL_UART_Transmit(&huart3, (uint8_t*)debug, debug_len, HAL_MAX_DELAY);
-            run_idle(&huart3);
-            break;
-        }
-        case GROUND: {
-          if (gekf_initialize) {
-            initialize_ekf_ground(&gekf, &huart3, &sensors, 6);
-            gekf_initialize = 0;
-          }
-          update_ekf_ground(&gekf, &sensors);
-          run_ground(&gekf, &sensors, &serial_data, &huart3);
-          iterations++;
-          break;
-        }
-        case ARMED: {
-          char debug_buffer[256];
-          int len;
-          if (fekf_initialize) {
-            initialize_ekf(&fekf, &huart3, &sensors, 3);
-            initialize_rocket_attitude(&rocket_atd, 1, 0, 0, 0); 
-            fekf_initialize = 0;
-          }
-          GPS2Flat(&sensors, &fekf, 0);
-          fekf.launch_gps[0] = fekf.gps_flat[0];
-          fekf.launch_gps[1] = fekf.gps_flat[1];
-          fekf.launch_gps[2] = fekf.gps_flat[2];
-          if (fekf.accelerometer[0] > 4.9) {
-              len = snprintf(debug_buffer, sizeof(debug_buffer), "Transitioning to FASTASCENT\r\n");
-              state_machine = FASTASCENT;
-              HAL_UART_Transmit(&huart3, (uint8_t*)debug_buffer, len, HAL_MAX_DELAY);
-          }
-          break;
-        }
-        case FASTASCENT: {
-          if (launched) {
-            launch_time_stamp = HAL_GetTick();
-            launched = 0;
-          }
-          run_fast_ascent(&fekf, &rocket_atd, &sensors, &serial_data, &huart3); 
-          break;
-        }
-        case SLOWASCENT: {
-          HAL_UART_Transmit(&huart3, "Slow Ascent\r\n", 
-                  sizeof("Slow Ascent\r\n"), HAL_MAX_DELAY);
-          run_slow_ascent(&fekf, &rocket_atd, &sensors, &serial_data, &huart3);
-          break;
-        }
-        case FREEFALL: {
-          HAL_UART_Transmit(&huart3, "Freefall\r\n", 
-                sizeof("Freefall\r\n"), HAL_MAX_DELAY);
-          run_freefall(&fekf, &rocket_atd, &sensors, &serial_data, &huart3); 
-          break;
-        }
-        case LANDED: {
-          serial_data.state = LANDED;
-          serial_data.vel_x = 0.0;
-          serial_data.vel_y = 0.0;
-          serial_data.vel_z = 0.0;
-          HAL_UART_Transmit(&huart3, "Landed\r\n", 
-                  sizeof("Landed\r\n"), HAL_MAX_DELAY);
-          break;
-        }
-    }
-    global_time = HAL_GetTick();
-    global_time_seconds = global_time / 1000.0f;
-    if (state_machine > 2) {
-      serial_data.t =  (global_time - launch_time_stamp) / 1000.0f;
-    }
-    log_data(&serial_data, &sensors, &huart2);
-    gekf.time_step = 0.05f;
-    fekf.time_step = 0.06f;
-    rocket_atd.time_step = 0.1f;
-    update_ekf(&fekf, &sensors);
-    if (state_machine > 1) {
-        char debug[256];
-        int len = sprintf(debug, "Sensors:\r\nGPS (x,y,z): %.3f, %.3f, %.3f\r\nAccel (x,y,z): %.3f, %.3f, %.3f\r\nGyro (x,y,z): %.3f, %.3f, %.3f\r\n",
-                        fekf.gps[0], fekf.gps[1], fekf.gps[2],
-                        fekf.accelerometer[0], fekf.accelerometer[1], fekf.accelerometer[2],
-                        fekf.gyro[0], fekf.gyro[1], fekf.gyro[2]);
-        HAL_UART_Transmit(&huart3, (uint8_t*)debug, len, HAL_MAX_DELAY);
-        print_rocket_attitude(&rocket_atd, &huart3); 
-    }
-    HAL_Delay(40);
+		// In microseconds
+		int dt_tick = __HAL_TIM_GET_COUNTER(&htim2) - last_timer_val;
+		last_timer_val += dt_tick;
+		float dt_sec = ((float)dt_tick) / 1000000.0;
+
+		dead_x += (sensors.gyro_x - 0.003660007138) * dt_sec;
+		dead_y += (sensors.gyro_y + 0.007507192166) * dt_sec;
+		dead_z += (sensors.gyro_z + 0.001419611124) * dt_sec;
+
+		iters += 1;
+
+		if (last_timer_val - last_print >= 250000) {
+			last_print = last_timer_val;
+			int sz = sprintf(debug, "t=%.4f (f=%.4f): x=%.10f, y=%.10f, z=%.10f, %.8f\r\n", 
+				(float)last_timer_val / 1000000.0,
+				(float)iters * 1000000.0 / (float)last_timer_val,
+				dead_x * 57.2958, dead_y * 57.2958, dead_z * 57.2958, dt_sec
+			);
+			HAL_UART_Transmit(&huart3, (uint8_t*)debug, sz, HAL_MAX_DELAY);
+		}
+		HAL_Delay(2);
   }
   /* USER CODE END 3 */
 }
@@ -505,6 +438,51 @@ static void MX_SPI6_Init(void)
   /* USER CODE BEGIN SPI6_Init 2 */
 
   /* USER CODE END SPI6_Init 2 */
+
+}
+
+/**
+  * @brief TIM2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM2_Init(void)
+{
+
+  /* USER CODE BEGIN TIM2_Init 0 */
+
+  /* USER CODE END TIM2_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM2_Init 1 */
+
+  /* USER CODE END TIM2_Init 1 */
+  htim2.Instance = TIM2;
+  htim2.Init.Prescaler = 223;
+  htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim2.Init.Period = 4294967295;
+  htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM2_Init 2 */
+
+  /* USER CODE END TIM2_Init 2 */
 
 }
 

@@ -55,9 +55,11 @@
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
+extern ADC_HandleTypeDef hadc1;
 extern ADC_HandleTypeDef hadc2;
 extern ADC_HandleTypeDef hadc3;
 extern OSPI_HandleTypeDef hospi1;
+extern TIM_HandleTypeDef htim2;
 extern UART_HandleTypeDef huart4;
 extern UART_HandleTypeDef huart5;
 extern UART_HandleTypeDef huart2;
@@ -148,16 +150,16 @@ void UsageFault_Handler(void)
 /**
   * @brief This function handles System service call via SWI instruction.
   */
-////void SVC_Handler(void)
-////{
-////  /* USER CODE BEGIN SVCall_IRQn 0 */
-////////////////////////////////////////////////////////////////////////
-////  /* USER CODE END SVCall_IRQn 0 */
-////  /* USER CODE BEGIN SVCall_IRQn 1 */
-////////////////////////////////////////////////////////////////////////
-////  /* USER CODE END SVCall_IRQn 1 */
-////}
-////
+//void SVC_Handler(void)
+//{
+//  /* USER CODE BEGIN SVCall_IRQn 0 */
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+//  /* USER CODE END SVCall_IRQn 0 */
+//  /* USER CODE BEGIN SVCall_IRQn 1 */
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+//  /* USER CODE END SVCall_IRQn 1 */
+//}
+//
 /**
   * @brief This function handles Debug monitor.
   */
@@ -174,29 +176,29 @@ void DebugMon_Handler(void)
 /**
   * @brief This function handles Pendable request for system service.
   */
-////void PendSV_Handler(void)
-////{
-////  /* USER CODE BEGIN PendSV_IRQn 0 */
-////////////////////////////////////////////////////////////////////////
-////  /* USER CODE END PendSV_IRQn 0 */
-////  /* USER CODE BEGIN PendSV_IRQn 1 */
-////////////////////////////////////////////////////////////////////////
-////  /* USER CODE END PendSV_IRQn 1 */
-////}
-////
+//void PendSV_Handler(void)
+//{
+//  /* USER CODE BEGIN PendSV_IRQn 0 */
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+//  /* USER CODE END PendSV_IRQn 0 */
+//  /* USER CODE BEGIN PendSV_IRQn 1 */
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+//  /* USER CODE END PendSV_IRQn 1 */
+//}
+//
 /**
   * @brief This function handles System tick timer.
   */
-////void SysTick_Handler(void)
-////{
-////  /* USER CODE BEGIN SysTick_IRQn 0 */
-////////////////////////////////////////////////////////////////////////
-////  /* USER CODE END SysTick_IRQn 0 */
-////
-////  /* USER CODE BEGIN SysTick_IRQn 1 */
-////////////////////////////////////////////////////////////////////////
-////  /* USER CODE END SysTick_IRQn 1 */
-////}
+//void SysTick_Handler(void)
+//{
+//  /* USER CODE BEGIN SysTick_IRQn 0 */
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+//  /* USER CODE END SysTick_IRQn 0 */
+//
+//  /* USER CODE BEGIN SysTick_IRQn 1 */
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+//  /* USER CODE END SysTick_IRQn 1 */
+//}
 
 /******************************************************************************/
 /* STM32H7xx Peripheral Interrupt Handlers                                    */
@@ -213,6 +215,7 @@ void ADC_IRQHandler(void)
   /* USER CODE BEGIN ADC_IRQn 0 */
 
   /* USER CODE END ADC_IRQn 0 */
+  HAL_ADC_IRQHandler(&hadc1);
   HAL_ADC_IRQHandler(&hadc2);
   /* USER CODE BEGIN ADC_IRQn 1 */
 
@@ -231,6 +234,20 @@ void TIM1_UP_IRQHandler(void)
   /* USER CODE BEGIN TIM1_UP_IRQn 1 */
 
   /* USER CODE END TIM1_UP_IRQn 1 */
+}
+
+/**
+  * @brief This function handles TIM2 global interrupt.
+  */
+void TIM2_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM2_IRQn 0 */
+
+  /* USER CODE END TIM2_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim2);
+  /* USER CODE BEGIN TIM2_IRQn 1 */
+
+  /* USER CODE END TIM2_IRQn 1 */
 }
 
 /**

@@ -233,10 +233,24 @@ $(BUILD_DIR):
 #######################################
 clean:
 	-rm -fR $(BUILD_DIR)
-  
+
+flash:
+	openocd -s /usr/share/openocd/scripts -f ./openocd.cfg -c "program build/MCU-h725zgt6.elf verify reset exit"
+
 #######################################
 # dependencies
 #######################################
 -include $(wildcard $(BUILD_DIR)/*.d)
+
+all: 
+	$(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).hex $(BUILD_DIR)/$(TARGET).bin
+	
+rebuild:
+	$(MAKE) clean
+	$(MAKE) -j4
+
+super:
+	$(MAKE) -j4
+	$(MAKE) flash
 
 # *** EOF ***

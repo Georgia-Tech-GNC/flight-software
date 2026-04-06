@@ -7,17 +7,16 @@
 #include "message_buffer.h"
 #include "semphr.h"
 #include "task.h"
+#include "uart_isr.h"
 
+#include "telemetry_rx.h"
 #include "port_config.h"
 
 #include "periph_io.h"
-#include "state_est_rx.h"
 #include "state_tx.h"
-#include "state_flash.h"
 #include "telemetry.h"
 #include "run_controls.h"
 #include "adc.h"
-#include "adc_convert.h"
 
 #include "globals.h"
 

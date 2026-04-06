@@ -29,7 +29,7 @@ uint8_t crctable[256] = {0, 231, 41, 206, 82, 181, 123, 156, 164, 67, 141, 106, 
  */
 uint8_t calculate_crc8_hash(const uint8_t *raw_data, const size_t data_size) {
     uint8_t crc = 0;
-    for (int i = 0; i < data_size; i++)
+    for (size_t i = 0; i < data_size; i++)
     {
         // XOR-in next input byte and get current CRC value = remainder 
         crc = crctable[raw_data[i] ^ crc];

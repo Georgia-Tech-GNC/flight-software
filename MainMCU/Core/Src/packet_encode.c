@@ -83,9 +83,9 @@ bool verify_packet(uint8_t *rawData, const size_t dataSize) {
 
     if (rawData[0] != 0) return false; // Leading byte was not 0.
     
-    int next_cobs_byte = 2;
+    size_t next_cobs_byte = 2;
     while (next_cobs_byte < dataSize) {
-        int increment = rawData[next_cobs_byte];
+        size_t increment = rawData[next_cobs_byte];
         if (increment == 0) return false; // Avoid infinite loops
         else if (next_cobs_byte + increment == dataSize - 1) {
             rawData[dataSize-1] = 0;
@@ -120,9 +120,9 @@ uint8_t extract_packet(uint8_t *rawData, const size_t dataSize, uint8_t *extract
     if (message_id == 0) return 0;
 
     // First de-stuff the packet
-    int next_cobs_byte = 2;
+    size_t next_cobs_byte = 2;
     while (next_cobs_byte < dataSize - 1) {
-        int increment = rawData[next_cobs_byte];
+        uint8_t increment = rawData[next_cobs_byte];
         if (increment == 0) return 0;
         rawData[next_cobs_byte] = 0;
 

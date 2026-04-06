@@ -149,16 +149,13 @@ int main(void)
 	char debug[128];
 
 	// Very empirically calculated IMU biases:
-	// x: 0.003073188398
-	// y: 0.006937632379
-	// z: 0.001217117898
+	// x: 0.003660007138
+	// y: 0.007507192166
+	// z: 0.001419611124
 
 	HAL_TIM_Base_Start(&htim2);
 	__HAL_TIM_SET_COUNTER(&htim2, 0);
-
 	int last_timer_val = 0;
-	int last_print = 0;
-	int iters = 0;
 
   while (1)
   {
@@ -173,17 +170,13 @@ int main(void)
 		dead_y += (sensors.gyro_y + 0.007507192166) * dt_sec;
 		dead_z += (sensors.gyro_z + 0.001419611124) * dt_sec;
 
-		iters += 1;
+        int sz = sprintf(debug, "x=%.10f, y=%.10f, z=%.10f\r\n", 
+            dead_x * 57.2958, dead_y * 57.2958, dead_z * 57.2958, dt_sec
+        );
+        HAL_UART_Transmit(&huart2, (uint8_t*)debug, sz, HAL_MAX_DELAY);
+        HAL_UART_Transmit(&huart3, (uint8_t*)debug, sz, HAL_MAX_DELAY);
 
-		if (last_timer_val - last_print >= 250000) {
-			last_print = last_timer_val;
-			int sz = sprintf(debug, "t=%.4f (f=%.4f): x=%.10f, y=%.10f, z=%.10f, %.8f\r\n", 
-				(float)last_timer_val / 1000000.0,
-				(float)iters * 1000000.0 / (float)last_timer_val,
-				dead_x * 57.2958, dead_y * 57.2958, dead_z * 57.2958, dt_sec
-			);
-			HAL_UART_Transmit(&huart3, (uint8_t*)debug, sz, HAL_MAX_DELAY);
-		}
+		
 		HAL_Delay(2);
   }
   /* USER CODE END 3 */

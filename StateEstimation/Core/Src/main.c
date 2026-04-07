@@ -84,6 +84,89 @@ static void MX_TIM2_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+#define deg2rad(x) (0.0174533*(x))
+
+typedef struct DiagMatrix3x3 {
+	float vals[3];
+} diag_matrix_3x3_t;
+
+typedef struct Vector3 {
+	float vals[3]
+} vector_3_t;
+
+diag_matrix_3x3_t square_diag(float a, float b, float c) {
+	diag_matrix_3x3_t mat;
+	mat.vals[0] = a * a;
+	mat.vals[1] = b * b;
+	mat.vals[2] = c * c;
+
+	return mat;
+}
+
+diag_matrix_3x3_t mat_add(diag_matrix_3x3_t a, diag_matrix_3x3_t b) {
+	diag_matrix_3x3_t mat;
+	for (int i = 0; i < 3; i++) {
+		mat.vals[i] = a.vals[i] + b.vals[i];
+	}
+
+	return mat;
+}
+
+diag_matrix_3x3_t mat_sub(diag_matrix_3x3_t a, diag_matrix_3x3_t b) {
+	diag_matrix_3x3_t mat;
+	for (int i = 0; i < 3; i++) {
+		mat.vals[i] = a.vals[i] - b.vals[i];
+	}
+
+	return mat;
+}
+
+vector_3_t mat_vec_mul(diag_matrix_3x3_t a, vector_3_t b) {
+	vector_3_t vec;
+	for (int i = 0; i < 3; i++) {
+		vec.vals[i] += a.vals[i] * b.vals[i];
+	}
+	return vec;
+}
+
+diag_matrix_3x3_t mat_mul(diag_matrix_3x3_t a, diag_matrix_3x3_t b) {
+	diag_matrix_3x3_t c;
+	for(int i=0;i<3;i++) {
+		for(int k=0;k<3;k++) {
+			c.vals[i] = a.vals[i] * b.vals[k];
+		}
+	}
+	return c;
+}
+
+diag_matrix_3x3_t diag_mat_inverse(diag_matrix_3x3_t a) {
+	diag_matrix_3x3_t b;
+	for(int i=0;i<3;i++) {
+		b.vals[i] = 1 / a.vals[i];
+	}
+	return b;
+}
+
+float vec_dot(vector_3_t a, vector_3_t b) {
+	float dot = 0;
+	for (int i = 0; i < 3; i++) dot += a.vals[i] * b.vals[i];
+
+	return dot;
+}
+
+vector_3_t vec_add(vector_3_t a, vector_3_t b) {
+	vector_3_t sum;
+	for (int i = 0; i < 3; i++) sum.vals[i] = a.vals[i] + b.vals[i];
+
+	return sum;
+}
+
+vector_3_t vec_sub(vector_3_t a, vector_3_t b) {
+	vector_3_t diff;
+	for (int i = 0; i < 3; i++) diff.vals[i] = a.vals[i] - b.vals[i];
+
+	return diff;
+}
 
 /* USER CODE END 0 */
 
@@ -157,9 +240,60 @@ int main(void)
 	__HAL_TIM_SET_COUNTER(&htim2, 0);
 	int last_timer_val = 0;
 
-  while (1)
-  {
+	// Values for R from Output Noise
+	float r_xy = deg2rad(152e-3);
+	float r_z  = deg2rad(181e-3);
+	diag_matrix_3x3_t R    = square_diag(r_xy, r_xy, r_z);
+
+	// Values for Q from In-Run Bias Stability
+	// Could change if needed
+	float q_x  = deg2rad(7.5/3600);
+	float q_y  = deg2rad(8.1/3600);
+	float q_z  = deg2rad(4.9/3600);
+	diag_matrix_3x3_t Q = square_diag(q_x, q_y, q_z);
+
+	diag_matrix_3x3_t H = square_diag(1, 1, 1);
+	vector_3_t x = { .vals = {0, 0, 0} }; // State = [bias_x, bias_y, biax_z]
+	diag_matrix_3x3_t P = square_diag(1, 1, 1);
+	
+	int counter = 0;
+	while (1)
+	{
+		// Could also just run for fixed number of samples if it doesn't
+    // converge, I kinda just made this up it has no basis
 		update_sensors(&sensors, &huart3);
+		vector_3_t z =  { .vals = {sensors.gyro_x, sensors.gyro_y, sensors.gyro_z} };
+
+    // Since we are measuring at rest any nonzero measurement is bias
+    vector_3_t x_prior = x; 
+    diag_matrix_3x3_t P_prior = mat_add(P, Q);
+
+		vector_3_t y = vec_sub(z, mat_vec_mul(H, x_prior));
+		diag_matrix_3x3_t S = mat_add(mat_mul(mat_mul(H, P_prior), H), R);
+
+    diag_matrix_3x3_t K = mat_mul(mat_mul(P_prior, H), diag_mat_inverse(S));
+    x = vec_add(x_prior, mat_vec_mul(K, y));
+    diag_matrix_3x3_t IKH = mat_sub(square_diag(1, 1, 1), mat_mul(K, H));
+		P = mat_add(mat_mul(mat_mul(IKH, P_prior), IKH), mat_mul(mat_mul(K, R), K));
+
+		HAL_Delay(4);
+
+		counter ++;
+
+		if (counter > 100) {
+			int sz = sprintf(debug, "x=%.10f, y=%.10f, z=%.10f\r\n", 
+				x.vals[0], x.vals[1], x.vals[2]
+			);
+			HAL_UART_Transmit(&huart3, (uint8_t*)debug, sz, HAL_MAX_DELAY);
+			sz = sprintf(debug, "GYRO: x=%.10f, y=%.10f, z=%.10f\r\n", 
+				z.vals[0], z.vals[1], z.vals[2]
+			);
+			HAL_UART_Transmit(&huart3, (uint8_t*)debug, sz, HAL_MAX_DELAY);
+
+			counter = 0;
+		}
+		continue;
+
 
 		// In microseconds
 		int dt_tick = __HAL_TIM_GET_COUNTER(&htim2) - last_timer_val;
@@ -170,15 +304,15 @@ int main(void)
 		dead_y += (sensors.gyro_y + 0.007507192166) * dt_sec;
 		dead_z += (sensors.gyro_z + 0.001419611124) * dt_sec;
 
-        int sz = sprintf(debug, "x=%.10f, y=%.10f, z=%.10f\r\n", 
-            dead_x * 57.2958, dead_y * 57.2958, dead_z * 57.2958, dt_sec
-        );
-        HAL_UART_Transmit(&huart2, (uint8_t*)debug, sz, HAL_MAX_DELAY);
-        HAL_UART_Transmit(&huart3, (uint8_t*)debug, sz, HAL_MAX_DELAY);
+		int sz = sprintf(debug, "x=%.10f, y=%.10f, z=%.10f\r\n", 
+				dead_x * 57.2958, dead_y * 57.2958, dead_z * 57.2958, dt_sec
+		);
+		HAL_UART_Transmit(&huart2, (uint8_t*)debug, sz, HAL_MAX_DELAY);
+		HAL_UART_Transmit(&huart3, (uint8_t*)debug, sz, HAL_MAX_DELAY);
 
 		
 		HAL_Delay(2);
-  }
+	}
   /* USER CODE END 3 */
 }
 

@@ -26,40 +26,64 @@ struct ring_buffer usart3_rx_rb;
 uint8_t uart4_rx_rb_data[512];
 struct ublox_gnss_cfg_val cfg[10];
 
-void adis_burst_read(struct ADIS_Device *device, Sensors* sensors) {
+#define ADIS_SWAP_BYTES(a, b) ((int16_t)((((uint16_t)a) << 8) | (((uint16_t)b) & 0xFF)))
+
+int adis_burst_read(struct ADIS_Device *device, Sensors* sensors) {
     // Lower the CS pin to start the read and wait >200ns
     HAL_GPIO_WritePin((GPIO_TypeDef*) device->cs_pin, (uint16_t)device->cs_pin_port, GPIO_PIN_RESET);
-    delay_us(1);
+    delay_us(3);
 
     // Send address 0x6800 to indicate start of burst read
-	uint8_t address[2] = {0x68, 0x00};
-	HAL_SPI_Transmit((SPI_HandleTypeDef*)device->spi_handle, address, 2, HAL_MAX_DELAY);
-    delay_us(5);
-
-    uint8_t txbuf[2] = {0x00, 0x00};
-	uint16_t rxbuf[9] = {0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF};
-    for (int i = 0; i < 9; i++) {
-        HAL_SPI_TransmitReceive((SPI_HandleTypeDef*)device->spi_handle, txbuf, (uint8_t*)(rxbuf + i), 2, 150);
-        delay_us(1);
-    }
+	uint8_t txbuf[22] = {0x68, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+    uint8_t rxbuf[22] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+    HAL_SPI_TransmitReceive((SPI_HandleTypeDef*)device->spi_handle, txbuf, rxbuf, 22, 2000);
 
     HAL_GPIO_WritePin((GPIO_TypeDef*) device->cs_pin, (uint16_t)device->cs_pin_port, GPIO_PIN_SET);
-	sensors->imu_status = rxbuf[0];
-    sensors->gyro_x = rxbuf[1];
-    sensors->gyro_y = rxbuf[2];
-    sensors->gyro_z = rxbuf[3];
-    sensors->accel_x = rxbuf[4];
-    sensors->accel_y = rxbuf[5];
-    sensors->accel_z = rxbuf[6];
+    delay_us(5);
+
+    uint16_t checksum = 0;
+    for (int i = 2; i < 20; i++) {
+        checksum += rxbuf[i];
+    }
+    if (checksum != ADIS_SWAP_BYTES(rxbuf[20], rxbuf[21])) {
+        char debug[128];
+        sensors->imu_status = 0xFFFF;
+        int sz = sprintf(debug, "ERR: 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x\r\n", 
+			rxbuf[0], rxbuf[1], rxbuf[2], rxbuf[3], rxbuf[4], rxbuf[5], rxbuf[6], rxbuf[7], rxbuf[8], rxbuf[9],   
+            rxbuf[10], rxbuf[11], rxbuf[12], rxbuf[13], rxbuf[14], rxbuf[15], rxbuf[16], rxbuf[17], rxbuf[18], rxbuf[19],   
+            rxbuf[20], rxbuf[21]
+		);
+		HAL_UART_Transmit(&huart3, (uint8_t*)debug, sz, HAL_MAX_DELAY);
+        return 1;
+    } else {
+        //char debug[128];
+        //sensors->imu_status = 0xFFFF;
+        //int sz = sprintf(debug, "Good: 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x 0x%x\r\n", 
+		//	rxbuf[0], rxbuf[1], rxbuf[2], rxbuf[3], rxbuf[4], rxbuf[5], rxbuf[6], rxbuf[7], rxbuf[8], rxbuf[9],   
+        //    rxbuf[10], rxbuf[11], rxbuf[12], rxbuf[13], rxbuf[14], rxbuf[15], rxbuf[16], rxbuf[17], rxbuf[18], rxbuf[19],   
+        //    rxbuf[20], rxbuf[21]
+		//);
+		//HAL_UART_Transmit(&huart3, (uint8_t*)debug, sz, HAL_MAX_DELAY);
+
+        sensors->imu_status = ADIS_SWAP_BYTES(rxbuf[2], rxbuf[3]);
+        sensors->gyro_x = (float)ADIS_SWAP_BYTES(rxbuf[4], rxbuf[5]) *  0.1f;
+        sensors->gyro_y = (float)ADIS_SWAP_BYTES(rxbuf[6], rxbuf[7]) * 0.1f;
+        sensors->gyro_z = (float)ADIS_SWAP_BYTES(rxbuf[8], rxbuf[9]) * 0.1f;
+        sensors->accel_x = (float)ADIS_SWAP_BYTES(rxbuf[10], rxbuf[11]) * 0.01225f;
+        sensors->accel_y = (float)ADIS_SWAP_BYTES(rxbuf[12], rxbuf[13]) * 0.01225f;
+        sensors->accel_z = (float)ADIS_SWAP_BYTES(rxbuf[14], rxbuf[15]) * 0.01225f;
+        return 0;
+    }
+	
 }
 
-void update_sensors(Sensors *sensors, UART_HandleTypeDef *huart) {
+int update_sensors(Sensors *sensors) {
     
     float32_t accel_readings[3];
     float32_t gyro_readings[3];
     //double mag_readings[3];
 
-    adis_burst_read(&imu_device, sensors);
+    return adis_burst_read(&imu_device, sensors);
 
     /*
     adis_read_accel(&imu_device, accel_readings);

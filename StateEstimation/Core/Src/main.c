@@ -58,7 +58,6 @@ uint8_t launched;
 
 /* Private variables ---------------------------------------------------------*/
 
-
 TIM_HandleTypeDef htim2;
 
 /* USER CODE BEGIN PV */
@@ -209,106 +208,64 @@ int main(void)
   MX_USART3_UART_Init();
   MX_UART4_Init();
   MX_TIM2_Init();
+	HAL_TIM_Base_Start(&htim2);
+	
   /* USER CODE BEGIN 2 */
   DWT_Init();
   sensors_init(&sensors);
   state_machine_init();
+	char debug[256];
+	HAL_Delay(100);
+
+	// Wait to recieve a bit over uart to signal activation
+	while (HAL_UART_Receive(&huart2, debug, 1, HAL_MAX_DELAY) != HAL_OK);
+
   /* USER CODE END 2 */
-
   /* Infinite loop */
+
   /* USER CODE BEGIN WHILE */
-  uint8_t tmp;
-  launched = 1;
-  // Print initial message
-  //while(HAL_TIMEOUT != HAL_UART_Receive(&huart2, &tmp, 1, 10));
-  //HAL_UART_Receive_IT(&huart2, signal_received, 2);
-  prev_global_time = global_time;
-  HAL_Delay(500);
+	// Initialize variables
+	int counter = 0;   //!< Debug counter for number of readings so far
+	float x_angle= 0;  //!< Dead reckoning x angle
+	float y_angle = 0; //!< Dead reckoning y angle
+	float z_angle = 0; //!< Dead reckoning z angle
 
-	float dead_x = 0;
-	float dead_y = 0;
-	float dead_z = 0;
-
-	char debug[128];
-
-	// Very empirically calculated IMU biases:
-	// x: 0.003660007138
-	// y: 0.007507192166
-	// z: 0.001419611124
-
-	HAL_TIM_Base_Start(&htim2);
+	// Reset the microsecond counter to 0 (used for delta-time calculations)
 	__HAL_TIM_SET_COUNTER(&htim2, 0);
 	int last_timer_val = 0;
-	
-	int counter = 0;
-	while (1)
-	{
-		// Could also just run for fixed number of samples if it doesn't
-    // converge, I kinda just made this up it has no basis
-		update_sensors(&sensors, &huart3);
 
-        int sz = sprintf(debug, "S=0x%x, gyro=%.2f %.2f %.2f, accel=%.2f %.2f %.2f\r\n", 
-			sensors.imu_status, 
-            sensors.gyro_x, sensors.gyro_y, sensors.gyro_z,
-            sensors.accel_x, sensors.accel_y, sensors.accel_z
-		);
-        HAL_UART_Transmit(&huart3, (uint8_t*)debug, sz, HAL_MAX_DELAY);
+  while (1) {
+		// 3ms period (~333Hz)
+		HAL_Delay(3);
 
-		HAL_Delay(100);
-
-		//int dt_tick = __HAL_TIM_GET_COUNTER(&htim2) - last_timer_val;
-		//last_timer_val += dt_tick;
-		//float dt_sec = ((float)dt_tick) / 1000000.0;
-
-		//dead_x += (sensors.gyro_x);// * dt_sec;
-		//dead_y += (sensors.gyro_y); // * dt_sec;
-		//dead_z += (sensors.gyro_z); // * dt_sec;
-
-		//if (sensors.imu_status != 0) {
-		//	int sz = sprintf(debug, "STATUS=0x%x\r\n", 
-		//		sensors.imu_status
-		//	);
-		//	HAL_UART_Transmit(&huart3, (uint8_t*)debug, sz, HAL_MAX_DELAY);
-		//}
-
-		counter ++;
-		
-		/* if (counter > 10) {
-			int sz = sprintf(debug, "x=%.10f, y=%.10f, z=%.10f, serial=0x%x\r\n", 
-				sensors.gyro_x, sensors.gyro_y, sensors.gyro_z, sensors.imu_serial
-			);
-			HAL_UART_Transmit(&huart3, (uint8_t*)debug, sz, HAL_MAX_DELAY);
-		
-			counter = 0;
-			dead_x = 0;
-			dead_y = 0;
-			dead_z = 0;
+		// Update sensors
+    if (update_sensors(&sensors)) {
+			continue; // IMU read failed, try again
 		}
-            */
 
-
-		continue;
-
-
-		/*// In microseconds
+		// Calculate time since last update
 		int dt_tick = __HAL_TIM_GET_COUNTER(&htim2) - last_timer_val;
-		last_timer_val += dt_tick;
-		float dt_sec = ((float)dt_tick) / 1000000.0;
+    last_timer_val += dt_tick;
+ 		float dt_sec = ((float)dt_tick) / 1000000.0;
 
-		dead_x += (sensors.gyro_x - 0.003660007138) * dt_sec;
-		dead_y += (sensors.gyro_y + 0.007507192166) * dt_sec;
-		dead_z += (sensors.gyro_z + 0.001419611124) * dt_sec;
+		// Increment counters and update velocity dead reckoning.
+		x_angle += (sensors.gyro_x + 0.07945997) * dt_sec;
+		y_angle += (sensors.gyro_y - 0.25380069) * dt_sec;
+		z_angle += (sensors.gyro_z + 0.13673413) * dt_sec;
+		counter += 1;
 
-		int sz = sprintf(debug, "x=%.10f, y=%.10f, z=%.10f\r\n", 
-				dead_x * 57.2958, dead_y * 57.2958, dead_z * 57.2958, dt_sec
-		);
-		HAL_UART_Transmit(&huart2, (uint8_t*)debug, sz, HAL_MAX_DELAY);
-		HAL_UART_Transmit(&huart3, (uint8_t*)debug, sz, HAL_MAX_DELAY);
+		// Forward data to MainMCU
+		// Packet contents: | x_angle | y_angle | z_angle | upward acceleration
+		uint8_t master_packet[16];
+		memcpy(master_packet, &x_angle, sizeof(float));
+		memcpy(master_packet + 4, &y_angle, sizeof(float));
+		memcpy(master_packet + 8, &z_angle, sizeof(float));
+		memcpy(master_packet + 12, &sensors.accel_x, sizeof(float));
 
-		
-		HAL_Delay(2);
-		*/
-	}
+		HAL_UART_Transmit(&huart2, master_packet, 16, HAL_MAX_DELAY);
+    /* USER CODE END WHILE */
+    /* USER CODE BEGIN 3 */
+  }
   /* USER CODE END 3 */
 }
 
@@ -487,11 +444,11 @@ static void MX_SPI4_Init(void)
   hspi4.Instance = SPI4;
   hspi4.Init.Mode = SPI_MODE_MASTER;
   hspi4.Init.Direction = SPI_DIRECTION_2LINES;
-  hspi4.Init.DataSize = SPI_DATASIZE_16BIT;
+  hspi4.Init.DataSize = SPI_DATASIZE_8BIT;
   hspi4.Init.CLKPolarity = SPI_POLARITY_HIGH;
   hspi4.Init.CLKPhase = SPI_PHASE_2EDGE;
   hspi4.Init.NSS = SPI_NSS_SOFT;
-  hspi4.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
+  hspi4.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_64;
   hspi4.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi4.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi4.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;

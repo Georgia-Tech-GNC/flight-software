@@ -54,8 +54,9 @@ int16_t adis_read_register(struct ADIS_Device *device, uint8_t addr) {
 	HAL_GPIO_WritePin((GPIO_TypeDef*) device->cs_pin, (uint16_t)device->cs_pin_port, GPIO_PIN_RESET);
 	uint8_t txbuf[2] = {0x00, 0x00};
 	uint8_t rxbuf[2];
-	HAL_SPI_TransmitReceive((SPI_HandleTypeDef*)device->spi_handle, txbuf, rxbuf, 2, 150);
     delay_us(1);
+
+	HAL_SPI_TransmitReceive((SPI_HandleTypeDef*)device->spi_handle, txbuf, rxbuf, 2, 150);
 	HAL_GPIO_WritePin((GPIO_TypeDef*) device->cs_pin, (uint16_t)device->cs_pin_port, GPIO_PIN_SET);
 	delay_us(5);
 	return (rxbuf[1] << 8) | (rxbuf[0] & 0xFF);

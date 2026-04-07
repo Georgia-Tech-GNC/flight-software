@@ -58,7 +58,7 @@ typedef struct {
   float32_t gps_offset_z;
 } Sensors;
 
-void update_sensors(Sensors *sensors, UART_HandleTypeDef *huart);
+int update_sensors(Sensors *sensors);
 void sensors_init(Sensors *sensors);
 
 #endif

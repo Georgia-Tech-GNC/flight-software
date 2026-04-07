@@ -9,7 +9,7 @@
  ******************************************************************************
  */
 
-
+#include "sensors.h"
 #include "ADIS16500.h"
 #include "arm_math.h"
 
@@ -37,7 +37,6 @@ void delay_us(uint32_t microseconds) {
     while ((uint32_t)(DWT->CYCCNT - startTick) < delayTicks);
 }
 
-
 /**
  * @brief reads a register given the memory address
  * @param device instance of ADIS IMU device
@@ -47,6 +46,7 @@ void delay_us(uint32_t microseconds) {
 int16_t adis_read_register(struct ADIS_Device *device, uint8_t addr) {
 	delay_us(5);
 	HAL_GPIO_WritePin((GPIO_TypeDef*) device->cs_pin, (uint16_t)device->cs_pin_port, GPIO_PIN_RESET);
+    delay_us(1);
 	uint8_t address[2] = {addr, 0x00};
 	HAL_SPI_Transmit((SPI_HandleTypeDef*)device->spi_handle, address, 2, HAL_MAX_DELAY);
 	HAL_GPIO_WritePin((GPIO_TypeDef*) device->cs_pin, (uint16_t)device->cs_pin_port, GPIO_PIN_SET);
@@ -55,6 +55,7 @@ int16_t adis_read_register(struct ADIS_Device *device, uint8_t addr) {
 	uint8_t txbuf[2] = {0x00, 0x00};
 	uint8_t rxbuf[2];
 	HAL_SPI_TransmitReceive((SPI_HandleTypeDef*)device->spi_handle, txbuf, rxbuf, 2, 150);
+    delay_us(1);
 	HAL_GPIO_WritePin((GPIO_TypeDef*) device->cs_pin, (uint16_t)device->cs_pin_port, GPIO_PIN_SET);
 	delay_us(5);
 	return (rxbuf[1] << 8) | (rxbuf[0] & 0xFF);

@@ -91,7 +91,7 @@ typedef struct DiagMatrix3x3 {
 } diag_matrix_3x3_t;
 
 typedef struct Vector3 {
-	float vals[3]
+	float vals[3];
 } vector_3_t;
 
 diag_matrix_3x3_t square_diag(float a, float b, float c) {
@@ -220,8 +220,8 @@ int main(void)
   uint8_t tmp;
   launched = 1;
   // Print initial message
-  while(HAL_TIMEOUT != HAL_UART_Receive(&huart2, &tmp, 1, 10));
-  HAL_UART_Receive_IT(&huart2, signal_received, 2);
+  //while(HAL_TIMEOUT != HAL_UART_Receive(&huart2, &tmp, 1, 10));
+  //HAL_UART_Receive_IT(&huart2, signal_received, 2);
   prev_global_time = global_time;
   HAL_Delay(500);
 
@@ -246,26 +246,36 @@ int main(void)
 		// Could also just run for fixed number of samples if it doesn't
     // converge, I kinda just made this up it has no basis
 		update_sensors(&sensors, &huart3);
-		int dt_tick = __HAL_TIM_GET_COUNTER(&htim2) - last_timer_val;
-		last_timer_val += dt_tick;
-		float dt_sec = ((float)dt_tick) / 1000000.0;
 
-		dead_x += (sensors.gyro_x);// * dt_sec;
-		dead_y += (sensors.gyro_y); // * dt_sec;
-		dead_z += (sensors.gyro_z); // * dt_sec;
+        int sz = sprintf(debug, "S=0x%x, gyro=%.2f %.2f %.2f, accel=%.2f %.2f %.2f\r\n", 
+			sensors.imu_status, 
+            sensors.gyro_x, sensors.gyro_y, sensors.gyro_z,
+            sensors.accel_x, sensors.accel_y, sensors.accel_z
+		);
+        HAL_UART_Transmit(&huart3, (uint8_t*)debug, sz, HAL_MAX_DELAY);
 
-		if (sensors.imu_status != 0) {
-			int sz = sprintf(debug, "STATUS=0x%x\r\n", 
-				sensors.imu_status
-			);
-			HAL_UART_Transmit(&huart3, (uint8_t*)debug, sz, HAL_MAX_DELAY);
-		}
+		HAL_Delay(100);
+
+		//int dt_tick = __HAL_TIM_GET_COUNTER(&htim2) - last_timer_val;
+		//last_timer_val += dt_tick;
+		//float dt_sec = ((float)dt_tick) / 1000000.0;
+
+		//dead_x += (sensors.gyro_x);// * dt_sec;
+		//dead_y += (sensors.gyro_y); // * dt_sec;
+		//dead_z += (sensors.gyro_z); // * dt_sec;
+
+		//if (sensors.imu_status != 0) {
+		//	int sz = sprintf(debug, "STATUS=0x%x\r\n", 
+		//		sensors.imu_status
+		//	);
+		//	HAL_UART_Transmit(&huart3, (uint8_t*)debug, sz, HAL_MAX_DELAY);
+		//}
 
 		counter ++;
-
-		if (counter > 1000) {
-			int sz = sprintf(debug, "c=%d, x=%.10f, y=%.10f, z=%.10f, serial=0x%x\r\n", 
-				counter, dead_x / counter, dead_y / counter, dead_z / counter, sensors.imu_serial
+		
+		/* if (counter > 10) {
+			int sz = sprintf(debug, "x=%.10f, y=%.10f, z=%.10f, serial=0x%x\r\n", 
+				sensors.gyro_x, sensors.gyro_y, sensors.gyro_z, sensors.imu_serial
 			);
 			HAL_UART_Transmit(&huart3, (uint8_t*)debug, sz, HAL_MAX_DELAY);
 		
@@ -274,8 +284,8 @@ int main(void)
 			dead_y = 0;
 			dead_z = 0;
 		}
+            */
 
-		HAL_Delay(10);
 
 		continue;
 

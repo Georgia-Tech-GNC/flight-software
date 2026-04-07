@@ -26,13 +26,42 @@ struct ring_buffer usart3_rx_rb;
 uint8_t uart4_rx_rb_data[512];
 struct ublox_gnss_cfg_val cfg[10];
 
+void adis_burst_read(struct ADIS_Device *device, Sensors* sensors) {
+    // Lower the CS pin to start the read and wait >200ns
+    HAL_GPIO_WritePin((GPIO_TypeDef*) device->cs_pin, (uint16_t)device->cs_pin_port, GPIO_PIN_RESET);
+    delay_us(1);
+
+    // Send address 0x6800 to indicate start of burst read
+	uint8_t address[2] = {0x68, 0x00};
+	HAL_SPI_Transmit((SPI_HandleTypeDef*)device->spi_handle, address, 2, HAL_MAX_DELAY);
+    delay_us(5);
+
+    uint8_t txbuf[2] = {0x00, 0x00};
+	uint16_t rxbuf[9] = {0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF};
+    for (int i = 0; i < 9; i++) {
+        HAL_SPI_TransmitReceive((SPI_HandleTypeDef*)device->spi_handle, txbuf, (uint8_t*)(rxbuf + i), 2, 150);
+        delay_us(1);
+    }
+
+    HAL_GPIO_WritePin((GPIO_TypeDef*) device->cs_pin, (uint16_t)device->cs_pin_port, GPIO_PIN_SET);
+	sensors->imu_status = rxbuf[0];
+    sensors->gyro_x = rxbuf[1];
+    sensors->gyro_y = rxbuf[2];
+    sensors->gyro_z = rxbuf[3];
+    sensors->accel_x = rxbuf[4];
+    sensors->accel_y = rxbuf[5];
+    sensors->accel_z = rxbuf[6];
+}
+
 void update_sensors(Sensors *sensors, UART_HandleTypeDef *huart) {
     
     float32_t accel_readings[3];
     float32_t gyro_readings[3];
     //double mag_readings[3];
 
-    
+    adis_burst_read(&imu_device, sensors);
+
+    /*
     adis_read_accel(&imu_device, accel_readings);
     sensors->accel_x = -1.0 * accel_readings[0];
     sensors->accel_y = -1.0 * accel_readings[1];
@@ -44,6 +73,7 @@ void update_sensors(Sensors *sensors, UART_HandleTypeDef *huart) {
     sensors->gyro_z = gyro_readings[2] * PI / 180;
     sensors->imu_status = adis_read_status(&imu_device);
     sensors->imu_serial = adis_read_serial_number(&imu_device);
+    */
     /*
     MS5607Update();
     uint32_t bytes_to_read = ring_buffer_get_full(&uart4_rx_rb);

@@ -16,7 +16,7 @@
  * @return          Returns the number of characters written (forwarded from printf)
  */
 int log_debug_message(char* fmt_str, ...) {
-#ifndef DEBUG_BUILD
+//#ifndef DEBUG_BUILD
     char buf[DEBUG_MESSAGE_BUFFER_SIZE];
     va_list args;
     va_start(args, fmt_str);
@@ -28,7 +28,7 @@ int log_debug_message(char* fmt_str, ...) {
     }
 
     return chars_written;
-#endif
+//#endif
     return 0;
 }
 

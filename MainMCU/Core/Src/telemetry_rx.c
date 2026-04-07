@@ -1,5 +1,6 @@
 #include "telemetry_rx.h"
 
+#ifdef DO_NOT_RUN
 void rx_process_byte(uint8_t byte, uint8_t *packet_buffer, uint8_t *extracted_buffer, uint8_t *packet_buffer_size, uint8_t *recieved_uuids);
 
 void process_command(int command_id);
@@ -160,3 +161,4 @@ void command_ignite() {
 void command_zero_servos() {
     xTaskNotify(g_static_fire_task_handle, ZERO_SERVOS_NOTIFICATION_BIT, eSetBits);
 }
+#endif

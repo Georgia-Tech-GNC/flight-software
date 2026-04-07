@@ -239,22 +239,6 @@ int main(void)
 	HAL_TIM_Base_Start(&htim2);
 	__HAL_TIM_SET_COUNTER(&htim2, 0);
 	int last_timer_val = 0;
-
-	// Values for R from Output Noise
-	float r_xy = deg2rad(152e-3);
-	float r_z  = deg2rad(181e-3);
-	diag_matrix_3x3_t R    = square_diag(r_xy, r_xy, r_z);
-
-	// Values for Q from In-Run Bias Stability
-	// Could change if needed
-	float q_x  = deg2rad(7.5/3600);
-	float q_y  = deg2rad(8.1/3600);
-	float q_z  = deg2rad(4.9/3600);
-	diag_matrix_3x3_t Q = square_diag(q_x, q_y, q_z);
-
-	diag_matrix_3x3_t H = square_diag(1, 1, 1);
-	vector_3_t x = { .vals = {0, 0, 0} }; // State = [bias_x, bias_y, biax_z]
-	diag_matrix_3x3_t P = square_diag(1, 1, 1);
 	
 	int counter = 0;
 	while (1)
@@ -262,40 +246,41 @@ int main(void)
 		// Could also just run for fixed number of samples if it doesn't
     // converge, I kinda just made this up it has no basis
 		update_sensors(&sensors, &huart3);
-		vector_3_t z =  { .vals = {sensors.gyro_x, sensors.gyro_y, sensors.gyro_z} };
+		int dt_tick = __HAL_TIM_GET_COUNTER(&htim2) - last_timer_val;
+		last_timer_val += dt_tick;
+		float dt_sec = ((float)dt_tick) / 1000000.0;
 
-    // Since we are measuring at rest any nonzero measurement is bias
-    vector_3_t x_prior = x; 
-    diag_matrix_3x3_t P_prior = mat_add(P, Q);
+		dead_x += (sensors.gyro_x);// * dt_sec;
+		dead_y += (sensors.gyro_y); // * dt_sec;
+		dead_z += (sensors.gyro_z); // * dt_sec;
 
-		vector_3_t y = vec_sub(z, mat_vec_mul(H, x_prior));
-		diag_matrix_3x3_t S = mat_add(mat_mul(mat_mul(H, P_prior), H), R);
-
-    diag_matrix_3x3_t K = mat_mul(mat_mul(P_prior, H), diag_mat_inverse(S));
-    x = vec_add(x_prior, mat_vec_mul(K, y));
-    diag_matrix_3x3_t IKH = mat_sub(square_diag(1, 1, 1), mat_mul(K, H));
-		P = mat_add(mat_mul(mat_mul(IKH, P_prior), IKH), mat_mul(mat_mul(K, R), K));
-
-		HAL_Delay(4);
+		if (sensors.imu_status != 0) {
+			int sz = sprintf(debug, "STATUS=0x%x\r\n", 
+				sensors.imu_status
+			);
+			HAL_UART_Transmit(&huart3, (uint8_t*)debug, sz, HAL_MAX_DELAY);
+		}
 
 		counter ++;
 
-		if (counter > 100) {
-			int sz = sprintf(debug, "x=%.10f, y=%.10f, z=%.10f\r\n", 
-				x.vals[0], x.vals[1], x.vals[2]
+		if (counter > 1000) {
+			int sz = sprintf(debug, "c=%d, x=%.10f, y=%.10f, z=%.10f, serial=0x%x\r\n", 
+				counter, dead_x / counter, dead_y / counter, dead_z / counter, sensors.imu_serial
 			);
 			HAL_UART_Transmit(&huart3, (uint8_t*)debug, sz, HAL_MAX_DELAY);
-			sz = sprintf(debug, "GYRO: x=%.10f, y=%.10f, z=%.10f\r\n", 
-				z.vals[0], z.vals[1], z.vals[2]
-			);
-			HAL_UART_Transmit(&huart3, (uint8_t*)debug, sz, HAL_MAX_DELAY);
-
+		
 			counter = 0;
+			dead_x = 0;
+			dead_y = 0;
+			dead_z = 0;
 		}
+
+		HAL_Delay(10);
+
 		continue;
 
 
-		// In microseconds
+		/*// In microseconds
 		int dt_tick = __HAL_TIM_GET_COUNTER(&htim2) - last_timer_val;
 		last_timer_val += dt_tick;
 		float dt_sec = ((float)dt_tick) / 1000000.0;
@@ -312,6 +297,7 @@ int main(void)
 
 		
 		HAL_Delay(2);
+		*/
 	}
   /* USER CODE END 3 */
 }

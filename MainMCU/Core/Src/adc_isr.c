@@ -15,6 +15,7 @@
  * as the sequence of ADCs to convert.
  */
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
+#ifdef DO_NOT_RUN
     static uint16_t adc1_conv_ptr = 0;
     static uint16_t adc2_conv_ptr = 0;
     static uint16_t adc3_conv_ptr = 0;
@@ -142,4 +143,5 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
 
     /* FreeRTOS boilerplate */
     //portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+#endif
 }

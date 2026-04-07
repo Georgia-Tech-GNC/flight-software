@@ -98,6 +98,15 @@ void adis_read_gyro(struct ADIS_Device *device, float32_t gyro_readings[3]) {
     gyro_readings[2] = (float)(adis_read_register(device, ADIS_Z_GYRO_OUT)) * 0.1f;
 }
 
+uint16_t adis_read_status(struct ADIS_Device *device) {
+    return adis_read_register(device, 0x02);
+}
+
+uint16_t adis_read_serial_number(struct ADIS_Device *device) {
+    return adis_read_register(device, 0x74);
+}
+
+
 /**
  * @brief Reads accelerometer data from the ADIS IMU
  * @param device Pointer to the ADIS IMU device instance

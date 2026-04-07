@@ -15,7 +15,7 @@
  * Task to receive new states and put them into the g_current_state global variable
  * @param args Unused
  */
-void state_est_rx_task(void *args) {
+void state_rx_task(void *args) {
     uint8_t _state_rx_buff[STATE_ESTIMATION_BYTES];
     uint8_t *state_rx_buff = _state_rx_buff;
 

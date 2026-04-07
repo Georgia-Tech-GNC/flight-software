@@ -102,4 +102,6 @@ int16_t adis_read_register(struct ADIS_Device *device, uint8_t addr);
 void adis_write_register(struct ADIS_Device *device,  uint8_t addr, uint16_t value);
 void adis_read_gyro(struct ADIS_Device *device, float32_t gyro_readings[3]);
 void adis_read_accel(struct ADIS_Device *device, float32_t accel_readings[3]);
+uint16_t adis_read_status(struct ADIS_Device *device);
+uint16_t adis_read_serial_number(struct ADIS_Device *device);
 #endif

@@ -1,6 +1,7 @@
 #include "static_fire.h"
 #include "adc.h"
 
+#ifdef DO_NOT_RUN
 void init_servos(Servo_T *servos);
 void enable_servos(Servo_T *servos);
 void disable_servos(Servo_T *servos);
@@ -189,3 +190,4 @@ void static_fire_task(void *args) {
 
     vTaskSuspend(NULL);
 }
+#endif

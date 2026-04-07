@@ -5,6 +5,7 @@
 #include "string.h"
 
 void poll_adcs() {
+#ifdef DO_NOT_RUN
     ADC_ChannelConfTypeDef sConfig = {0};
 
     uint16_t adc_readings[ADC_NUM_CHANNELS] = {0};
@@ -110,4 +111,5 @@ void poll_adcs() {
 
         xSemaphoreGive(g_state_mutex_handle);
     }
+#endif
 }

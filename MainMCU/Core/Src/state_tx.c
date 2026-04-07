@@ -37,6 +37,7 @@ void state_tx_task(void *args) {
             xSemaphoreGive(g_state_mutex_handle);
         }
 
+#ifdef DO_NOT_RUN
 #ifndef STATIC_FIRE
         send_state_vector(&rocket_state, payload_buf);
         vTaskDelay(pdMS_TO_TICKS((ROCKETSTATEVECTOR_SIZE + 5) * MULT));
@@ -58,9 +59,11 @@ void state_tx_task(void *args) {
         send_analog_feedback_data(&rocket_state, payload_buf);
         vTaskDelay(pdMS_TO_TICKS((ROCKETANALOGFEEDBACKDATA_SIZE + 5) * MULT));
 #endif
+#endif
     }
 }
 
+#ifdef DO_NOT_RUN
 /**
  * @brief Send the state vector over telemetry
  * @param rocket_state RocketState to send
@@ -97,10 +100,10 @@ void send_servo_deflection(RocketState *rocket_state, uint8_t *payload_buf) {
  * @param payload_buf Buffer to write to
  */
 void send_state(RocketState *rocket_state, uint8_t *payload_buf) {
-    struct RocketState *_rocket_state = &rocket_state->rocket_state;
-    _rocket_state->timestamp = pdTICKS_TO_MS(xTaskGetTickCount());
+    //struct RocketState *_rocket_state = &rocket_state;
+    //_rocket_state->timestamp = pdTICKS_TO_MS(xTaskGetTickCount());
 
-    RocketState_encode(_rocket_state, payload_buf);
+    //RocketState_encode(_rocket_state, payload_buf);
     telemetry_send_message(payload_buf, ROCKETSTATE_SIZE, ROCKETSTATE_MSG_ID);
 }
 
@@ -149,3 +152,5 @@ void send_analog_feedback_data(RocketState *rocket_state, uint8_t *payload_buf) 
     telemetry_send_message(payload_buf, ROCKETANALOGFEEDBACKDATA_SIZE, ROCKETANALOGFEEDBACKDATA_MSG_ID);
 }
 #endif
+#endif
+

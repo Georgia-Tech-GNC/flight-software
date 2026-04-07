@@ -5,6 +5,6 @@
 
 #define STATE_ESTIMATION_BYTES 118
 
-void state_est_rx_task(void *args);
+void state_rx_task(void *args);
 
 #endif

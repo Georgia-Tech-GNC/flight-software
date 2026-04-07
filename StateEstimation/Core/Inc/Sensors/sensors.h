@@ -45,6 +45,8 @@ typedef struct {
   float32_t gps_x;
   float32_t gps_y;
   float32_t gps_z;
+  uint16_t  imu_status;
+  uint16_t  imu_serial;
   float32_t accel_bias_x;
   float32_t accel_bias_y;
   float32_t accel_bias_z;

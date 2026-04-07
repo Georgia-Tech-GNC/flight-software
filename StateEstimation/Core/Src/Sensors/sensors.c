@@ -42,6 +42,8 @@ void update_sensors(Sensors *sensors, UART_HandleTypeDef *huart) {
     sensors->gyro_x = -1.0 * gyro_readings[0] * PI / 180;
     sensors->gyro_y = -1.0 * gyro_readings[1] * PI / 180;
     sensors->gyro_z = gyro_readings[2] * PI / 180;
+    sensors->imu_status = adis_read_status(&imu_device);
+    sensors->imu_serial = adis_read_serial_number(&imu_device);
     /*
     MS5607Update();
     uint32_t bytes_to_read = ring_buffer_get_full(&uart4_rx_rb);

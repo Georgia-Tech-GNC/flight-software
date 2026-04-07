@@ -20,18 +20,21 @@ void set_servo_positions(Controller *controller);
  * @param args Unused
  */
 void run_controls_task(void *args) {
-    Controller controller;
-    float state[9];
-    float seconds_since_launch = 0;
-
-    initialize_controls(&controller);
-
-    /* Wait for notification to begin */
-    wait_for_notification(BEGIN_CONTROLS_NOTIFICATION_BIT);
-
-    log_debug_message("Running controls\r\n");
+    
+    log_debug_message("Master task active\r\n");
 
     while (1) {
+        // At the start of each iteration, we want a new sensor reading
+        size_t bytes_read = 0;
+        uint8_t state_rx_buffer[16];
+
+        while (bytes_read < 16) {
+            bytes_read = xStreamBufferReceive(
+                g_state_rx_sb_handle, 
+                state_rx_buffer + bytes_read, 
+                16 - bytes_read, 10);
+            bytes_read += read;
+        }
         /* Update state array */
         int current_rocket_state = grab_state(state, &seconds_since_launch);
         if (current_rocket_state > 3) break; // If the state is greater than 3, we are out of the control period of the flight

@@ -30,7 +30,6 @@ uint8_t ready_message_printed;
 uint8_t gekf_initialize;
 uint8_t fekf_initialize;
 
-
 /**
  * @brief Function that linearly interpolates the distance from the IMU to the center of mass so that Coriolis effects may be subtracted
  *  from accelerometer measurements
@@ -53,6 +52,7 @@ float32_t* com_to_imu(float32_t seconds_since_launch, int launch_has_occurred){
     //float32_t imu_distances[3] = {x_dist, COM_TO_IMU_Y, COM_TO_IMU_Z};
     return (float32_t[3]){x_dist, COM_TO_IMU_Y, COM_TO_IMU_Z};
 }
+
 /**
  * @brief This function converts barometric pressure readings to altitude based on an atmospheric model.
  * @param pressure, a pressure reading in ??? units

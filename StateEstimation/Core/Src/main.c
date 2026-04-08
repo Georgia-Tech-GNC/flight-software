@@ -33,6 +33,7 @@
 #include "States/FastAscent.h"
 #include "States/SlowAscent.h"
 #include "States/FreeFall.h"
+#include "Dependencies/quaternion.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -77,95 +78,35 @@ static void MX_USB_OTG_HS_PCD_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_UART4_Init(void);
 static void MX_TIM2_Init(void);
+
+
 /* USER CODE BEGIN PFP */
+
+int16_t quantize(double x) {
+	if (x + DBL_EPSILON >= 32767) { return 32767; }
+	if (x - DBL_EPSILON < -32767) { return -32768;}
+	else return (int16_t)x;
+}
+
+void write_to_packet(int16_t* packet, quaternion_t* orientation, double accel_x, double w_x, double w_y, double w_z) {
+	packet[0] = quantize(orientation->w * 32767);
+	packet[1] = quantize(orientation->x * 32767);
+	packet[2] = quantize(orientation->y * 32767);
+	packet[3] = quantize(orientation->z * 32767);
+	
+	// TODO: currently supports max acceleration of +-100m/s^2, resolution is 0.003m/s^2
+	packet[4] = quantize(accel_x * 327.67); 
+	
+	// TODO: currently supports max angular velocity of +-25 rad/s^2, resolution is 0.0008rad/sec
+	packet[5] = quantize(w_x * 1310.68);
+	packet[6] = quantize(w_y * 1310.68);
+	packet[7] = quantize(w_z * 1310.68);
+}
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-#define deg2rad(x) (0.0174533*(x))
-
-typedef struct DiagMatrix3x3 {
-	float vals[3];
-} diag_matrix_3x3_t;
-
-typedef struct Vector3 {
-	float vals[3];
-} vector_3_t;
-
-diag_matrix_3x3_t square_diag(float a, float b, float c) {
-	diag_matrix_3x3_t mat;
-	mat.vals[0] = a * a;
-	mat.vals[1] = b * b;
-	mat.vals[2] = c * c;
-
-	return mat;
-}
-
-diag_matrix_3x3_t mat_add(diag_matrix_3x3_t a, diag_matrix_3x3_t b) {
-	diag_matrix_3x3_t mat;
-	for (int i = 0; i < 3; i++) {
-		mat.vals[i] = a.vals[i] + b.vals[i];
-	}
-
-	return mat;
-}
-
-diag_matrix_3x3_t mat_sub(diag_matrix_3x3_t a, diag_matrix_3x3_t b) {
-	diag_matrix_3x3_t mat;
-	for (int i = 0; i < 3; i++) {
-		mat.vals[i] = a.vals[i] - b.vals[i];
-	}
-
-	return mat;
-}
-
-vector_3_t mat_vec_mul(diag_matrix_3x3_t a, vector_3_t b) {
-	vector_3_t vec;
-	for (int i = 0; i < 3; i++) {
-		vec.vals[i] += a.vals[i] * b.vals[i];
-	}
-	return vec;
-}
-
-diag_matrix_3x3_t mat_mul(diag_matrix_3x3_t a, diag_matrix_3x3_t b) {
-	diag_matrix_3x3_t c;
-	for(int i=0;i<3;i++) {
-		for(int k=0;k<3;k++) {
-			c.vals[i] = a.vals[i] * b.vals[k];
-		}
-	}
-	return c;
-}
-
-diag_matrix_3x3_t diag_mat_inverse(diag_matrix_3x3_t a) {
-	diag_matrix_3x3_t b;
-	for(int i=0;i<3;i++) {
-		b.vals[i] = 1 / a.vals[i];
-	}
-	return b;
-}
-
-float vec_dot(vector_3_t a, vector_3_t b) {
-	float dot = 0;
-	for (int i = 0; i < 3; i++) dot += a.vals[i] * b.vals[i];
-
-	return dot;
-}
-
-vector_3_t vec_add(vector_3_t a, vector_3_t b) {
-	vector_3_t sum;
-	for (int i = 0; i < 3; i++) sum.vals[i] = a.vals[i] + b.vals[i];
-
-	return sum;
-}
-
-vector_3_t vec_sub(vector_3_t a, vector_3_t b) {
-	vector_3_t diff;
-	for (int i = 0; i < 3; i++) diff.vals[i] = a.vals[i] - b.vals[i];
-
-	return diff;
-}
 
 /* USER CODE END 0 */
 
@@ -225,9 +166,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 	// Initialize variables
 	int counter = 0;   //!< Debug counter for number of readings so far
-	float x_angle= 0;  //!< Dead reckoning x angle
-	float y_angle = 0; //!< Dead reckoning y angle
-	float z_angle = 0; //!< Dead reckoning z angle
+	quaternion_t orientation = IDENTITY_QUAT; //!< Current rocket orientation
 
 	// Reset the microsecond counter to 0 (used for delta-time calculations)
 	__HAL_TIM_SET_COUNTER(&htim2, 0);
@@ -245,23 +184,23 @@ int main(void)
 		// Calculate time since last update
 		int dt_tick = __HAL_TIM_GET_COUNTER(&htim2) - last_timer_val;
     last_timer_val += dt_tick;
- 		float dt_sec = ((float)dt_tick) / 1000000.0;
+ 		double dt_sec = ((double)dt_tick) / 1000000.0;
 
-		// Increment counters and update velocity dead reckoning.
-		x_angle += (sensors.gyro_x + 0.07945997) * dt_sec;
-		y_angle += (sensors.gyro_y - 0.25380069) * dt_sec;
-		z_angle += (sensors.gyro_z + 0.13673413) * dt_sec;
-		counter += 1;
+		// Update dead reckoning
+		double w_x = DEG2RAD(sensors.gyro_x + 0.07945997);
+		double w_y = DEG2RAD(sensors.gyro_y - 0.25380069);
+		double w_z = DEG2RAD(sensors.gyro_z + 0.13673413);
+		quaternion_t delta_quat_local = to_delta_quaternion(w_x, w_y, w_z, dt_sec);
+		quaternion_t delta_quat_global = multiply(&orientation, &delta_quat_local);
+		orientation = add(&orientation, &delta_quat_global);
+		normalize_inplace(&orientation);
+
+		counter++;
 
 		// Forward data to MainMCU
-		// Packet contents: | x_angle | y_angle | z_angle | upward acceleration
-		uint8_t master_packet[16];
-		memcpy(master_packet, &x_angle, sizeof(float));
-		memcpy(master_packet + 4, &y_angle, sizeof(float));
-		memcpy(master_packet + 8, &z_angle, sizeof(float));
-		memcpy(master_packet + 12, &sensors.accel_x, sizeof(float));
-
-		HAL_UART_Transmit(&huart2, master_packet, 16, HAL_MAX_DELAY);
+		int16_t master_packet[8];
+		write_to_packet(master_packet, &orientation, sensors.accel_x, w_x, w_y, w_z);
+		HAL_UART_Transmit(&huart2, (uint8_t*) master_packet, 16, HAL_MAX_DELAY);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

@@ -1,15 +1,16 @@
 #include "globals.h"
 #include "string.h"
 
-
 void master_task_handler(void* args) {
     HAL_UART_Transmit(&debug_uart, "Started master task!\r\n", 22, HAL_MAX_DELAY);
 
     TickType_t last_servo_update = xTaskGetTickCount();
     TickType_t servo_update_period = pdMS_TO_TICKS(20);
     while (1) {
-        uint8_t state_rx_buffer[16];
-        xStreamBufferReceive(g_state_stream_buffer.handle, state_rx_buffer, 16, portMAX_DELAY);
+        uint16_t state_rx_buffer[8];
+        xStreamBufferReceive(g_state_stream_buffer.handle, (uint8_t*)state_rx_buffer, 16, portMAX_DELAY);
+
+        // TODO: handle de-quantizing
 
         float a, b, c, d;
         memcpy(&a, state_rx_buffer, sizeof(float));

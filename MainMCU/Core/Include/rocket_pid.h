@@ -14,18 +14,18 @@
 // Convention: q = [w, x, y, z] (scalar first)
 
 // Quaternion (Quat): 4-number representation of 3D rotation 
-typedef struct {
+typedef struct Quaternion {
     double w, x, y, z;
-} Quat;
+} quaternion_t;
 
 // Normalize Quat: Floating-point drift, sensor noise, or interpolation can push the magnitude slightly off
-Quat quat_normalize(Quat q);
+quaternion_t quat_normalize(quaternion_t*);
 
 // Conjugate: to represent opposite rotation
-Quat quat_conjugate(Quat q);
+quaternion_t quat_conjugate(quaternion_t* q);
 
 // compares where rocket is to where the rocket should be
-Quat quat_multiply(Quat a, Quat b);
+quaternion_t quat_multiply(quaternion_t* a, quaternion_t* b);
 
 #define MAX_REF_POINTS 1024 // maximum size of the reference trajectory table
 
@@ -36,7 +36,7 @@ Quat quat_multiply(Quat a, Quat b);
 typedef struct {
     int      count;                     // How many waypoints are filled in
     double   time[MAX_REF_POINTS];      // Timestamps in seconds from launch
-    Quat     quat[MAX_REF_POINTS];      // Parallel list of quaternions, one per timestamp
+    quaternion_t     quat[MAX_REF_POINTS];      // Parallel list of quaternions, one per timestamp
 } RefTrajectory;
 
 
@@ -53,9 +53,9 @@ int ref_find_closest(const RefTrajectory *ref, double t);
 
 typedef struct {
     // PID gains, indexed per body axis: [0]=roll, [1]=pitch, [2]=yaw 
-    double Kp[3];   /* Proportional gain */
-    double Ki[3];   /* Integral gain     */
-    double Kd[3];   /* Derivative gain   */
+    double Kp;   /* Proportional gain */
+    double Ki;   /* Integral gain     */
+    double Kd;   /* Derivative gain   */
 
     // Persistent controller state, updated every call to pid_get_control 
     double integralError[3];  // Accumulated error per axis (rad*s) 
@@ -73,7 +73,7 @@ typedef struct {
 } PIDController;
 
 void pid_init(PIDController *ctrl,
-              const double Kp[3], const double Ki[3], const double Kd[3],
+              const double Kp, const double Ki, const double Kd,
               double tau, const RefTrajectory *ref);
 
 // Compute the rotation-vector attitude error 
@@ -88,7 +88,7 @@ void pid_get_error(const PIDController *ctrl,
  * currentTime      — simulation clock (seconds)
  * rocketControl_out — output: [roll, pitch, yaw] command in degrees */
 void getControl(PIDController *ctrl,
-                     const double state[14], double currentCumVelocity,
+                     const double state[14],
                      double currentTime,
                      double rocketControl_out[3]);
 

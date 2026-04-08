@@ -15,10 +15,10 @@
  * State vector convention (14 elements, 0-indexed in C):
  *   [0..2]   position (x, y, z)           — unused by this controller
  *   [3..6]   velocity / other              — unused by this controller
- *   [7..10]  quaternion (w, x, y, z)       — MATLAB indices 8:11
+ *   [7..10]  quaternion_ternion (w, x, y, z)       — MATLAB indices 8:11
  *   [11..13] angular velocity (rad/s)      — MATLAB indices 12:14
  *
- * Quaternion convention: scalar-first [w, x, y, z]
+ * quaternion_ternion convention: scalar-first [w, x, y, z]
  *
  * Compile:  gcc -o rocket_pid rocket_pid.c -lm
  * Run:      ./rocket_pid
@@ -31,30 +31,30 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-// normalize quaternion
-Quat quat_normalize(Quat q) {
-    double mag = sqrt(q.w*q.w + q.x*q.x + q.y*q.y + q.z*q.z);
+// normalize quaternion_ternion
+quaternion_t quaternion_t_normalize(quaternion_t* q) {
+    double mag = sqrt(q->w*q->w + q->x*q->x + q->y*q->y + q->z*q->z);
     if (mag < 1e-30) {
-        Quat identity = {1.0, 0.0, 0.0, 0.0};
+        quaternion_t identity = {1.0, 0.0, 0.0, 0.0};
         return identity;
     }
-    Quat out = { q.w/mag, q.x/mag, q.y/mag, q.z/mag };
+    quaternion_t out = { q->w/mag, q->x/mag, q->y/mag, q->z/mag };
     return out;
 }
 
 // conjugate: to represent opposite rotation
-Quat quat_conjugate(Quat q) {
-    Quat out = { q.w, -q.x, -q.y, -q.z };
+quaternion_t quaternion_t_conjugate(quaternion_t* q) {
+    quaternion_t out = { q->w, -q->x, -q->y, -q->z };
     return out;
 }
 
 // compares where rocket is to where the rocket should be
-Quat quat_multiply(Quat a, Quat b) {
-    Quat out;
-    out.w = a.w*b.w - a.x*b.x - a.y*b.y - a.z*b.z;
-    out.x = a.w*b.x + a.x*b.w + a.y*b.z - a.z*b.y;
-    out.y = a.w*b.y - a.x*b.z + a.y*b.w + a.z*b.x;
-    out.z = a.w*b.z + a.x*b.y - a.y*b.x + a.z*b.w;
+quaternion_t quaternion_t_multiply(quaternion_t* a, quaternion_t* b) {
+    quaternion_t out;
+    out.w = a->w*b->w - a->x*b->x - a->y*b->y - a->z*b->z;
+    out.x = a->w*b->x + a->x*b->w + a->y*b->z - a->z*b->y;
+    out.y = a->w*b->y - a->x*b->z + a->y*b->w + a->z*b->x;
+    out.z = a->w*b->z + a->x*b->y - a->y*b->x + a->z*b->w;
     return out;
 }
 
@@ -75,16 +75,17 @@ int ref_find_closest(const RefTrajectory *ref, double t) {
 /*PID Controller*/
 /* Initialize controller */
 void pid_init(PIDController *ctrl,
-              const double Kp[3], const double Ki[3], const double Kd[3],
+              const double Kp, const double Ki, const double Kd,
               double tau, const RefTrajectory *ref)
 {
     for (int i = 0; i < 3; i++) {
-        ctrl->Kp[i] = Kp[i];
-        ctrl->Ki[i] = Ki[i];
-        ctrl->Kd[i] = Kd[i];
+        
         ctrl->integralError[i] = 0.0;
         ctrl->filteredOmega[i] = 0.0;
     }
+    ctrl->Kp = Kp;
+    ctrl->Ki = Ki;
+    ctrl->Kd = Kd;
     ctrl->lastTime          = 0.0;
     ctrl->tau               = tau;
     ctrl->alpha             = 0.0;
@@ -98,28 +99,28 @@ void pid_init(PIDController *ctrl,
  * replaces: function err = getError(obj, rocketStateEstimate, currentTime)
  *
  * computes the rotation-vector attitude error between the rocket's
- * current quaternion and the reference quaternion at the nearest time.
+ * current quaternion_ternion and the reference quaternion_ternion at the nearest time.
  * ----------------------------------------------------------------------- */
 void pid_get_error(const PIDController *ctrl,
                    const double state[14], double currentTime,
                    double err_out[3])
 {
-    /* q_cur = Utils.normalizeQuat(rocketStateEstimate(8:11))
+    /* q_cur = Utils.normalizequaternion_t(rocketStateEstimate(8:11))
      * MATLAB 1-indexed 8:11 -> C 0-indexed 7:10 */
-    Quat q_cur = { state[7], state[8], state[9], state[10] };
-    q_cur = quat_normalize(q_cur);
+    quaternion_t q_cur = { state[7], state[8], state[9], state[10] };
+    q_cur = quaternion_t_normalize(&q_cur);
 
     /* [~, idx] = min(abs(time_vec - currentTime)) */
-    int idx = ref_find_closest(ctrl->ref, currentTime);
+    int idx = 0; // ref_find_closest(ctrl->ref, currentTime);
 
-    /* q_ref = Utils.normalizeQuat(obj.referenceAttitudes(2:5, idx)) */
-    Quat q_ref = quat_normalize(ctrl->ref->quat[idx]);
+    /* q_ref = Utils.normalizequaternion_t(obj.referenceAttitudes(2:5, idx)) */
+    quaternion_t q_ref = quaternion_t_normalize(&ctrl->ref->quat[idx]);
 
     /* q_cur_inv = [q_cur(1); -q_cur(2); -q_cur(3); -q_cur(4)] */
-    Quat q_cur_inv = quat_conjugate(q_cur);
+    quaternion_t q_cur_inv = quaternion_t_conjugate(&q_cur);
 
-    /* q_err = Utils.quatMult(q_cur_inv, q_ref) */
-    Quat q_err = quat_multiply(q_cur_inv, q_ref);
+    /* q_err = Utils.quaternion_tMult(q_cur_inv, q_ref) */
+    quaternion_t q_err = quaternion_t_multiply(&q_cur_inv, &q_ref);
 
     /* if q_err(1) < 0; q_err = -q_err; end */
     if (q_err.w < 0.0) {
@@ -133,7 +134,7 @@ void pid_get_error(const PIDController *ctrl,
     double vec_norm = sqrt(q_err.x*q_err.x + q_err.y*q_err.y + q_err.z*q_err.z);
 
     /* if vec_norm < 1e-20; err = zeros(3,1) */
-    if (vec_norm < 1e-20) {
+    if (vec_norm < __DBL_EPSILON__) {
         err_out[0] = 0.0;
         err_out[1] = 0.0;
         err_out[2] = 0.0;
@@ -159,7 +160,7 @@ void pid_get_error(const PIDController *ctrl,
  * to the original MATLAB.
  * ----------------------------------------------------------------------- */
 void getControl(PIDController *ctrl,
-                     const double state[14], double currentCumVelocity,
+                     const double state[14],
                      double currentTime,
                      double rocketControl_out[3])
 {
@@ -210,9 +211,9 @@ void getControl(PIDController *ctrl,
      * omega replaced with filteredOmega (the only change from original) */
     double controlRad[3];
     for (int i = 0; i < 3; i++) {
-        controlRad[i] = ctrl->Kp[i] * err[i]
-                       + ctrl->Ki[i] * ctrl->integralError[i]
-                       + ctrl->Kd[i] * ctrl->filteredOmega[i];
+        controlRad[i] = ctrl->Kp * err[i]
+                       + ctrl->Ki * ctrl->integralError[i]
+                       + ctrl->Kd * ctrl->filteredOmega[i];
     }
 
     /* debug print (first 12 seconds)
@@ -234,10 +235,6 @@ void getControl(PIDController *ctrl,
 
     /* rocketControl = rad2deg(rocketControlRad) */
     for (int i = 0; i < 3; i++) {
-        rocketControl_out[i] = controlRad[i] * (180.0 / M_PI);
+        rocketControl_out[i] = controlRad[i]; // * (180.0 / M_PI);
     }
-
-    /* Suppress unused parameter warning — matches MATLAB interface
-     * where currentCumVelocity is passed but not used */
-    (void)currentCumVelocity;
 }

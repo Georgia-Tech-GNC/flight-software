@@ -8,6 +8,8 @@ typedef struct Quaternion {
 static const quaternion_t IDENTITY_QUAT = (quaternion_t) {.w = 1, .x = 0, .y = 0, .z = 0};
 
 #define DEG2RAD(x) ((x) * 0.01745329252)
+#define RAD2DEG(x) ((x) * 57.2958)
+
 
 /** Multiplies the quaternion a by the quaternion b */
 quaternion_t multiply(quaternion_t* a, quaternion_t* b);

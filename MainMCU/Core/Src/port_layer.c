@@ -40,8 +40,8 @@ int port_init(void) {
     }
 
     // Initialize servos
-    servo_init(&servo_1, PWM0_TIMER, PWM0_CHANNEL);
-    servo_set_pos(&servo_1, 1500);
+    //servo_init(&servo_1, PWM0_TIMER, PWM0_CHANNEL);
+    //servo_set_pos(&servo_1, 1500);
     
     return 1;
 }
@@ -71,11 +71,14 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
 void port_start(void) {
 
     // Signal to the state estimation MCU to begin
+    //HAL_Delay(2000);
     HAL_UART_Transmit(&state_uart, "r", 1, HAL_MAX_DELAY);
     //HAL_TIM_PWM_Start(PWM0_TIMER, PWM0_CHANNEL);
 
     //uint16_t count = 1000.0 * 3.2;
     //__HAL_TIM_SET_COMPARE(PWM0_TIMER, PWM0_CHANNEL, count);
+
+    HAL_UART_Transmit(&debug_uart, "starting scheduler\r\n", 20, HAL_MAX_DELAY);
 
     vTaskStartScheduler();
 }

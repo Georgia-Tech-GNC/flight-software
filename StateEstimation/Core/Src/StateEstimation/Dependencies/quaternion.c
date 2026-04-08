@@ -40,25 +40,19 @@ void normalize_inplace(quaternion_t* a) {
 }
 
 quaternion_t to_delta_quaternion(double w_x, double w_y, double w_z, double delta_t) {
-    double magnitude = sqrtf(w_x * w_x + w_y * w_y + w_z * w_z);
-    double angle = magnitude * delta_t;
+    double magnitude = sqrt(w_x * w_x + w_y * w_y + w_z * w_z);
+    double angle = magnitude * delta_t * 0.5;
 
-    if (angle < __DBL_EPSILON__) {
-        return (quaternion_t) { .w = 1, .x = 0, .y = 0, .z = 0};
+    double mult = (delta_t / 2);
+    if (angle > __DBL_EPSILON__) {
+        mult *= sin(angle) / angle;
     }
 
-    w_x /= magnitude;
-    w_y /= magnitude;
-    w_z /= magnitude;
-
-    double cos_wt2 = cos(angle / 2);
-    double sin_wt2 = sin(angle / 2);
-
     quaternion_t output;
-    output.w = cos_wt2;
-    output.x = w_x * sin_wt2;
-    output.y = w_y * sin_wt2;
-    output.z = w_z * sin_wt2;
+    output.w = cos(angle);
+    output.x = w_x * mult;
+    output.y = w_y * mult;
+    output.z = w_z * mult;
 
     return output;
 }

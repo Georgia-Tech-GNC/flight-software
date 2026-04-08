@@ -5,6 +5,8 @@
 void master_task_handler(void* args) {
     HAL_UART_Transmit(&debug_uart, "Started master task!\r\n", 22, HAL_MAX_DELAY);
 
+    TickType_t last_servo_update = xTaskGetTickCount();
+    TickType_t servo_update_period = pdMS_TO_TICKS(20);
     while (1) {
         uint8_t state_rx_buffer[16];
         xStreamBufferReceive(g_state_stream_buffer.handle, state_rx_buffer, 16, portMAX_DELAY);
@@ -18,5 +20,16 @@ void master_task_handler(void* args) {
         char msg_buffer[256];
         size_t msg_size = sprintf(msg_buffer, "%.4f %.4f %.4f %.4f\r\n", a, b, c, d);
         HAL_UART_Transmit(&debug_uart, (uint8_t*)msg_buffer, msg_size, HAL_MAX_DELAY);
+
+        TickType_t current_time = xTaskGetTickCount();
+        if (current_time > last_servo_update + servo_update_period) {
+            last_servo_update = current_time;
+
+            if (b > 60) { b = 60; }
+            if (b < -60) { b = -60; }
+
+            uint16_t servo_pos = 1500 + b * 10;
+            servo_set_pos(&servo_1, servo_pos);
+        }
     }
 }

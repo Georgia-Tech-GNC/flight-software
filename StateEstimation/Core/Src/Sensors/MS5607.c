@@ -37,10 +37,10 @@ MS5607StateTypeDef MS5607_Init(SPI_HandleTypeDef *hspix, GPIO_TypeDef *GPIOx, ui
   enableCSB();
   SPITransmitData = RESET_COMMAND;
   HAL_SPI_Transmit(hspi, &SPITransmitData, 1, 10);
-  HAL_Delay(3);
   disableCSB();
+  HAL_Delay(10);
   MS5607PromRead(&promData);
-  return promData.reserved == 0x00 || promData.reserved == 0xff ? MS5607_STATE_FAILED : MS5607_STATE_READY;
+  return promData.reserved;
 }
 
 /**
@@ -48,25 +48,18 @@ MS5607StateTypeDef MS5607_Init(SPI_HandleTypeDef *hspix, GPIO_TypeDef *GPIOx, ui
  * @param prom: PROM address
 */
 void MS5607PromRead(struct PromData *prom) {
-  uint8_t   address;
-  uint16_t  *structPointer;
   uint8_t receiveBuffer[2];
-  structPointer = (uint16_t *) prom;
-  for (address = 0; address < 8; address++) {
+  uint16_t *structPointer = (uint16_t *) prom;
+
+  for (uint8_t address = 0; address < 8; address++) {
     SPITransmitData = PROM_READ(address);
     enableCSB();
     HAL_SPI_Transmit(hspi, &SPITransmitData, 1, 10);
     HAL_SPI_Receive(hspi, receiveBuffer, 2, 10);
     disableCSB();
+    HAL_Delay(1);
+    *structPointer = (receiveBuffer[0] << 8) | receiveBuffer[1];
     structPointer++;
-  }
-  structPointer = (uint16_t *) prom;
-  for (address = 0; address < 8; address++) {
-    uint8_t   *toSwap = (uint8_t *) structPointer;
-    uint8_t secondByte = toSwap[0];
-    toSwap[0] = toSwap[1];
-    toSwap[1] = secondByte;
-    structPointer++; 
   }
 }
 

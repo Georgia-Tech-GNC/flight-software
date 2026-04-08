@@ -9,6 +9,7 @@
 #include "message_buffer.h"
 #include "state.h"
 #include "tests.h"
+#include "servo.h"
 
 #define TASK_STACK_SIZE 4096
 typedef struct {
@@ -39,6 +40,8 @@ extern UART_HandleTypeDef state_uart;
 extern UART_HandleTypeDef debug_uart;
 
 extern SPI_HandleTypeDef sd_spi;
+
+extern servo_t servo_1;
 
 #ifdef USE_TIM1
 extern TIM_HandleTypeDef htim1;

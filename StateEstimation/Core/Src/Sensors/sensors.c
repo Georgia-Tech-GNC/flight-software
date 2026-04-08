@@ -79,9 +79,14 @@ int adis_burst_read(struct ADIS_Device *device, Sensors* sensors) {
 
 int update_sensors(Sensors *sensors) {
     
-    float32_t accel_readings[3];
-    float32_t gyro_readings[3];
+    //float32_t accel_readings[3];
+    //float32_t gyro_readings[3];
     //double mag_readings[3];
+
+    //char buffer[128];
+    //MS5607Update();
+    //size_t sz = sprintf(buffer, "Baro: %d -> %.4f\r\n", MS5607GetPressurePa(), MS5607GetTemperatureC());
+    //HAL_UART_Transmit(&huart3, buffer, sz, HAL_MAX_DELAY);
 
     return adis_burst_read(&imu_device, sensors);
 
@@ -140,6 +145,15 @@ void sensors_init(Sensors *sensors) {
   imu_device.cs_pin = GPIOE;
   imu_device.cs_pin_port = GPIO_PIN_4;
 
+  memset(sensors, 0, sizeof(Sensors));
+
+  // ms5607_state = MS5607_Init(&hspi6, GPIOB, GPIO_PIN_12);
+
+    //char buffer[128];
+    //size_t sz = sprintf(buffer, "Baro Status: %d\r\n", ms5607_state);
+    //HAL_UART_Transmit(&huart3, buffer, sz, HAL_MAX_DELAY);
+
+  /*
   mag_device.spi_handle = &hspi4;  
   mag_device.cs_pin_port = GPIO_PIN_5; 
   mag_device.cs_pin = GPIOC;  
@@ -150,9 +164,10 @@ void sensors_init(Sensors *sensors) {
   mag_device.z_axis_mode = LIS3MDL_Z_UHP;
   mag_device.endianness = LIS3MDL_LITTLE_ENDIAN;
   lis3mdl_initialize(&mag_device);
+  */
 
-  ms5607_state = MS5607_Init(&hspi6, GPIOC, GPIO_PIN_4);
   
+  /*
   gps.transport_type = UBLOX_GNSS_TRANSPORT_UART;
   //gps.transport_type = UBLOX_GNSS_TRANSPORT_SPI;
   gps.transport_handle.uart = &huart4;
@@ -192,5 +207,5 @@ void sensors_init(Sensors *sensors) {
   ublox_gnss_cfg_val_set_list(&gps, cfg, 10, 0, 1);
   HAL_UARTEx_ReceiveToIdle_IT(&huart4, uart4_rx_dma_buffer, sizeof(uart4_rx_dma_buffer));
   ring_buffer_init(&uart4_rx_rb, uart4_rx_rb_data, sizeof(uart4_rx_rb_data));
-  memset(sensors, 0, sizeof(Sensors));
+  */
 }

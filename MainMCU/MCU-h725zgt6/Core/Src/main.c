@@ -83,8 +83,7 @@ static void MX_TIM3_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-double servo_angle = 0.0;
-Servo_T servo;
+servo_t servo_1, servo_2;
 /* USER CODE END 0 */
 
 /**

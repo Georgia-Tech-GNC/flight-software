@@ -38,6 +38,10 @@ int port_init(void) {
     if (HAL_UARTEx_ReceiveToIdle_IT(&state_uart, state_uart_rx_buf, 16) != HAL_OK) {
         return 0;
     }
+
+    // Initialize servos
+    servo_init(&servo_1, PWM0_TIMER, PWM0_CHANNEL);
+    servo_set_pos(&servo_1, 1500);
     
     return 1;
 }

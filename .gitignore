@@ -62,3 +62,6 @@ MainMCU/Nucleo-F429ZI/.vscode/
 MainMCU/Nucleo-F429ZI/build/
 MainMCU/Nucleo-H723ZG/.vscode/
 MainMCU/Nucleo-H723ZG/build/
+
+
+**/.DS_Store

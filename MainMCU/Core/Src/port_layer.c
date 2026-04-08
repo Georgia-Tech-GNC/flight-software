@@ -20,10 +20,6 @@ StaticTask_t run_controls_task_buff;
 SemaphoreHandle_t g_state_mutex_handle;
 StaticSemaphore_t state_mutex_buff;
 
-StreamBufferHandle_t g_telemetry_rx_sb_handle;
-uint8_t telemetry_rx_sb_storage[TELEMETRY_RX_MAX_PROCESS_SIZE + 2];
-StaticStreamBuffer_t telemetry_rx_sb_buff;
-
 StreamBufferHandle_t g_state_rx_sb_handle;
 uint8_t state_rx_sb_storage[64];
 StaticStreamBuffer_t state_rx_sb_buff;
@@ -119,7 +115,7 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
         //HAL_UARTEx_ReceiveToIdle_IT(&telemetry_uart, telemetry_uart_rx_buf, TELEMETRY_RX_MAX_PROCESS_SIZE);
     } else if (huart->Instance == state_uart.Instance) {
         xStreamBufferSendFromISR(g_state_rx_sb_handle, state_uart_rx_buf, size, &xHigherPriorityTaskWoken);
-        HAL_UARTEx_ReceiveToIdle_IT(&state_uart, state_uart_rx_buf, STATE_PACKET_SIZE);
+        HAL_UARTEx_ReceiveToIdle_IT(&state_uart, state_uart_rx_buf, 16);
     }
 
     /* FreeRTOS boilerplate */

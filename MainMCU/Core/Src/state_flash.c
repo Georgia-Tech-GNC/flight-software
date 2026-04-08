@@ -68,10 +68,10 @@ void state_flash_task(void *args) {
             uint8_t state_bytes[EXT_FLASH_PAGE_SIZE];
 
             /* Always use mutex on g_current_state */
-            if (xSemaphoreTake(g_state_mutex_handle, portMAX_DELAY) == pdTRUE) {
+            if (xSemaphoreTake(g_state_lock.handle, portMAX_DELAY) == pdTRUE) {
                 /* Memcpy out so we can give back the mutex as fast as possible */
                 memcpy(state_bytes, &g_current_state, sizeof(RocketState));
-                xSemaphoreGive(g_state_mutex_handle);
+                xSemaphoreGive(g_state_lock.handle);
             }
 
             /* Flash state */

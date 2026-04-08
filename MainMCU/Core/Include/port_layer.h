@@ -9,14 +9,14 @@
 #include "task.h"
 
 #include "port_config.h"
-
-#include "periph_io.h"
-
 #include "globals.h"
+#include "periph_io.h"
+#include "master_task.h"
 
 #include "tests.h"
 
 int port_init(void);
 void port_start(void);
+
 
 #endif

@@ -10,34 +10,35 @@
 #include "state.h"
 #include "tests.h"
 
-extern TaskHandle_t g_telemetry_rx_task_handle;
-extern TaskHandle_t g_state_rx_task_handle;
-extern TaskHandle_t g_state_flash_task_handle;
+#define TASK_STACK_SIZE 4096
+typedef struct {
+    TaskHandle_t handle;
+    StackType_t  stack[TASK_STACK_SIZE];
+    StaticTask_t freertos_internal_data;
+} task_data_t;
 
-extern TaskHandle_t g_run_controls_task_handle;
+extern task_data_t g_master_task;
 
+typedef struct {
+    StreamBufferHandle_t handle;
+    uint8_t              internal_buffer[64];
+    StaticStreamBuffer_t freertos_internal_data;
+} stream_buffer_64_bit_t;
 
-extern SemaphoreHandle_t g_state_mutex_handle;
+extern stream_buffer_64_bit_t g_state_stream_buffer;
 
-extern StreamBufferHandle_t g_telemetry_rx_sb_handle;
-extern StreamBufferHandle_t g_state_rx_sb_handle;
+typedef struct {
+    SemaphoreHandle_t handle;
+    StaticSemaphore_t freertos_internal_data;
+} semaphore_data_t;
 
+extern semaphore_data_t g_state_lock;
 
 extern UART_HandleTypeDef telemetry_uart;
 extern UART_HandleTypeDef state_uart;
 extern UART_HandleTypeDef debug_uart;
 
 extern SPI_HandleTypeDef sd_spi;
-
-#ifdef USE_ADC1
-extern ADC_HandleTypeDef hadc1;
-#endif
-#ifdef USE_ADC2
-extern ADC_HandleTypeDef hadc2;
-#endif
-#ifdef USE_ADC3
-extern ADC_HandleTypeDef hadc3;
-#endif
 
 #ifdef USE_TIM1
 extern TIM_HandleTypeDef htim1;
@@ -52,9 +53,7 @@ extern TIM_HandleTypeDef htim3;
 extern TIM_HandleTypeDef htim4;
 #endif
 
-#ifdef MCU_H725ZGT6
 extern OSPI_HandleTypeDef flash_spi;
-#endif
 
 extern RocketState g_current_state;
 

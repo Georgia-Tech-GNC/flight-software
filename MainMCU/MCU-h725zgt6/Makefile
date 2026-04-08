@@ -83,6 +83,7 @@ Core/Src/port.c \
 ../Core/FreeRTOS-Kernel/timers.c \
 ../Core/Src/crc_hash.c \
 ../Core/Src/fatfs_sd.c \
+../Core/Src/master_task.c \
 ../Core/Src/packet_encode.c \
 ../Core/Src/periph_io.c \
 ../Core/Src/port_layer.c \

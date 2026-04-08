@@ -25,8 +25,6 @@
  */
 
 #include "rocket_pid.h"
-
-#include <stdio.h>
 #include <math.h>
 
 #ifndef M_PI
@@ -220,6 +218,7 @@ void getControl(PIDController *ctrl,
     /* debug print (first 12 seconds)
      * extended from original to also show raw vs filtered omega */
     if (currentTime < 12.0) {
+        /*
         printf("  t=%.2f  err=[%.4f %.4f %.4f]  omega_raw=[%.4f %.4f %.4f]  "
                "omega_filt=[%.4f %.4f %.4f]  u=[%.4f %.4f %.4f]\n",
                currentTime,
@@ -227,6 +226,7 @@ void getControl(PIDController *ctrl,
                omega_raw[0], omega_raw[1], omega_raw[2],
                ctrl->filteredOmega[0], ctrl->filteredOmega[1], ctrl->filteredOmega[2],
                controlRad[0], controlRad[1], controlRad[2]);
+        */
     }
 
     /* obj.lastTime = currentTime */

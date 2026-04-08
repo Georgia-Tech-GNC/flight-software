@@ -88,6 +88,7 @@ Core/Src/port.c \
 ../Core/Src/periph_io.c \
 ../Core/Src/port_layer.c \
 ../Core/Src/protocol.c \
+../Core/Src/rocket_pid.c \
 ../Core/Src/servo.c \
 ../Core/Src/state_flash.c \
 ../Core/Src/w25q_impl.c \

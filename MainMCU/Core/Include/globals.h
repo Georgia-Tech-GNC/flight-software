@@ -19,6 +19,7 @@ typedef struct {
 } task_data_t;
 
 extern task_data_t g_master_task;
+extern task_data_t g_telemetry_task;
 
 typedef struct {
     StreamBufferHandle_t handle;

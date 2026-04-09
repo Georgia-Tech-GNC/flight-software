@@ -8,6 +8,10 @@
 #include "ff.h"
 #include "w25q.h"
 
+#ifndef USE_HW_FLASH_CHIP
+//#define USE_HW_FLASH_CHIP
+#endif 
+
 #define SD_MAX_READ_WRITE_SIZE 512
 #define EXT_FLASH_PAGE_SIZE W25Q_MEM_PAGE_SIZE
 #define EXT_FLASH_SECTOR_SIZE (W25Q_MEM_SECTOR_SIZE * 1024)

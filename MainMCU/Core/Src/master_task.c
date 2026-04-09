@@ -32,11 +32,11 @@ state_estimation_packet_t read_state_estimation_packet(int16_t* packet) {
  * Start controls: 1s
  * Fire chutes: 11.5
  */
-const TickType_t SERVO_UPDATE_PERIOD = pdMS_TO_TICKS(200);
+const TickType_t SERVO_UPDATE_PERIOD = pdMS_TO_TICKS(20);
 const TickType_t CONTROLS_START_DELAY = pdMS_TO_TICKS(1000);
 
-const TickType_t CHUTE_DEPLOYMENT_DELAY = pdMS_TO_TICKS(100000000); // pdMS_TO_TICKS(11500);
-const TickType_t SD_FLASH_DELAY = pdMS_TO_TICKS(100000000); // pdMS_TO_TICKS(30000);
+const TickType_t CHUTE_DEPLOYMENT_DELAY = pdMS_TO_TICKS(11500);
+const TickType_t SD_FLASH_DELAY = pdMS_TO_TICKS(30000);
 
 
 
@@ -51,7 +51,7 @@ void master_task_handler(void* args) {
     PIDController controller;
     pid_init(&controller, 1.0, 0.0, 0.0, 0.05);
 
-    fsm_state_t rocket_state = CONTROLLED_ASCENT;
+    fsm_state_t rocket_state = ARMED;
 
     while (1) {
         // Wait to recieve message
@@ -158,12 +158,12 @@ void master_task_handler(void* args) {
         if (current_time > last_servo_update + SERVO_UPDATE_PERIOD) {
             last_servo_update = current_time;
 
-            char msg_buffer[256];
-            size_t msg_size = sprintf(msg_buffer, "Error: %.3f\t%.3f\t%.3f\tState: %.3f\t%.3f\t%.3f\t%.3f\r\n", 
-                error[0], error[1], error[2],
-                state_data.orientation.w, state_data.orientation.x, state_data.orientation.y, state_data.orientation.z
-            );
-            HAL_UART_Transmit(&debug_uart, (uint8_t*)msg_buffer, msg_size, HAL_MAX_DELAY);
+            //char msg_buffer[256];
+            //size_t msg_size = sprintf(msg_buffer, "Error: %.3f\t%.3f\t%.3f\tState: %.3f\t%.3f\t%.3f\t%.3f\r\n", 
+            //    error[0], error[1], error[2],
+            //    state_data.orientation.w, state_data.orientation.x, state_data.orientation.y, state_data.orientation.z
+            //);
+            //HAL_UART_Transmit(&debug_uart, (uint8_t*)msg_buffer, msg_size, HAL_MAX_DELAY);
 
             /*
             if (b > 60) { b = 60; }

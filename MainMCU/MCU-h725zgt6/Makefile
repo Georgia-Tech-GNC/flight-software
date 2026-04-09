@@ -91,6 +91,7 @@ Core/Src/port.c \
 ../Core/Src/rocket_pid.c \
 ../Core/Src/servo.c \
 ../Core/Src/state_flash.c \
+../Core/Src/telemetry_task.c \
 ../Core/Src/w25q_impl.c \
 ../Core/Src/w25q.c \
 ../Core/Tests/Src/uart_test.c \

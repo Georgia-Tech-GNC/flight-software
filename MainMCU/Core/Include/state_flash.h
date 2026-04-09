@@ -16,5 +16,7 @@
 #define SD_TEST_SIZE 2048
 
 void state_flash_task(void *args);
+int flash_test(void);
+int sd_test(void);
 
 #endif

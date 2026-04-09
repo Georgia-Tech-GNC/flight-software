@@ -19,26 +19,18 @@ void state_flash_task(void *args) {
     } else {
         HAL_UART_Transmit(&debug_uart, (uint8_t *) "IO initialized\r\n", 17, HAL_MAX_DELAY);
     }
-
-    /* Run tests */
     if (flash_test()) {
         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Flash test PASS\r\n", 17, HAL_MAX_DELAY);
     } else {
         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Flash test FAIL\r\n", 19, HAL_MAX_DELAY);
     }
-
     if (sd_test()) {
         HAL_UART_Transmit(&debug_uart, (uint8_t *) "SD test PASS\r\n", 14, HAL_MAX_DELAY);
     } else {
         HAL_UART_Transmit(&debug_uart, (uint8_t *) "SD test FAIL\r\n", 16, HAL_MAX_DELAY);
     }
-
+    
     /* Wait for notification before beginning */
-    uint32_t notification_value = 0;
-    while ((notification_value & BEGIN_STATE_FLASH_NOTIFICATION_BIT) == 0) {
-        xTaskNotifyWait(0, BEGIN_STATE_FLASH_NOTIFICATION_BIT, &notification_value, portMAX_DELAY);
-    }
-
     FlashBlock flash_block;
     SDFile sd_file;
 
@@ -48,36 +40,68 @@ void state_flash_task(void *args) {
     size_t flash_page_index = 0;
 
     while (1) {
-        /* Wait for next notification */
-        xTaskNotifyWait(0, FLASH_STATE_NOTIFICATION_BIT | FLASH_SD_CARD_NOTIFICATION_BIT, &notification_value, portMAX_DELAY);
 
-        /* Flash state to SD card */
+        uint8_t state_bytes[sizeof(RocketState)];
+        bool should_flash = false;
+        bool should_write_sd = false;
+        // Update global state
+        if (xSemaphoreTake(g_state_lock.handle, pdMS_TO_TICKS(100)) == pdTRUE) {
+            memcpy(state_bytes, &g_current_state, sizeof(RocketState));
+            if (g_current_state.state == SD_FLASH) {
+                should_write_sd = true;
+            } else if (g_current_state.state != GROUND && g_current_state.state != ARMED && g_current_state.state != FREEFALL) {
+                should_flash = true;
+            } 
+            xSemaphoreGive(g_state_lock.handle);
+        }
+
+        if (should_write_sd) {
+            HAL_UART_Transmit(&debug_uart, (uint8_t *) "Flashing SD card...\r\n", 20, HAL_MAX_DELAY);
+            flash_sd_card(&flash_block, &sd_file, flash_page_index);
+            HAL_UART_Transmit(&debug_uart, (uint8_t *) "Finished. Suspending...\r\n", 25, HAL_MAX_DELAY);
+
+            // Stop everything 
+            vTaskSuspendAll();
+            HAL_Delay(HAL_MAX_DELAY);
+            // we cannot use vTaskDelay(portMAX_DELAY) while the scheduler is suspended
+
+        } else if (should_flash) {
+            flash_write_block(&flash_block, flash_page_index * EXT_FLASH_PAGE_SIZE, state_bytes, EXT_FLASH_PAGE_SIZE);
+            flash_page_index++;
+            HAL_UART_Transmit(&debug_uart, "Flashed state\r\n", 15, HAL_MAX_DELAY);
+        }
+        vTaskDelay(pdMS_TO_TICKS(200));
+        
+
+        /* Flash state to SD card 
         if (notification_value & FLASH_SD_CARD_NOTIFICATION_BIT) {
             HAL_UART_Transmit(&debug_uart, (uint8_t *) "Flashing SD card...\r\n", 20, HAL_MAX_DELAY);
             flash_sd_card(&flash_block, &sd_file, flash_page_index);
 
-            /* Stop everything */
+            /* Stop everything 
             vTaskSuspendAll();
 
-            /* Tasks aren't allowed to exit, so stall here */
+            /* Tasks aren't allowed to exit, so stall here 
             vTaskDelay(portMAX_DELAY);
         }
+        */
 
-        /* Write state to flash chip */
+        /* Write state to flash chip 
         if (notification_value & FLASH_STATE_NOTIFICATION_BIT) {
             uint8_t state_bytes[EXT_FLASH_PAGE_SIZE];
 
-            /* Always use mutex on g_current_state */
+            /* Always use mutex on g_current_state 
             if (xSemaphoreTake(g_state_lock.handle, portMAX_DELAY) == pdTRUE) {
-                /* Memcpy out so we can give back the mutex as fast as possible */
+                /* Memcpy out so we can give back the mutex as fast as possible 
                 memcpy(state_bytes, &g_current_state, sizeof(RocketState));
                 xSemaphoreGive(g_state_lock.handle);
             }
 
-            /* Flash state */
+            /* Flash state 
             flash_write_block(&flash_block, flash_page_index * EXT_FLASH_PAGE_SIZE, state_bytes, EXT_FLASH_PAGE_SIZE);
             flash_page_index ++;
         }
+        */
     }
 }
 
@@ -120,6 +144,7 @@ int flash_test(void) {
     /* Check if the pattern matches */
     for (size_t i = 0; i < FLASH_TEST_SIZE; i ++) {
         if (test_bytes[i] != (i + offset) % 256) {
+            HAL_UART_Transmit(&debug_uart, (uint8_t *) "Invalid read from flash\r\n", 27, HAL_MAX_DELAY);
             return 0;
         }
     }
@@ -248,76 +273,19 @@ void flash_sd_card(FlashBlock *flash_block, SDFile *sd_file, size_t n_states) {
 size_t to_csv_line(RocketState *rocket_state, char *line) {
     size_t len = 0;
     
-    len += sprintf(line + len, "%lu,", (uint32_t) rocket_state->timestamp);
+    len += sprintf(line + len, "%lu,%lu,", (uint32_t)rocket_state->timestamp, (uint32_t)rocket_state->state);
 
-#ifdef DO_NOT_RUN
-    len += sprintf(line + len, "%lu,", (uint32_t) (rocket_state->state_vector.timestamp));
-    len += printf_fixed_float(line + len, rocket_state->state_vector.velocity_x);
-    len += printf_fixed_float(line + len, rocket_state->state_vector.velocity_y);
-    len += printf_fixed_float(line + len, rocket_state->state_vector.velocity_z);
-    len += printf_fixed_float(line + len, rocket_state->state_vector.attitude_w);
-    len += printf_fixed_float(line + len, rocket_state->state_vector.attitude_x);
-    len += printf_fixed_float(line + len, rocket_state->state_vector.attitude_y);
-    len += printf_fixed_float(line + len, rocket_state->state_vector.attitude_z);
-    len += printf_fixed_float(line + len, rocket_state->state_vector.position_x);
-    len += printf_fixed_float(line + len, rocket_state->state_vector.position_y);
-    len += printf_fixed_float(line + len, rocket_state->state_vector.position_z);
-    len += printf_fixed_float(line + len, rocket_state->state_vector.world_x);
-    len += printf_fixed_float(line + len, rocket_state->state_vector.world_y);
-    len += printf_fixed_float(line + len, rocket_state->state_vector.world_z);
-    len += sprintf(line + len, "%lu,", (uint32_t) (rocket_state->servo_deflection.timestamp));
-    len += printf_fixed_float(line + len, rocket_state->servo_deflection.servo_deflection_1);
-    len += printf_fixed_float(line + len, rocket_state->servo_deflection.servo_deflection_2);
-    len += printf_fixed_float(line + len, rocket_state->servo_deflection.servo_deflection_3);
-    len += printf_fixed_float(line + len, rocket_state->servo_deflection.servo_deflection_4);
+    len += printf_fixed_float(line + len, rocket_state->orientation.w);
+    len += printf_fixed_float(line + len, rocket_state->orientation.x);
+    len += printf_fixed_float(line + len, rocket_state->orientation.y);
+    len += printf_fixed_float(line + len, rocket_state->orientation.z);
 
-    len += sprintf(line + len, "%lu,", (uint32_t) rocket_state->servo_deflections.timestamp);
-    len += sprintf(line + len, "%d", rocket_state->servo_deflections.servo_1_desired);
-    len += sprintf(line + len, "%d", rocket_state->servo_deflections.servo_1_actual);
-    len += sprintf(line + len, "%d", rocket_state->servo_deflections.servo_2_desired);
-    len += sprintf(line + len, "%d", rocket_state->servo_deflections.servo_2_actual);
-    len += sprintf(line + len, "%d", rocket_state->servo_deflections.servo_3_desired);
-    len += sprintf(line + len, "%d", rocket_state->servo_deflections.servo_3_actual);
-    len += sprintf(line + len, "%d", rocket_state->servo_deflections.servo_4_desired);
-    len += sprintf(line + len, "%d", rocket_state->servo_deflections.servo_4_actual);
+    len += printf_fixed_float(line + len, rocket_state->servo_cmd_1);
+    len += printf_fixed_float(line + len, rocket_state->servo_cmd_2);
 
-    len += sprintf(line + len, "%lu,", (uint32_t) (rocket_state->rocket_state.timestamp));
-    len += sprintf(line + len, "%d,", rocket_state->rocket_state.rocket_state);
-    
-#ifndef STATIC_FIRE
-    len += sprintf(line + len, "%d,", rocket_state->rocket_state.firing_channel_1);
-    len += sprintf(line + len, "%d,", rocket_state->rocket_state.firing_channel_2);
-    len += sprintf(line + len, "%d,", rocket_state->rocket_state.firing_channel_3);
-
-    len += sprintf(line + len, "%lu,", (uint32_t) (rocket_state->ground_ekf.timestamp));
-    len += printf_fixed_float(line + len, rocket_state->ground_ekf.pn_matrix_d1);
-    len += printf_fixed_float(line + len, rocket_state->ground_ekf.pn_matrix_d2);
-    len += printf_fixed_float(line + len, rocket_state->ground_ekf.pn_matrix_d3);
-    len += printf_fixed_float(line + len, rocket_state->ground_ekf.pn_matrix_d4);
-    len += printf_fixed_float(line + len, rocket_state->ground_ekf.pn_matrix_d5);
-    len += printf_fixed_float(line + len, rocket_state->ground_ekf.pn_matrix_d6);
-
-    len += sprintf(line + len, "%lu,", (uint32_t) (rocket_state->sensor_data.timestamp));
-    len += printf_fixed_float(line + len, rocket_state->sensor_data.accelerometer_x);
-    len += printf_fixed_float(line + len, rocket_state->sensor_data.accelerometer_y);
-    len += printf_fixed_float(line + len, rocket_state->sensor_data.accelerometer_z);
-    len += printf_fixed_float(line + len, rocket_state->sensor_data.gyro_x);
-    len += printf_fixed_float(line + len, rocket_state->sensor_data.gyro_y);
-    len += printf_fixed_float(line + len, rocket_state->sensor_data.gyro_z);
-    len += printf_fixed_float(line + len, rocket_state->sensor_data.gps_x);
-    len += printf_fixed_float(line + len, rocket_state->sensor_data.gps_y);
-    len += printf_fixed_float(line + len, rocket_state->sensor_data.gps_z);
-
-    len += sprintf(line + len, "%lu,", (uint32_t) (rocket_state->analog_feedback_data.timestamp));
-    len += sprintf(line + len, "%d,", rocket_state->analog_feedback_data.current_fb_33);
-    len += sprintf(line + len, "%d,", rocket_state->analog_feedback_data.pyro_0_cont);
-    len += sprintf(line + len, "%d,", rocket_state->analog_feedback_data.pyro_1_cont);
-    len += sprintf(line + len, "%d,", rocket_state->analog_feedback_data.pyro_2_cont);
-    len += sprintf(line + len, "%d", rocket_state->analog_feedback_data.pyro_channel_deploy);
-#endif
-#endif
-
-
+    len += printf_fixed_float(line + len, rocket_state->w_x);
+    len += printf_fixed_float(line + len, rocket_state->w_y);
+    len += printf_fixed_float(line + len, rocket_state->w_z);
     line[len++] = '\n';
 
     return len;

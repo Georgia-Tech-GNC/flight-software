@@ -2,6 +2,8 @@
 
 // Declare Tasks
 task_data_t g_master_task;
+task_data_t g_telemetry_task;
+task_data_t g_state_flash_task;
 
 // Declare stream buffers and mutexes
 stream_buffer_64_bit_t g_state_stream_buffer;
@@ -29,6 +31,16 @@ int port_init(void) {
     );
     if (g_master_task.handle == NULL) return 0;
 
+    g_telemetry_task.handle = xTaskCreateStatic(
+        telemetry_task_handler, "telemetry_task", TASK_STACK_SIZE, NULL, 1, g_telemetry_task.stack, &g_telemetry_task.freertos_internal_data
+    );
+    if (g_telemetry_task.handle == NULL) return 0;
+
+    g_state_flash_task.handle = xTaskCreateStatic(
+        state_flash_task, "state_flash_task", TASK_STACK_SIZE, NULL, 1, g_state_flash_task.stack, &g_state_flash_task.freertos_internal_data
+    );
+    if (g_state_flash_task.handle == NULL) return 0;
+
     // Create stream buffers
     g_state_stream_buffer.handle = xStreamBufferCreateStatic(
         64, 1, g_state_stream_buffer.internal_buffer, &g_state_stream_buffer.freertos_internal_data);
@@ -38,6 +50,10 @@ int port_init(void) {
     if (HAL_UARTEx_ReceiveToIdle_IT(&state_uart, state_uart_rx_buf, 16) != HAL_OK) {
         return 0;
     }
+
+    // Initialize and test SD and flash chip
+    // TODO
+
 
     // Initialize servos
     //servo_init(&servo_1, PWM0_TIMER, PWM0_CHANNEL);

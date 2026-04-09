@@ -18,6 +18,10 @@ typedef struct Quaternion {
     double w, x, y, z;
 } quaternion_t;
 
+typedef struct Vector3 {
+    double x, y, z;
+} vector3_t;
+
 // Normalize Quat: Floating-point drift, sensor noise, or interpolation can push the magnitude slightly off
 quaternion_t quat_normalize(quaternion_t*);
 
@@ -88,6 +92,6 @@ void pid_get_error(const PIDController *ctrl,
 void getControl(PIDController *ctrl,
                      const double state[14],
                      double currentTime,
-                     double rocketControl_out[3]);
+                     double rocketControl_out[3], double err_out[3]);
 
 #endif 

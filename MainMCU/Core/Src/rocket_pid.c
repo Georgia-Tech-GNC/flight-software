@@ -32,7 +32,7 @@
 #endif
 
 // normalize quaternion_ternion
-quaternion_t quaternion_t_normalize(quaternion_t* q) {
+quaternion_t quat_normalize(quaternion_t* q) {
     double mag = sqrt(q->w*q->w + q->x*q->x + q->y*q->y + q->z*q->z);
     if (mag < 1e-30) {
         quaternion_t identity = {1.0, 0.0, 0.0, 0.0};
@@ -56,6 +56,44 @@ quaternion_t quaternion_t_multiply(quaternion_t* a, quaternion_t* b) {
     out.y = a->w*b->y - a->x*b->z + a->y*b->w + a->z*b->x;
     out.z = a->w*b->z + a->x*b->y - a->y*b->x + a->z*b->w;
     return out;
+}
+
+vector3_t vector_cross(const vector3_t* a, const vector3_t* b) {
+    vector3_t out;
+    out.x = a->y * b->z - b->y * a->z;
+    out.y = -a->x * b->z + b->x * a->z;
+    out.z = a->x * b->y - b->x * a->y;
+    return out;
+}
+
+double vector_dot(const vector3_t* a, const vector3_t* b) {
+    return a->x * b->x + a->y * b->y + a->z * b->z;
+}
+
+vector3_t vector_add(const vector3_t* a, const vector3_t* b) {
+    return (vector3_t) { .x = a->x + b->x, .y = a->y + b->y, .z = a->z + b->z}; 
+}
+
+vector3_t scalar_add(const vector3_t* a, double b) {
+    return (vector3_t) { .x = a->x + b, .y = a->y + b, .z = a->z + b};
+}
+
+vector3_t scalar_prod(const vector3_t* a, double b) {
+    return (vector3_t) { .x = a->x * b, .y = a->y * b, .z = a->z * b};
+}
+
+vector3_t quaternion_rotate(const vector3_t* vec, const quaternion_t* quat) {
+    double quat_w = quat->w;
+    vector3_t quat_vec = (vector3_t) {.x = quat->x, .y = quat->y, .z = quat->z};
+
+    vector3_t t = vector_cross(&quat_vec, vec);
+    t = scalar_prod(&t, 2);
+
+    vector3_t i2 = vector_cross(&quat_vec, &t);
+    vector3_t wt = scalar_prod(&t, quat_w);
+
+    vector3_t i3 = vector_add(vec, &wt);
+    return vector_add(&i3, &i2);
 }
 
 // linear scan to find closest waypoint in time for which reference orientation to aim for
@@ -92,6 +130,8 @@ void pid_init(PIDController *ctrl,
     ctrl->filterInitialized = 0;
 }
 
+const quaternion_t Q_REF = (quaternion_t) { .w = 1.0, .x = 0.0, .y = 0.0, .z = 0.0};
+
 /* -----------------------------------------------------------------------
  * pid_get_error
  *
@@ -107,45 +147,31 @@ void pid_get_error(const PIDController *ctrl,
     /* q_cur = Utils.normalizequaternion_t(rocketStateEstimate(8:11))
      * MATLAB 1-indexed 8:11 -> C 0-indexed 7:10 */
     quaternion_t q_cur = { state[7], state[8], state[9], state[10] };
-    q_cur = quaternion_t_normalize(&q_cur);
-
-    /* [~, idx] = min(abs(time_vec - currentTime)) */
-    int idx = 0; // ref_find_closest(ctrl->ref, currentTime);
-
-    /* q_ref = Utils.normalizequaternion_t(obj.referenceAttitudes(2:5, idx)) */
-    quaternion_t q_ref = (quaternion_t) { .w = 1.0, .x = 0.0, .y = 0.0, .z = 0.0};
+    q_cur = quat_normalize(&q_cur);
 
     /* q_cur_inv = [q_cur(1); -q_cur(2); -q_cur(3); -q_cur(4)] */
     quaternion_t q_cur_inv = quaternion_t_conjugate(&q_cur);
+    quaternion_t q_ref_inv = quaternion_t_conjugate(&Q_REF);
 
-    /* q_err = Utils.quaternion_tMult(q_cur_inv, q_ref) */
-    quaternion_t q_err = quaternion_t_multiply(&q_cur_inv, &q_ref);
+    vector3_t vb = (vector3_t) { .x = 1, .y = 0, .z = 0};
+    vector3_t v_curr = quaternion_rotate(&vb, &q_cur);
+    vector3_t v_desired = quaternion_rotate(&vb, &Q_REF);
 
-    /* if q_err(1) < 0; q_err = -q_err; end */
-    if (q_err.w < 0.0) {
-        q_err.w = -q_err.w;
-        q_err.x = -q_err.x;
-        q_err.y = -q_err.y;
-        q_err.z = -q_err.z;
-    }
+    double d = vector_dot(&v_curr, &v_desired);
+    vector3_t a = vector_cross(&v_curr, &v_desired);
 
-    /* vec_norm = norm(q_err(2:4)) */
-    double vec_norm = sqrt(q_err.x*q_err.x + q_err.y*q_err.y + q_err.z*q_err.z);
+    quaternion_t error = (quaternion_t) {
+        .w = 1 + d,
+        .x = a.x, .y = a.y, .z = a.z
+    };
+    error = quat_normalize(&error);
+    vector3_t error_vec = (vector3_t) {.x = error.x, .y = error.y, .z = error.z};
 
-    /* if vec_norm < 1e-20; err = zeros(3,1) */
-    if (vec_norm < __DBL_EPSILON__) {
-        err_out[0] = 0.0;
-        err_out[1] = 0.0;
-        err_out[2] = 0.0;
-    } else {
-        /* theta = 2 * atan2(vec_norm, q_err(1)) */
-        double theta = 2.0 * atan2(vec_norm, q_err.w);
-        /* n_hat = q_err(2:4) / vec_norm */
-        /* err   = theta * n_hat */
-        err_out[0] = theta * (q_err.x / vec_norm);
-        err_out[1] = theta * (q_err.y / vec_norm);
-        err_out[2] = theta * (q_err.z / vec_norm);
-    }
+    vector3_t error_body = quaternion_rotate(&error_vec, &q_cur_inv);
+
+    err_out[0] = error_body.x;
+    err_out[1] = error_body.y;
+    err_out[2] = error_body.z;
 }
 
 /* -----------------------------------------------------------------------
@@ -161,7 +187,7 @@ void pid_get_error(const PIDController *ctrl,
 void getControl(PIDController *ctrl,
                      const double state[14],
                      double currentTime,
-                     double rocketControl_out[3])
+                     double rocketControl_out[3], double err_out[3])
 {
     /* dt = currentTime - obj.lastTime */
     double dt = currentTime - ctrl->lastTime;
@@ -169,12 +195,11 @@ void getControl(PIDController *ctrl,
     if (dt <= 0.0) dt = 1e-4;
 
     /* err = obj.getError(state, currentTime) */
-    double err[3];
-    pid_get_error(ctrl, state, currentTime, err);
+    pid_get_error(ctrl, state, currentTime, err_out);
 
     /* obj.integralError = obj.integralError + err * dt */
     for (int i = 0; i < 3; i++) {
-        ctrl->integralError[i] += err[i] * dt;
+        ctrl->integralError[i] += err_out[i] * dt;
     }
 
     /* omega = state(12:14)  — MATLAB 1-indexed -> C 0-indexed 11:13 */
@@ -210,7 +235,7 @@ void getControl(PIDController *ctrl,
      * omega replaced with filteredOmega (the only change from original) */
     double controlRad[3];
     for (int i = 0; i < 3; i++) {
-        controlRad[i] = ctrl->Kp * err[i]
+        controlRad[i] = ctrl->Kp * err_out[i]
                        + ctrl->Ki * ctrl->integralError[i]
                        + ctrl->Kd * ctrl->filteredOmega[i];
     }

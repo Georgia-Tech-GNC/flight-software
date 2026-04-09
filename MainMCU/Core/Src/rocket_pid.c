@@ -76,7 +76,7 @@ int ref_find_closest(const RefTrajectory *ref, double t) {
 /* Initialize controller */
 void pid_init(PIDController *ctrl,
               const double Kp, const double Ki, const double Kd,
-              double tau, const RefTrajectory *ref)
+              double tau)
 {
     for (int i = 0; i < 3; i++) {
         
@@ -90,7 +90,6 @@ void pid_init(PIDController *ctrl,
     ctrl->tau               = tau;
     ctrl->alpha             = 0.0;
     ctrl->filterInitialized = 0;
-    ctrl->ref               = ref;
 }
 
 /* -----------------------------------------------------------------------
@@ -114,7 +113,7 @@ void pid_get_error(const PIDController *ctrl,
     int idx = 0; // ref_find_closest(ctrl->ref, currentTime);
 
     /* q_ref = Utils.normalizequaternion_t(obj.referenceAttitudes(2:5, idx)) */
-    quaternion_t q_ref = quaternion_t_normalize(&ctrl->ref->quat[idx]);
+    quaternion_t q_ref = (quaternion_t) { .w = 1.0, .x = 0.0, .y = 0.0, .z = 0.0};
 
     /* q_cur_inv = [q_cur(1); -q_cur(2); -q_cur(3); -q_cur(4)] */
     quaternion_t q_cur_inv = quaternion_t_conjugate(&q_cur);

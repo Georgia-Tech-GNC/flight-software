@@ -25,50 +25,138 @@ state_estimation_packet_t read_state_estimation_packet(int16_t* packet) {
     return data;
 }
 
+/**
+ * Thresholds:
+ * Acceleration: 16
+ * Start controls: 1s
+ * Fire chutes: 11.5
+ */
+const TickType_t SERVO_UPDATE_PERIOD = pdMS_TO_TICKS(20);
+const TickType_t CONTROLS_START_DELAY = pdMS_TO_TICKS(1000);
+const TickType_t CHUTE_DEPLOYMENT_DELAY = pdMS_TO_TICKS(11500);
+const TickType_t SD_FLASH_DELAY = pdMS_TO_TICKS(30000);
+
+
+
 void master_task_handler(void* args) {
     HAL_UART_Transmit(&debug_uart, "Started master task!\r\n", 22, HAL_MAX_DELAY);
 
     TickType_t last_servo_update = xTaskGetTickCount();
-    TickType_t start_time = last_servo_update;
-    TickType_t servo_update_period = pdMS_TO_TICKS(20);
+    
+    TickType_t ascent_start_time;
+    TickType_t control_start_time;
 
     PIDController controller;
-    RefTrajectory trajectory = {.count = 1, .time = 0, .quat = (quaternion_t){.w = 1, .x = 0, .y = 0, .z = 0}};
-    pid_init(&controller, 1.0, 0.0, 0.0, 0.05, &trajectory);
+    pid_init(&controller, 1.0, 0.0, 0.0, 0.05);
+
+    fsm_state_t rocket_state = ARMED;
 
     while (1) {
+        // Wait to recieve message
         uint16_t state_rx_buffer[8];
-        xStreamBufferReceive(g_state_stream_buffer.handle, (uint8_t*)state_rx_buffer, 16, portMAX_DELAY);
+        size_t recv_bytes = xStreamBufferReceive(g_state_stream_buffer.handle, (uint8_t*)state_rx_buffer, 16, portMAX_DELAY);
+        if (recv_bytes != 16) {
+            // State Estimation failed
+            if (rocket_state == GROUND || rocket_state == ARMED || rocket_state == FREEFALL || rocket_state == SD_FLASH) {
+                rocket_state = SD_FLASH; 
+            } else {
+                // state is fast_ascent, controlled_ascent, or uncontrolled_ascent
+                rocket_state = UNCONTROLLED_ASCENT;
+            }
+        }
         state_estimation_packet_t state_data = read_state_estimation_packet(state_rx_buffer);
-        
         TickType_t current_time = xTaskGetTickCount();
 
-        double output[3];
-        double state[14] = {
-            0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-            state_data.orientation.w,
-            state_data.orientation.x,
-            state_data.orientation.y,
-            state_data.orientation.z,
-            state_data.w_x,
-            state_data.w_y,
-            state_data.w_z,
-        };
-        getControl(&controller, state, current_time - start_time, output);
+        // Handle state transitions
+        switch (rocket_state) {
+        case GROUND:
+            if (xSemaphoreTake(g_state_lock.handle, pdMS_TO_TICKS(10)) == pdTRUE) {
+                if (g_current_state.arm_signal_recieved) {
+                    rocket_state = ARMED;
+                }
+                xSemaphoreGive(g_state_lock.handle);
+            }
+            break;
         
-        if (current_time > last_servo_update + servo_update_period) {
-            last_servo_update = current_time;
+        case ARMED:
+            if (state_data.upward_accel < -16) {
+                rocket_state = FAST_ASCENT;
+                ascent_start_time = current_time;
+            }
+            break;
 
-            char buffer[256];
-            size_t sz = sprintf(buffer, "Orientation: %.4f %.4f %.4f %.4f Output: %.4f %.4f %.4f", state_data.orientation.w,
+        case FAST_ASCENT:
+            if (current_time > CONTROLS_START_DELAY + ascent_start_time) {
+                rocket_state = CONTROLLED_ASCENT;
+                control_start_time = current_time;
+            }
+            break;
+
+        case CONTROLLED_ASCENT:
+            if (current_time > CHUTE_DEPLOYMENT_DELAY + ascent_start_time) {
+                // TODO: fire pyro channels
+                rocket_state = FREEFALL;
+            }
+            // TODO: figure out how to check rocket angle threshold for failure case
+            break;
+
+         case UNCONTROLLED_ASCENT:
+            if (current_time > CHUTE_DEPLOYMENT_DELAY + ascent_start_time) {
+                // TODO: fire pyro channels
+                rocket_state = FREEFALL;
+            }
+            break;
+
+        case FREEFALL:
+            if (current_time > SD_FLASH_DELAY + ascent_start_time) {
+                rocket_state = SD_FLASH;
+            }
+            break;
+        }
+
+        // Set servo positions depending on state
+        float servo_1_command, servo_2_command;
+        if (rocket_state == CONTROLLED_ASCENT) {
+            double output[3];
+            double state[14] = {
+                0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                state_data.orientation.w,
                 state_data.orientation.x,
                 state_data.orientation.y,
                 state_data.orientation.z,
-                RAD2DEG(output[0]),
-                RAD2DEG(output[1]),
-                RAD2DEG(output[2])
-            );
-            HAL_UART_Transmit(&debug_uart, buffer, sz, HAL_MAX_DELAY);
+                state_data.w_x,
+                state_data.w_y,
+                state_data.w_z,
+            };
+            getControl(&controller, state, current_time - control_start_time, output);
+
+            // TODO: adjust servos
+            servo_1_command = output[0];
+            servo_2_command = output[1];
+        } else {
+            servo_1_command = 0;
+            servo_2_command = 0;
+        }
+    
+        // Update global state
+        if (xSemaphoreTake(g_state_lock.handle, pdMS_TO_TICKS(10)) == pdTRUE) {
+            g_current_state.orientation = state_data.orientation;
+            g_current_state.w_x = state_data.w_x;
+            g_current_state.w_y = state_data.w_y;
+            g_current_state.w_z = state_data.w_z;
+            g_current_state.timestamp = current_time;
+            g_current_state.state = rocket_state;
+            g_current_state.servo_cmd_1 = servo_1_command;
+            g_current_state.servo_cmd_2 = servo_2_command;
+            xSemaphoreGive(g_state_lock.handle);
+        }
+        
+        if (current_time > last_servo_update + SERVO_UPDATE_PERIOD) {
+            last_servo_update = current_time;
+
+            char msg_buffer[256];
+            size_t msg_size = sprintf(msg_buffer, "State: %d, Control: %.4f %.4f State: %.4f\r\n", rocket_state, servo_1_command, servo_2_command, state_data.upward_accel);
+            HAL_UART_Transmit(&debug_uart, (uint8_t*)msg_buffer, msg_size, HAL_MAX_DELAY);
 
             /*
             if (b > 60) { b = 60; }

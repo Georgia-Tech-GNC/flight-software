@@ -248,7 +248,7 @@ void flash_sd_card(FlashBlock *flash_block, SDFile *sd_file, size_t n_states) {
 size_t to_csv_line(RocketState *rocket_state, char *line) {
     size_t len = 0;
     
-    len += sprintf(line + len, "%lu,", (uint32_t) rocket_state->launch_timestamp);
+    len += sprintf(line + len, "%lu,", (uint32_t) rocket_state->timestamp);
 
 #ifdef DO_NOT_RUN
     len += sprintf(line + len, "%lu,", (uint32_t) (rocket_state->state_vector.timestamp));

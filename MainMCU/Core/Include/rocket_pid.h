@@ -68,13 +68,11 @@ typedef struct {
     double alpha;             // Smoothing factor, recomputed each tick as dt/(tau+dt).
     double tau;               // Filter time constant (seconds). Larger tau = smoother
     int    filterInitialized; 
-
-    const RefTrajectory *ref;
 } PIDController;
 
 void pid_init(PIDController *ctrl,
               const double Kp, const double Ki, const double Kd,
-              double tau, const RefTrajectory *ref);
+              double tau);
 
 // Compute the rotation-vector attitude error 
 void pid_get_error(const PIDController *ctrl,

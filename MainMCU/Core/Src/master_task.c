@@ -1,6 +1,7 @@
 #include "globals.h"
 #include "string.h"
 #include "rocket_pid.h"
+#include "main.h"
 
 #define RAD2DEG(x) ((x) * 57.2958)
 
@@ -94,7 +95,7 @@ void master_task_handler(void* args) {
 
         case CONTROLLED_ASCENT:
             if (current_time > CHUTE_DEPLOYMENT_DELAY + ascent_start_time) {
-                // TODO: fire pyro channels
+                HAL_GPIO_WritePin(PYRO_0_GPIO_Port, PYRO_0_Pin, GPIO_PIN_SET);
                 rocket_state = FREEFALL;
             }
             // TODO: figure out how to check rocket angle threshold for failure case
@@ -102,13 +103,14 @@ void master_task_handler(void* args) {
 
          case UNCONTROLLED_ASCENT:
             if (current_time > CHUTE_DEPLOYMENT_DELAY + ascent_start_time) {
-                // TODO: fire pyro channels
+                HAL_GPIO_WritePin(PYRO_0_GPIO_Port, PYRO_0_Pin, GPIO_PIN_SET);
                 rocket_state = FREEFALL;
             }
             break;
 
         case FREEFALL:
             if (current_time > SD_FLASH_DELAY + ascent_start_time) {
+                HAL_GPIO_WritePin(PYRO_0_GPIO_Port, PYRO_0_Pin, GPIO_PIN_RESET);
                 rocket_state = SD_FLASH;
             }
             break;

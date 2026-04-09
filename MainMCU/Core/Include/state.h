@@ -11,13 +11,15 @@ typedef enum FSMState {
 } fsm_state_t;
 
 typedef struct {
+    bool arm_signal_recieved;
+    fsm_state_t state;
     quaternion_t orientation;
     float w_x, w_y, w_z;
     float servo_cmd_1, servo_cmd_2;
-    bool arm_signal_recieved;
-    fsm_state_t state;
-    uint64_t timestamp;
+    uint32_t timestamp;
 } RocketState;
+
+#define a sizeof(RocketState)
 
 
 #endif

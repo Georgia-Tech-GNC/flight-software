@@ -39,16 +39,18 @@ int io_init(void) {
     }
 
 #ifdef MCU_H725ZGT6
-    if (w25q_init(&flash_chip) == W25Q_ERR_OK) {
-        HAL_UART_Transmit(&debug_uart, (uint8_t *) "Initialized flash chip\r\n", 24, HAL_MAX_DELAY);
-        flash_init = 1;
-    } else {
-        HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to initialize flash chip\r\n", 32, HAL_MAX_DELAY);
-        flash_init = 0;
-    }
+    //if (w25q_init(&flash_chip) == W25Q_ERR_OK) {
+    //    HAL_UART_Transmit(&debug_uart, (uint8_t *) "Initialized flash chip\r\n", 24, HAL_MAX_DELAY);
+    //    flash_init = 1;
+    //} else {
+    //    HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to initialize flash chip\r\n", 32, HAL_MAX_DELAY);
+    //    flash_init = 0;
+    //}
 #else
-    flash_init = 1;
+    //flash_init = 1;
 #endif
+    flash_init = 1;
+
 
     return sd_mounted && flash_init;
 }

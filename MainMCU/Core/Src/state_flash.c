@@ -4,9 +4,11 @@ int flash_test(void);
 int sd_test(void);
 
 void write_to_flash(FlashBlock *flash_block, RocketState *rocket_state, size_t page_index);
-void flash_sd_card(FlashBlock *flash_block, SDFile *sd_file, size_t n_states);
+void flash_sd_card(SDFile *sd_file, size_t n_states);
 size_t to_csv_line(RocketState *rocket_state, char *line);
 size_t printf_fixed_float(char *buf, float f);
+
+RocketState local_buffer[800];
 
 /**
  * @brief Task to handle writing state to flash chip and SD card
@@ -19,11 +21,6 @@ void state_flash_task(void *args) {
     } else {
         HAL_UART_Transmit(&debug_uart, (uint8_t *) "IO initialized\r\n", 17, HAL_MAX_DELAY);
     }
-    if (flash_test()) {
-        HAL_UART_Transmit(&debug_uart, (uint8_t *) "Flash test PASS\r\n", 17, HAL_MAX_DELAY);
-    } else {
-        HAL_UART_Transmit(&debug_uart, (uint8_t *) "Flash test FAIL\r\n", 19, HAL_MAX_DELAY);
-    }
     if (sd_test()) {
         HAL_UART_Transmit(&debug_uart, (uint8_t *) "SD test PASS\r\n", 14, HAL_MAX_DELAY);
     } else {
@@ -31,22 +28,20 @@ void state_flash_task(void *args) {
     }
     
     /* Wait for notification before beginning */
-    FlashBlock flash_block;
     SDFile sd_file;
 
-    flash_init_block(&flash_block, STATE_FLASH_START_SECTOR, STATE_FLASH_N_SECTORS);
     sd_init_file(&sd_file, "/data.csv");
 
-    size_t flash_page_index = 0;
+    size_t flash_index = 0;
 
     while (1) {
 
-        uint8_t state_bytes[sizeof(RocketState)];
+        RocketState state;
         bool should_flash = false;
         bool should_write_sd = false;
         // Update global state
         if (xSemaphoreTake(g_state_lock.handle, pdMS_TO_TICKS(100)) == pdTRUE) {
-            memcpy(state_bytes, &g_current_state, sizeof(RocketState));
+            state = g_current_state;
             if (g_current_state.state == SD_FLASH) {
                 should_write_sd = true;
             } else if (g_current_state.state != GROUND && g_current_state.state != ARMED && g_current_state.state != FREEFALL) {
@@ -57,7 +52,7 @@ void state_flash_task(void *args) {
 
         if (should_write_sd) {
             HAL_UART_Transmit(&debug_uart, (uint8_t *) "Flashing SD card...\r\n", 20, HAL_MAX_DELAY);
-            flash_sd_card(&flash_block, &sd_file, flash_page_index);
+            flash_sd_card(&sd_file, flash_index);
             HAL_UART_Transmit(&debug_uart, (uint8_t *) "Finished. Suspending...\r\n", 25, HAL_MAX_DELAY);
 
             // Stop everything 
@@ -66,11 +61,12 @@ void state_flash_task(void *args) {
             // we cannot use vTaskDelay(portMAX_DELAY) while the scheduler is suspended
 
         } else if (should_flash) {
-            flash_write_block(&flash_block, flash_page_index * EXT_FLASH_PAGE_SIZE, state_bytes, EXT_FLASH_PAGE_SIZE);
-            flash_page_index++;
-            HAL_UART_Transmit(&debug_uart, "Flashed state\r\n", 15, HAL_MAX_DELAY);
+            if (flash_index < 800) {
+                local_buffer[flash_index++] = state;
+            }
+            //HAL_UART_Transmit(&debug_uart, "Flashed state\r\n", 15, HAL_MAX_DELAY);
         }
-        vTaskDelay(pdMS_TO_TICKS(200));
+        vTaskDelay(pdMS_TO_TICKS(20));
         
 
         /* Flash state to SD card 
@@ -226,13 +222,10 @@ int sd_test(void) {
  * @param sd_file SD card file to write to
  * @param n_states Number of states to copy
  */
-void flash_sd_card(FlashBlock *flash_block, SDFile *sd_file, size_t n_states) {
+void flash_sd_card(SDFile *sd_file, size_t n_states) {
     if (sd_open_file(sd_file, FA_READ | FA_WRITE | FA_CREATE_ALWAYS)) {
         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Successfully opened SD card file\r\n", 34, HAL_MAX_DELAY);
     }
-
-    RocketState rocket_state;
-    uint8_t data_buffer[EXT_FLASH_PAGE_SIZE];
 
     char line_buf[2048];
     HAL_UART_Transmit(&debug_uart, (uint8_t *) "Writing to SD card...\r\n", 23, HAL_MAX_DELAY);
@@ -244,11 +237,7 @@ void flash_sd_card(FlashBlock *flash_block, SDFile *sd_file, size_t n_states) {
         sprintf(progress, "Writing to SD card: %d/%d\r\n", i + 1, n_states);
         HAL_UART_Transmit(&debug_uart, (uint8_t *) progress, strlen(progress), HAL_MAX_DELAY);
 
-        flash_read_block(flash_block, i * EXT_FLASH_PAGE_SIZE, data_buffer, EXT_FLASH_PAGE_SIZE);
-
-        memcpy(&rocket_state, data_buffer, sizeof(RocketState));
-
-        size_t line_len = to_csv_line(&rocket_state, line_buf);
+        size_t line_len = to_csv_line(&local_buffer[i], line_buf);
 
         if (sd_write_file(sd_file, sd_bytes_written, (uint8_t *) line_buf, line_len)) {
             HAL_UART_Transmit(&debug_uart, (uint8_t *) "writing to SD card\r\n", 20, HAL_MAX_DELAY);

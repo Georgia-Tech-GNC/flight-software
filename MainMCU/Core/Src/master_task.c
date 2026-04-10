@@ -50,7 +50,7 @@ void master_task_handler(void* args) {
 
     PIDController controller;
     // 0.55, 0, 0.22
-    pid_init(&controller, 1.0, 0.0, 0, 0.05);
+    pid_init(&controller, 0.55, 0.0, 0.22, 0.2);
 
     fsm_state_t rocket_state = GROUND;
 

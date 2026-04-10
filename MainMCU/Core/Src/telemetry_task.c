@@ -5,6 +5,7 @@
 
 
 void telemetry_task_handler(void* args) {
+    uint64_t counter;
     while (1) {
         RocketState state;
         // Update global state
@@ -12,6 +13,8 @@ void telemetry_task_handler(void* args) {
             state = g_current_state;
             xSemaphoreGive(g_state_lock.handle);
         }
+
+        counter++;
 
         
         struct RocketStatePacket packet_data = {
@@ -22,14 +25,14 @@ void telemetry_task_handler(void* args) {
             .rocket_state = (uint8_t)state.state,
             .servo_cmd_1 = state.servo_cmd_1,
             .servo_cmd_2 = state.servo_cmd_2,
-            .timestamp = state.timestamp
+            .timestamp = counter
         };
         uint8_t payload[ROCKETSTATEPACKET_SIZE];
         RocketStatePacket_encode(&packet_data, payload);
 
         uint8_t packet[256];
         size_t packet_size = generate_packet(payload, ROCKETSTATEPACKET_SIZE, packet, ROCKETSTATEPACKET_MSG_ID);
-        HAL_UART_Transmit(&telemetry_uart, packet, packet_size, HAL_MAX_DELAY);
+        // HAL_UART_Transmit(&telemetry_uart, packet, packet_size, HAL_MAX_DELAY);
         
         vTaskDelay(pdMS_TO_TICKS(200));
     }

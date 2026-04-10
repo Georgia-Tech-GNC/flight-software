@@ -55,10 +55,12 @@ void state_flash_task(void *args) {
             flash_sd_card(&sd_file, flash_index);
             HAL_UART_Transmit(&debug_uart, (uint8_t *) "Finished. Suspending...\r\n", 25, HAL_MAX_DELAY);
 
+
+            vTaskDelay(portMAX_DELAY);
             // Stop everything 
-            vTaskSuspendAll();
-            HAL_Delay(HAL_MAX_DELAY);
-            // we cannot use vTaskDelay(portMAX_DELAY) while the scheduler is suspended
+            // vTaskSuspendAll();
+            //HAL_Delay(HAL_MAX_DELAY);
+            // we cannot use  while the scheduler is suspended
 
         } else if (should_flash) {
             if (flash_index < 800) {

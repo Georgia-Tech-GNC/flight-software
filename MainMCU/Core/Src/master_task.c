@@ -2,6 +2,7 @@
 #include "string.h"
 #include "rocket_pid.h"
 #include "main.h"
+#include "protocol.h"
 
 #define RAD2DEG(x) ((x) * 57.2958)
 
@@ -36,9 +37,7 @@ const TickType_t SERVO_UPDATE_PERIOD = pdMS_TO_TICKS(20); // pdMS_TO_TICKS(20);
 const TickType_t CONTROLS_START_DELAY = pdMS_TO_TICKS(1000);
 
 const TickType_t CHUTE_DEPLOYMENT_DELAY = pdMS_TO_TICKS(11500);
-const TickType_t SD_FLASH_DELAY = pdMS_TO_TICKS(30000);
-
-
+const TickType_t SD_FLASH_DELAY = pdMS_TO_TICKS(13000);
 
 void master_task_handler(void* args) {
     HAL_UART_Transmit(&debug_uart, "Started master task!\r\n", 22, HAL_MAX_DELAY);
@@ -57,8 +56,11 @@ void master_task_handler(void* args) {
     while (1) {
         // Wait to recieve message
         uint16_t state_rx_buffer[8];
-        size_t recv_bytes = xStreamBufferReceive(g_state_stream_buffer.handle, (uint8_t*)state_rx_buffer, 16, portMAX_DELAY);
-        if (recv_bytes != 16) {
+        size_t recv_bytes = xMessageBufferReceive(g_state_message_buffer.handle, (uint8_t*)state_rx_buffer, 16, portMAX_DELAY);
+        if (recv_bytes == 0) {
+            uint8_t print[50];
+            int fdsf = sprintf(print, "Failed to recv from SE %d\r\n", recv_bytes);
+            HAL_UART_Transmit(&debug_uart, print, fdsf, HAL_MAX_DELAY);
             // State Estimation failed
             if (rocket_state == GROUND || rocket_state == ARMED || rocket_state == FREEFALL || rocket_state == SD_FLASH) {
                 rocket_state = SD_FLASH; 
@@ -70,6 +72,33 @@ void master_task_handler(void* args) {
         state_estimation_packet_t state_data = read_state_estimation_packet(state_rx_buffer);
         TickType_t current_time = xTaskGetTickCount();
 
+        // Check for commands
+        uint8_t cmd;
+        
+        if (xStreamBufferReceive(g_telemetry_command_stream_buffer.handle, &cmd, 1, 1) > 0) {
+            char asdsad[40];
+            int fdsf = sprintf(asdsad, "Recv: %d\r\n", cmd);
+            HAL_UART_Transmit(&debug_uart, asdsad, fdsf, HAL_MAX_DELAY);
+            if (cmd == DEPLOY_PYRO_COMMAND_ID) {
+                rocket_state = FREEFALL;
+                HAL_UART_Transmit(&debug_uart, "Trigger\r\n", 9, HAL_MAX_DELAY);
+                HAL_GPIO_WritePin(PYRO_0_GPIO_Port, PYRO_0_Pin, GPIO_PIN_SET);
+                HAL_Delay(2000);
+                HAL_GPIO_WritePin(PYRO_0_GPIO_Port, PYRO_0_Pin, GPIO_PIN_RESET);
+                HAL_UART_Transmit(&debug_uart, "Release\r\n", 9, HAL_MAX_DELAY);
+
+                ascent_start_time = current_time;
+        
+                fdsf = sprintf(asdsad, "Inside If: %d\r\n", cmd);
+                HAL_UART_Transmit(&debug_uart, asdsad, fdsf, HAL_MAX_DELAY);
+            }
+            fdsf = sprintf(asdsad, "After If: %d\r\n", cmd);
+            HAL_UART_Transmit(&debug_uart, asdsad, fdsf, HAL_MAX_DELAY);
+        }
+        
+        HAL_UART_Transmit(&debug_uart, ".\r\n", 3, HAL_MAX_DELAY);
+
+        vTaskDelay(10);
         // Handle state transitions
         switch (rocket_state) {
         case GROUND:
@@ -113,6 +142,7 @@ void master_task_handler(void* args) {
         case FREEFALL:
             if (current_time > SD_FLASH_DELAY + ascent_start_time) {
                 HAL_GPIO_WritePin(PYRO_0_GPIO_Port, PYRO_0_Pin, GPIO_PIN_RESET);
+                HAL_UART_Transmit(&debug_uart, "Entered SD_FLASH from freefall\r\n", 32, HAL_MAX_DELAY);
                 rocket_state = SD_FLASH;
             }
             break;

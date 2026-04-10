@@ -22,12 +22,20 @@ extern task_data_t g_master_task;
 extern task_data_t g_telemetry_task;
 
 typedef struct {
+    MessageBufferHandle_t handle;
+    uint8_t               internal_buffer[64];
+    StaticMessageBuffer_t freertos_internal_data;
+} message_buffer_64_bit_t;
+
+typedef struct {
     StreamBufferHandle_t handle;
     uint8_t              internal_buffer[64];
     StaticStreamBuffer_t freertos_internal_data;
 } stream_buffer_64_bit_t;
 
-extern stream_buffer_64_bit_t g_state_stream_buffer;
+extern message_buffer_64_bit_t g_state_message_buffer;
+extern stream_buffer_64_bit_t g_telemetry_command_stream_buffer;
+
 
 typedef struct {
     SemaphoreHandle_t handle;

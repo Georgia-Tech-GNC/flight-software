@@ -1,4 +1,5 @@
 #include "port_layer.h"
+#include "packet_encode.h"
 
 // Declare Tasks
 task_data_t g_master_task;
@@ -75,6 +76,10 @@ int port_init(void) {
     return 1;
 }
 
+uint8_t packet_buffer[260];
+uint8_t payload_buffer[260];
+int packet_buffer_size = 0;
+uint8_t last_cmd_counter[10] = {255, 255, 255, 255, 255, 255, 255, 255, 255, 255};
 
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
     /* FreeRTOS boilerplate */
@@ -83,8 +88,28 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
     /* Direct uart data to the appropriate place */
     if (huart->Instance == telemetry_uart.Instance) {
         /* Send telemetry data to the telemetry_rx task */
-        //xStreamBufferSendFromISR(g_telemetry_rx_sb_handle, telemetry_uart_rx_buf, size, &xHigherPriorityTaskWoken);
-        //HAL_UARTEx_ReceiveToIdle_IT(&telemetry_uart, telemetry_uart_rx_buf, TELEMETRY_RX_MAX_PROCESS_SIZE);
+        for (int i = 0; i < size; i++) {
+            packet_buffer_size = process_incoming_byte(state_uart_rx_buf[i], packet_buffer, packet_buffer_size);
+
+            if (packet_buffer_size < 0) {
+                size_t msg_id = extract_packet(packet_buffer, -packet_buffer_size, payload_buffer);
+                if (msg_id == 1) {
+                    // CMD!
+                    struct CommandStruct cmd;
+                    extract_command(payload_buffer, 2, &cmd);
+                    if (cmd.command_id < 10 && cmd.command_counter != last_cmd_counter[cmd.command_id]) {
+                        xStreamBufferSendFromISR(g_telemetry_rx_sb_handle, telemetry_uart_rx_buf, size, &xHigherPriorityTaskWoken);
+                        last_cmd_counter[cmd.command_id] = cmd.command_counter;
+                    }
+                }
+
+                packet_buffer_size = 0;
+            }
+        }
+        //
+        
+        HAL_UARTEx_ReceiveToIdle_IT(&telemetry_uart, telemetry_uart_rx_buf, TELEMETRY_RX_MAX_PROCESS_SIZE);
+        
     } else if (huart->Instance == state_uart.Instance) {
         xStreamBufferSendFromISR(g_state_stream_buffer.handle, state_uart_rx_buf, size, &xHigherPriorityTaskWoken);
         HAL_UARTEx_ReceiveToIdle_IT(&state_uart, state_uart_rx_buf, 16);

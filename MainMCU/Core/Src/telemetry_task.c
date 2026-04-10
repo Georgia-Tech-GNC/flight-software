@@ -1,5 +1,6 @@
-
+#include "protocol.h"
 #include "globals.h"
+#include "packet_encode.h"
 
 
 
@@ -13,11 +14,22 @@ void telemetry_task_handler(void* args) {
         }
 
         
-        char msg_buffer[256];
-        size_t msg_size = sprintf(msg_buffer, "%.3f \t%.3f\r\n", 
-            state.servo_cmd_1, state.servo_cmd_2
-        );
-        HAL_UART_Transmit(&debug_uart, (uint8_t*)msg_buffer, msg_size, HAL_MAX_DELAY);
+        struct RocketStatePacket packet_data = {
+            .orientation_w = state.orientation.w,
+            .orientation_x = state.orientation.x,
+            .orientation_y = state.orientation.y,
+            .orientation_z = state.orientation.z,
+            .rocket_state = (uint8_t)state.state,
+            .servo_cmd_1 = state.servo_cmd_1,
+            .servo_cmd_2 = state.servo_cmd_2,
+            .timestamp = state.timestamp
+        };
+        uint8_t payload[ROCKETSTATEPACKET_SIZE];
+        RocketStatePacket_encode(&packet_data, payload);
+
+        uint8_t packet[256];
+        size_t packet_size = generate_packet(payload, ROCKETSTATEPACKET_SIZE, packet, ROCKETSTATEPACKET_MSG_ID);
+        HAL_UART_Transmit(&telemetry_uart, packet, packet_size, HAL_MAX_DELAY);
         
         vTaskDelay(pdMS_TO_TICKS(200));
     }

@@ -8,7 +8,7 @@
 #include <stdio.h>
 
 // Uncomment this line to include SQL macros
-//#define INCLUDE_PROTOCOL_SQL_MACROS
+// #define INCLUDE_PROTOCOL_SQL_MACROS
 
 //****************************************************************************************************
 //****************************************************************************************************
@@ -19,15 +19,6 @@
 //****************************************************************************************************
 //****************************************************************************************************
 //****************************************************************************************************
-
-#ifdef INCLUDE_PROTOCOL_SQL_MACROS
-	#define WEB_SERVER_URL "http://0.0.0.0:8080"
-
-	#define SET_ALL_NULL(x, len) for (int i = 0; i < (len); i++) x[i] = NULL
-	#define FREE_ALL(x, len) for (int i = 0; i < (len); i++) free(x[i])
-
-	#define COMMAND_API_PATH "/api/command/send"
-#endif
 
 /*
  * 0x00 command_id
@@ -41,11 +32,12 @@ struct CommandStruct {
 #define COMMAND_MSG_ID 1
 #define COMMAND_ACK_MSG_ID 2
 
-#define IGNITE_COMMAND_ID 1
-#define ZERO_SERVOS_COMMAND_ID 2
-#define PING_ROCKET_COMMAND_ID 3
+#define PING_ROCKET_COMMAND_ID 1
+#define ARM_COMMAND_ID 2
+#define DEPLOY_PYRO_COMMAND_ID 3
+#define ESTOP_COMMAND_ID 4
 
-#define NUM_COMMAND_TYPES 3
+#define NUM_COMMAND_TYPES 4
 
 /**
  * Checks if the inputted packet represents a command
@@ -96,102 +88,31 @@ bool extract_command(uint8_t *buffer, uint8_t buffer_size, struct CommandStruct*
 
 
 
-struct RocketState {
+struct RocketStatePacket {
+	float orientation_w;
+	float orientation_x;
+	float orientation_y;
+	float orientation_z;
 	uint8_t rocket_state;
+	float servo_cmd_1;
+	float servo_cmd_2;
 	int64_t timestamp;
 };
-#define ROCKETSTATE_MSG_ID 10
-#define ROCKETSTATE_SIZE 9
-#define ROCKETSTATE_NUM_VALUES 2
-#ifdef INCLUDE_PROTOCOL_SQL_MACROS
-	#define ROCKETSTATE_SQL_TABLE_GEN "CREATE TABLE RocketState ( " \
-	"rocket_state int, " \
-	"time bigint PRIMARY KEY);"
-	#define ROCKETSTATE_SQL_GET_MOST_RECENT "SELECT * FROM RocketState WHERE time = (SELECT MAX(time) FROM RocketState);"
-	#define ROCKETSTATE_SQL_ADD_ENTRY(buffer, data) sprintf(buffer, \
-		"INSERT INTO ROCKETSTATE VALUES ('%d', '%ld');", \
-		(data)->rocket_state, \
-		(data)->timestamp); 
-	#define ROCKETSTATE_API_PATH "/api/data/RocketState"
-	#define ROCKETSTATE_SQL_SELECT_TO_JSON(sql_row_values) "{ %m: \"%s\", %m: \"%s\"}", \
-		MG_ESC("rocket_state"), sql_row_values[0], \
-		MG_ESC("timestamp"), sql_row_values[1]
-#endif
+#define ROCKETSTATEPACKET_MSG_ID 10
+#define ROCKETSTATEPACKET_SIZE 33
+#define ROCKETSTATEPACKET_NUM_VALUES 8
 
 /**
  * Serializes the data.
- * Output must have a length of at least 9 bytes.
+ * Output must have a length of at least 33 bytes.
  */
-void RocketState_encode(struct RocketState *input, uint8_t *output);
+void RocketStatePacket_encode(struct RocketStatePacket *input, uint8_t *output);
 
 /**
  * Deserializes the data.
- * Input must have a length of at least 9 bytes.
+ * Input must have a length of at least 33 bytes.
  */
-void RocketState_decode(uint8_t *input, struct RocketState *output);
-
-
-struct ServoDeflections {
-	uint16_t servo_1_desired;
-	uint16_t servo_1_actual;
-	uint16_t servo_2_desired;
-	uint16_t servo_2_actual;
-	uint16_t servo_3_desired;
-	uint16_t servo_3_actual;
-	uint16_t servo_4_desired;
-	uint16_t servo_4_actual;
-	int64_t timestamp;
-};
-#define SERVODEFLECTIONS_MSG_ID 11
-#define SERVODEFLECTIONS_SIZE 24
-#define SERVODEFLECTIONS_NUM_VALUES 9
-#ifdef INCLUDE_PROTOCOL_SQL_MACROS
-	#define SERVODEFLECTIONS_SQL_TABLE_GEN "CREATE TABLE ServoDeflections ( " \
-	"servo_1_desired int, " \
-	"servo_1_actual int, " \
-	"servo_2_desired int, " \
-	"servo_2_actual int, " \
-	"servo_3_desired int, " \
-	"servo_3_actual int, " \
-	"servo_4_desired int, " \
-	"servo_4_actual int, " \
-	"time bigint PRIMARY KEY);"
-	#define SERVODEFLECTIONS_SQL_GET_MOST_RECENT "SELECT * FROM ServoDeflections WHERE time = (SELECT MAX(time) FROM ServoDeflections);"
-	#define SERVODEFLECTIONS_SQL_ADD_ENTRY(buffer, data) sprintf(buffer, \
-		"INSERT INTO SERVODEFLECTIONS VALUES ('%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%ld');", \
-		(data)->servo_1_desired, \
-		(data)->servo_1_actual, \
-		(data)->servo_2_desired, \
-		(data)->servo_2_actual, \
-		(data)->servo_3_desired, \
-		(data)->servo_3_actual, \
-		(data)->servo_4_desired, \
-		(data)->servo_4_actual, \
-		(data)->timestamp); 
-	#define SERVODEFLECTIONS_API_PATH "/api/data/ServoDeflections"
-	#define SERVODEFLECTIONS_SQL_SELECT_TO_JSON(sql_row_values) "{ %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\", %m: \"%s\"}", \
-		MG_ESC("servo_1_desired"), sql_row_values[0], \
-		MG_ESC("servo_1_actual"), sql_row_values[1], \
-		MG_ESC("servo_2_desired"), sql_row_values[2], \
-		MG_ESC("servo_2_actual"), sql_row_values[3], \
-		MG_ESC("servo_3_desired"), sql_row_values[4], \
-		MG_ESC("servo_3_actual"), sql_row_values[5], \
-		MG_ESC("servo_4_desired"), sql_row_values[6], \
-		MG_ESC("servo_4_actual"), sql_row_values[7], \
-		MG_ESC("timestamp"), sql_row_values[8]
-#endif
-
-/**
- * Serializes the data.
- * Output must have a length of at least 24 bytes.
- */
-void ServoDeflections_encode(struct ServoDeflections *input, uint8_t *output);
-
-/**
- * Deserializes the data.
- * Input must have a length of at least 24 bytes.
- */
-void ServoDeflections_decode(uint8_t *input, struct ServoDeflections *output);
+void RocketStatePacket_decode(uint8_t *input, struct RocketStatePacket *output);
 
 /**
  * Calculates the size of a message given its ID
@@ -204,41 +125,5 @@ int get_msg_size(int message_id);
  * Returns true if this message id corresponds to a data packet, and false otherwise
  */
 bool is_data_send_msg(int message_id);
-
-#ifdef INCLUDE_PROTOCOL_SQL_MACROS
-	#define MAX_SQL_WRITE_CMD_SIZE 192
-
-	#define ALL_SQL_TABLE_CREATE_COMMANDS ROCKETSTATE_SQL_TABLE_GEN, SERVODEFLECTIONS_SQL_TABLE_GEN
-
-	#define NUM_SQL_TABLES 2
-
-	/**
-	 * Takes a recieved data packet and converts it into an SQL command
-	 * 
-	 * @param message_id	The id associated with this message
-	 * @param data			  The data recieved (as an array of bytes)
-   * @param data_size   Length of the data received
-	 * @param sql_cmd		  A char* buffer where the SQL command will be saved (must be at least as big as MAX_SQL_WRITE_CMD_SIZE)
-	 * 
-	 * @return				true if the operation was successful, and false otherwise.
-	 */
-	bool convert_data_msg_to_sql_cmd(int message_id, uint8_t *data, size_t data_size, char *sql_cmd);
-
-	#define HANDLE_API_INPUT(db, hm) \
-		if (mg_match(hm->uri, mg_str(ROCKETSTATE_API_PATH), NULL)) { \
-			char *data[ROCKETSTATE_NUM_VALUES]; \
-			SET_ALL_NULL(data, ROCKETSTATE_NUM_VALUES); \
-			query_sql_with_callback(db, data, ROCKETSTATE_SQL_GET_MOST_RECENT); \
-			mg_http_reply(c, 200, "Content-Type: application/json\r\n", ROCKETSTATE_SQL_SELECT_TO_JSON(data)); \
-			FREE_ALL(data, ROCKETSTATE_NUM_VALUES); \
-		} else if (mg_match(hm->uri, mg_str(SERVODEFLECTIONS_API_PATH), NULL)) { \
-			char *data[SERVODEFLECTIONS_NUM_VALUES]; \
-			SET_ALL_NULL(data, SERVODEFLECTIONS_NUM_VALUES); \
-			query_sql_with_callback(db, data, SERVODEFLECTIONS_SQL_GET_MOST_RECENT); \
-			mg_http_reply(c, 200, "Content-Type: application/json\r\n", SERVODEFLECTIONS_SQL_SELECT_TO_JSON(data)); \
-			FREE_ALL(data, SERVODEFLECTIONS_NUM_VALUES); \
-		}
-
-#endif
 
 #endif

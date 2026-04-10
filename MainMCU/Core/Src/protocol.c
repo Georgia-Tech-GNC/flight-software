@@ -63,88 +63,37 @@ bool extract_command(uint8_t *buffer, uint8_t buffer_size, struct CommandStruct*
 
 int get_msg_size(int message_id) {
 	switch (message_id) {
-    	case ROCKETSTATE_MSG_ID:
-			return ROCKETSTATE_SIZE;
-    	case SERVODEFLECTIONS_MSG_ID:
-			return SERVODEFLECTIONS_SIZE;
+    	case ROCKETSTATEPACKET_MSG_ID:
+			return ROCKETSTATEPACKET_SIZE;
     	default:
 			return -1;
 	}
 }
 
 bool is_data_send_msg(int message_id) {
-	return (message_id >= 10) && (message_id <= 10 + 2);
+	return (message_id >= 10) && (message_id <= 10 + 1);
 }
 
-#ifdef INCLUDE_PROTOCOL_SQL_MACROS
-	
-    bool convert_data_msg_to_sql_cmd(int message_id, uint8_t *data, size_t data_size, char *sql_cmd) {
-		if (!is_data_send_msg(message_id)) {
-			return false;
-		}
-
-		switch (message_id) {
-    	    case ROCKETSTATE_MSG_ID: {
-        if (data_size != ROCKETSTATE_SIZE) {
-          printf("warning: wrong data size!\n");
-        }
-				struct RocketState cvt_data;
-				RocketState_decode(data, &cvt_data);
-				ROCKETSTATE_SQL_ADD_ENTRY(sql_cmd, &cvt_data);
-				return true;
-			} 
-    	    case SERVODEFLECTIONS_MSG_ID: {
-        if (data_size != SERVODEFLECTIONS_SIZE) {
-          printf("warning: wrong data size!\n");
-        }
-				struct ServoDeflections cvt_data;
-				ServoDeflections_decode(data, &cvt_data);
-				SERVODEFLECTIONS_SQL_ADD_ENTRY(sql_cmd, &cvt_data);
-				return true;
-			} 
-    		default:
-				return false;
-		}
-	}
-
-#endif
-
-
-void RocketState_encode(struct RocketState *input, uint8_t *output) {
-		memcpy(output + 0, &input->rocket_state, 1);
-		memcpy(output + 1, &input->timestamp, 8);
+void RocketStatePacket_encode(struct RocketStatePacket *input, uint8_t *output) {
+		memcpy(output + 0, &input->orientation_w, 4);
+		memcpy(output + 4, &input->orientation_x, 4);
+		memcpy(output + 8, &input->orientation_y, 4);
+		memcpy(output + 12, &input->orientation_z, 4);
+		memcpy(output + 16, &input->rocket_state, 1);
+		memcpy(output + 17, &input->servo_cmd_1, 4);
+		memcpy(output + 21, &input->servo_cmd_2, 4);
+		memcpy(output + 25, &input->timestamp, 8);
 
 }
 
-void RocketState_decode(uint8_t *input, struct RocketState *output) {
-		memcpy(&output->rocket_state, input + 0, 1);
-		memcpy(&output->timestamp, input + 1, 8);
-
+void RocketStatePacket_decode(uint8_t *input, struct RocketStatePacket *output) {
+		memcpy(&output->orientation_w, input + 0, 4);
+		memcpy(&output->orientation_x, input + 4, 4);
+		memcpy(&output->orientation_y, input + 8, 4);
+		memcpy(&output->orientation_z, input + 12, 4);
+		memcpy(&output->rocket_state, input + 16, 1);
+		memcpy(&output->servo_cmd_1, input + 17, 4);
+		memcpy(&output->servo_cmd_2, input + 21, 4);
+		memcpy(&output->timestamp, input + 25, 8);
 }
 
-
-void ServoDeflections_encode(struct ServoDeflections *input, uint8_t *output) {
-		memcpy(output + 0, &input->servo_1_desired, 2);
-		memcpy(output + 2, &input->servo_1_actual, 2);
-		memcpy(output + 4, &input->servo_2_desired, 2);
-		memcpy(output + 6, &input->servo_2_actual, 2);
-		memcpy(output + 8, &input->servo_3_desired, 2);
-		memcpy(output + 10, &input->servo_3_actual, 2);
-		memcpy(output + 12, &input->servo_4_desired, 2);
-		memcpy(output + 14, &input->servo_4_actual, 2);
-		memcpy(output + 16, &input->timestamp, 8);
-
-}
-
-void ServoDeflections_decode(uint8_t *input, struct ServoDeflections *output) {
-		memcpy(&output->servo_1_desired, input + 0, 2);
-		memcpy(&output->servo_1_actual, input + 2, 2);
-		memcpy(&output->servo_2_desired, input + 4, 2);
-		memcpy(&output->servo_2_actual, input + 6, 2);
-		memcpy(&output->servo_3_desired, input + 8, 2);
-		memcpy(&output->servo_3_actual, input + 10, 2);
-		memcpy(&output->servo_4_desired, input + 12, 2);
-		memcpy(&output->servo_4_actual, input + 14, 2);
-		memcpy(&output->timestamp, input + 16, 8);
-
-}

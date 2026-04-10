@@ -11,7 +11,7 @@
 #define TIMER_PRESC 29
 
 //#define COUNTS_PER_US (APB1_TIMER_FREQ / (TIMER_PRESC + 1) / 1e6)
-#define US_TO_COUNTS 3.6
+#define US_TO_COUNTS 3.2
 static_assert(APB1_TIMER_FREQ == 96000000, "If APB1 frequency is not this, adjust US_TO_COUNTS");
 static_assert(TIMER_PRESC == 29, "If timer prescalar frequency is not this, adjust US_TO_COUNTS");
 

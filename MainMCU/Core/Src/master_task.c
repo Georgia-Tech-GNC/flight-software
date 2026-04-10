@@ -32,7 +32,7 @@ state_estimation_packet_t read_state_estimation_packet(int16_t* packet) {
  * Start controls: 1s
  * Fire chutes: 11.5
  */
-const TickType_t SERVO_UPDATE_PERIOD = pdMS_TO_TICKS(20);
+const TickType_t SERVO_UPDATE_PERIOD = pdMS_TO_TICKS(20); // pdMS_TO_TICKS(20);
 const TickType_t CONTROLS_START_DELAY = pdMS_TO_TICKS(1000);
 
 const TickType_t CHUTE_DEPLOYMENT_DELAY = pdMS_TO_TICKS(11500);
@@ -49,9 +49,10 @@ void master_task_handler(void* args) {
     TickType_t control_start_time;
 
     PIDController controller;
-    pid_init(&controller, 1.0, 0.0, 0.0, 0.05);
+    // 0.55, 0, 0.22
+    pid_init(&controller, 1.0, 0.0, 0, 0.05);
 
-    fsm_state_t rocket_state = ARMED;
+    fsm_state_t rocket_state = GROUND;
 
     while (1) {
         // Wait to recieve message
@@ -137,10 +138,31 @@ void master_task_handler(void* args) {
             // TODO: adjust servos
             servo_1_command = output[1];
             servo_2_command = output[2];
+        } else if (rocket_state == GROUND) {
+            double output[3];
+            double state[14] = {
+                0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                state_data.orientation.w,
+                state_data.orientation.x,
+                state_data.orientation.y,
+                state_data.orientation.z,
+                state_data.w_x,
+                state_data.w_y,
+                state_data.w_z,
+            };
+            getControl(&controller, state, current_time, output, error);
+
+            // TODO: adjust servos
+            servo_1_command = output[1];
+            servo_2_command = output[2]; 
         } else {
             servo_1_command = 0;
             servo_2_command = 0;
         }
+
+        servo_1_command = RAD2DEG(servo_1_command);
+        servo_2_command = RAD2DEG(servo_2_command);
+
     
         // Update global state
         if (xSemaphoreTake(g_state_lock.handle, pdMS_TO_TICKS(10)) == pdTRUE) {
@@ -158,6 +180,13 @@ void master_task_handler(void* args) {
         if (current_time > last_servo_update + SERVO_UPDATE_PERIOD) {
             last_servo_update = current_time;
 
+            /*
+            char msg_buffer[256];
+            size_t msg_size = sprintf(msg_buffer, "%.8f,\t%.8f,\t%.8f\r\n", 
+                state_data.w_x, state_data.w_y, state_data.w_z
+            );
+            HAL_UART_Transmit(&debug_uart, (uint8_t*)msg_buffer, msg_size, HAL_MAX_DELAY);
+            //HAL_UART_Transmit(&debug_uart, (uint8_t*)msg_buffer, msg_size, HAL_MAX_DELAY);
             //char msg_buffer[256];
             //size_t msg_size = sprintf(msg_buffer, "Error: %.3f\t%.3f\t%.3f\tState: %.3f\t%.3f\t%.3f\t%.3f\r\n", 
             //    error[0], error[1], error[2],
@@ -165,17 +194,22 @@ void master_task_handler(void* args) {
             //);
             //HAL_UART_Transmit(&debug_uart, (uint8_t*)msg_buffer, msg_size, HAL_MAX_DELAY);
 
-            /*
+            
             if (b > 60) { b = 60; }
             if (b < -60) { b = -60; }
-
-            uint16_t servo_pos = 1500 + b * 10;
-            servo_set_pos(&servo_1, servo_pos);
-
-            char msg_buffer[256];
-            size_t msg_size = sprintf(msg_buffer, "%.4f %.4f %.4f %.4f\r\n", a, b, c, d);
-            HAL_UART_Transmit(&debug_uart, (uint8_t*)msg_buffer, msg_size, HAL_MAX_DELAY);
             */
+
+            float servo_tick_1 = 1500 + (10 * servo_1_command);
+            if (servo_tick_1 > 1570) { servo_tick_1 = 1570; }
+            if (servo_tick_1 < 1430) { servo_tick_1 = 1430; }
+
+            servo_set_pos(&servo_1, (uint32_t)servo_tick_1);            
+
+            float servo_tick_2 = 1500 + (10 * servo_2_command);
+            if (servo_tick_2 > 1570) { servo_tick_2 = 1570; }
+            if (servo_tick_2 < 1430) { servo_tick_2 = 1430; }
+
+            servo_set_pos(&servo_2, (uint32_t)servo_tick_2);       
         }
     }
 }

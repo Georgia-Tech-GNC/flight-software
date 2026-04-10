@@ -56,8 +56,11 @@ int port_init(void) {
 
 
     // Initialize servos
-    //servo_init(&servo_1, PWM0_TIMER, PWM0_CHANNEL);
-    //servo_set_pos(&servo_1, 1500);
+    servo_init(&servo_1, PWM2_TIMER, PWM2_CHANNEL);
+    servo_set_pos(&servo_1, 1500);
+
+    servo_init(&servo_2, PWM3_TIMER, PWM3_CHANNEL);
+    servo_set_pos(&servo_2, 1500);
 
     // Initialize rocket state
     g_current_state.orientation = (quaternion_t) {.w = 1.0, .x = 0.0, .y = 0.0, .z = 0.0};

@@ -43,6 +43,8 @@ extern UART_HandleTypeDef debug_uart;
 extern SPI_HandleTypeDef sd_spi;
 
 extern servo_t servo_1;
+extern servo_t servo_2;
+
 
 #ifdef USE_TIM1
 extern TIM_HandleTypeDef htim1;

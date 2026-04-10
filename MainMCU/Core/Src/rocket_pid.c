@@ -96,6 +96,15 @@ vector3_t quaternion_rotate(const vector3_t* vec, const quaternion_t* quat) {
     return vector_add(&i3, &i2);
 }
 
+#define DEG2RAD(x) ((x) * M_PI / 180.0)
+
+const quaternion_t Q_CORRECT = {
+    .w = 0.9238795325,
+    .x = 0.0,
+    .y = 0.0,
+    .z = 0.3826834324,
+};
+
 // linear scan to find closest waypoint in time for which reference orientation to aim for
 int ref_find_closest(const RefTrajectory *ref, double t) {
     int best = 0;
@@ -146,7 +155,10 @@ void pid_get_error(const PIDController *ctrl,
 {
     /* q_cur = Utils.normalizequaternion_t(rocketStateEstimate(8:11))
      * MATLAB 1-indexed 8:11 -> C 0-indexed 7:10 */
-    quaternion_t q_cur = { state[7], state[8], state[9], state[10] };
+    quaternion_t q_imu = { state[7], state[8], state[9], state[10] };
+    q_imu = quat_normalize(&q_imu);
+
+    quaternion_t q_cur = quaternion_t_multiply(&Q_CORRECT,&q_imu);
     q_cur = quat_normalize(&q_cur);
 
     /* q_cur_inv = [q_cur(1); -q_cur(2); -q_cur(3); -q_cur(4)] */
@@ -169,9 +181,9 @@ void pid_get_error(const PIDController *ctrl,
 
     vector3_t error_body = quaternion_rotate(&error_vec, &q_cur_inv);
 
-    err_out[0] = error_body.x;
-    err_out[1] = error_body.y;
-    err_out[2] = error_body.z;
+    err_out[0] = error_body.x * 2;
+    err_out[1] = error_body.y * 2;
+    err_out[2] = error_body.z * 2;
 }
 
 /* -----------------------------------------------------------------------
@@ -203,7 +215,10 @@ void getControl(PIDController *ctrl,
     }
 
     /* omega = state(12:14)  — MATLAB 1-indexed -> C 0-indexed 11:13 */
-    double omega_raw[3] = { state[11], state[12], state[13] };
+    vector3_t omega_imu = { state[11], state[12], state[13] };
+    /* Rotate angular velocity into body/gimbal frame*/
+    vector3_t omega_body = quaternion_rotate(&omega_imu, &Q_CORRECT);
+    double omega_raw[3] = { omega_body.x, omega_body.y, omega_body.z };
 
     /* ---------------------------------------------------------------
      * NEW: low-pass filter (first-order EMA) on the derivative term

@@ -187,16 +187,19 @@ int main(void)
  		double dt_sec = ((double)dt_tick) / 1000000.0;
 
 		// Update dead reckoning
-		double w_x = DEG2RAD(sensors.gyro_x + 0.07945997) * (dt_sec / 2);
-		double w_y = DEG2RAD(sensors.gyro_y - 0.25380069) * (dt_sec / 2);
-		double w_z = DEG2RAD(sensors.gyro_z + 0.13673413) * (dt_sec / 2);
+		double w_x = DEG2RAD(sensors.gyro_x + 0.07945997);
+		double w_y = DEG2RAD(sensors.gyro_y - 0.25380069);
+		double w_z = DEG2RAD(sensors.gyro_z + 0.13673413);
+        double wt_x = w_x * (dt_sec / 2);
+		double wt_y = w_y * (dt_sec / 2);
+		double wt_z = w_z * (dt_sec / 2);
 		//quaternion_t delta_quat = to_delta_quaternion(w_x, w_y, w_z, dt_sec);
 		//orientation = multiply(&orientation, &delta_quat);
 
-		double a = orientation.w + -w_x*orientation.x - w_y*orientation.y - w_z*orientation.z;
-		double b = w_x*orientation.w + orientation.x + w_z*orientation.y - w_y*orientation.z;
-		double c = w_y*orientation.w - w_z*orientation.x + orientation.y + w_x*orientation.z;
-		double d = w_z*orientation.w - w_y*orientation.x + -w_x*orientation.y + orientation.z;
+		double a = orientation.w + -wt_x*orientation.x - wt_y*orientation.y - wt_z*orientation.z;
+		double b = wt_x*orientation.w + orientation.x + wt_z*orientation.y - wt_y*orientation.z;
+		double c = wt_y*orientation.w - wt_z*orientation.x + orientation.y + wt_x*orientation.z;
+		double d = wt_z*orientation.w - wt_y*orientation.x + -wt_x*orientation.y + orientation.z;
 		orientation.w = a;
 		orientation.x = b;
 		orientation.y = c;

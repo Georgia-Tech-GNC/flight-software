@@ -70,6 +70,10 @@ double vector_dot(const vector3_t* a, const vector3_t* b) {
     return a->x * b->x + a->y * b->y + a->z * b->z;
 }
 
+double vector_mag(const vector3_t* a) {
+    return sqrt(a->x * a->x + a->y * a->y + a->z * a->z);
+}
+
 vector3_t vector_add(const vector3_t* a, const vector3_t* b) {
     return (vector3_t) { .x = a->x + b->x, .y = a->y + b->y, .z = a->z + b->z}; 
 }
@@ -144,7 +148,7 @@ const quaternion_t Q_REF = (quaternion_t) { .w = 1.0, .x = 0.0, .y = 0.0, .z = 0
  * computes the rotation-vector attitude error between the rocket's
  * current quaternion_ternion and the reference quaternion_ternion at the nearest time.
  * ----------------------------------------------------------------------- */
-void pid_get_error(const PIDController *ctrl,
+double pid_get_error(const PIDController *ctrl,
                    const double state[14], double currentTime,
                    double err_out[3])
 {
@@ -163,6 +167,8 @@ void pid_get_error(const PIDController *ctrl,
     vector3_t v_curr = quaternion_rotate(&vb, &q_cur);
     vector3_t v_desired = quaternion_rotate(&vb, &Q_REF);
 
+    double theta = acos(vector_dot(&v_curr, &v_desired) / (vector_mag(&v_curr) * vector_mag(&v_desired)));
+
     double d = vector_dot(&v_curr, &v_desired);
     vector3_t a = vector_cross(&v_curr, &v_desired);
 
@@ -180,6 +186,8 @@ void pid_get_error(const PIDController *ctrl,
     err_out[0] = error_body.x * 2;
     err_out[1] = cos(PHI)*error_body.y - sin(PHI)*error_body.z;
     err_out[2] = sin(PHI)*error_body.y + cos(PHI)*error_body.z;
+
+    return theta;
 }
 
 /* -----------------------------------------------------------------------
@@ -192,7 +200,7 @@ void pid_get_error(const PIDController *ctrl,
  * filter before being used in the Kd term. All other logic is identical
  * to the original MATLAB.
  * ----------------------------------------------------------------------- */
-void getControl(PIDController *ctrl,
+double getControl(PIDController *ctrl,
                      const double state[14],
                      double currentTime,
                      double rocketControl_out[3], double err_out[3])
@@ -203,7 +211,7 @@ void getControl(PIDController *ctrl,
     if (dt <= 0.0) dt = 1e-4;
 
     /* err = obj.getError(state, currentTime) */
-    pid_get_error(ctrl, state, currentTime, err_out);
+    double error_angle = pid_get_error(ctrl, state, currentTime, err_out);
 
     /* obj.integralError = obj.integralError + err * dt */
     for (int i = 0; i < 3; i++) {
@@ -274,4 +282,6 @@ void getControl(PIDController *ctrl,
     for (int i = 0; i < 3; i++) {
         rocketControl_out[i] = controlRad[i]; // * (180.0 / M_PI);
     }
+
+    return error_angle;
 }

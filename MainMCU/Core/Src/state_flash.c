@@ -44,7 +44,7 @@ void state_flash_task(void *args) {
             state = g_current_state;
             if (g_current_state.state == SD_FLASH) {
                 should_write_sd = true;
-            } else if (g_current_state.state != GROUND && g_current_state.state != ARMED && g_current_state.state != FREEFALL) {
+            } else if (g_current_state.state > 1) {
                 should_flash = true;
             } 
             xSemaphoreGive(g_state_lock.handle);

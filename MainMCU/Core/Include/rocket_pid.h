@@ -79,7 +79,7 @@ void pid_init(PIDController *ctrl,
               double tau);
 
 // Compute the rotation-vector attitude error 
-void pid_get_error(const PIDController *ctrl,
+double pid_get_error(const PIDController *ctrl,
                    const double state[14], double currentTime,
                    double err_out[3]);
 
@@ -89,7 +89,7 @@ void pid_get_error(const PIDController *ctrl,
  * currentCumVelocity — passed for interface compatibility (unused)
  * currentTime      — simulation clock (seconds)
  * rocketControl_out — output: [roll, pitch, yaw] command in degrees */
-void getControl(PIDController *ctrl,
+double getControl(PIDController *ctrl,
                      const double state[14],
                      double currentTime,
                      double rocketControl_out[3], double err_out[3]);

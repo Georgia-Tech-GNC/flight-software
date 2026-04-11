@@ -27,6 +27,9 @@ state_estimation_packet_t read_state_estimation_packet(int16_t* packet) {
     return data;
 }
 
+fsm_state_t run_state_machine(fsm_state_t current_state, uint8_t command, const state_estimation_packet_t* sensors);
+TickType_t get_active_control_duration();
+
 /**
  * Thresholds:
  * Acceleration: 16
@@ -34,6 +37,7 @@ state_estimation_packet_t read_state_estimation_packet(int16_t* packet) {
  * Fire chutes: 11.5
  */
 const TickType_t SERVO_UPDATE_PERIOD = pdMS_TO_TICKS(20); // pdMS_TO_TICKS(20);
+const TickType_t PYRO_TIME = pdMS_TO_TICKS(1000);
 const TickType_t CONTROLS_START_DELAY = pdMS_TO_TICKS(1000);
 
 const TickType_t CHUTE_DEPLOYMENT_DELAY = pdMS_TO_TICKS(11500);
@@ -42,116 +46,45 @@ const TickType_t SD_FLASH_DELAY = pdMS_TO_TICKS(13000);
 void master_task_handler(void* args) {
     HAL_UART_Transmit(&debug_uart, "Started master task!\r\n", 22, HAL_MAX_DELAY);
 
+    vTaskDelay(200);
+
     TickType_t last_servo_update = xTaskGetTickCount();
-    
-    TickType_t ascent_start_time;
-    TickType_t control_start_time;
 
     PIDController controller;
     // 0.55, 0, 0.22
-    pid_init(&controller, 0.55, 0.0, 0.22, 0.2);
+    pid_init(&controller, 0.24215, 0.0, 0.0, 0.15);
 
     fsm_state_t rocket_state = GROUND;
 
     while (1) {
         // Wait to recieve message
         uint16_t state_rx_buffer[8];
-        size_t recv_bytes = xMessageBufferReceive(g_state_message_buffer.handle, (uint8_t*)state_rx_buffer, 16, portMAX_DELAY);
-        if (recv_bytes == 0) {
-            uint8_t print[50];
-            int fdsf = sprintf(print, "Failed to recv from SE %d\r\n", recv_bytes);
-            HAL_UART_Transmit(&debug_uart, print, fdsf, HAL_MAX_DELAY);
-            // State Estimation failed
-            if (rocket_state == GROUND || rocket_state == ARMED || rocket_state == FREEFALL || rocket_state == SD_FLASH) {
-                rocket_state = SD_FLASH; 
-            } else {
-                // state is fast_ascent, controlled_ascent, or uncontrolled_ascent
-                rocket_state = UNCONTROLLED_ASCENT;
-            }
+        size_t recv_bytes = xMessageBufferReceive(g_state_message_buffer.handle, (uint8_t*)state_rx_buffer, 16, 20);
+        if (recv_bytes < 16) {
+            HAL_UART_Transmit(&debug_uart, "recv0\r\n", 7, HAL_MAX_DELAY);
+            continue;
         }
+        
         state_estimation_packet_t state_data = read_state_estimation_packet(state_rx_buffer);
         TickType_t current_time = xTaskGetTickCount();
 
         // Check for commands
-        uint8_t cmd;
-        
-        if (xStreamBufferReceive(g_telemetry_command_stream_buffer.handle, &cmd, 1, 1) > 0) {
-            char asdsad[40];
-            int fdsf = sprintf(asdsad, "Recv: %d\r\n", cmd);
-            HAL_UART_Transmit(&debug_uart, asdsad, fdsf, HAL_MAX_DELAY);
-            if (cmd == DEPLOY_PYRO_COMMAND_ID) {
-                rocket_state = FREEFALL;
-                HAL_UART_Transmit(&debug_uart, "Trigger\r\n", 9, HAL_MAX_DELAY);
-                HAL_GPIO_WritePin(PYRO_0_GPIO_Port, PYRO_0_Pin, GPIO_PIN_SET);
-                HAL_Delay(2000);
-                HAL_GPIO_WritePin(PYRO_0_GPIO_Port, PYRO_0_Pin, GPIO_PIN_RESET);
-                HAL_UART_Transmit(&debug_uart, "Release\r\n", 9, HAL_MAX_DELAY);
-
-                ascent_start_time = current_time;
-        
-                fdsf = sprintf(asdsad, "Inside If: %d\r\n", cmd);
-                HAL_UART_Transmit(&debug_uart, asdsad, fdsf, HAL_MAX_DELAY);
-            }
-            fdsf = sprintf(asdsad, "After If: %d\r\n", cmd);
-            HAL_UART_Transmit(&debug_uart, asdsad, fdsf, HAL_MAX_DELAY);
+        uint8_t cmd = 0;
+        xStreamBufferReceive(g_telemetry_command_stream_buffer.handle, &cmd, 1, 0);
+        if (cmd > 0) {
+            char buf[40];
+            size_t buf_len = sprintf(buf, "Recv: %d\r\n", cmd);
+            HAL_UART_Transmit(&debug_uart, buf, buf_len, HAL_MAX_DELAY);
         }
         
-        HAL_UART_Transmit(&debug_uart, ".\r\n", 3, HAL_MAX_DELAY);
+        rocket_state = run_state_machine(rocket_state, cmd, &state_data);
 
-        vTaskDelay(10);
-        // Handle state transitions
-        switch (rocket_state) {
-        case GROUND:
-            if (xSemaphoreTake(g_state_lock.handle, pdMS_TO_TICKS(10)) == pdTRUE) {
-                if (g_current_state.arm_signal_recieved) {
-                    rocket_state = ARMED;
-                }
-                xSemaphoreGive(g_state_lock.handle);
-            }
-            break;
         
-        case ARMED:
-            if (state_data.upward_accel < -16) {
-                rocket_state = FAST_ASCENT;
-                ascent_start_time = current_time;
-            }
-            break;
-
-        case FAST_ASCENT:
-            if (current_time > CONTROLS_START_DELAY + ascent_start_time) {
-                rocket_state = CONTROLLED_ASCENT;
-                control_start_time = current_time;
-            }
-            break;
-
-        case CONTROLLED_ASCENT:
-            if (current_time > CHUTE_DEPLOYMENT_DELAY + ascent_start_time) {
-                HAL_GPIO_WritePin(PYRO_0_GPIO_Port, PYRO_0_Pin, GPIO_PIN_SET);
-                rocket_state = FREEFALL;
-            }
-            // TODO: figure out how to check rocket angle threshold for failure case
-            break;
-
-         case UNCONTROLLED_ASCENT:
-            if (current_time > CHUTE_DEPLOYMENT_DELAY + ascent_start_time) {
-                HAL_GPIO_WritePin(PYRO_0_GPIO_Port, PYRO_0_Pin, GPIO_PIN_SET);
-                rocket_state = FREEFALL;
-            }
-            break;
-
-        case FREEFALL:
-            if (current_time > SD_FLASH_DELAY + ascent_start_time) {
-                HAL_GPIO_WritePin(PYRO_0_GPIO_Port, PYRO_0_Pin, GPIO_PIN_RESET);
-                HAL_UART_Transmit(&debug_uart, "Entered SD_FLASH from freefall\r\n", 32, HAL_MAX_DELAY);
-                rocket_state = SD_FLASH;
-            }
-            break;
-        }
 
         double error[3];
         // Set servo positions depending on state
         float servo_1_command, servo_2_command;
-        if (rocket_state == CONTROLLED_ASCENT) {
+        if (rocket_state == CONTROLLED_ASCENT || rocket_state == GROUND) {
             double output[3];
             double state[14] = {
                 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
@@ -163,28 +96,16 @@ void master_task_handler(void* args) {
                 state_data.w_y,
                 state_data.w_z,
             };
-            getControl(&controller, state, current_time - control_start_time, output, error);
-
-            // TODO: adjust servos
-            servo_1_command = output[1];
-            servo_2_command = output[2];
-        } else if (rocket_state == GROUND) {
-            double output[3];
-            double state[14] = {
-                0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-                state_data.orientation.w,
-                state_data.orientation.x,
-                state_data.orientation.y,
-                state_data.orientation.z,
-                state_data.w_x,
-                state_data.w_y,
-                state_data.w_z,
-            };
-            getControl(&controller, state, current_time, output, error);
-
-            // TODO: adjust servos
-            servo_1_command = output[1];
-            servo_2_command = output[2]; 
+            double angle = getControl(&controller, state, current_time - get_active_control_duration(), output, error);
+            if (fabs(angle) > 0.349066) {
+                servo_1_command = 0;
+                servo_2_command = 0;
+                rocket_state = (rocket_state == CONTROLLED_ASCENT) ? UNCONTROLLED_ASCENT : GROUND;
+            } else {
+                // TODO: adjust servos
+                servo_1_command = output[1];
+                servo_2_command = output[2];
+            }
         } else {
             servo_1_command = 0;
             servo_2_command = 0;
@@ -205,6 +126,8 @@ void master_task_handler(void* args) {
             g_current_state.servo_cmd_1 = servo_1_command;
             g_current_state.servo_cmd_2 = servo_2_command;
             xSemaphoreGive(g_state_lock.handle);
+        } else {
+            HAL_UART_Transmit(&debug_uart, "mfail\r\n", 7, HAL_MAX_DELAY);
         }
         
         if (current_time > last_servo_update + SERVO_UPDATE_PERIOD) {
@@ -242,4 +165,93 @@ void master_task_handler(void* args) {
             servo_set_pos(&servo_2, (uint32_t)servo_tick_2);       
         }
     }
+}
+
+
+TickType_t launch_start_time; 
+TickType_t pyro_deploy_time;
+
+TickType_t get_active_control_duration() {
+    TickType_t current_time = xTaskGetTickCount();
+
+    if (current_time <= launch_start_time + CONTROLS_START_DELAY) {
+        return 0;
+    } else {
+        return current_time - launch_start_time - CONTROLS_START_DELAY;
+    }
+}
+
+fsm_state_t run_state_machine(fsm_state_t current_state, uint8_t command, const state_estimation_packet_t* sensors) {
+    TickType_t current_time = xTaskGetTickCount();
+
+    if (command == ESTOP_COMMAND_ID) {
+        return STASIS;
+    } else if (command  == PYRO_DEPLOY) {
+        HAL_GPIO_WritePin(PYRO_0_GPIO_Port, PYRO_0_Pin, GPIO_PIN_SET);
+        pyro_deploy_time = current_time;
+        return PYRO_DEPLOY;
+    }
+
+    switch (current_state) {
+        case GROUND:
+            if (command == ARM_COMMAND_ID) {
+                return ARMED;
+            } else {
+                return GROUND;
+            }
+
+        case ARMED:
+            if (sensors->upward_accel > 16) {
+                launch_start_time = current_time;
+                return FAST_ASCENT;
+            } else {
+                return ARMED;
+            }
+
+         case FAST_ASCENT:
+            if (current_time > CONTROLS_START_DELAY + launch_start_time) {
+                return CONTROLLED_ASCENT;
+            } else {
+                return FAST_ASCENT;
+            }
+
+        case CONTROLLED_ASCENT:
+            if (current_time > CHUTE_DEPLOYMENT_DELAY + launch_start_time) {
+                HAL_GPIO_WritePin(PYRO_0_GPIO_Port, PYRO_0_Pin, GPIO_PIN_SET);
+                pyro_deploy_time = current_time;
+                return PYRO_DEPLOY;
+            } else {
+                return CONTROLLED_ASCENT;
+            }
+            // TODO: figure out how to check rocket angle threshold for failure case
+
+        case UNCONTROLLED_ASCENT: 
+            if (current_time > CHUTE_DEPLOYMENT_DELAY + launch_start_time) {
+                HAL_GPIO_WritePin(PYRO_0_GPIO_Port, PYRO_0_Pin, GPIO_PIN_SET);
+                pyro_deploy_time = current_time;
+                return PYRO_DEPLOY;
+            } else {
+                return UNCONTROLLED_ASCENT;
+            }
+
+        case PYRO_DEPLOY:
+            if (current_time > PYRO_TIME + pyro_deploy_time) {
+                HAL_GPIO_WritePin(PYRO_0_GPIO_Port, PYRO_0_Pin, GPIO_PIN_RESET);
+                return STASIS;
+            } else {
+                return PYRO_DEPLOY;
+            }
+
+        case STASIS: 
+            if (command == FLASH_SD_COMMAND_ID) {
+                return SD_FLASH;
+            } else {
+                return STASIS;
+            }
+
+        case SD_FLASH:
+            return SD_FLASH;
+    }
+
+    return current_state;
 }

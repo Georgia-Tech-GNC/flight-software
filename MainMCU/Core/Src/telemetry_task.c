@@ -5,7 +5,7 @@
 
 
 void telemetry_task_handler(void* args) {
-    uint64_t counter;
+    uint64_t counter = 0;
     while (1) {
         RocketState state;
         // Update global state
@@ -32,7 +32,7 @@ void telemetry_task_handler(void* args) {
 
         uint8_t packet[256];
         size_t packet_size = generate_packet(payload, ROCKETSTATEPACKET_SIZE, packet, ROCKETSTATEPACKET_MSG_ID);
-        // HAL_UART_Transmit(&telemetry_uart, packet, packet_size, HAL_MAX_DELAY);
+        HAL_UART_Transmit(&telemetry_uart, packet, packet_size, HAL_MAX_DELAY);
         
         vTaskDelay(pdMS_TO_TICKS(200));
     }

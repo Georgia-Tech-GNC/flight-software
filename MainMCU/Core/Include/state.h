@@ -7,7 +7,14 @@
 #include "rocket_pid.h"
 
 typedef enum FSMState {
-    GROUND, ARMED, FAST_ASCENT, CONTROLLED_ASCENT, UNCONTROLLED_ASCENT, FREEFALL, SD_FLASH
+    GROUND = 0, 
+    ARMED = 1, 
+    FAST_ASCENT = 2, 
+    CONTROLLED_ASCENT = 3, 
+    PYRO_DEPLOY = 4, 
+    STASIS = 5, 
+    SD_FLASH = 6, 
+    UNCONTROLLED_ASCENT = 7
 } fsm_state_t;
 
 typedef struct {

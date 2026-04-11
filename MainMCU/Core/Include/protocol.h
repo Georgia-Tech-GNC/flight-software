@@ -36,8 +36,9 @@ struct CommandStruct {
 #define ARM_COMMAND_ID 2
 #define DEPLOY_PYRO_COMMAND_ID 3
 #define ESTOP_COMMAND_ID 4
+#define FLASH_SD_COMMAND_ID 5
 
-#define NUM_COMMAND_TYPES 4
+#define NUM_COMMAND_TYPES 5
 
 /**
  * Checks if the inputted packet represents a command

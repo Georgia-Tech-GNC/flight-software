@@ -102,7 +102,7 @@ vector3_t quaternion_rotate(const vector3_t* vec, const quaternion_t* quat) {
 
 #define DEG2RAD(x) ((x) * M_PI / 180.0)
 
-const double PHI = M_PI / 4;
+const double PHI = -M_PI / 4;
 
 // linear scan to find closest waypoint in time for which reference orientation to aim for
 int ref_find_closest(const RefTrajectory *ref, double t) {

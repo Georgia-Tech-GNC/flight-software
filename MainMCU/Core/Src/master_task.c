@@ -52,7 +52,7 @@ void master_task_handler(void* args) {
 
     PIDController controller;
     // 0.55, 0, 0.22
-    pid_init(&controller, 0.24215, 0.0, 0.0, 0.15);
+    pid_init(&controller, 0.24215, 0.0, 0.11415, 0.015);
 
     fsm_state_t rocket_state = GROUND;
 
@@ -96,6 +96,11 @@ void master_task_handler(void* args) {
                 state_data.w_y,
                 state_data.w_z,
             };
+            //char buffer[128];
+            //size_t sz = sprintf(buffer, "%f %f %f\r\n", state_data.w_x,
+            //    state_data.w_y,
+            //    state_data.w_z);
+            //HAL_UART_Transmit(&debug_uart, buffer, sz, HAL_MAX_DELAY);
             double angle = getControl(&controller, state, current_time - get_active_control_duration(), output, error);
             if (fabs(angle) > 0.349066) {
                 servo_1_command = 0;
@@ -104,7 +109,7 @@ void master_task_handler(void* args) {
             } else {
                 // TODO: adjust servos
                 servo_1_command = output[1];
-                servo_2_command = output[2];
+                servo_2_command = -output[2];
             }
         } else {
             servo_1_command = 0;
@@ -152,15 +157,15 @@ void master_task_handler(void* args) {
             if (b < -60) { b = -60; }
             */
 
-            float servo_tick_1 = 1500 + (10 * servo_1_command);
-            if (servo_tick_1 > 1570) { servo_tick_1 = 1570; }
-            if (servo_tick_1 < 1430) { servo_tick_1 = 1430; }
+            float servo_tick_1 = 1500 + (8.38 * servo_1_command);
+            if (servo_tick_1 > 1583) { servo_tick_1 = 1583; }
+            if (servo_tick_1 < 1416) { servo_tick_1 = 1416; }
 
             servo_set_pos(&servo_1, (uint32_t)servo_tick_1);            
 
-            float servo_tick_2 = 1500 + (10 * servo_2_command);
-            if (servo_tick_2 > 1570) { servo_tick_2 = 1570; }
-            if (servo_tick_2 < 1430) { servo_tick_2 = 1430; }
+            float servo_tick_2 = 1500 + (8.38 * servo_2_command);
+            if (servo_tick_2 > 1583) { servo_tick_2 = 1583; }
+            if (servo_tick_2 < 1416) { servo_tick_2 = 1416; }
 
             servo_set_pos(&servo_2, (uint32_t)servo_tick_2);       
         }

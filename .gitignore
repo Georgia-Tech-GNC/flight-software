@@ -1,0 +1,8 @@
+# Build and setting folders
+build
+.vscode
+
+# Cache files
+**/.DS_Store
+**/__pycache__
+**/*.pyc

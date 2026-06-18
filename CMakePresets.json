@@ -1,0 +1,39 @@
+{
+    "version": 3,
+    "configurePresets": [
+        {
+            "name": "default",
+            "hidden": true,
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+		    "toolchainFile": "${sourceDir}/targets/Nucleo-h723zg/cmake/gcc-arm-none-eabi.cmake",
+            "cacheVariables": { }
+        },
+        {
+            "name": "dev",
+            "inherits": "default",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "TARGET_BOARD": "Nucleo-h723zg"
+            }
+        },
+        {
+            "name": "dev-release",
+            "inherits": "default",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "TARGET_BOARD": "Nucleo-h723zg"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "dev",
+            "configurePreset": "dev"
+        },
+        {
+            "name": "dev-release",
+            "configurePreset": "dev-release"
+        }
+    ]
+}

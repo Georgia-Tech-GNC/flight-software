@@ -24,7 +24,7 @@ def replace_cmake_toolchain_root(target_directory: Path):
     
     for file in (gcc_arm_none_eabi, starm_clang):
         file_text = file.read_text()
-        assert file_text.count("CMAKE_SOURCE_DIR") == 1, \
+        assert file_text.count("CMAKE_SOURCE_DIR") == 1 or file_text.count("CMAKE_CURRENT_LIST_DIR") == 1, \
             f'Expected to find exactly one instance of "CMAKE_SOURCE_DIR" in {file.name}! ' \
             'Note that if CubeMX has updated their CMake template, you may need to update this script.'
 

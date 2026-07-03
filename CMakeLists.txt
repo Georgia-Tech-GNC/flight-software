@@ -20,7 +20,8 @@ set(WARNING_FLAGS "-Wall" "-Wextra" "-Wpedantic" "-Wshadow")
 list(APPEND WARNING_FLAGS "-Wconversion" "-Wcast-align" "-Wcast-qual" "-Wdouble-promotion" "-Wsign-conversion")
 list(APPEND WARNING_FLAGS "-Wformat=2" "-Wundef" "-Wstrict-prototypes" "-Wmissing-prototypes" "-Wpointer-arith")
 
-target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE ${WARNING_FLAGS})
+# TODO: apply compiler flags?
+
 enable_language(C ASM)
 
 ########################################## Build Submodules ##########################################

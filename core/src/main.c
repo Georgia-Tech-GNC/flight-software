@@ -1,4 +1,6 @@
 #include "main.h"
+#include "FreeRTOS.h"
+#include "queue.h"
 
 int main(void) {
     initialize_mcu();
@@ -12,7 +14,6 @@ int main(void) {
         HAL_GPIO_WritePin(LED_Yellow_GPIO_Port, LED_Yellow_Pin, GPIO_PIN_SET);
         HAL_GPIO_WritePin(LED_Red_GPIO_Port, LED_Red_Pin, GPIO_PIN_SET);
         HAL_Delay(500);
-        
-        
+
     }
 }

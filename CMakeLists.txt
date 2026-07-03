@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
+cmake_policy(SET CMP0135 NEW)
 
 ################################## CMake Top-Level Project Settings ##################################
 set(CMAKE_C_STANDARD 23)
@@ -28,6 +29,35 @@ enable_language(C ASM)
 add_subdirectory(targets)
 add_subdirectory(core)
 
+############################################# Build Docs #############################################
+find_package(Doxygen)
+if(Doxygen_FOUND)
+    message(STATUS "Downloading doxygen theme...")
+    include(FetchContent)
+    FetchContent_Declare(
+        doxygen-theme-css
+        URL https://github.com/jothepro/doxygen-awesome-css/archive/refs/heads/main.zip
+    )
+    FetchContent_MakeAvailable(doxygen-theme-css)
+    FetchContent_GetProperties(doxygen-theme-css SOURCE_DIR DOXYGEN_THEME_DIR)
+
+    set(DOXYGEN_PROJECT_NAME "Flight Software")
+    set(DOXYGEN_GENERATE_HTML YES)
+    set(DOXYGEN_EXTRACT_ALL YES)
+    set(DOXYGEN_QUIET YES)
+    set(DOXYGEN_OPTIMIZE_OUTPUT_FOR_C YES)
+    set(DOXYGEN_GENERATE_LATEX NO)
+    set(DOXYGEN_HTML_EXTRA_STYLESHEET "${DOXYGEN_THEME_DIR}/doxygen-awesome.css")
+ 
+    doxygen_add_docs(
+        generate_docs
+        ${PROJECT_SOURCE_DIR}/core 
+        ALL
+        COMMENT "Generating API documentation with Doxygen"
+    )
+else()
+    message(STATUS "Doxygen not found. Documentation target will not be created.")
+endif()
 
 # Remove wrong libob.a library dependency when using cpp files
 list(REMOVE_ITEM CMAKE_C_IMPLICIT_LINK_LIBRARIES ob)

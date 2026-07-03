@@ -1,18 +1,22 @@
+/** @file main.c
+ * @brief General entry point for all targets
+ */
+
 #include "main.h"
+#include "port.h"
 
-int main(void) {
-    initialize_mcu();
 
-    
+
+/** 
+ * The main methods of all targets are expected to call this method once they are fully initialized
+ */
+void shared_main(void) {
+    HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_SET);
+
     while (true) {
-        // HAL_UART_Transmit(&huart3, (uint8_t*)"Hello World!\r\n", 15, HAL_MAX_DELAY);
-        HAL_GPIO_WritePin(LED_Yellow_GPIO_Port, LED_Yellow_Pin, GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(LED_Red_GPIO_Port, LED_Red_Pin, GPIO_PIN_RESET);
         HAL_Delay(500);
-        HAL_GPIO_WritePin(LED_Yellow_GPIO_Port, LED_Yellow_Pin, GPIO_PIN_SET);
-        HAL_GPIO_WritePin(LED_Red_GPIO_Port, LED_Red_Pin, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_RESET);
         HAL_Delay(500);
-        
-        
+        HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_SET);
     }
-}
+} 

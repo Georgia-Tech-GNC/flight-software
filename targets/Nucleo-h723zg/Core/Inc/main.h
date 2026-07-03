@@ -36,7 +36,7 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
-
+extern UART_HandleTypeDef huart3;
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
@@ -54,19 +54,15 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 
-void initialize_mcu();
-
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define LED_Green_Pin GPIO_PIN_0
-#define LED_Green_GPIO_Port GPIOB
+#define LED_GREEN_Pin GPIO_PIN_0
+#define LED_GREEN_GPIO_Port GPIOB
 #define STLK_VCP_RX_Pin GPIO_PIN_8
 #define STLK_VCP_RX_GPIO_Port GPIOD
 #define STLK_VCP_TX_Pin GPIO_PIN_9
 #define STLK_VCP_TX_GPIO_Port GPIOD
-#define SD_CardDetect_Pin GPIO_PIN_12
-#define SD_CardDetect_GPIO_Port GPIOA
 #define SWDIO_Pin GPIO_PIN_13
 #define SWDIO_GPIO_Port GPIOA
 #define SWCLK_Pin GPIO_PIN_14

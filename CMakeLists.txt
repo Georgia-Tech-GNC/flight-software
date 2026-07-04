@@ -17,7 +17,7 @@ project(flight-software)
 add_executable(${CMAKE_PROJECT_NAME} "")
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES LINKER_LANGUAGE C)
 
-set(WARNING_FLAGS "-Wall" "-Wextra" "-Wpedantic" "-Wshadow")
+set(WARNING_FLAGS "-Wall" "-Wextra" "-Wpedantic" "-Wshadow" "-fanalyzer")
 list(APPEND WARNING_FLAGS "-Wconversion" "-Wcast-align" "-Wcast-qual" "-Wdouble-promotion" "-Wsign-conversion")
 list(APPEND WARNING_FLAGS "-Wformat=2" "-Wundef" "-Wstrict-prototypes" "-Wmissing-prototypes" "-Wpointer-arith")
 

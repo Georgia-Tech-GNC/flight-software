@@ -20,7 +20,7 @@ jobs:
         sudo apt-get install -y gcc-arm-none-eabi ninja-build clang-tidy
     
     - name: Configure CMake
-      run: cmake --preset dev -DCMAKE_C_FLAGS="-Werror -fanalyzer" -DCMAKE_CXX_FLAGS="-Werror -fanalyzer"
+      run: cmake --preset dev -DCMAKE_C_FLAGS="-Werror" -DCMAKE_CXX_FLAGS="-Werror"
 
     - name: Build project
       run: cmake --build --preset dev

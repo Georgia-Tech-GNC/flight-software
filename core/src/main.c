@@ -3,7 +3,6 @@
  */
 
 #include "main.h"
-#include "port.h"
 
 void example(int x);
 

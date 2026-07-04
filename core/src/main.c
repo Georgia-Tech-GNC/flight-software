@@ -12,6 +12,14 @@
  */
 void shared_main(void) {
     HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_SET);
+    int x;
+    int y;
+
+    for (int i = 0; i < 10; i++) {
+        int y = 5;
+        y++;
+        
+    }
 
     while (true) {
         HAL_Delay(500);

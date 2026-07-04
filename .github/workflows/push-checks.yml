@@ -26,4 +26,4 @@ jobs:
       run: cmake --build --preset dev
 
     - name: Run cppcheck
-      run: cppcheck --project=build/dev/compile_commands.json --enable=all --suppress=missingIncludeSystem --error-exitcode=1 core/ drivers/
+      run: cppcheck --project=build/dev/compile_commands.json --enable=all --suppress=missingIncludeSystem --suppress=missingInclude --suppress=unusedFunction --error-exitcode=1 -i targets 

@@ -3,9 +3,6 @@
  */
 
 #include "main.h"
-#include "port.h"
-
-
 
 /** 
  * The main methods of all targets are expected to call this method once they are fully initialized

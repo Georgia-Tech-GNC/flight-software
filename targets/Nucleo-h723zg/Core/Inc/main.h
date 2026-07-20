@@ -37,6 +37,9 @@ void shared_main();
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
 extern UART_HandleTypeDef huart3;
+extern SPI_HandleTypeDef hspi1;
+extern TIM_HandleTypeDef htim2;
+
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/

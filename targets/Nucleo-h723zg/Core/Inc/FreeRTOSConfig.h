@@ -166,6 +166,15 @@ standard names. */
 
 /* USER CODE BEGIN Defines */
 /* Section where parameter definitions can be added (for instance, to override default ones in FreeRTOS.h) */
+#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() vConfigureTIM5Counter()
+#define portGET_RUN_TIME_COUNTER_VALUE() vGetTIM5Counter()
+#define configRUN_TIME_COUNTER_TYPE uint64_t
+
+#define configGENERATE_RUN_TIME_STATS 1
+
+void vConfigureTIM5Counter(void);
+configRUN_TIME_COUNTER_TYPE vGetTIM5Counter(void);
+
 /* USER CODE END Defines */
 
 #endif /* FREERTOS_CONFIG_H */

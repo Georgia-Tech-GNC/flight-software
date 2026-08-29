@@ -9,10 +9,18 @@ if (TARGET_BOARD STREQUAL "Nucleo-h723zg")
 
     add_subdirectory(Nucleo-h723zg/cmake/stm32cubemx)
 
+    set(FREERTOS_PORT "GCC_ARM_CM7" CACHE STRING "")
+
+    add_library(freertos_config INTERFACE)
+    target_include_directories(freertos_config SYSTEM INTERFACE 
+        ${CMAKE_CURRENT_SOURCE_DIR}/Nucleo-h723zg/Core/Inc
+    )
+
+        
     # Mark cubemx as a system header to avoid warnings when including it
     get_target_property(CUBEMX_INCLUDES stm32cubemx INTERFACE_INCLUDE_DIRECTORIES)
     target_include_directories(${CMAKE_PROJECT_NAME} SYSTEM PRIVATE ${CUBEMX_INCLUDES})
-    target_link_libraries(${CMAKE_PROJECT_NAME} stm32cubemx)
+    target_link_libraries(${CMAKE_PROJECT_NAME} stm32cubemx freertos_kernel)
 
     # Disable warnings for items in targets
     get_target_property(SOURCE_LIST ${CMAKE_PROJECT_NAME} SOURCES)

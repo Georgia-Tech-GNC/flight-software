@@ -2,6 +2,7 @@
 
 from pathlib import Path
 import argparse
+import re
 
 PROJECT_DIRECTORY = Path(__file__).resolve().parent.parent.parent
 
@@ -31,6 +32,60 @@ def replace_cmake_toolchain_root(target_directory: Path):
         fixed_text = file_text.replace("{CMAKE_SOURCE_DIR}", "{CMAKE_CURRENT_LIST_DIR}/..")
         file.write_text(fixed_text)
 
+def remove_isr(filepath: str, isr_name: str):
+    """
+    Removes the function definition void isr_name(void) {...} from filepath
+    """
+    with open(filepath, "r", encoding="utf-8") as f:
+        source = f.read()
+
+    # matches "void isr_name(void) {"
+    match = re.search(
+        rf"\bvoid\s+{re.escape(isr_name)}\s*\(\s*(?:void)?\s*\)\s*\{{",
+        source,
+    )
+
+    if not match:
+        print(f"ISR {isr_name} not found, skipping.")
+        return
+
+    depth = 1
+    i = match.end()
+
+    while i < len(source) and depth:
+        if source[i] == "{":
+            depth += 1
+        elif source[i] == "}":
+            depth -= 1
+        i += 1
+
+    if depth != 0:
+        raise ValueError(f"Could not find end of function {isr_name}")
+
+    replacement = f"// {isr_name} removed by lib/scripts/fix_cubemx_autogen.py"
+
+    # TODO: Error if the function contains non-comment code to prevent inadvertently deleting code.
+    source = source[:match.start()] + replacement + source[i:]
+
+    with open(filepath, "w", encoding="utf-8") as f:
+        f.write(source)
+
+
+def find_stm32_it_file(directory: str) -> Path:
+    """
+    Finds the corresponding stm32_*it.c file under the target's source directory.
+    Errors if there is not exactly 1 file matching the glob pattern in Core/Src/
+    """
+
+    files = list(Path(directory).glob("Core/Src/stm32*_it.c"))
+
+    if len(files) > 1:
+        raise RuntimeError(f"Found multiple stm32*_it.c files: {files}")
+
+    if not files:
+        raise FileNotFoundError(f"No stm32*_it.c file found in {directory}")
+
+    return files[0]
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -46,5 +101,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     replace_cmake_toolchain_root(args.target_directory)
+    stm32_it_file = find_stm32_it_file(args.target_directory)
+    print(f"Discovered STM32 interrupt file {stm32_it_file}")
+    for isr in ["PendSV_Handler", "SVC_Handler", "SysTick_Handler"]:
+        print(f"Removing ISR {isr}...")
+        remove_isr(stm32_it_file, isr) 
 
     print("Done")

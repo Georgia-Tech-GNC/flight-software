@@ -59,6 +59,8 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define LED_GREEN_Pin GPIO_PIN_0
 #define LED_GREEN_GPIO_Port GPIOB
+#define LED_RED_Pin GPIO_PIN_14
+#define LED_RED_GPIO_Port GPIOB
 #define STLK_VCP_RX_Pin GPIO_PIN_8
 #define STLK_VCP_RX_GPIO_Port GPIOD
 #define STLK_VCP_TX_Pin GPIO_PIN_9
@@ -67,6 +69,8 @@ void Error_Handler(void);
 #define SWDIO_GPIO_Port GPIOA
 #define SWCLK_Pin GPIO_PIN_14
 #define SWCLK_GPIO_Port GPIOA
+#define LED_YELLOW_Pin GPIO_PIN_1
+#define LED_YELLOW_GPIO_Port GPIOE
 
 /* USER CODE BEGIN Private defines */
 

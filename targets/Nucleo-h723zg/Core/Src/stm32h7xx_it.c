@@ -140,6 +140,11 @@ void UsageFault_Handler(void)
 }
 
 /**
+  * @brief This function handles System service call via SWI instruction.
+  */
+// SVC_Handler removed by lib/scripts/fix_cubemx_autogen.py
+
+/**
   * @brief This function handles Debug monitor.
   */
 void DebugMon_Handler(void)
@@ -151,6 +156,16 @@ void DebugMon_Handler(void)
 
   /* USER CODE END DebugMonitor_IRQn 1 */
 }
+
+/**
+  * @brief This function handles Pendable request for system service.
+  */
+// PendSV_Handler removed by lib/scripts/fix_cubemx_autogen.py
+
+/**
+  * @brief This function handles System tick timer.
+  */
+// SysTick_Handler removed by lib/scripts/fix_cubemx_autogen.py
 
 /******************************************************************************/
 /* STM32H7xx Peripheral Interrupt Handlers                                    */

@@ -65,7 +65,12 @@ def remove_isr(filepath: os.PathLike, isr_name: str):
 
     replacement = f"// {isr_name} removed by lib/scripts/fix_cubemx_autogen.py"
 
-    # TODO: Error if the function contains non-comment code to prevent inadvertently deleting code.
+    body = source[match.end():(i-1)]
+    non_comment_body = re.sub(rf"\/\/[\s\S]*?\r?\n|\/\*[\s\S]*?\*\/|\s", '', body)
+
+    if len(non_comment_body) > 0:
+        raise ValueError(f"Function {isr_name} contains non-comment text! Aborting. Non-comment text detected:\n{non_comment_body}")
+
     source = source[:match.start()] + replacement + source[i:]
 
     with open(filepath, "w", encoding="utf-8") as f:

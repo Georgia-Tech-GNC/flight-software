@@ -13,6 +13,8 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+      with:
+        submodules: recursive
 
     - name: Install dependencies
       run: |
@@ -36,4 +38,4 @@ jobs:
         --suppress=unmatchedSuppression \
         --suppress=checkersReport \
         --error-exitcode=1 \
-        -i targets 
+        -i targets -i lib/FreeRTOS-Kernel

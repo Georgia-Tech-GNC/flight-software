@@ -55,7 +55,7 @@ static void blink_green(void *_params) {
 /** 
  * The main methods of all targets are expected to call this method once they are fully initialized
  */
-void shared_main(void) {
+[[noreturn]] void shared_main(void) {
     TaskHandle_t blink_red_task = xTaskCreateStatic(blink_red, "Blink Red", STACK_SIZE, NULL, tskIDLE_PRIORITY, blink_red_stack, &blink_red_buffer);
     TaskHandle_t blink_yellow_task = xTaskCreateStatic(blink_yellow, "Blink Yellow", STACK_SIZE, NULL, tskIDLE_PRIORITY, blink_yellow_stack, &blink_yellow_buffer);
     TaskHandle_t blink_green_task = xTaskCreateStatic(blink_green, "Blink Green", STACK_SIZE, NULL, tskIDLE_PRIORITY, blink_green_stack, &blink_green_buffer);
@@ -67,4 +67,5 @@ void shared_main(void) {
         HAL_UART_Transmit(&huart3, (uint8_t *) "Failed to create tasks\r\n", 25, HAL_MAX_DELAY);
     }
 
+    while (true) __asm__ volatile (""); // No return
 } 

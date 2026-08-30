@@ -38,4 +38,4 @@ jobs:
         --suppress=unmatchedSuppression \
         --suppress=checkersReport \
         --error-exitcode=1 \
-        -i targets 
+        -i targets -i lib/FreeRTOS-Kernel

@@ -12,7 +12,7 @@ if (TARGET_BOARD STREQUAL "Nucleo-h723zg")
     set(FREERTOS_PORT "GCC_ARM_CM7" CACHE STRING "")
 
     add_library(freertos_config INTERFACE)
-    target_include_directories(freertos_config SYSTEM INTERFACE 
+    target_include_directories(freertos_config INTERFACE 
         ${CMAKE_CURRENT_SOURCE_DIR}/Nucleo-h723zg/Core/Inc
     )
 

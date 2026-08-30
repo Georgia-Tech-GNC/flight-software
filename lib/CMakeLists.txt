@@ -1,1 +1,1 @@
-add_subdirectory(FreeRTOS-Kernel)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/FreeRTOS-Kernel)

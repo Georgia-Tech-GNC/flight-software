@@ -20,6 +20,8 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y gcc-arm-none-eabi ninja-build cppcheck
+        pip install uv
+
     
     - name: Configure CMake
       run: cmake --preset dev -DCMAKE_C_FLAGS="-Werror" -DCMAKE_CXX_FLAGS="-Werror"

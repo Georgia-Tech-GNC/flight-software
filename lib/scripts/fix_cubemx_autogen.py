@@ -3,6 +3,7 @@
 from pathlib import Path
 import argparse
 import re
+import os
 
 PROJECT_DIRECTORY = Path(__file__).resolve().parent.parent.parent
 
@@ -32,7 +33,7 @@ def replace_cmake_toolchain_root(target_directory: Path):
         fixed_text = file_text.replace("{CMAKE_SOURCE_DIR}", "{CMAKE_CURRENT_LIST_DIR}/..")
         file.write_text(fixed_text)
 
-def remove_isr(filepath: str, isr_name: str):
+def remove_isr(filepath: os.PathLike, isr_name: str):
     """
     Removes the function definition void isr_name(void) {...} from filepath
     """

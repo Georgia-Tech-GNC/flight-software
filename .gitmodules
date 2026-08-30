@@ -1,0 +1,3 @@
+[submodule "lib/ground-station"]
+	path = lib/ground-station
+	url = https://github.com/Georgia-Tech-GNC/ground-station.git

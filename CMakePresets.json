@@ -51,6 +51,13 @@
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release"
             }
+        },
+        {
+            "name": "dev",
+            "inherits": "default-nucleo-h723zg",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
         }
     ],
     "buildPresets": [
@@ -69,6 +76,10 @@
         {
             "name": "ncl-h723-release",
             "configurePreset": "ncl-h723-release"
+        },
+        {
+            "name": "dev",
+            "configurePreset": "dev"
         }
     ]
 }

@@ -1,4 +1,4 @@
-/** @file main.c
+/** @file shared_main.c
  * @brief General entry point for all targets
  */
 

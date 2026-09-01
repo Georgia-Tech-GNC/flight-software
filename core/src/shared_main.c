@@ -2,7 +2,8 @@
  * @brief General entry point for all targets
  */
 
-#include "main.h"
+#include "port.h"
+#include "shared_main.h"
 #include "FreeRTOS.h"
 #include "task.h"
 
@@ -22,33 +23,33 @@ StackType_t blink_green_stack[STACK_SIZE];
 static void blink_red(void *_params) {
     UNUSED(_params);
 
-    while (1) {
+    while (true) {
         HAL_Delay(100);
-        HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET);
         HAL_Delay(100);
-        HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
     }
 }
 
 static void blink_yellow(void *_params) {
     UNUSED(_params);
 
-    while (1) {
+    while (true) {
         HAL_Delay(200);
-        HAL_GPIO_WritePin(LED_YELLOW_GPIO_Port, LED_YELLOW_Pin, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
         HAL_Delay(200);
-        HAL_GPIO_WritePin(LED_YELLOW_GPIO_Port, LED_YELLOW_Pin, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_SET);
     }
 }
 
 static void blink_green(void *_params) {
     UNUSED(_params);
 
-    while (1) {
+    while (true) {
         HAL_Delay(500);
-        HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin, GPIO_PIN_RESET);
         HAL_Delay(500);
-        HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin, GPIO_PIN_SET);
     }
 }
 

@@ -23,21 +23,8 @@ jobs:
         pip install uv
 
     
-    - name: Configure CMake
-      run: cmake --preset dev -DCMAKE_C_FLAGS="-Werror" -DCMAKE_CXX_FLAGS="-Werror"
+    - name: Build and check (ncl-f429-dev)
+      run: .github/scripts/build_and_check.sh ncl-f429-dev
 
-    - name: Build project
-      run: cmake --build --preset dev
-
-    - name: Run cppcheck
-      run: |
-       cppcheck \
-        --project=build/dev/compile_commands.json \
-        --enable=all \
-        --suppress=missingIncludeSystem \
-        --suppress=missingInclude \
-        --suppress=unusedFunction \
-        --suppress=unmatchedSuppression \
-        --suppress=checkersReport \
-        --error-exitcode=1 \
-        -i targets -i lib/FreeRTOS-Kernel
+    - name: Build and check (ncl-h723-dev)
+      run: .github/scripts/build_and_check.sh ncl-h723-dev

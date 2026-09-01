@@ -9,47 +9,47 @@
 
 #define STACK_SIZE 200
 
-static void blink_red(void *_params);
-static void blink_yellow(void *_params);
-static void blink_green(void *_params);
+static void blink_led_1(void *_params);
+static void blink_led_2(void *_params);
+static void blink_led_3(void *_params);
 
-StaticTask_t blink_red_buffer;
-StackType_t blink_red_stack[STACK_SIZE];
-StaticTask_t blink_yellow_buffer;
-StackType_t blink_yellow_stack[STACK_SIZE];
-StaticTask_t blink_green_buffer;
-StackType_t blink_green_stack[STACK_SIZE];
+StaticTask_t blink_led_1_buffer;
+StackType_t blink_led_1_stack[STACK_SIZE];
+StaticTask_t blink_led_2_buffer;
+StackType_t blink_led_2_stack[STACK_SIZE];
+StaticTask_t blink_led_3_buffer;
+StackType_t blink_led_3_stack[STACK_SIZE];
 
-static void blink_red(void *_params) {
+static void blink_led_1(void *_params) {
     UNUSED(_params);
 
     while (true) {
         HAL_Delay(100);
-        HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(LED1_GPIO_PORT, LED1_PIN, GPIO_PIN_RESET);
         HAL_Delay(100);
-        HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(LED1_GPIO_PORT, LED1_PIN, GPIO_PIN_SET);
     }
 }
 
-static void blink_yellow(void *_params) {
+static void blink_led_2(void *_params) {
     UNUSED(_params);
 
     while (true) {
         HAL_Delay(200);
-        HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(LED2_GPIO_PORT, LED2_PIN, GPIO_PIN_RESET);
         HAL_Delay(200);
-        HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(LED2_GPIO_PORT, LED2_PIN, GPIO_PIN_SET);
     }
 }
 
-static void blink_green(void *_params) {
+static void blink_led_3(void *_params) {
     UNUSED(_params);
 
     while (true) {
-        HAL_Delay(500);
-        HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin, GPIO_PIN_RESET);
-        HAL_Delay(500);
-        HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin, GPIO_PIN_SET);
+        HAL_Delay(400);
+        HAL_GPIO_WritePin(LED3_GPIO_PORT, LED3_PIN, GPIO_PIN_RESET);
+        HAL_Delay(400);
+        HAL_GPIO_WritePin(LED3_GPIO_PORT, LED3_PIN, GPIO_PIN_SET);
     }
 }
 
@@ -57,15 +57,15 @@ static void blink_green(void *_params) {
  * The main methods of all targets are expected to call this method once they are fully initialized
  */
 [[noreturn]] void shared_main(void) {
-    TaskHandle_t blink_red_task = xTaskCreateStatic(blink_red, "Blink Red", STACK_SIZE, NULL, tskIDLE_PRIORITY, blink_red_stack, &blink_red_buffer);
-    TaskHandle_t blink_yellow_task = xTaskCreateStatic(blink_yellow, "Blink Yellow", STACK_SIZE, NULL, tskIDLE_PRIORITY, blink_yellow_stack, &blink_yellow_buffer);
-    TaskHandle_t blink_green_task = xTaskCreateStatic(blink_green, "Blink Green", STACK_SIZE, NULL, tskIDLE_PRIORITY, blink_green_stack, &blink_green_buffer);
+    TaskHandle_t blink_led_1_task = xTaskCreateStatic(blink_led_1, "Blink LED 1", STACK_SIZE, NULL, tskIDLE_PRIORITY, blink_led_1_stack, &blink_led_1_buffer);
+    TaskHandle_t blink_led_2_task = xTaskCreateStatic(blink_led_2, "Blink LED 2", STACK_SIZE, NULL, tskIDLE_PRIORITY, blink_led_2_stack, &blink_led_2_buffer);
+    TaskHandle_t blink_led_3_task = xTaskCreateStatic(blink_led_3, "Blink LED 3", STACK_SIZE, NULL, tskIDLE_PRIORITY, blink_led_3_stack, &blink_led_3_buffer);
 
-    if (blink_red_task && blink_yellow_task && blink_green_task) {
-        HAL_UART_Transmit(&huart3, (uint8_t *) "Successfully created tasks, starting scheduler.\r\n", 50, HAL_MAX_DELAY);
+    if (blink_led_1_task && blink_led_2_task && blink_led_3_task) {
+        HAL_UART_Transmit(&debug_uart, (uint8_t *) "Successfully created tasks, starting scheduler.\r\n", 50, HAL_MAX_DELAY);
         vTaskStartScheduler();
     } else {
-        HAL_UART_Transmit(&huart3, (uint8_t *) "Failed to create tasks\r\n", 25, HAL_MAX_DELAY);
+        HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to create tasks\r\n", 25, HAL_MAX_DELAY);
     }
 
     while (true) __asm__ volatile (""); // No return

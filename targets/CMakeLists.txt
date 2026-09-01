@@ -2,6 +2,7 @@
 # Note that the toolchain directory must also be set in the root CMakePresets.json
 
 set(TARGET_BOARD "unknown" CACHE STRING "Target microcontroller architecture (see ./targets directory for implementations)")
+set_property(CACHE TARGET_BOARD PROPERTY STRINGS "Nucleo-h723zg" "Nucleo-f429zi")
 
 if (TARGET_BOARD STREQUAL "Nucleo-h723zg")
     message("Selected target board: Nucleo-h723zg")

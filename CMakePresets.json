@@ -6,34 +6,80 @@
             "hidden": true,
             "generator": "Ninja",
             "binaryDir": "${sourceDir}/build/${presetName}",
-		    "toolchainFile": "${sourceDir}/targets/Nucleo-h723zg/cmake/gcc-arm-none-eabi.cmake",
             "cacheVariables": { }
         },
         {
-            "name": "dev",
+            "name": "default-nucleo-f429zi",
             "inherits": "default",
+            "toolchainFile": "${sourceDir}/targets/Nucleo-f429zi/cmake/gcc-arm-none-eabi.cmake",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
+                "TARGET_BOARD": "Nucleo-f429zi"
+            }
+        },
+        {
+            "name": "default-nucleo-h723zg",
+            "inherits": "default",
+            "toolchainFile": "${sourceDir}/targets/Nucleo-h723zg/cmake/gcc-arm-none-eabi.cmake",
+            "cacheVariables": {
                 "TARGET_BOARD": "Nucleo-h723zg"
             }
         },
         {
-            "name": "dev-release",
-            "inherits": "default",
+            "name": "ncl-f429-dev",
+            "inherits": "default-nucleo-f429zi",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release",
-                "TARGET_BOARD": "Nucleo-h723zg"
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "ncl-f429-release",
+            "inherits": "default-nucleo-f429zi",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "ncl-h723-dev",
+            "inherits": "default-nucleo-h723zg",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "ncl-h723-release",
+            "inherits": "default-nucleo-h723zg",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "dev",
+            "inherits": "default-nucleo-h723zg",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
             }
         }
     ],
     "buildPresets": [
         {
-            "name": "dev",
-            "configurePreset": "dev"
+            "name": "ncl-f429-dev",
+            "configurePreset": "ncl-f429-dev"
         },
         {
-            "name": "dev-release",
-            "configurePreset": "dev-release"
+            "name": "ncl-f429-release",
+            "configurePreset": "ncl-f429-release"
+        },
+        {
+            "name": "ncl-h723-dev",
+            "configurePreset": "ncl-h723-dev"
+        },
+        {
+            "name": "ncl-h723-release",
+            "configurePreset": "ncl-h723-release"
+        },
+        {
+            "name": "dev",
+            "configurePreset": "dev"
         }
     ]
 }

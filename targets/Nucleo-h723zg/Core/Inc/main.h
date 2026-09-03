@@ -66,6 +66,8 @@ void Error_Handler(void);
 #define STLK_VCP_RX_GPIO_Port GPIOD
 #define STLK_VCP_TX_Pin GPIO_PIN_9
 #define STLK_VCP_TX_GPIO_Port GPIOD
+#define SPI1_CS_Pin GPIO_PIN_14
+#define SPI1_CS_GPIO_Port GPIOD
 #define SWDIO_Pin GPIO_PIN_13
 #define SWDIO_GPIO_Port GPIOA
 #define SWCLK_Pin GPIO_PIN_14

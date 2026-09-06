@@ -1,4 +1,5 @@
 #include "lsm6dso.h"
+#include "string.h"
 #define WHO_AM_I 0x0F 
 #define WHO_AM_I_VAL 0x6C
 #define CTRL2_G 0x11
@@ -17,12 +18,19 @@
 
 static bool lsm6dso_read(SPI_HandleTypeDef* spi_handle, uint8_t reg, uint8_t* data, uint16_t len)
 {
-    uint8_t addr = reg | 0x80;
+    uint8_t tx[8] = {0};
+    uint8_t rx[8] = {0};
+
+    if((size_t) len + 1u > sizeof(tx))
+    {
+        return false;
+    }
+    tx[0] = reg | 0x80;
     HAL_GPIO_WritePin(SPI1_CS_GPIO_Port, SPI1_CS_Pin, GPIO_PIN_RESET); //CS low
-    HAL_StatusTypeDef tx = HAL_SPI_Transmit(spi_handle, &addr, 1, HAL_MAX_DELAY);
-    HAL_StatusTypeDef rx = HAL_SPI_Receive(spi_handle, data, len, HAL_MAX_DELAY);
+    HAL_StatusTypeDef txrx = HAL_SPI_TransmitReceive(spi_handle, tx, rx, (uint16_t) (len +1), HAL_MAX_DELAY);
     HAL_GPIO_WritePin(SPI1_CS_GPIO_Port, SPI1_CS_Pin, GPIO_PIN_SET); //CS high
-    return tx == HAL_OK && rx == HAL_OK; 
+    memcpy(data, &rx[1], len);
+    return txrx == HAL_OK;
 }
 static bool lsm6dso_write(SPI_HandleTypeDef* spi_handle, uint8_t reg, uint8_t value)
 {

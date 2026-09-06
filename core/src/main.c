@@ -65,14 +65,13 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
         portYIELD_FROM_ISR(hiWoken);
     }
     else {
-        HAL_UART_Receive_IT(&huart3, &byte, 1);
+        HAL_UART_Receive_IT(huart, &byte, 1);
     }
 }
 
 static void imu_task(void *pvParameters) {
     UNUSED(pvParameters); // Silence warnings related to pvParameters
     char buf[80];
-    int len;
     // Tasks are expected to run forever and never return
     while (true) {
         // Insert business logic here
@@ -80,7 +79,7 @@ static void imu_task(void *pvParameters) {
         float roll  = lsm6dso_get_roll_rate(&hspi1);
         float yaw   = lsm6dso_get_yaw_rate(&hspi1);
 
-        len = snprintf(buf, sizeof(buf),
+        int len = snprintf(buf, sizeof(buf),
                        "P %s%d.%05d  R %s%d.%05d  Y %s%d.%05d\r\n",
                        SIGN(pitch), WHOLE(pitch), FRAC(pitch),
                        SIGN(roll),  WHOLE(roll),  FRAC(roll),

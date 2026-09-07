@@ -68,7 +68,42 @@ static void MX_USB_OTG_FS_PCD_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+uint32_t trace_backend_enter_critical() {
+    uint32_t state = __get_PRIMASK();
+    __disable_irq();
+    return state;
+}
 
+void trace_backend_exit_critical(uint32_t state) {
+    __set_PRIMASK(state);
+}
+
+void trace_backend_send8(uint8_t channel, uint8_t value) {
+    do {
+        while (ITM->PORT[channel].u32 == 0u) __NOP();
+        ITM->PORT[channel].u8 = value;
+    } while (0);
+}
+
+void trace_backend_send16(uint8_t channel, uint16_t value) {
+    do {
+        while (ITM->PORT[channel].u32 == 0u) __NOP();
+        ITM->PORT[channel].u16 = value;
+    } while (0);
+}
+
+void trace_backend_send32(uint8_t channel, uint32_t value) {
+    do {
+        while (ITM->PORT[channel].u32 == 0u) __NOP();
+        ITM->PORT[channel].u32 = value;
+    } while (0);
+}
+
+void trace_backend_initialize() {
+    CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+    ITM->TCR |= ITM_TCR_ITMENA_Msk;
+    ITM->TER = 0xFFFFFFFFUL;
+}
 /* USER CODE END 0 */
 
 /**

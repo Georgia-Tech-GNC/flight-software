@@ -1,0 +1,3 @@
+$cpu_freq = 192000000
+$debug_uart = sysbus.uart3
+

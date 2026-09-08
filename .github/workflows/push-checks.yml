@@ -27,3 +27,6 @@ jobs:
 
     - name: Build and check (ncl-h723-dev)
       run: .github/scripts/build_and_check.sh ncl-h723-dev
+
+    - name: Renode test (ncl-h723-dev)
+      run: .github/scripts/renode_test.sh

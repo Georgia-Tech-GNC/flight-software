@@ -1,0 +1,3 @@
+mach create "{{platform.name}}"
+machine LoadPlatformDescription @{{target_dir}}/platform.repl
+sysbus.nvic Frequency {{ioc["RCC.CpuClockFreq_Value"]}}

@@ -1,0 +1,12 @@
+name: nucleo-h723zg
+debug_uart:
+  id: 3
+led_1:
+  gpio_port: A
+  gpio_pin: 1
+led_2:
+  gpio_port: A
+  gpio_pin: 3
+led_3:
+  gpio_port: B
+  gpio_pin: 10

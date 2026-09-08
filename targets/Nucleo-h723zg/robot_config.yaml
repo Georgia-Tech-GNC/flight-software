@@ -1,0 +1,2 @@
+INIT_RESC_FILE: targets/Nucleo-h723zg/init.resc
+DEBUG_UART: sysbus.usart3

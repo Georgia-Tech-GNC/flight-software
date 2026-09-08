@@ -15,6 +15,17 @@ if (TARGET_BOARD STREQUAL "Nucleo-h723zg")
     target_include_directories(freertos_config INTERFACE 
         ${CMAKE_CURRENT_SOURCE_DIR}/Nucleo-h723zg/Core/Inc
     )
+elseif (TARGET_BOARD STREQUAL "flight-computer")
+    message("Selected target board: flight-computer")
+
+    add_subdirectory(flight-computer/cmake/stm32cubemx)
+
+    set(FREERTOS_PORT "GCC_ARM_CM7" CACHE STRING "")
+
+    add_library(freertos_config INTERFACE)
+    target_include_directories(freertos_config INTERFACE 
+        ${CMAKE_CURRENT_SOURCE_DIR}/flight-computer/Core/Inc
+    )
 elseif (TARGET_BOARD STREQUAL "Nucleo-f429zi")
     message("Selected target board: Nucleo-f429zi")
 

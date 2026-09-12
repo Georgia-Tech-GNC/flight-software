@@ -3,7 +3,7 @@ from pathlib import Path
 from perfetto.trace_builder.proto_builder import StreamingTraceProtoBuilder
 from perfetto.protos.perfetto.trace.perfetto_trace_pb2 import TrackEvent
 
-from itm_parser import ITMPacket, ITMPacketType
+from app.itm_parser import ITMPacket, ITMPacketType
 
 def _decode_str(encoded: int) -> str:
     """

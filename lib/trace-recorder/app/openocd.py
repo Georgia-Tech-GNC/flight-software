@@ -3,7 +3,7 @@ import signal
 import os
 from collections.abc import AsyncIterator
 
-from tcp_connection import TCPConnection
+from app.tcp_connection import TCPConnection
 
 class OpenOCDSWOStream(TCPConnection):
     """

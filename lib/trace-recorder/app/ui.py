@@ -9,9 +9,9 @@ from textual.app import App, ComposeResult
 from textual.containers import Horizontal, Vertical
 from textual.widgets import Button, Static
 
-from session_manager import SessionManager, SessionState, SessionConfig
-from open_trace_in_ui import open_trace
-from dialogue_box import TraceCompleteDialog
+from app.session_manager import SessionManager, SessionState, SessionConfig
+from app.open_trace_in_ui import open_trace
+from app.dialogue_box import TraceCompleteDialog
 
 GDB_STARTUP_COMMANDS = ["target remote localhost:3333", "monitor halt", "tui enable", "layout src"]
 PROJECT_PATH = Path(__file__).resolve().parent.parent.resolve()

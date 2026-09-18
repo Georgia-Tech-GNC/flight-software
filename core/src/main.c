@@ -152,4 +152,6 @@ static void led_task(void* pvParameters) {
     );
     
     vTaskStartScheduler();
+   
+    while (true) __asm__ volatile (""); // No return 
 } 

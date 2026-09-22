@@ -10,6 +10,9 @@
 #include <portmacro.h>
 #include <stdio.h>
 
+#include <string.h>
+#include <stdint.h>
+
 
 /* HELPFUL HINTS:
  * 
@@ -42,7 +45,13 @@
     // Don't worry about this line for now :)
     HAL_TIM_Base_Start(&htim2);
 
+    lsm6dso_initialize(&hspi1);
     while (true) {
+        HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_SET);
 
-    }
-} 
+        float pitch = lsm6dso_get_pitch_rate(&hspi1);
+        float yaw = lsm6dso_get_yaw_rate(&hspi1);
+        float roll = lsm6dso_get_roll_rate(&hspi1);
+
+        char print[100];
+        int length = 

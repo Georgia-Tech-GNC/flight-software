@@ -20,13 +20,13 @@ jobs:
       uses: DeterminateSystems/nix-installer-action@main
 
     - name: Build and check (ncl-f429-dev)
-      run: nix-shell --run '.github/scripts/build_and_check.sh ncl-f429-dev'
+      run: nix develop --command '.github/scripts/build_and_check.sh ncl-f429-dev'
 
     - name: Build and check (ncl-h723-dev)
-      run: nix-shell --run '.github/scripts/build_and_check.sh ncl-h723-dev'
+      run: nix develop --command '.github/scripts/build_and_check.sh ncl-h723-dev'
 
     - name: Renode test (ncl-h723-dev)
-      run: nix-shell --run '.github/scripts/renode_test.sh'
+      run: nix develop --command '.github/scripts/renode_test.sh'
 
     - name: Upload Renode test results
       if: always()

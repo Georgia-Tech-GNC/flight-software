@@ -28,3 +28,10 @@ jobs:
     - name: Renode test (ncl-h723-dev)
       run: nix-shell --run '.github/scripts/renode_test.sh'
 
+    - name: Upload Renode test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: renode-test-results
+        path: test-results/
+        if-no-files-found: error

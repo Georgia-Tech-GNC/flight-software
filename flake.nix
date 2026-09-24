@@ -22,22 +22,35 @@
         };
 
         renode-17 = pkgs.stdenv.mkDerivation {
-            pname = "renode";
-            version = "1.17.0";
+  pname = "renode";
+  version = "1.17.0";
 
-            src = pkgs.fetchurl {
-            url = "https://builds.renode.io/renode-1.17.0.linux-portable.tar.gz";
-            hash = "sha256-kqM9aqedPIv3TA2TREegSNvHYQLe9nXS5T3pAazzAOs=";
-            };
+  src = pkgs.fetchurl {
+    url = "https://builds.renode.io/renode-1.17.0.multiplatform.zip";
+    hash = "sha256-us1hpfebrTxPDWLQjp29fHDQbeTqUaLbGJdDsrdMyCY=";
+  };
 
-            installPhase = ''
-            mkdir -p $out/bin
-            mkdir -p $out/share
+  nativeBuildInputs = [
+    pkgs.unzip
+  ];
 
-            cp -r ./* $out/share
-            ln -s $out/share/renode $out/bin/renode
-            '';
-        };
+  unpackPhase = ''
+    unzip "$src"
+  '';
+
+  installPhase = ''
+    mkdir -p $out/bin
+    mkdir -p $out/share
+
+    cp -r renode_1.17.0-multiplatform/. $out/share/
+  '';
+};
+        renode = pkgs.writeShellScriptBin "renode" ''
+        export RENODE_ROOT=${renode-17}/share/renode
+  export PATH=${renode-17}/share/renode:$PATH
+
+        exec ${renode-17}/share/renode "$@"
+'';
 
         renode-test = pkgs.writeShellScriptBin "renode-test" ''
             exec ${pkgs.uv}/bin/uv run \
@@ -52,12 +65,14 @@
             cppcheck
             python3
             renode-17
+            renode
             renode-test
             gcc-arm-embedded
             openocd
             git
             picocom
             cmakeCurses
+            dotnet-sdk_10
             ];
         };
         });

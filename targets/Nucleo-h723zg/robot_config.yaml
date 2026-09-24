@@ -1,2 +1,2 @@
-INIT_RESC_FILE: targets/Nucleo-h723zg/init.resc
+INIT_RESC_FILE: /home/sam/shared/git/flight-software/targets/Nucleo-h723zg/init.resc
 DEBUG_UART: sysbus.usart3

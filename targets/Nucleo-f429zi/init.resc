@@ -1,0 +1,3 @@
+mach create "nucleo-f429zi"
+machine LoadPlatformDescription @/home/sam/shared/git/flight-software/targets/Nucleo-f429zi/platform.repl
+sysbus.nvic Frequency 

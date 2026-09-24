@@ -4,6 +4,8 @@
 set(TARGET_BOARD "unknown" CACHE STRING "Target microcontroller architecture (see ./targets directory for implementations)")
 set_property(CACHE TARGET_BOARD PROPERTY STRINGS "Nucleo-h723zg" "Nucleo-f429zi")
 
+find_program(UV_EXECUTABLE uv REQUIRED)
+
 if (TARGET_BOARD STREQUAL "Nucleo-h723zg")
     message("Selected target board: Nucleo-h723zg")
 
@@ -15,16 +17,12 @@ if (TARGET_BOARD STREQUAL "Nucleo-h723zg")
     target_include_directories(freertos_config INTERFACE 
         ${CMAKE_CURRENT_SOURCE_DIR}/Nucleo-h723zg/Core/Inc
     )
-elseif (TARGET_BOARD STREQUAL "flight-computer")
-    message("Selected target board: flight-computer")
 
-    add_subdirectory(flight-computer/cmake/stm32cubemx)
-
-    set(FREERTOS_PORT "GCC_ARM_CM7" CACHE STRING "")
-
-    add_library(freertos_config INTERFACE)
-    target_include_directories(freertos_config INTERFACE 
-        ${CMAKE_CURRENT_SOURCE_DIR}/flight-computer/Core/Inc
+    add_custom_target(autogen_platform
+        COMMAND ${UV_EXECUTABLE} run --project "${CMAKE_SOURCE_DIR}" 
+            python "${CMAKE_SOURCE_DIR}/scripts/fix_cubemx_autogen.py" "${CMAKE_CURRENT_SOURCE_DIR}/Nucleo-h723zg" 
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        COMMENT "Autogenerating platform..."
     )
 elseif (TARGET_BOARD STREQUAL "Nucleo-f429zi")
     message("Selected target board: Nucleo-f429zi")
@@ -36,6 +34,13 @@ elseif (TARGET_BOARD STREQUAL "Nucleo-f429zi")
     add_library(freertos_config INTERFACE)
     target_include_directories(freertos_config INTERFACE 
         ${CMAKE_CURRENT_SOURCE_DIR}/Nucleo-f429zi/Core/Inc
+    )
+
+    add_custom_target(autogen_platform
+        COMMAND ${UV_EXECUTABLE} run --project "${CMAKE_SOURCE_DIR}" 
+            python "${CMAKE_SOURCE_DIR}/scripts/fix_cubemx_autogen.py" "${CMAKE_CURRENT_SOURCE_DIR}/Nucleo-f429zi" 
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        COMMENT "Autogenerating platform..."
     )
 else()
     message(FATAL_ERROR "Unknown target board: ${TARGET_BOARD}")
@@ -50,4 +55,4 @@ target_link_libraries(${CMAKE_PROJECT_NAME} stm32cubemx freertos_kernel)
 get_target_property(SOURCE_LIST ${CMAKE_PROJECT_NAME} SOURCES)
 set_source_files_properties(${SOURCE_LIST} PROPERTIES COMPILE_OPTIONS "-w")
 
-
+add_dependencies(${CMAKE_PROJECT_NAME} autogen_platform)

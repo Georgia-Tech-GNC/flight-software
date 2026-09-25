@@ -16,14 +16,22 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y gcc-arm-none-eabi ninja-build cppcheck
-        pip install uv
-    
+    - name: Install Nix
+      uses: DeterminateSystems/nix-installer-action@main
+
     - name: Build and check (ncl-f429-dev)
-      run: .github/scripts/build_and_check.sh ncl-f429-dev
+      run: nix develop --command .github/scripts/build_and_check.sh ncl-f429-dev
 
     - name: Build and check (ncl-h723-dev)
-      run: .github/scripts/build_and_check.sh ncl-h723-dev
+      run: nix develop --command .github/scripts/build_and_check.sh ncl-h723-dev
+
+    - name: Renode test (ncl-h723-dev)
+      run: nix develop --command .github/scripts/renode_test.sh
+
+    - name: Upload Renode test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: renode-test-results
+        path: test-results/
+        if-no-files-found: error

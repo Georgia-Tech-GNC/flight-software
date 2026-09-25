@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 
 from pathlib import Path
+from jinja2 import Environment, FileSystemLoader
 import argparse
 import re
 import os
+import yaml
 
 PROJECT_DIRECTORY = Path(__file__).resolve().parent.parent.parent
+ACCEPTED_IOC_VERSION = "6"
 
 def replace_cmake_toolchain_root(target_directory: Path):
     """
@@ -33,7 +36,7 @@ def replace_cmake_toolchain_root(target_directory: Path):
         fixed_text = file_text.replace("{CMAKE_SOURCE_DIR}", "{CMAKE_CURRENT_LIST_DIR}/..")
         file.write_text(fixed_text)
 
-def remove_isr(filepath: os.PathLike, isr_name: str):
+def remove_isr(filepath: Path, isr_name: str):
     """
     Removes the function definition void isr_name(void) {...} from filepath
     """
@@ -76,22 +79,74 @@ def remove_isr(filepath: os.PathLike, isr_name: str):
     with open(filepath, "w", encoding="utf-8") as f:
         f.write(source)
 
-
-def find_stm32_it_file(directory: str) -> Path:
-    """
-    Finds the corresponding stm32_*it.c file under the target's source directory.
-    Errors if there is not exactly 1 file matching the glob pattern in Core/Src/
-    """
-
-    files = list(Path(directory).glob("Core/Src/stm32*_it.c"))
+def find_single_file_glob(directory: Path, glob: str):
+    files = list(directory.glob(glob))
 
     if len(files) > 1:
-        raise RuntimeError(f"Found multiple stm32*_it.c files: {files}")
+        raise RuntimeError(f"Found multiple {glob} files: {files}")
 
     if not files:
-        raise FileNotFoundError(f"No stm32*_it.c file found in {directory}")
+        raise FileNotFoundError(f"No {glob} file found in {directory}")
 
-    return files[0]
+    return files[0] 
+
+def parse_ioc(source: str):
+    config = {}
+    for line in source.splitlines():
+        line = line.strip()
+        if not line or line.startswith('#'): 
+            continue
+        if '=' in line:
+            key, val = line.split('=', 1)
+            config[key.strip()] = val.strip()
+        else:
+            print(f"Warning: failed to parse line\n {line}\n")
+
+    version = config["File.Version"]
+
+    if version != ACCEPTED_IOC_VERSION:
+        raise ValueError(f"Incorrect ioc file version detcted. Expected {ACCEPTED_IOC_VERSION}, got {version}")
+
+    return config
+
+def autogen_platform(directory: Path):
+    platform_yaml_file = find_single_file_glob(directory, "platform.yaml")
+    with open(platform_yaml_file, "r", encoding="utf-8") as f:
+        platform = yaml.safe_load(f)
+    
+    ioc_file = find_single_file_glob(directory, "*.ioc")
+    with open(ioc_file, "r", encoding="utf-8") as f:
+        ioc = parse_ioc(f.read())
+
+    autogen_config = {
+        "platform": platform,
+        "ioc": ioc,
+        "target_dir": str(directory)
+    }
+    
+    to_render = [
+        {
+            "template": Path("scripts") / "port.h.jinja",
+            "dest": directory / "Core" / "Inc" / "port.h",
+        },
+        {
+            "template": Path("scripts") / "init.resc.jinja",
+            "dest": directory / "init.resc",
+        },
+        {
+            "template": Path("scripts") / "robot_config.yaml.jinja",
+            "dest": directory / "robot_config.yaml",
+        },
+    ]
+
+    env = Environment(loader=FileSystemLoader(os.getcwd()))
+    env.globals.update(autogen_config)
+
+    for item in to_render:
+        template = env.get_template(str(item["template"]))
+        rendered = template.render()
+        with open(item["dest"], "w", encoding="utf-8") as f:
+            f.write(rendered)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -107,10 +162,12 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     replace_cmake_toolchain_root(args.target_directory)
-    stm32_it_file = find_stm32_it_file(args.target_directory)
+    stm32_it_file = find_single_file_glob(args.target_directory / "Core" / "Src", "stm32*_it.c")
     print(f"Discovered STM32 interrupt file {stm32_it_file}")
     for isr in ["PendSV_Handler", "SVC_Handler", "SysTick_Handler"]:
         print(f"Removing ISR {isr}...")
         remove_isr(stm32_it_file, isr) 
+
+    autogen_platform(args.target_directory)
 
     print("Done")

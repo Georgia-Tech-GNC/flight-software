@@ -62,6 +62,7 @@
         default = pkgs.mkShell {
             packages = with pkgs; [
             uv
+            gtk3
             cppcheck
             python3
             renode-17
@@ -74,6 +75,14 @@
             cmakeCurses
             dotnet-sdk_10
             ];
+
+            shellHook = ''
+    export LD_LIBRARY_PATH="${
+      pkgs.lib.makeLibraryPath [
+        pkgs.gtk3
+      ]
+    }:$LD_LIBRARY_PATH"
+  '';
         };
         });
     };

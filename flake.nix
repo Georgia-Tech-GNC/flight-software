@@ -62,6 +62,8 @@
         default = pkgs.mkShell {
             packages = with pkgs; [
             uv
+            glib
+            gtk-sharp-3_0
             gtk3
             cppcheck
             python3
@@ -80,6 +82,8 @@
     export LD_LIBRARY_PATH="${
       pkgs.lib.makeLibraryPath [
         pkgs.gtk3
+        pkgs.glib
+        pkgs.gtk-sharp-3_0
       ]
     }:$LD_LIBRARY_PATH"
   '';

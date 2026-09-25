@@ -62,9 +62,14 @@
         default = pkgs.mkShell {
             packages = with pkgs; [
             uv
-            glib
-            gtk-sharp-3_0
+            
             gtk3
+            glib
+            atk
+            pango
+            cairo
+            gdk-pixbuf
+
             cppcheck
             python3
             renode-17
@@ -83,7 +88,10 @@
       pkgs.lib.makeLibraryPath [
         pkgs.gtk3
         pkgs.glib
-        pkgs.gtk-sharp-3_0
+        pkgs.atk
+        pkgs.pango
+        pkgs.cairo
+        pkgs.gdk-pixbuf
       ]
     }:$LD_LIBRARY_PATH"
   '';

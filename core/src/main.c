@@ -83,6 +83,7 @@ static TaskHandle_t sensor_task_handle;
 static TaskHandle_t led_task_handle;
 
 // C-5
+// cppcheck-suppress constParameterPointer
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
     if (huart == &huart3) {
         if (value == '\n') {

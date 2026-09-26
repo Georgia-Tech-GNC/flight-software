@@ -3,7 +3,7 @@
 #include <stdbool.h>
 
 // enable gyroscope
-void lsm6dso_enable_gyroscope(SPI_HandleTypeDef* spi_handle) {
+static void lsm6dso_enable_gyroscope(SPI_HandleTypeDef* spi_handle) {
 
     // pull CS low
     HAL_GPIO_WritePin(SPI1_CS_GPIO_Port, SPI1_CS_Pin, GPIO_PIN_RESET);

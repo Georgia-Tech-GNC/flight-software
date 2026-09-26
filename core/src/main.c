@@ -98,7 +98,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 
 
 // part C first task
-void my_task1(void *pvParameters) {
+static void my_task1(void *pvParameters) {
     UNUSED(pvParameters); // Silence warnings related to pvParameters
 
     // Tasks are expected to run forever and never return
@@ -149,7 +149,7 @@ void my_task1(void *pvParameters) {
 
 
 // part C second task
-void my_task2(void *pvParameters) {
+static void my_task2(void *pvParameters) {
     UNUSED(pvParameters); // Silence warnings related to pvParameters
 
     // Tasks are expected to run forever and never return
@@ -175,4 +175,5 @@ void my_task2(void *pvParameters) {
     led_task_handle = xTaskCreateStatic(my_task2, "led_blink", STACK_SIZE, NULL, 1, led_task_stack, &led_task_tcb);
 
     vTaskStartScheduler();
+    while (1) {}
 }

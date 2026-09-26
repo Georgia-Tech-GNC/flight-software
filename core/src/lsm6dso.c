@@ -80,7 +80,7 @@ float lsm6dso_get_pitch_rate(SPI_HandleTypeDef* spi_handle) {
     int16_t data = (int16_t)((high_byte << 8) | low_byte);
 
     // 500 dsp = 17.50 mdps, mdps/LSB = data?
-    float pitch = (0.0175) * data;
+    float pitch = (0.0175f) * data;
 
     return pitch;
 }
@@ -103,7 +103,7 @@ float lsm6dso_get_yaw_rate(SPI_HandleTypeDef* spi_handle) {
     HAL_GPIO_WritePin(SPI1_CS_GPIO_Port, SPI1_CS_Pin, GPIO_PIN_SET);
 
     int16_t data = (int16_t)((high_byte << 8) | low_byte);
-    float yaw = (0.0175) * data;
+    float yaw = (0.0175f) * data;
 
     return yaw;
 }
@@ -126,7 +126,7 @@ float lsm6dso_get_roll_rate(SPI_HandleTypeDef* spi_handle) {
     HAL_GPIO_WritePin(SPI1_CS_GPIO_Port, SPI1_CS_Pin, GPIO_PIN_SET);
 
     int16_t data = (int16_t)((high_byte << 8) | low_byte);
-    float roll = (0.0175) * data;
+    float roll = (0.0175f) * data;
 
     return roll;
 }

@@ -6,6 +6,8 @@ set_property(CACHE TARGET_BOARD PROPERTY STRINGS "Nucleo-h723zg" "Nucleo-f429zi"
 
 find_program(UV_EXECUTABLE uv REQUIRED)
 
+find_program(UV_EXECUTABLE uv REQUIRED)
+
 if (TARGET_BOARD STREQUAL "Nucleo-h723zg")
     message("Selected target board: Nucleo-h723zg")
 

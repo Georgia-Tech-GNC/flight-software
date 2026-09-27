@@ -5,6 +5,8 @@
 // enable gyroscope
 static void lsm6dso_enable_gyroscope(SPI_HandleTypeDef* spi_handle) {
 
+    HAL_Delay(50);
+
     // pull CS low
     HAL_GPIO_WritePin(SPI1_CS_GPIO_Port, SPI1_CS_Pin, GPIO_PIN_RESET);
 

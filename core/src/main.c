@@ -40,14 +40,18 @@
 
 // part B 
 
-//  /** 
-//  * The main methods of all targets are expected to call this method once they are fully initialized
-//  */
+ /** 
+ * The main methods of all targets are expected to call this method once they are fully initialized
+ */
 // [[noreturn]] void shared_main(void) {
 //     // Don't worry about this line for now :)
 //     HAL_TIM_Base_Start(&htim2);
 
-//     lsm6dso_initialize(&hspi1);
+//     bool imu_check = lsm6dso_initialize(&hspi1);
+//     char msg[40];
+//     int len = snprintf(msg, sizeof(msg), "WHO_AM_I check: %s\r\n", imu_check ? "PASS" : "FAIL");
+//     HAL_UART_Transmit(&huart3, (uint8_t *)msg, (uint16_t)len, HAL_MAX_DELAY);
+    
 //     while (true) {
 //         HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_SET);
 
@@ -58,7 +62,7 @@
 //         char print[100];
 //         int length = snprintf(print, sizeof(print), "pitch = %d, yaw = %d, roll = %d\r\n", (int)pitch, (int)yaw, (int)roll);
 
-//         HAL_UART_Transmit(&huart3, (uint8_t *)print, length, HAL_MAX_DELAY);
+//         HAL_UART_Transmit(&huart3, (uint8_t *)print, (uint16_t)length, HAL_MAX_DELAY);
 
 //         HAL_Delay(500);
 //         HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_RESET);
@@ -148,7 +152,6 @@ static void my_task1(void *pvParameters) {
     }
 }
 
-
 // part C second task
 static void my_task2(void *pvParameters) {
     UNUSED(pvParameters); // Silence warnings related to pvParameters
@@ -167,7 +170,10 @@ static void my_task2(void *pvParameters) {
     // Don't worry about this line for now :)
     HAL_TIM_Base_Start(&htim2);
 
-    lsm6dso_initialize(&hspi1);
+    bool imu_check = lsm6dso_initialize(&hspi1);
+    char msg[40];
+    int len = snprintf(msg, sizeof(msg), "WHO_AM_I check: %s\r\n", imu_check ? "PASS" : "FAIL");
+    HAL_UART_Transmit(&huart3, (uint8_t *)msg, (uint16_t)len, HAL_MAX_DELAY);
 
     // part C task 1
     sensor_task_handle = xTaskCreateStatic(my_task1, "sensor_data", STACK_SIZE, NULL, 2, sensor_task_stack, &sensor_task_tcb);

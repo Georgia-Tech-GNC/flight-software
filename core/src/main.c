@@ -41,8 +41,17 @@
 [[noreturn]] void shared_main(void) {
     // Don't worry about this line for now :)
     HAL_TIM_Base_Start(&htim2);
+    const char msg[] = "Hello world!\r\n";
 
     while (true) {
+        // LED infinite blink
+        HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_SET);
+        HAL_Delay(1000);
+        HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_RESET);
+        HAL_Delay(1000);
 
+        // UART hello world
+        HAL_UART_Transmit(&huart3, (uint8_t *)msg, sizeof(msg)-1, HAL_MAX_DELAY);
     }
+
 } 

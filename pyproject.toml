@@ -1,0 +1,17 @@
+[project]
+name = "flight-software"
+version = "0.1.0"
+description = "Primary embedded software monorepo for all GNC projects"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "trace-recorder"
+]
+
+[tool.uv.workspace]
+members = [
+    "lib/trace-recorder",
+]
+
+[tool.uv.sources]
+trace-recorder = { workspace = true }

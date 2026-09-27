@@ -4,6 +4,7 @@
 
 #include "port.h"
 #include "shared_main.h"
+#include "trace_recorder.h"
 #include "FreeRTOS.h"
 #include "task.h"
 
@@ -46,9 +47,9 @@ static void blink_led_3(void *_params) {
     UNUSED(_params);
 
     while (true) {
-        HAL_Delay(400);
+        vTaskDelay(400);
         HAL_GPIO_WritePin(LED3_GPIO_PORT, LED3_PIN, GPIO_PIN_RESET);
-        HAL_Delay(400);
+        vTaskDelay(400);
         HAL_GPIO_WritePin(LED3_GPIO_PORT, LED3_PIN, GPIO_PIN_SET);
     }
 }
@@ -57,11 +58,20 @@ static void blink_led_3(void *_params) {
  * The main methods of all targets are expected to call this method once they are fully initialized
  */
 [[noreturn]] void shared_main(void) {
+
+    HAL_Delay(8000);
+
+    trace_recorder_initialize(NULL);
+
     TaskHandle_t blink_led_1_task = xTaskCreateStatic(blink_led_1, "Blink LED 1", STACK_SIZE, NULL, tskIDLE_PRIORITY, blink_led_1_stack, &blink_led_1_buffer);
     TaskHandle_t blink_led_2_task = xTaskCreateStatic(blink_led_2, "Blink LED 2", STACK_SIZE, NULL, tskIDLE_PRIORITY, blink_led_2_stack, &blink_led_2_buffer);
     TaskHandle_t blink_led_3_task = xTaskCreateStatic(blink_led_3, "Blink LED 3", STACK_SIZE, NULL, tskIDLE_PRIORITY, blink_led_3_stack, &blink_led_3_buffer);
 
-    if (blink_led_1_task && blink_led_2_task && blink_led_3_task) {
+    trace_recorder_register_task(blink_led_1_task, "led_a");
+    trace_recorder_register_task(blink_led_2_task, "led_b");
+    trace_recorder_register_task(blink_led_3_task, "led_c");
+
+    if (blink_led_3_task) {
         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Successfully created tasks, starting scheduler.\r\n", 50, HAL_MAX_DELAY);
         vTaskStartScheduler();
     } else {

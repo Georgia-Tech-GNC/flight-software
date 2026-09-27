@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <string.h>
 
+void uart_message(char* str);
 
 /* HELPFUL HINTS:
  * 
@@ -35,7 +36,7 @@
  *      - HAL_DELAY(<DELAY IN MS>)
  */
 
- void uart_message(char* str) {
+void uart_message(char* str) {
     uint8_t length = (uint8_t)strlen(str);
     uint8_t size = sizeof(char) * length;
     
@@ -74,14 +75,14 @@
         uart_message(msg);
     }
     
-//     uint8_t myString[] = "Hello";
-//     uint8_t recivedData[1] = "";
+    // uint8_t myString[] = "Hello";
+    // uint8_t recivedData[1] = "";
 
-//     while (true) {
-//         // HAL_UART_Transmit(&huart3, myString, 5, HAL_MAX_DELAY);
-//         HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_SET);
-//         HAL_UART_Receive(&huart3, recivedData, 1, HAL_MAX_DELAY);
-//         HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_RESET);
-//         HAL_UART_Transmit(&huart3, recivedData, 1, HAL_MAX_DELAY);
-//     }
+    // while (true) {
+    //     // HAL_UART_Transmit(&huart3, myString, 5, HAL_MAX_DELAY);
+    //     HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_SET);
+    //     HAL_UART_Receive(&huart3, recivedData, 1, HAL_MAX_DELAY);
+    //     HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_RESET);
+    //     HAL_UART_Transmit(&huart3, recivedData, 1, HAL_MAX_DELAY);
+    // }
 } 

@@ -20,6 +20,8 @@ static uint8_t lsm6dso_read_reg(SPI_HandleTypeDef* spi_handle, uint8_t reg) {
     
     //activate cs low
     set_cs_low();
+    //1microsecond delay
+    HAL_Delay(0.1);
     //send reg address and receive data
     HAL_SPI_TransmitReceive(spi_handle, tx_data, rx_data, 2, HAL_MAX_DELAY);
     //deactivate cs
@@ -29,6 +31,7 @@ static uint8_t lsm6dso_read_reg(SPI_HandleTypeDef* spi_handle, uint8_t reg) {
 
 static void lsm6dso_write_reg(SPI_HandleTypeDef* spi_handle, uint8_t reg, uint8_t data) {
     set_cs_low();
+    HAL_Delay(0.1);
     uint8_t tx_data[2] = {reg & ~0x80, data};
     HAL_SPI_Transmit(spi_handle, tx_data,2, HAL_MAX_DELAY);
     set_cs_high();
@@ -53,13 +56,16 @@ static float axis_to_dps(int16_t axis) {
  *          and false otherwise
  */
 bool lsm6dso_initialize(SPI_HandleTypeDef* spi_handle) {
+    //20ms delay
+    HAL_Delay(20);
     set_cs_high();
 
     uint8_t who_am_i = lsm6dso_read_reg(spi_handle, 0x0F);
-    if (who_am_i != 0x6C) {
+    if (who_am_i != 0x6C) { //our imus think 
         return false;
     }
     lsm6dso_write_reg(spi_handle, 0x11, 0x40);
+    lsm6dso_write_reg(spi_handle, 0x12, 0x20);
     return true;
 }
 

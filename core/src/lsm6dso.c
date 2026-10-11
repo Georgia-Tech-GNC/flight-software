@@ -61,7 +61,7 @@ bool lsm6dso_initialize(SPI_HandleTypeDef* spi_handle) {
     set_cs_high();
 
     uint8_t who_am_i = lsm6dso_read_reg(spi_handle, 0x0F);
-    if (who_am_i != 0x6C) { //our imus think 
+    if (who_am_i != 0x6C) { // our imus think this is the correct value
         return false;
     }
     lsm6dso_write_reg(spi_handle, 0x11, 0x40);

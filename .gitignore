@@ -1,6 +1,7 @@
 # Build and setting folders
 build
 .vscode
+arm-gnu-toolchain-14.2.rel1-darwin-arm64-arm-none-eabi.pkg
 
 # Cache files
 **/.DS_Store

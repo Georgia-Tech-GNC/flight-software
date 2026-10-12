@@ -460,6 +460,8 @@ bool zed_f9p_set_baudrate(zed_f9p_t *dev, zed_f9p_port_t port, uint32_t baud, ze
 bool zed_f9p_start_rtk_rover(zed_f9p_t *dev, zed_f9p_port_t port, zed_f9p_port_t rtcm_port, zed_f9p_write_fn write_fn, void *context, uint32_t now_ms, uint32_t timeout_ms) {
     if (!valid_port(port) || !valid_port(rtcm_port)) return false;
     const zed_f9p_cfg_t items[] = {
+        {ZED_F9P_KEY_TMODE_MODE, 0},
+        {ZED_F9P_KEY_OUTPROT(port, ZED_F9P_PROT_UBX), 1},
         {ZED_F9P_KEY_INPROT(rtcm_port, ZED_F9P_PROT_RTCM3), 1},
         {ZED_F9P_KEY_NAVHPG_DGNSSMODE, 3},
         {ZED_F9P_KEY_MSGOUT(ZED_F9P_MSGOUT_NAV_HPPOSLLH, port), 1},

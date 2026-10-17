@@ -18,7 +18,7 @@ bool servo_init(
         return false;
     }
 
-    if (servo->zero_pulse_us < min_pulse_us || servo->zero_pulse_us > max_pulse_us) {
+    if (min_pulse_us >= max_pulse_us) {
         return false;
     }
 
@@ -29,7 +29,7 @@ bool servo_init(
     servo->min_pulse_us = min_pulse_us;
     servo->max_pulse_us = max_pulse_us;
     servo->angle_range_deg = angle_range_deg;
-    servo->zero_pulse_us = (servo->max_pulse_us - servo->min_pulse_us) / 2;
+    servo->zero_pulse_us = servo->min_pulse_us + (servo->max_pulse_us - servo->min_pulse_us) / 2;
 
     servo->us_per_degree = (servo->max_pulse_us - servo->min_pulse_us) / servo->angle_range_deg;
 

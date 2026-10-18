@@ -1,5 +1,5 @@
 #include "lsm6dso.h"
-
+#include <stdio.h>
 
 #define LSM6DSO_OUTX_L_G_REG    0x22  // X axis: OUTX_L_G, OUTX_H_G
 #define LSM6DSO_OUTY_L_G_REG    0x24  // Y axis: OUTY_L_G, OUTY_H_G
@@ -21,11 +21,14 @@ static uint8_t lsm6dso_read_reg(SPI_HandleTypeDef* spi_handle, uint8_t reg) {
     //activate cs low
     set_cs_low();
     //1microsecond delay
-    HAL_Delay(0.1);
+    HAL_Delay(100);
     //send reg address and receive data
     HAL_SPI_TransmitReceive(spi_handle, tx_data, rx_data, 2, HAL_MAX_DELAY);
     //deactivate cs
     set_cs_high();
+    // char buffer[100];
+    // int len = snprintf(buffer, 100, "Read reg: 0x%02X, Value: 0x%02X\r\n", reg, rx_data[1]);
+    // HAL_UART_Transmit(&huart3, (uint8_t *)buffer, len, HAL_MAX_DELAY);
     return rx_data[1];
 }
 
@@ -41,12 +44,18 @@ static int16_t lsm6dso_read_axis(SPI_HandleTypeDef* spi_handle, uint8_t reg) {
     int16_t value = 0;
     value |= (int16_t)lsm6dso_read_reg(spi_handle, reg+1) << 8;
     value |= (int16_t)lsm6dso_read_reg(spi_handle, reg);
+    // char buffer[100];
+    // int len = snprintf(buffer, 100, "Read axis: 0x%02X, Value: 0x%04X\r\n", reg, value);
+    // HAL_UART_Transmit(&huart3, (uint8_t *)buffer, len, HAL_MAX_DELAY);
     return value;
 }
 
 static float axis_to_dps(int16_t axis) {
-    return (float)axis * 8.75f / 1000.0f;
+    float value = axis * 8.75f / 1000.0f;
+    char buffer[100];    
+    return value;
 }
+
 
 
 
@@ -61,7 +70,10 @@ bool lsm6dso_initialize(SPI_HandleTypeDef* spi_handle) {
     set_cs_high();
 
     uint8_t who_am_i = lsm6dso_read_reg(spi_handle, 0x0F);
-    if (who_am_i != 0x6C) { // our imus think this is the correct value
+    if (who_am_i != 0x7F) { // our imus think this is the correct value
+        char msg[100];
+        int len = snprintf(msg, 100, "Who_Am_I: %4X\r\n", who_am_i);
+        HAL_UART_Transmit(&huart3, (uint8_t *)msg, len, HAL_MAX_DELAY);
         return false;
     }
     lsm6dso_write_reg(spi_handle, 0x11, 0x40);
@@ -77,13 +89,13 @@ float lsm6dso_get_pitch_rate(SPI_HandleTypeDef* spi_handle) {
 
 /** Reads and outputs the current reported angular yaw rate from the IMU in degrees/sec */
 float lsm6dso_get_yaw_rate(SPI_HandleTypeDef* spi_handle) {
-    int16_t axis = lsm6dso_read_axis(spi_handle, LSM6DSO_OUTZ_L_G_REG);
+    int16_t axis = lsm6dso_read_axis(spi_handle, LSM6DSO_OUTY_L_G_REG);
     return axis_to_dps(axis);
 }
 
 /** Reads and outputs the current reported angular roll rate from the IMU in degrees/sec */
 float lsm6dso_get_roll_rate(SPI_HandleTypeDef* spi_handle) {
-    int16_t axis = lsm6dso_read_axis(spi_handle, LSM6DSO_OUTY_L_G_REG);
+    int16_t axis = lsm6dso_read_axis(spi_handle, LSM6DSO_OUTZ_L_G_REG);
     return axis_to_dps(axis);
 }
 

@@ -4,6 +4,23 @@
 
 #include "main.h"
 
+// Constants used in barometric equation
+// https://en.wikipedia.org/wiki/Barometric_formula
+
+/** Default reference pressure (Pa) */
+#define BARO_P_0 101325.0f
+/** Default reference temperature (K) */
+#define BARO_T_M_0 216.65f
+
+/** Temperature Gradient (K/km) */
+#define BARO_L_M_0 (-0.0065f)
+/** Universal gas constant (J / (kmol * K)) */
+#define BARO_R_star 8314.32f
+/** Mean molar mass of air at sea level (kg/kmol) */
+#define BARO_M_0 28.9644f
+/** Gravitational acceleration (m/s^2) */
+#define BARO_G_0 9.80665f
+
 /**
  * Read a register from the lps25hb device
  * 
@@ -20,7 +37,7 @@ bool lps25hb_read_register(I2C_HandleTypeDef* i2c_handle, LPS25HB_Register reg, 
     if (HAL_I2C_Master_Transmit(i2c_handle, LPS25HB_ADDRESS << 1 | 0, tx, sizeof(tx), HAL_MAX_DELAY) != HAL_OK)
         return false;
 
-    uint8_t rx[2] =  { 0, 0 };
+    uint8_t rx[3] =  { 0, 0, 0 };
     if (HAL_I2C_Master_Receive(i2c_handle, LPS25HB_ADDRESS << 1 | 1, rx, size, HAL_MAX_DELAY) != HAL_OK)
         return false;
     
@@ -40,13 +57,19 @@ bool lps25hb_write_register(I2C_HandleTypeDef* i2c_handle, LPS25HB_Register reg,
 }
 
 
-bool lps25hb_initialize(I2C_HandleTypeDef* i2c_handle) {
+bool lps25hb_initialize(lps25hb_data* lps25hb, I2C_HandleTypeDef* i2c_handle) {
+    lps25hb->i2c_handle = i2c_handle;
+    lps25hb->reference_pressure = BARO_P_0;
+    lps25hb->reference_temperature = BARO_T_M_0;
+    
     // TODO: HAL_Delay(T_on)?
 
-    HAL_GPIO_WritePin(I2C1_CS_GPIO_Port, I2C1_CS_Pin, GPIO_PIN_SET);
+    #warning "I2C1_CS_GPIO_Port not configured"
+    #warning "I2C1_CS_Pin not configured"
+    HAL_GPIO_WritePin(0, 0, GPIO_PIN_SET);
     // TODO: delay_us?
     
-    HAL_Delay(1);
+    // HAL_Delay(1);
 
     uint8_t result = 0;
     if (!lps25hb_read_register(i2c_handle, LPS25HB_REGISTER_WHO_AM_I, &result, LPS25HB_REGISTER_WHO_AM_I_SIZE))
@@ -59,19 +82,55 @@ bool lps25hb_initialize(I2C_HandleTypeDef* i2c_handle) {
     return true;
 }
 
-
-bool lps25hb_calibrate(I2C_HandleTypeDef* i2c_handle) {
-    
+/**
+ * Sets the reference level to the current altitude. 
+ * Future calls to lps25hb_get_altitude will be relative to this level.
+ * @note To minimize drift from changes in atmospheric pressure, this method should be called just before launch.
+ * @param lps25hb an initialized instance of the lps25hb device
+ * @return true if the operation was successful
+ */
+void lps25hb_set_reference(lps25hb_data* lps25hb) {
+    lps25hb->reference_pressure = lps25hb_get_pressure(lps25hb);
+    lps25hb->reference_temperature = lps25hb_get_temperature(lps25hb);
 }
 
-float lps25hb_get_temperature() {
+float lps25hb_get_temperature(lps25hb_data* lps25hb) {
+    uint8_t data[LPS25HB_REGISTER_TEMP_OUT_SIZE];
+    lps25hb_read_register(lps25hb->i2c_handle, LPS25HB_REGISTER_TEMP_OUT_L, data, LPS25HB_REGISTER_TEMP_OUT_SIZE);
     
+    float temp = (float)(~(data[1] - 1) << 1 | ~(data[0] - 1)) * (1.0f / LPS25HB_T_sens);
+    
+    return temp;
 }
 
-float lps25hb_get_pressure() {
+/**
+ * Gets the pressure measured by the lps25hb device
+ * @param lps25hb an initialized instance of the lps25hb device
+ * @return the measured pressure (in hPa)
+ */
+float lps25hb_get_pressure(lps25hb_data* lps25hb) {
+    uint8_t data[LPS25HB_REGISTER_PRESS_OUT_SIZE];
+    lps25hb_read_register(lps25hb->i2c_handle, LPS25HB_REGISTER_PRESS_OUT_XL, data, LPS25HB_REGISTER_PRESS_OUT_SIZE);
     
+    uint32_t pressure_counts = data[2] & data[1] & data[0];
+    const float pressure = (float)pressure_counts / 4096.0f;
+    
+    return pressure;
 }
 
-float lps25hb_get_altitude() {
+/**
+ * Calculates the altitude using the reference pressure, reference temperature, and current pressure.
+ * See https://en.wikipedia.org/wiki/Barometric_formula for more info on the barometric formula.
+ * @param lps25hb an initialized instance of the lps25hb device
+ * @return the altitude (in meters) relative to the reference altitude.
+ */
+float lps25hb_get_altitude(lps25hb_data* lps25hb) {
+    const float pressure = lps25hb_get_pressure(lps25hb);
+    const float pressure_ratio = pressure / lps25hb->reference_pressure;
+
+    constexpr float exponent = (-BARO_R_star * BARO_L_M_0) / (BARO_G_0 * BARO_M_0);
     
+    const float altitude = (lps25hb->reference_temperature / BARO_L_M_0) * (powf(pressure_ratio, exponent) - 1.0f);
+    
+    return altitude;
 }

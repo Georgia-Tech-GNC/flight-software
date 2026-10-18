@@ -10,7 +10,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
-#include "../../drivers/lps25hb/lps25hb.h"
+#include "lps25hb.h"
 
 #define STACK_SIZE 200
 
@@ -81,20 +81,15 @@ static void uart_send_message(const char* str) {
     //     HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to create tasks\r\n", 25, HAL_MAX_DELAY);
     // }
     
-    // lps25hb_initialize()
+    // Test stuff
+    HAL_GPIO_WritePin(LED1_GPIO_PORT, LED1_PIN, GPIO_PIN_SET);
+    uart_send_message("Before Init.\n");
     
-    int x = 5;
+    lps25hb_data lps25hb_data;
+    lps25hb_initialize(&lps25hb_data, &hi2c1);
     
-    while (true) {
-        uint8_t tx[] = { 0x50 };
-        HAL_GPIO_WritePin(LED1_GPIO_PORT, LED1_PIN, GPIO_PIN_SET);
-        uart_send_message("Before Transmit.\n");
-        HAL_I2C_Master_Transmit(&hi2c1, LPS25HB_ADDRESS << 1 | 0, tx, sizeof(tx), HAL_MAX_DELAY);
-        uart_send_message("After Transmit.\n");
-        
-        HAL_Delay(1000);
-        HAL_GPIO_WritePin(LED1_GPIO_PORT, LED1_PIN, GPIO_PIN_RESET);
-    }
+    uart_send_message("After Init.\n");
+    HAL_GPIO_WritePin(LED1_GPIO_PORT, LED1_PIN, GPIO_PIN_RESET);
 
     while (true) __asm__ volatile (""); // No return
 } 

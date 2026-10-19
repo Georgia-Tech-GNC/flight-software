@@ -11,6 +11,7 @@
 #include "message_buffer.h"
 #include <stdint.h>
 #include <stdio.h>
+#include <stm32h7xx_hal_uart.h>
 // Main Task variables
 #define MainTaskStackSize 4096
 #define MainTaskPriority tskIDLE_PRIORITY
@@ -48,6 +49,39 @@ FSM_State FSM = GROUND;
 
 static void set_fsm_state(FSM_State state) {
     FSM = state;
+}
+
+static double get_roll() {
+    // To be implemented
+    return 0;
+}
+
+static double get_pitch() {
+    // To be implemented
+    return 0;
+}
+
+static double get_yaw() {
+    // To be implemented
+    return 0;
+}
+
+static int get_altitude() {
+    // To be implemented
+    return 0;
+}
+
+static int get_acceleration() {
+    // To be implemented
+    return 0;
+}
+
+static void send_telemetry(char *state) {
+    uint64_t time = getAbsoluteTimeMS();
+    char message[100];
+    snprintf(message, 100, "State: %s | MS Since Start: %u | Roll: %d | Pitch: %d | Yaw: %d | Altitude: %d | Acceleration: %d\r\n", state, time, get_roll(), get_pitch(), get_yaw(), get_altitude(), get_acceleration());
+    xMessageBufferSend(telemetry_buffer_handle, &message, sizeof(message), portMAX_DELAY);
+    HAL_UART_Transmit(&huart3, (uint8_t *)message, 100, HAL_MAX_DELAY);
 }
 
 #define STACK_SIZE 200
@@ -122,7 +156,6 @@ static void main_task(void *_params) {
         }
         // process FSM (ground -> armed -> fast ascent -> controlled -> uncontrolled)
         // move servos accordingly
-
         // send telemetry (FSM state, timer, position, velocity, etc, control in and control out)
         switch (FSM) {
             case GROUND:
@@ -131,26 +164,32 @@ static void main_task(void *_params) {
                 // check for launch signal (aka + acceleration)
                 // if detected change state to FAST_ASCENT
                 // send telemetry
+                send_telemetry("ARMED");
                 break;
             case FAST_ASCENT:
                 // motor push for 0.5 seconds
                 // after 0.5 seconds change state to CONTROLLED
                 // send telemetry
+                send_telemetry("FAST_ASCENT");
                 break;
             case CONTROLLED:
                 // run control algorithm and move servos accordingly
                 // send telemetry
+                send_telemetry("CONTROLLED");
                 break;
             case UNCONTROLLED:
                 // turn motor off
                 // check for pyro conditions (timer past a certain time, max altitude reached)
                 // send telemetry
+                send_telemetry("UNCONTROLLED");
                 break;
             case PYRO_DEPLOY:
                 // deploy pyro
                 // send telemetry
+                send_telemetry("PYRO_DEPLOY");
                 break;
             case EMERGENCY_STOP:
+                send_telemetry("EMERGENCY_STOP");
                 break;
         }
 

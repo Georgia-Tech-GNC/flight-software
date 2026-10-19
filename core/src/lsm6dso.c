@@ -69,10 +69,10 @@ bool lsm6dso_initialize(SPI_HandleTypeDef* spi_handle) {
     HAL_Delay(20);
     set_cs_high();
 
-    uint8_t who_am_i = lsm6dso_read_reg(spi_handle, 0x0F);
-    if (who_am_i != 0x7F) { // our imus think this is the correct value
+    uint8_t who_am_i = lsm6dso_read_reg(spi_handle, 0x0F | 0x80);
+    if (who_am_i != 0x6C) { // our imus think this is the correct value
         char msg[100];
-        int len = snprintf(msg, 100, "Who_Am_I: %4X\r\n", who_am_i);
+        int len = snprintf(msg, 100, "Who_Am_I: 0x%4X\r\n", who_am_i);
         HAL_UART_Transmit(&huart3, (uint8_t *)msg, len, HAL_MAX_DELAY);
         return false;
     }
@@ -89,13 +89,13 @@ float lsm6dso_get_pitch_rate(SPI_HandleTypeDef* spi_handle) {
 
 /** Reads and outputs the current reported angular yaw rate from the IMU in degrees/sec */
 float lsm6dso_get_yaw_rate(SPI_HandleTypeDef* spi_handle) {
-    int16_t axis = lsm6dso_read_axis(spi_handle, LSM6DSO_OUTY_L_G_REG);
+    int16_t axis = lsm6dso_read_axis(spi_handle, LSM6DSO_OUTZ_L_G_REG);
     return axis_to_dps(axis);
 }
 
 /** Reads and outputs the current reported angular roll rate from the IMU in degrees/sec */
 float lsm6dso_get_roll_rate(SPI_HandleTypeDef* spi_handle) {
-    int16_t axis = lsm6dso_read_axis(spi_handle, LSM6DSO_OUTZ_L_G_REG);
+    int16_t axis = lsm6dso_read_axis(spi_handle, LSM6DSO_OUTY_L_G_REG);
     return axis_to_dps(axis);
 }
 

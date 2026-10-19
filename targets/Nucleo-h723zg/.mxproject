@@ -9,18 +9,18 @@ CDefines=USE_PWR_LDO_SUPPLY;USE_HAL_DRIVER;STM32H723xx;USE_HAL_DRIVER;USE_HAL_DR
 [PreviousGenFiles]
 AdvancedFolderStructure=true
 HeaderFileListSize=3
-HeaderFiles#0=../Core/Inc/stm32h7xx_it.h
-HeaderFiles#1=../Core/Inc/stm32h7xx_hal_conf.h
-HeaderFiles#2=../Core/Inc/main.h
+HeaderFiles#0=..\Core\Inc\stm32h7xx_it.h
+HeaderFiles#1=..\Core\Inc\stm32h7xx_hal_conf.h
+HeaderFiles#2=..\Core\Inc\main.h
 HeaderFolderListSize=1
-HeaderPath#0=../Core/Inc
+HeaderPath#0=..\Core\Inc
 HeaderFiles=;
 SourceFileListSize=4
-SourceFiles#0=../Core/Src/stm32h7xx_it.c
-SourceFiles#1=../Core/Src/stm32h7xx_hal_msp.c
-SourceFiles#2=../Core/Src/stm32h7xx_hal_timebase_tim.c
-SourceFiles#3=../Core/Src/main.c
+SourceFiles#0=..\Core\Src\stm32h7xx_it.c
+SourceFiles#1=..\Core\Src\stm32h7xx_hal_msp.c
+SourceFiles#2=..\Core\Src\stm32h7xx_hal_timebase_tim.c
+SourceFiles#3=..\Core\Src\main.c
 SourceFolderListSize=1
-SourcePath#0=../Core/Src
+SourcePath#0=..\Core\Src
 SourceFiles=;
 

@@ -5,13 +5,7 @@
 #include <stdint.h>
 #include "stm32h7xx_hal.h"
 
-/* Copied from legacy driver
-PWM0 = PA15, TIM2_CH1
-PWM1 = PB3, TIM2_CH2
-PWM2 = PB10, TIM2_CH3
-PWM3 = PB7, TIM4_CH2
-PWM4 = PC7, TIM3_CH2
-*/
+#define SERVO_TIMER_FREQ_HZ 3200000
 
 typedef struct {
     TIM_HandleTypeDef *htim;
@@ -41,7 +35,7 @@ typedef struct {
  * @param htim Pointer to the configured HAL timer handle.
  * @param channel Timer PWM channel (TIM_CHANNEL_x).
  * @param timer_freq_hz freq_input_clock / (presc + 1), in Hz.
- * @param angle_range_deg Total angular range in degrees (e.g., 90 for -45 to +45 degrees).
+ * @param angle_range_deg Total angular range in degrees (e.g. 90 for -45 to +45 degrees).
  * @param min_pulse_us Minimum allowed pulse width in microseconds.
  * @param max_pulse_us Maximum allowed pulse width in microseconds.
  * @param reversed True to reverse the angular direction.

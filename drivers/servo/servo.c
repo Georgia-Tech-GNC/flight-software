@@ -1,9 +1,6 @@
 #include "servo.h"
 #include <stdbool.h>
 
-// Should timer_freq_hz be MACRO? Or per servo?
-// timer_freq_hz -> freq_input_clock / (presc + 1)
-
 bool servo_init(
     servo_t *servo,
     TIM_HandleTypeDef *htim,
@@ -29,12 +26,14 @@ bool servo_init(
     servo->min_pulse_us = min_pulse_us;
     servo->max_pulse_us = max_pulse_us;
     servo->angle_range_deg = angle_range_deg;
-    servo->zero_pulse_us = servo->min_pulse_us + (servo->max_pulse_us - servo->min_pulse_us) / 2;
+    servo->zero_pulse_us = (uint16_t)(min_pulse_us + (max_pulse_us - min_pulse_us) / 2);
 
     servo->us_per_degree = (servo->max_pulse_us - servo->min_pulse_us) / servo->angle_range_deg;
 
     servo->reversed = reversed;
     servo->enabled = false;
+
+    servo_set_pulse_us(servo, servo->zero_pulse_us);
 
     return true;
 }

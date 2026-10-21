@@ -143,6 +143,14 @@ typedef struct {
     bool valid;
     bool active;
 } zed_f9p_svin_t;
+typedef struct{
+    uint32_t tow_ms;
+    uint32_t tow_sub_ms;
+    int32_t q_err_ps;
+    uint16_t week;
+    uint8_t flags;
+    uint8_t ref_info;
+} zed_f9p_timepulse_t;
 
 typedef enum {
     ZED_F9P_WAIT_SYNC1 = 0,
@@ -203,6 +211,10 @@ typedef struct {
     zed_f9p_svin_t svin;
     bool hpposllh_valid, relposned_valid, svin_valid;
     uint32_t hpposllh_sequence, relposned_sequence, svin_sequence;
+
+    zed_f9p_timepulse_t timepulse;
+    bool timepulse_valid;
+    uint32_t timepulse_sequence;
 } zed_f9p_t;
 
 
@@ -244,6 +256,7 @@ bool zed_f9p_get_pvt(const zed_f9p_t *dev, zed_f9p_pvt_t *out);
 bool zed_f9p_get_hpposllh(const zed_f9p_t *dev, zed_f9p_hpposllh_t *out);
 bool zed_f9p_get_relposned(const zed_f9p_t *dev, zed_f9p_relposned_t *out);
 bool zed_f9p_get_svin(const zed_f9p_t *dev, zed_f9p_svin_t *out);
+bool zed_f9p_get_timepulse(const zed_f9p_t *dev, zed_f9p_timepulse_t *out);
 
 uint32_t zed_f9p_pvt_age_ms(const zed_f9p_t *dev, uint32_t now_ms);
 

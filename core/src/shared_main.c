@@ -6,6 +6,7 @@
 #include "shared_main.h"
 #include "FreeRTOS.h"
 #include "task.h"
+#include "zed_f9p.h"
 
 #define STACK_SIZE 200
 
@@ -67,6 +68,5 @@ static void blink_led_3(void *_params) {
     } else {
         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to create tasks\r\n", 25, HAL_MAX_DELAY);
     }
-
     while (true) __asm__ volatile (""); // No return
 } 

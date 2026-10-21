@@ -12,6 +12,9 @@
 #define UBX_ID_ACK_ACK 0x01u
 #define UBX_ID_CFG_VALSET 0x8Au
 #define RTCM_PREAMBLE 0xD3u
+#define UBX_CLASS_TIM 0x0Du
+#define UBX_TIM_TP_ID 0x01u
+#define TIM_TP_LEN 16u
 #define MIN_MEAS_MS 25u
 #define PVT_LEN  92u
 #define PVT_ITOW  0u
@@ -165,6 +168,18 @@ static void decode_svin(zed_f9p_t *dev) {
     dev->svin_valid = true;
     dev->svin_sequence++;
 }
+static void decode_tim_tp(zed_f9p_t *dev) {
+    const uint8_t *p = dev->payload;
+    zed_f9p_timepulse_t *o = &dev->timepulse;
+    o->tow_ms = read_u32(p);
+    o->tow_sub_ms = read_u32(p+4);
+    o->q_err_ps = read_i32(p+8);
+    o->week = read_u16(p+12);
+    o->flags = p[14];
+    o->ref_info = p[15];
+    dev->timepulse_valid = true;
+    dev->timepulse_sequence++;
+}
 
 static void handle_nav(zed_f9p_t *dev) {
     const uint16_t len = dev->payload_len;
@@ -187,6 +202,15 @@ static void handle_nav(zed_f9p_t *dev) {
         break;
     default:
         break;
+    }
+}
+static void handle_tim(zed_f9p_t *dev) {
+    const uint16_t len = dev->payload_len;
+    if(dev->msg_id == UBX_TIM_TP_ID){
+        if(len == TIM_TP_LEN){
+            decode_tim_tp(dev);
+        }
+        else{dev->malformed_messages++;}
     }
 }
 
@@ -296,7 +320,10 @@ bool zed_f9p_feed(zed_f9p_t *dev, uint8_t byte)
 
             if (dev->msg_class == UBX_CLASS_NAV) {
                 handle_nav(dev);
-            } else if (dev->msg_class == UBX_CLASS_ACK && dev->msg_id <= UBX_ID_ACK_ACK) {
+            } else if(dev->msg_class == UBX_CLASS_TIM){
+                handle_tim(dev);
+            }
+            else if (dev->msg_class == UBX_CLASS_ACK && dev->msg_id <= UBX_ID_ACK_ACK) {
                 handle_ack(dev);
             }
             return true;
@@ -339,6 +366,11 @@ bool zed_f9p_get_relposned(const zed_f9p_t *dev, zed_f9p_relposned_t *out) {
 bool zed_f9p_get_svin(const zed_f9p_t *dev, zed_f9p_svin_t *out) {
     if (dev == NULL || out == NULL || !dev->svin_valid) return false;
     *out = dev->svin;
+    return true;
+}
+bool zed_f9p_get_timepulse(const zed_f9p_t *dev, zed_f9p_timepulse_t *out){
+    if (dev == NULL || out == NULL || !dev->timepulse_valid) return false;
+    *out = dev->timepulse;
     return true;
 }
 
@@ -438,7 +470,7 @@ bool zed_f9p_start_pvt(zed_f9p_t *dev, zed_f9p_port_t port, uint16_t period_ms, 
     if (!valid_port(port) || period_ms < MIN_MEAS_MS) return false;
     const zed_f9p_cfg_t items[] = {
         {ZED_F9P_KEY_OUTPROT(port, ZED_F9P_PROT_UBX), 1},
-        {ZED_F9P_KEY_OUTPROT(port, ZED_F9P_PROT_NMEA), 0}, // nmea eats the bandwidth
+        {ZED_F9P_KEY_OUTPROT(port, ZED_F9P_PROT_NMEA), 0},
         {ZED_F9P_KEY_MSGOUT(ZED_F9P_MSGOUT_NAV_PVT, port), 1}, // NAV-PVT output every navigation epoch
         {ZED_F9P_KEY_RATE_MEAS, period_ms},
         {ZED_F9P_KEY_RATE_NAV, 1}

@@ -2,7 +2,7 @@
 # Note that the toolchain directory must also be set in the root CMakePresets.json
 
 set(TARGET_BOARD "unknown" CACHE STRING "Target microcontroller architecture (see ./targets directory for implementations)")
-set_property(CACHE TARGET_BOARD PROPERTY STRINGS "Nucleo-h723zg" "Nucleo-f429zi")
+set_property(CACHE TARGET_BOARD PROPERTY STRINGS "Nucleo-h723zg" "Nucleo-f429zi" "MCU-h725ve")
 
 if (TARGET_BOARD STREQUAL "Nucleo-h723zg")
     message("Selected target board: Nucleo-h723zg")
@@ -25,6 +25,17 @@ elseif (TARGET_BOARD STREQUAL "Nucleo-f429zi")
     add_library(freertos_config INTERFACE)
     target_include_directories(freertos_config INTERFACE 
         ${CMAKE_CURRENT_SOURCE_DIR}/Nucleo-f429zi/Core/Inc
+    )
+elseif (TARGET_BOARD STREQUAL "fc-h725ve")
+    message("Selected target board: fc-h725ve")
+
+    add_subdirectory(fc-h725ve/cmake/stm32cubemx)
+
+    set(FREERTOS_PORT "GCC_ARM_CM7" CACHE STRING "")
+
+    add_library(freertos_config INTERFACE)
+    target_include_directories(freertos_config INTERFACE 
+        ${CMAKE_CURRENT_SOURCE_DIR}/fc-h725ve/Core/Inc
     )
 else()
     message(FATAL_ERROR "Unknown target board: ${TARGET_BOARD}")

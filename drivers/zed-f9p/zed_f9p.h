@@ -32,6 +32,19 @@
 #define ZED_F9P_KEY_TMODE_FIXED_POS_ACC 0x4003000fu // 0.1 mm
 #define ZED_F9P_KEY_TMODE_SVIN_MIN_DUR 0x40030010u // s
 #define ZED_F9P_KEY_TMODE_SVIN_ACC_LIMIT 0x40030011u // 0.1 mm
+#define ZED_F9P_KEY_TP_TP1_ENA 	0x10050007u
+#define ZED_F9P_KEY_TP_PULSE_DEF 0x20050023u //0 period, 1 freq
+#define ZED_F9P_KEY_TP_PULSE_LENGTH_DEF 0x20050030u
+#define ZED_F9P_KEY_TP_PERIOD_TP1 0x40050002u
+#define ZED_F9P_KEY_TP_PERIOD_LOCK_TP1 0x40050003u
+#define ZED_F9P_KEY_TP_LEN_TP1 0x40050004u
+#define ZED_F9P_KEY_TP_LEN_LOCK_TP1 0x40050005u
+#define ZED_F9P_KEY_TP_SYNC_GNSS_TP1 0x10050008u
+#define ZED_F9P_KEY_TP_USE_LOCKED_TP1 0x10050009u
+#define ZED_F9P_KEY_TP_ALIGN_TO_TOW_TP1 0x1005000au
+#define ZED_F9P_KEY_TP_POL_TP1 0x1005000bu //1 rising edge on the second
+#define ZED_F9P_KEY_TP_TIMEGRID_TP1 0x2005000cu //0 utc, 1 gps
+#define ZED_F9P_MSGOUT_TIM_TP 0x2091017du
 
 // msgout keys i2c
 #define ZED_F9P_MSGOUT_NAV_PVT 0x20910006u
@@ -265,6 +278,8 @@ bool zed_f9p_pvt_has_time(const zed_f9p_pvt_t *pvt);
 
 size_t zed_f9p_encode(uint8_t cls, uint8_t id, const uint8_t *payload, size_t length, uint8_t *out, size_t capacity);
 
+uint64_t zed_f9p_timepulse_ms(const zed_f9p_timepulse_t *tp);
+
 /** Sends one cfg-valset (ram layer) and waits on ack/nak through feed + tick
  * one command at a time, a late ack after a timeout can land on the next one
  * @returns false on bad args, busy, or write failure
@@ -287,6 +302,8 @@ bool zed_f9p_start_base_survey(zed_f9p_t *dev, zed_f9p_port_t port, uint32_t min
 bool zed_f9p_start_base_fixed(zed_f9p_t *dev, zed_f9p_port_t port, int64_t lat_1e9_deg, int64_t lon_1e9_deg, int64_t height_1e1_mm, uint32_t acc_1e1_mm, zed_f9p_write_fn write_fn, void *context, uint32_t now_ms, uint32_t timeout_ms);
 
 void zed_f9p_rtcm_init(zed_f9p_rtcm_t *rtcm);
+
+bool zed_f9p_start_timepulse(zed_f9p_t *dev, zed_f9p_port_t port, zed_f9p_write_fn write_fn, void *context, uint32_t now_ms, uint32_t timeout_ms);
 
 bool zed_f9p_rtcm_feed(zed_f9p_rtcm_t *rtcm, uint8_t byte);
 size_t zed_f9p_rtcm_length(const zed_f9p_rtcm_t *rtcm); //whole frame incl header + crc

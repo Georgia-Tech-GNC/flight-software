@@ -37,6 +37,7 @@
 #define RELPOSNED_LEN 64u
 #define RELPOSNED_VERSION 1u
 #define SVIN_LEN 40u
+#define MS_PER_WEEK 604800000
 
 static uint16_t read_u16(const uint8_t *p) {
     return (uint16_t)((uint16_t)p[0] | (uint16_t)((uint16_t)p[1] << 8));
@@ -204,6 +205,12 @@ static void handle_nav(zed_f9p_t *dev) {
         break;
     }
 }
+
+uint64_t zed_f9p_timepulse_ms(const zed_f9p_timepulse_t *tp) {
+    if(tp == NULL) {return 0;}
+    return (tp->week * (uint64_t) MS_PER_WEEK) + tp->tow_ms;
+}
+
 static void handle_tim(zed_f9p_t *dev) {
     const uint16_t len = dev->payload_len;
     if(dev->msg_id == UBX_TIM_TP_ID){
@@ -547,6 +554,27 @@ bool zed_f9p_start_base_fixed(zed_f9p_t *dev, zed_f9p_port_t port, int64_t lat_1
     items[n++] = (zed_f9p_cfg_t){ZED_F9P_KEY_TMODE_HEIGHT_HP, (uint8_t)height_hp};
     items[n++] = (zed_f9p_cfg_t){ZED_F9P_KEY_TMODE_FIXED_POS_ACC, acc_1e1_mm};
     return zed_f9p_configure(dev, items, n, write_fn, context, now_ms, timeout_ms);
+}
+bool zed_f9p_start_timepulse(zed_f9p_t *dev, zed_f9p_port_t port, zed_f9p_write_fn write_fn, void *context, uint32_t now_ms, uint32_t timeout_ms) {
+    if (!valid_port(port) )return false;
+    const zed_f9p_cfg_t items[] = {
+        {ZED_F9P_KEY_TP_TP1_ENA, 1},
+        {ZED_F9P_KEY_TP_PULSE_DEF, 0},
+        {ZED_F9P_KEY_TP_PULSE_LENGTH_DEF, 1},
+        {ZED_F9P_KEY_TP_PERIOD_TP1, 1000000},
+        {ZED_F9P_KEY_TP_PERIOD_LOCK_TP1, 1000000}, //100ms
+        {ZED_F9P_KEY_TP_LEN_TP1, 0}, //no pulse until locked
+        {ZED_F9P_KEY_TP_LEN_LOCK_TP1, 100000},
+        {ZED_F9P_KEY_TP_SYNC_GNSS_TP1, 1},
+        {ZED_F9P_KEY_TP_USE_LOCKED_TP1, 1},
+        {ZED_F9P_KEY_TP_ALIGN_TO_TOW_TP1, 1},
+        {ZED_F9P_KEY_TP_POL_TP1, 1},
+        {ZED_F9P_KEY_TP_TIMEGRID_TP1, 1},
+        {ZED_F9P_KEY_MSGOUT(ZED_F9P_MSGOUT_TIM_TP, port), 1},
+        {ZED_F9P_KEY_OUTPROT(port, ZED_F9P_PROT_UBX), 1}
+    };
+    return zed_f9p_configure(dev, items, sizeof(items) / sizeof(items[0]), write_fn, context, now_ms, timeout_ms);
+
 }
 
 //crc-24q, bitwise so no 1k table

@@ -88,6 +88,11 @@
               cmakeCurses
               dotnet-sdk_10
               doxygen
+              webkitgtk_4_1
+              xorg.libxcb
+              xorg.libXrandr
+              xorg.libXrandr
+              libpng
             ];
 
             shellHook = ''
@@ -100,6 +105,11 @@
                   pkgs.cairo
                   pkgs.gdk-pixbuf
                   pkgs.stdenv.cc.cc.lib
+                  pkgs.webkitgtk_4_1
+                  pkgs.xorg.libxcb
+                  pkgs.xorg.libX11
+                  pkgs.xorg.libXrandr
+                  pkgs.libpng
                 ]
               }''${${libraryPathVar}:+:$${libraryPathVar}}"
 

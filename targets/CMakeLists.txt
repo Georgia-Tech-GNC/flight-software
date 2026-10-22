@@ -26,16 +26,16 @@ elseif (TARGET_BOARD STREQUAL "Nucleo-f429zi")
     target_include_directories(freertos_config INTERFACE 
         ${CMAKE_CURRENT_SOURCE_DIR}/Nucleo-f429zi/Core/Inc
     )
-elseif (TARGET_BOARD STREQUAL "MCU-h725ve")
-    message("Selected target board: MCU-h725ve")
+elseif (TARGET_BOARD STREQUAL "fc-h725ve")
+    message("Selected target board: fc-h725ve")
 
-    add_subdirectory(MCU-h725ve/cmake/stm32cubemx)
+    add_subdirectory(fc-h725ve/cmake/stm32cubemx)
 
     set(FREERTOS_PORT "GCC_ARM_CM7" CACHE STRING "")
 
     add_library(freertos_config INTERFACE)
     target_include_directories(freertos_config INTERFACE 
-        ${CMAKE_CURRENT_SOURCE_DIR}/MCU-h725ve/Core/Inc
+        ${CMAKE_CURRENT_SOURCE_DIR}/fc-h725ve/Core/Inc
     )
 else()
     message(FATAL_ERROR "Unknown target board: ${TARGET_BOARD}")

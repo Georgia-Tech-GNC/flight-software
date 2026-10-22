@@ -25,11 +25,11 @@
             }
         },
         {
-            "name": "default-mcu-h725ve",
+            "name": "default-fc-h725ve",
             "inherits": "default",
-            "toolchainFile": "${sourceDir}/targets/MCU-h725ve/cmake/gcc-arm-none-eabi.cmake",
+            "toolchainFile": "${sourceDir}/targets/fc-h725ve/cmake/gcc-arm-none-eabi.cmake",
             "cacheVariables": {
-                "TARGET_BOARD": "MCU-h725ve"
+                "TARGET_BOARD": "fc-h725ve"
             }
         },
         {
@@ -61,15 +61,15 @@
             }
         },
         {
-            "name": "mcu-h725-dev",
-            "inherits": "default-mcu-h725ve",
+            "name": "fc-h725-dev",
+            "inherits": "default-fc-h725ve",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug"
             }
         },
         {
-            "name": "mcu-h725-release",
-            "inherits": "default-mcu-h725ve",
+            "name": "fc-h725-release",
+            "inherits": "default-fc-h725ve",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release"
             }
@@ -100,12 +100,12 @@
             "configurePreset": "ncl-h723-release"
         },
         {
-            "name": "mcu-h725-dev",
-            "configurePreset": "mcu-h725-dev"
+            "name": "fc-h725-dev",
+            "configurePreset": "fc-h725-dev"
         },
         {
-            "name": "mcu-h725-release",
-            "configurePreset": "mcu-h725-release"
+            "name": "fc-h725-release",
+            "configurePreset": "fc-h725-release"
         },
         {
             "name": "dev",

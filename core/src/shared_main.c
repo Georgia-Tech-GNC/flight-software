@@ -9,18 +9,25 @@
 #include "task.h"
 
 #include "message_buffer.h"
+#include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stm32h7xx_hal_uart.h>
 // Main Task variables
 #define MainTaskStackSize 4096
-#define MainTaskPriority tskIDLE_PRIORITY
-MessageBufferHandle_t telemetry_buffer_handle; // Message buffer from telemetry task
+#define MainTaskPriority (tskIDLE_PRIORITY + 1)
+#define MessageBufferSize 256
+MessageBufferHandle_t command_buffer_handle;
+MessageBufferHandle_t telemetry_buffer_handle;
+static StaticMessageBuffer_t command_buffer_struct;
+static uint8_t command_buffer_storage[MessageBufferSize];
+static StaticMessageBuffer_t telemetry_buffer_struct;
+static uint8_t telemetry_buffer_storage[MessageBufferSize];
 StaticTask_t main_task_buffer;
 StackType_t main_task_stack[MainTaskStackSize];
 
 // Get the time from startup in milliseconds
-static uint64_t getAbsoluteTimeMS(void) {
+static uint64_t get_time_from_startup(void) {
     return pdTICKS_TO_MS(xTaskGetTickCount());
 }
 
@@ -76,89 +83,61 @@ static int get_acceleration() {
     return 0;
 }
 
-static void send_telemetry(char *state) {
-    uint64_t time = getAbsoluteTimeMS();
-    char message[100];
-    snprintf(message, 100, "State: %s | MS Since Start: %u | Roll: %d | Pitch: %d | Yaw: %d | Altitude: %d | Acceleration: %d\r\n", state, time, get_roll(), get_pitch(), get_yaw(), get_altitude(), get_acceleration());
-    xMessageBufferSend(telemetry_buffer_handle, &message, sizeof(message), portMAX_DELAY);
-    HAL_UART_Transmit(&huart3, (uint8_t *)message, 100, HAL_MAX_DELAY);
-}
-
-#define STACK_SIZE 200
-static void blink_led_1(void *_params);
-static void blink_led_2(void *_params);
-static void blink_led_3(void *_params);
-
-StaticTask_t blink_led_1_buffer;
-StackType_t blink_led_1_stack[STACK_SIZE];
-StaticTask_t blink_led_2_buffer;
-StackType_t blink_led_2_stack[STACK_SIZE];
-StaticTask_t blink_led_3_buffer;
-StackType_t blink_led_3_stack[STACK_SIZE];
-
-static void blink_led_1(void *_params) {
-    UNUSED(_params);
-
-    while (true) {
-        HAL_Delay(100);
-        HAL_GPIO_WritePin(LED1_GPIO_PORT, LED1_PIN, GPIO_PIN_RESET);
-        HAL_Delay(100);
-        HAL_GPIO_WritePin(LED1_GPIO_PORT, LED1_PIN, GPIO_PIN_SET);
+static void send_telemetry(const char *state) {
+    uint64_t time = get_time_from_startup();
+    char message[MessageBufferSize];
+    int message_length = snprintf(message, sizeof(message),
+                                    "State: %s | MS Since Start: %" PRIu64
+                                    " | Roll: %.2f | Pitch: %.2f | Yaw: %.2f"
+                                    " | Altitude: %d | Acceleration: %d\r\n",
+                                    state, time, get_roll(), get_pitch(), get_yaw(),
+                                    get_altitude(), get_acceleration());
+    if (message_length < 0) {
+        return;
     }
-}
 
-static void blink_led_2(void *_params) {
-    UNUSED(_params);
-
-    while (true) {
-        HAL_Delay(200);
-        HAL_GPIO_WritePin(LED2_GPIO_PORT, LED2_PIN, GPIO_PIN_RESET);
-        HAL_Delay(200);
-        HAL_GPIO_WritePin(LED2_GPIO_PORT, LED2_PIN, GPIO_PIN_SET);
+    size_t message_size = (size_t)message_length;
+    if (message_size >= sizeof(message)) {
+        message_size = sizeof(message) - 1;
     }
+
+    (void)xMessageBufferSend(telemetry_buffer_handle, message, message_size,
+                                0);
+    (void)HAL_UART_Transmit(&debug_uart, (uint8_t *)message,
+                            (uint16_t)message_size, HAL_MAX_DELAY);
 }
 
-static void blink_led_3(void *_params) {
-    UNUSED(_params);
-
-    while (true) {
-        HAL_Delay(400);
-        HAL_GPIO_WritePin(LED3_GPIO_PORT, LED3_PIN, GPIO_PIN_RESET);
-        HAL_Delay(400);
-        HAL_GPIO_WritePin(LED3_GPIO_PORT, LED3_PIN, GPIO_PIN_SET);
-    }
-}
-
+// 333 Hz
 static void main_task(void *_params) {
     UNUSED(_params);
+    TickType_t next_wake = xTaskGetTickCount();
+
     while (true) {
-        uint64_t time = getAbsoluteTimeMS();
-        char buffer[100];
-        int len = snprintf(buffer, 100, "Main task is running at %u\r\n", time);
-        HAL_UART_Transmit(&debug_uart, (uint8_t *) buffer, len, HAL_MAX_DELAY);
         // read telemetry for new commands
-        Telemetry_Command telemetry;
-        xMessageBufferReceive(telemetry_buffer_handle, &telemetry, sizeof(telemetry), portMAX_DELAY);
-        // process telemetry command
-        switch (telemetry) {
-            case ARM:
-                set_fsm_state(ARMED);
-                break;
-            case UNCONTROLL:
-                set_fsm_state(UNCONTROLLED);
-                break;
-            case PYRO:
-                set_fsm_state(PYRO_DEPLOY);
-                break;
-            case ESTOP:
-                set_fsm_state(EMERGENCY_STOP);
-                break;
+        Telemetry_Command telemetry_command;
+        while (xMessageBufferReceive(command_buffer_handle, &telemetry_command,sizeof(telemetry_command), 0) == sizeof(telemetry_command)) {
+            // process telemetry command
+            switch (telemetry_command) {
+                case ARM:
+                    set_fsm_state(ARMED);
+                    break;
+                case UNCONTROLL:
+                    set_fsm_state(UNCONTROLLED);
+                    break;
+                case PYRO:
+                    set_fsm_state(PYRO_DEPLOY);
+                    break;
+                case ESTOP:
+                    set_fsm_state(EMERGENCY_STOP);
+                    break;
+            }
         }
         // process FSM (ground -> armed -> fast ascent -> controlled -> uncontrolled)
         // move servos accordingly
         // send telemetry (FSM state, timer, position, velocity, etc, control in and control out)
         switch (FSM) {
             case GROUND:
+                send_telemetry("GROUND");
                 break;
             case ARMED:
                 // check for launch signal (aka + acceleration)
@@ -194,7 +173,7 @@ static void main_task(void *_params) {
         }
 
 
-        vTaskDelay(pdMS_TO_TICKS(333));
+        vTaskDelayUntil(&next_wake, pdMS_TO_TICKS(3));
     }
 }
 
@@ -202,17 +181,18 @@ static void main_task(void *_params) {
  * The main methods of all targets are expected to call this method once they are fully initialized
  */
 [[noreturn]] void shared_main(void) {
-    TaskHandle_t blink_led_1_task = xTaskCreateStatic(blink_led_1, "Blink LED 1", STACK_SIZE, NULL, tskIDLE_PRIORITY, blink_led_1_stack, &blink_led_1_buffer);
-    TaskHandle_t blink_led_2_task = xTaskCreateStatic(blink_led_2, "Blink LED 2", STACK_SIZE, NULL, tskIDLE_PRIORITY, blink_led_2_stack, &blink_led_2_buffer);
-    TaskHandle_t blink_led_3_task = xTaskCreateStatic(blink_led_3, "Blink LED 3", STACK_SIZE, NULL, tskIDLE_PRIORITY, blink_led_3_stack, &blink_led_3_buffer);
+    command_buffer_handle = xMessageBufferCreateStatic(
+        MessageBufferSize, command_buffer_storage, &command_buffer_struct);
+    telemetry_buffer_handle = xMessageBufferCreateStatic(
+        MessageBufferSize, telemetry_buffer_storage, &telemetry_buffer_struct);
     // main task
-    TaskHandle_t main_task_handle = xTaskCreateStatic(main_task, "Main Task", MainTaskStackSize, NULL, tskIDLE_PRIORITY, main_task_stack, &main_task_buffer);
+    TaskHandle_t main_task_handle = xTaskCreateStatic(main_task, "Main Task", MainTaskStackSize, NULL, MainTaskPriority, main_task_stack, &main_task_buffer);
 
-    if (blink_led_1_task && blink_led_2_task && blink_led_3_task && main_task_handle) {
+    if (command_buffer_handle && telemetry_buffer_handle && main_task_handle) {
         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Successfully created tasks, starting scheduler.\r\n", 50, HAL_MAX_DELAY);
         vTaskStartScheduler();
     } else {
-        HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to create tasks\r\n", 25, HAL_MAX_DELAY);
+        HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to create tasks\r\n", 20, HAL_MAX_DELAY);
     }
 
 

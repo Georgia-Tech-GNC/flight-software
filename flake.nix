@@ -9,7 +9,6 @@
     let
       systems = [
         "x86_64-linux"
-        "aarch64-linux"
         "aarch64-darwin"
       ];
 
@@ -37,6 +36,8 @@
 
             nativeBuildInputs = [
               pkgs.unzip
+            ] ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
+              pkgs.darwin.sigtool
             ];
 
             unpackPhase = ''
@@ -44,10 +45,25 @@
             '';
 
             installPhase = ''
-              mkdir -p $out/bin
-              mkdir -p $out/share
+              runHook preInstall
 
-              cp -r renode_1.17.0-multiplatform/. $out/share/
+              mkdir -p "$out/bin" "$out/share"
+              cp -r renode_1.17.0-multiplatform/. "$out/share/"
+
+              ${pkgs.lib.optionalString pkgs.stdenv.hostPlatform.isDarwin ''
+                codesign --force --sign - \
+                  "$out/share/bin/platform-lib/osx-arm64/renode-ui"
+
+                ln -s /tmp/renode-ui-tmp \
+                  "$out/share/bin/platform-lib/osx-arm64/.tmp"
+              ''}
+
+              ${pkgs.lib.optionalString (pkgs.stdenv.hostPlatform.isLinux && pkgs.stdenv.hostPlatform.isx86_64) ''
+                ln -s /tmp/renode-ui-tmp \
+                  "$out/share/bin/platform-lib/linux-x64/.tmp"
+              ''}
+
+              runHook postInstall
             '';
           };
 
@@ -88,11 +104,19 @@
               cmakeCurses
               dotnet-sdk_10
               doxygen
+
+              libxcb
+              libXrandr
+              libXrandr
+              libpng
+            ] ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isLinux [
+              webkitgtk_4_1
             ];
 
             shellHook = ''
               export ${libraryPathVar}="${
-                pkgs.lib.makeLibraryPath [
+              pkgs.lib.makeLibraryPath (
+                [
                   pkgs.gtk3
                   pkgs.glib
                   pkgs.atk
@@ -101,10 +125,20 @@
                   pkgs.gdk-pixbuf
                   pkgs.stdenv.cc.cc.lib
                 ]
-              }''${${libraryPathVar}:+:$${libraryPathVar}}"
+                ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isLinux [
+                  pkgs.libxcb
+                  pkgs.libX11
+                  pkgs.libXrandr
+                  pkgs.libpng
+                  pkgs.webkitgtk_4_1
+                ]
+              )
+            }''${${libraryPathVar}:+:$${libraryPathVar}}"
 
               export UV_PYTHON="${pkgs.python3}/bin/python3"
               export UV_PYTHON_PREFERENCE="only-managed"
+
+              mkdir -p /tmp/renode-ui-tmp
 
               uv sync
               pre-commit install

@@ -1,0 +1,13 @@
+repos:
+  - repo: local
+    hooks:
+      - id: verify-autogen (ncl-f429-dev)
+        name: Run and Verify Autogen (verify-autogen (ncl-f429-dev))
+        entry: nix develop --command .github/scripts/pre_commit.sh ncl-f429-dev
+        language: system
+        pass_filenames: false
+      - id: verify-autogen (ncl-h723-dev)
+        name: Run and Verify Autogen (verify-autogen (ncl-h723-dev))
+        entry: nix develop --command .github/scripts/pre_commit.sh ncl-h723-dev
+        language: system
+        pass_filenames: false

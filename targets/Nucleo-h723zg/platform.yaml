@@ -1,0 +1,14 @@
+name: nucleo-h723zg
+base_renode_platform: platforms/cpus/stm32h7.repl
+debug_uart:
+  hal_uart_id: huart3
+  renode_uart_id: sysbus.usart3
+led_1:
+  gpio_port: B
+  gpio_pin: 0
+led_2:
+  gpio_port: E
+  gpio_pin: 1
+led_3:
+  gpio_port: B
+  gpio_pin: 14

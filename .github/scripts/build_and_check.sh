@@ -12,4 +12,4 @@ cppcheck \
         --suppress=unmatchedSuppression \
         --suppress=checkersReport \
         --error-exitcode=1 \
-        -i targets -i lib/FreeRTOS-Kernel
+        -i targets -i lib/FreeRTOS-Kernel -i lib/CMSIS-DSP -i lib/nanoprintf

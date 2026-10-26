@@ -1,11 +1,11 @@
 # When adding new source files to core, make sure to add those files to this list
 set(DRIVER_SOURCES
-
+    rgb-led/rgb_led.c
 )
 
 # When adding new include's directories to core, make sure to add those files to this list 
 set(DRIVER_INCLUDES
-
+    rgb-led/
 )
 
 target_sources(${CMAKE_PROJECT_NAME} PUBLIC ${DRIVER_SOURCES})

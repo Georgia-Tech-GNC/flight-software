@@ -15,6 +15,8 @@ if (TARGET_BOARD STREQUAL "Nucleo-h723zg")
     target_include_directories(freertos_config INTERFACE 
         ${CMAKE_CURRENT_SOURCE_DIR}/Nucleo-h723zg/Core/Inc
     )
+    set(CMSISCORE "${CMAKE_CURRENT_SOURCE_DIR}/Nucleo-h723zg/Drivers/CMSIS" PARENT_SCOPE)
+
 elseif (TARGET_BOARD STREQUAL "Nucleo-f429zi")
     message("Selected target board: Nucleo-f429zi")
 
@@ -26,6 +28,8 @@ elseif (TARGET_BOARD STREQUAL "Nucleo-f429zi")
     target_include_directories(freertos_config INTERFACE 
         ${CMAKE_CURRENT_SOURCE_DIR}/Nucleo-f429zi/Core/Inc
     )
+    set(CMSISCORE "${CMAKE_CURRENT_SOURCE_DIR}/Nucleo-f429zi/Drivers/CMSIS" PARENT_SCOPE)
+
 elseif (TARGET_BOARD STREQUAL "fc-h725ve")
     message("Selected target board: fc-h725ve")
 
@@ -37,6 +41,8 @@ elseif (TARGET_BOARD STREQUAL "fc-h725ve")
     target_include_directories(freertos_config INTERFACE 
         ${CMAKE_CURRENT_SOURCE_DIR}/fc-h725ve/Core/Inc
     )
+    set(CMSISCORE "${CMAKE_CURRENT_SOURCE_DIR}/fc-h725ve/Drivers/CMSIS" PARENT_SCOPE)
+
 else()
     message(FATAL_ERROR "Unknown target board: ${TARGET_BOARD}")
 endif()

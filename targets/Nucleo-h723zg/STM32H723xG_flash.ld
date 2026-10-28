@@ -73,6 +73,11 @@ _Min_Stack_Size = 0x400; /* required amount of stack */
 /* Define output sections */
 SECTIONS
 {
+  .dma : 
+  {
+      . = ALIGN(4);
+  } >RAM_D2
+
   /* The startup code goes first into FLASH */
   .isr_vector :
   {

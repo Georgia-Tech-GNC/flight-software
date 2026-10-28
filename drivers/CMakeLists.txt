@@ -1,11 +1,11 @@
 # When adding new source files to core, make sure to add those files to this list
 set(DRIVER_SOURCES
-
+    cpt9091a/cpt9091a.c
 )
 
 # When adding new include's directories to core, make sure to add those files to this list 
 set(DRIVER_INCLUDES
-
+    cpt9091a
 )
 
 target_sources(${CMAKE_PROJECT_NAME} PUBLIC ${DRIVER_SOURCES})

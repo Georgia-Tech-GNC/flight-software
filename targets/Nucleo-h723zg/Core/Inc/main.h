@@ -32,6 +32,12 @@ extern "C" {
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "shared_main.h"
+
+extern DAC_HandleTypeDef hdac1;
+extern DMA_HandleTypeDef hdma_dac1_ch1;
+
+extern TIM_HandleTypeDef htim1;
+extern TIM_HandleTypeDef htim2;
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/

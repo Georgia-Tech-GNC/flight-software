@@ -4,6 +4,8 @@
 
 #include "port.h"
 #include "shared_main.h"
+
+#include "cpt9091a.h"
 #include "FreeRTOS.h"
 #include "task.h"
 
@@ -57,16 +59,21 @@ static void blink_led_3(void *_params) {
  * The main methods of all targets are expected to call this method once they are fully initialized
  */
 [[noreturn]] void shared_main(void) {
-    TaskHandle_t blink_led_1_task = xTaskCreateStatic(blink_led_1, "Blink LED 1", STACK_SIZE, NULL, tskIDLE_PRIORITY, blink_led_1_stack, &blink_led_1_buffer);
-    TaskHandle_t blink_led_2_task = xTaskCreateStatic(blink_led_2, "Blink LED 2", STACK_SIZE, NULL, tskIDLE_PRIORITY, blink_led_2_stack, &blink_led_2_buffer);
-    TaskHandle_t blink_led_3_task = xTaskCreateStatic(blink_led_3, "Blink LED 3", STACK_SIZE, NULL, tskIDLE_PRIORITY, blink_led_3_stack, &blink_led_3_buffer);
+    // TaskHandle_t blink_led_1_task = xTaskCreateStatic(blink_led_1, "Blink LED 1", STACK_SIZE, NULL, tskIDLE_PRIORITY, blink_led_1_stack, &blink_led_1_buffer);
+    // TaskHandle_t blink_led_2_task = xTaskCreateStatic(blink_led_2, "Blink LED 2", STACK_SIZE, NULL, tskIDLE_PRIORITY, blink_led_2_stack, &blink_led_2_buffer);
+    // TaskHandle_t blink_led_3_task = xTaskCreateStatic(blink_led_3, "Blink LED 3", STACK_SIZE, NULL, tskIDLE_PRIORITY, blink_led_3_stack, &blink_led_3_buffer);
 
-    if (blink_led_1_task && blink_led_2_task && blink_led_3_task) {
-        HAL_UART_Transmit(&debug_uart, (uint8_t *) "Successfully created tasks, starting scheduler.\r\n", 50, HAL_MAX_DELAY);
-        vTaskStartScheduler();
-    } else {
-        HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to create tasks\r\n", 25, HAL_MAX_DELAY);
-    }
+    // if (blink_led_1_task && blink_led_2_task && blink_led_3_task) {
+    //     HAL_UART_Transmit(&debug_uart, (uint8_t *) "Successfully created tasks, starting scheduler.\r\n", 50, HAL_MAX_DELAY);
+    //     vTaskStartScheduler();
+    // } else {
+    //     HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to create tasks\r\n", 25, HAL_MAX_DELAY);
+    // }
+    
+    cpt9091a_init(&hdac1);
+    cpt9091a_play_sin(&hdac1, 0.8, 800.0);
+    // cpt9091a_play_square(&hdac1, 1.0, 400.0);
+    // cpt9091a_play_pattern_1(&hdac1, 1.0);
 
     while (true) __asm__ volatile (""); // No return
 } 

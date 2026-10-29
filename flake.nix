@@ -105,12 +105,11 @@
               cmakeCurses
               dotnet-sdk_10
               doxygen
-
+            ] ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isLinux [
               libxcb
               libXrandr
               libXrandr
               libpng
-            ] ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isLinux [
               webkitgtk_4_1
             ];
 

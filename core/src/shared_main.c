@@ -19,7 +19,7 @@
 #define MessageBufferSize 256
 #define MainTaskPeriodTicks pdMS_TO_TICKS(333)
 
-#define GRAVITY_MPS2 9.80665f
+#define GRAVITY_MPS2 9.81f
 #define LAUNCH_ACCELERATION_MPS2 5.0f
 #define BAROMETER_MEASUREMENT_VARIANCE 4.0f
 #define ACCELERATION_NOISE_VARIANCE 4.0f
@@ -298,20 +298,16 @@ static void send_telemetry(const Imu_Packet_Receive *latest_imu) {
     };
 
     if (latest_imu != NULL) {
-        (void)memcpy(packet.imu_velocity, latest_imu->velocity,
-                     sizeof(packet.imu_velocity));
-        (void)memcpy(packet.imu_acceleration, latest_imu->acceleration,
-                     sizeof(packet.imu_acceleration));
+        (void)memcpy(packet.imu_velocity, latest_imu->velocity, sizeof(packet.imu_velocity));
+        (void)memcpy(packet.imu_acceleration, latest_imu->acceleration, sizeof(packet.imu_acceleration));
     }
 
-    (void)xMessageBufferSend(telemetry_buffer_handle, &packet, sizeof(packet),
-                             0);
+    (void)xMessageBufferSend(telemetry_buffer_handle, &packet, sizeof(packet), 0);
 }
 
 static void process_commands(void) {
     Telemetry_Command command;
-    while (xMessageBufferReceive(command_buffer_handle, &command,
-                                 sizeof(command), 0) == sizeof(command)) {
+    while (xMessageBufferReceive(command_buffer_handle, &command, sizeof(command), 0) == sizeof(command)) {
         switch (command) {
             case ARM:
                 set_fsm_state(ARMED);
@@ -370,9 +366,7 @@ static void main_task(void *_params) {
         process_commands();
 
         Imu_Packet_Receive imu_packet;
-        while (xMessageBufferReceive(imu_buffer_handle, &imu_packet,
-                                     sizeof(imu_packet), 0) ==
-               sizeof(imu_packet)) {
+        while (xMessageBufferReceive(imu_buffer_handle, &imu_packet, sizeof(imu_packet), 0) == sizeof(imu_packet)) {
             process_imu_packet(&imu_packet);
             latest_imu = imu_packet;
             have_imu_sample = true;
@@ -400,13 +394,11 @@ static void main_task(void *_params) {
         telemetry_buffer_handle && main_task_handle) {
         static uint8_t success_message[] =
             "Successfully created tasks, starting scheduler.\r\n";
-        HAL_UART_Transmit(&debug_uart, success_message,
-                          sizeof(success_message) - 1, HAL_MAX_DELAY);
+        HAL_UART_Transmit(&debug_uart, success_message, sizeof(success_message) - 1, HAL_MAX_DELAY);
         vTaskStartScheduler();
     } else {
         static uint8_t failure_message[] = "Failed to create tasks\r\n";
-        HAL_UART_Transmit(&debug_uart, failure_message,
-                          sizeof(failure_message) - 1, HAL_MAX_DELAY);
+        HAL_UART_Transmit(&debug_uart, failure_message, sizeof(failure_message) - 1, HAL_MAX_DELAY);
     }
 
     while (true) {

@@ -74,13 +74,20 @@ in {
         '';
       };
 
+      fontsConf = pkgs.makeFontsConf {
+        fontDirectories = with pkgs; [
+          dejavu_fonts
+          liberation_ttf
+          noto-fonts
+        ];
+      };
+
       renode = pkgs.writeShellScriptBin "renode" ''
         export RENODE_ROOT=${renode-17}/share/renode
         export PATH=${renode-17}/share/renode:$PATH
         ${pkgs.lib.optionalString pkgs.stdenv.hostPlatform.isLinux ''
           export GDK_BACKEND=x11
           export LIBGL_ALWAYS_SOFTWARE=1
-          export GALLIUM_DRIVER=llvmpipe
         ''}
         exec ${renode-17}/share/renode "$@"
       '';
@@ -118,7 +125,6 @@ in {
           doxygen
           mesa
           libglvnd
-          fontconfig
         ] ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isLinux [
           libxcb
           libX11
@@ -151,9 +157,8 @@ in {
               ]
             )}"
 
-          export FONTCONFIG_FILE="${pkgs.fontconfig.lib}/etc/fonts/fonts.conf"
-          export FONTCONFIG_PATH="${pkgs.fontconfig.lib}/etc/fonts"
-
+		      export FONTCONFIG_FILE="${fontsConf}"          
+          
           ${pkgs.lib.optionalString pkgs.stdenv.hostPlatform.isLinux ''
             export LIBGL_DRIVERS_PATH="${pkgs.mesa}/lib/dri"
             export __EGL_VENDOR_LIBRARY_DIRS="${pkgs.mesa}/share/glvnd/egl_vendor.d"

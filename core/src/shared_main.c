@@ -90,10 +90,9 @@ static Quaternion quaternion_normalize(Quaternion quaternion) {
                             quaternion.x * quaternion.x +
                             quaternion.y * quaternion.y +
                             quaternion.z * quaternion.z);
-    if (magnitude <= 0.0f) {
-        return (Quaternion){1.0f, 0.0f, 0.0f, 0.0f};
+    if (magnitude == 0.0f) {
+        return (Quaternion) {1.0f, 0.0f, 0.0f, 0.0f};
     }
-
     return (Quaternion){
         quaternion.w / magnitude,
         quaternion.x / magnitude,
@@ -302,7 +301,7 @@ static void send_telemetry(const Imu_Packet_Receive *latest_imu) {
         (void)memcpy(packet.imu_acceleration, latest_imu->acceleration, sizeof(packet.imu_acceleration));
     }
 
-    (void)xMessageBufferSend(telemetry_buffer_handle, &packet, sizeof(packet), 0);
+    xMessageBufferSend(telemetry_buffer_handle, &packet, sizeof(packet), 0);
 }
 
 static void process_commands(void) {
@@ -334,13 +333,12 @@ static void process_fsm(const Imu_Packet_Receive *latest_imu) {
             break;
         case ARMED:
             if (get_acceleration() > LAUNCH_ACCELERATION_MPS2) {
-                (void)move_fsm_forward();
+                move_fsm_forward();
             }
             break;
         case FAST_ASCENT:
-            if (xTaskGetTickCount() - last_fsm_change >=
-                pdMS_TO_TICKS(500)) {
-                (void)move_fsm_forward();
+            if (xTaskGetTickCount() - last_fsm_change >= pdMS_TO_TICKS(500)) {
+                move_fsm_forward();
             }
             break;
         case CONTROLLED:
@@ -358,7 +356,6 @@ static void process_fsm(const Imu_Packet_Receive *latest_imu) {
 
 static void main_task(void *_params) {
     UNUSED(_params);
-    TickType_t next_wake = xTaskGetTickCount();
     Imu_Packet_Receive latest_imu = {0};
     bool have_imu_sample = false;
 
@@ -366,14 +363,13 @@ static void main_task(void *_params) {
         process_commands();
 
         Imu_Packet_Receive imu_packet;
-        while (xMessageBufferReceive(imu_buffer_handle, &imu_packet, sizeof(imu_packet), 0) == sizeof(imu_packet)) {
+        while (xMessageBufferReceive(imu_buffer_handle, &imu_packet, sizeof(imu_packet), 3) == sizeof(imu_packet)) {
             process_imu_packet(&imu_packet);
             latest_imu = imu_packet;
             have_imu_sample = true;
         }
 
         process_fsm(have_imu_sample ? &latest_imu : NULL);
-        vTaskDelayUntil(&next_wake, MainTaskPeriodTicks);
     }
 }
 

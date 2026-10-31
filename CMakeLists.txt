@@ -55,7 +55,8 @@ if(Doxygen_FOUND)
  
     doxygen_add_docs(
         generate_docs
-        ${PROJECT_SOURCE_DIR}/core 
+        ${PROJECT_SOURCE_DIR}/core
+        ${PROJECT_SOURCE_DIR}/drivers
         ALL
         COMMENT "Generating API documentation with Doxygen"
     )

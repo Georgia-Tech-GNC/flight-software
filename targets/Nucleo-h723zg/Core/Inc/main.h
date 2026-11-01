@@ -49,6 +49,8 @@ extern "C" {
 
 /* USER CODE END EM */
 
+void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
+
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
 
@@ -65,6 +67,16 @@ void Error_Handler(void);
 #define STLK_VCP_RX_GPIO_Port GPIOD
 #define STLK_VCP_TX_Pin GPIO_PIN_9
 #define STLK_VCP_TX_GPIO_Port GPIOD
+#define PYRO2_CONT_Pin GPIO_PIN_9
+#define PYRO2_CONT_GPIO_Port GPIOC
+#define SPI2_CS_Pin GPIO_PIN_9
+#define SPI2_CS_GPIO_Port GPIOA
+#define PYRO2_EN_Pin GPIO_PIN_10
+#define PYRO2_EN_GPIO_Port GPIOA
+#define PYRO1_EN_Pin GPIO_PIN_11
+#define PYRO1_EN_GPIO_Port GPIOA
+#define PYRO_GLOBAL_EN_Pin GPIO_PIN_12
+#define PYRO_GLOBAL_EN_GPIO_Port GPIOA
 #define SWDIO_Pin GPIO_PIN_13
 #define SWDIO_GPIO_Port GPIOA
 #define SWCLK_Pin GPIO_PIN_14

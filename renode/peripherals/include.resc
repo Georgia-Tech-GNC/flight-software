@@ -1,0 +1,12 @@
+i @renode/peripherals/ISPICSPeripheral.cs
+i @renode/peripherals/PWMCounter.cs
+i @renode/peripherals/ADIS16500.cs
+i @renode/peripherals/LPS25HBTR.cs
+i @renode/peripherals/LSM6DSV.cs
+i @renode/peripherals/PWMServo.cs
+i @renode/peripherals/RGBLed.cs
+i @renode/peripherals/IVoltageSink.cs
+i @renode/peripherals/STM32Dac.cs
+i @renode/peripherals/AnalogAudioRecorder.cs
+i @renode/peripherals/STM32_Timer_Custom.cs
+i @renode/peripherals/STM32DMA_Custom.cs

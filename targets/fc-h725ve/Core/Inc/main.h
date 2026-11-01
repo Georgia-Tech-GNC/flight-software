@@ -59,12 +59,14 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define PYRO1_EN_Pin GPIO_PIN_2
-#define PYRO1_EN_GPIO_Port GPIOE
-#define PYRO1_STATUS_Pin GPIO_PIN_4
-#define PYRO1_STATUS_GPIO_Port GPIOE
-#define PYRO2_EN_Pin GPIO_PIN_5
+#define PYRO2_STAT_Pin GPIO_PIN_2
+#define PYRO2_STAT_GPIO_Port GPIOE
+#define PYRO2_EN_Pin GPIO_PIN_4
 #define PYRO2_EN_GPIO_Port GPIOE
+#define PYRO1_STAT_Pin GPIO_PIN_5
+#define PYRO1_STAT_GPIO_Port GPIOE
+#define PYRO1_EN_Pin GPIO_PIN_13
+#define PYRO1_EN_GPIO_Port GPIOC
 #define SPI2_CS2_Pin GPIO_PIN_14
 #define SPI2_CS2_GPIO_Port GPIOC
 #define SPI2_CS1_Pin GPIO_PIN_15
@@ -85,12 +87,6 @@ void Error_Handler(void);
 #define PWM_3_GPIO_Port GPIOD
 #define PWM_4_Pin GPIO_PIN_15
 #define PWM_4_GPIO_Port GPIOD
-#define STATUS_LED_R_Pin GPIO_PIN_6
-#define STATUS_LED_R_GPIO_Port GPIOC
-#define STATUS_LED_G_Pin GPIO_PIN_7
-#define STATUS_LED_G_GPIO_Port GPIOC
-#define STATUS_LED_B_Pin GPIO_PIN_8
-#define STATUS_LED_B_GPIO_Port GPIOC
 #define GPS_PPS_Pin GPIO_PIN_15
 #define GPS_PPS_GPIO_Port GPIOA
 #define SPI3_CS2_Pin GPIO_PIN_2
@@ -101,8 +97,6 @@ void Error_Handler(void);
 #define SPI1_CS2_GPIO_Port GPIOD
 #define SPI1_CS1_Pin GPIO_PIN_5
 #define SPI1_CS1_GPIO_Port GPIOD
-#define GPIO_HPSB_Pin GPIO_PIN_7
-#define GPIO_HPSB_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 

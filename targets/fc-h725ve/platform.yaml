@@ -1,0 +1,92 @@
+name: fc-h725ve
+base_renode_platform: renode/platforms/stm32h72x.repl
+
+uart:
+  - hal_uart_id: huart7
+    renode_uart_id: uart7
+    devices:
+      debug: {}
+  - hal_uart_id: huart1
+    renode_uart_id: usart1
+    devices:
+      zed_f9p: {}
+spi:
+  - hal_spi_id: hspi1
+    renode_spi_id: spi1
+    devices:
+      adis16500:
+        cs:
+          gpio_port: D
+          gpio_pin: 5
+        int:
+          gpio_port: B
+          gpio_pin: 7
+i2c:
+  - hal_i2c_id: hi2c2
+    renode_i2c_id: i2c2
+    devices:
+      lsm6dsv:
+        i2c_address: 0x6A
+      lps25hbtr:
+        i2c_address: 0x5C
+servo_config:
+  min_pulse_width_us: 500
+  max_pulse_width_us: 2500
+  min_angle: -90
+  max_angle: 90
+  expected_frequency_hz: 333
+  frequency_tolerance_percent: 5
+  renode_tim_id: timer4
+  hal_tim_id: htim4
+  tim_clk_hz: 192000000
+servos:
+  - name: pitch
+    renode_tim_channel: 0
+    hal_tim_channel: 1
+  - name: yaw
+    renode_tim_channel: 1
+    hal_tim_channel: 2
+rgb_led:
+  renode_tim_id: timer3
+  hal_tim_id: htim3
+  tim_clk_hz: 192000000
+  expected_frequency_hz: 1000
+  frequency_tolerance_percent: 5
+  red:
+    renode_tim_channel: 0
+    hal_tim_channel: 1
+  green:
+    renode_tim_channel: 1
+    hal_tim_channel: 2
+  blue:
+    renode_tim_channel: 2
+    hal_tim_channel: 3
+buzzer:
+  renode_dac_id: dac1
+  hal_dac_id: hdac1
+  hal_dac_channel: 1
+  renode_timer_id: timer5
+  hal_timer_id: htim5
+  timer_clk_freq_hz: 192000000
+  hal_dma_id: hdma_dac1_ch1
+pyro:
+  global_en:
+    gpio_port: A
+    gpio_pin: 0
+  channel1:
+    enable:
+      gpio_port: C
+      gpio_pin: 13
+    continuity:
+      gpio_port: E
+      gpio_pin: 5
+  channel2:
+    enable:
+      gpio_port: E
+      gpio_pin: 4
+    continuity:
+      gpio_port: E
+      gpio_pin: 2
+feedback_adc:
+  hal_adc_id: hadc1
+

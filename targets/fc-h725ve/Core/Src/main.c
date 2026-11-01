@@ -44,6 +44,7 @@
 ADC_HandleTypeDef hadc1;
 
 DAC_HandleTypeDef hdac1;
+DMA_HandleTypeDef hdma_dac1_ch1;
 
 FDCAN_HandleTypeDef hfdcan1;
 
@@ -74,6 +75,7 @@ void SystemClock_Config(void);
 void PeriphCommonClock_Config(void);
 static void MPU_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_DAC1_Init(void);
 static void MX_FDCAN1_Init(void);
@@ -139,6 +141,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_ADC1_Init();
   MX_DAC1_Init();
   MX_FDCAN1_Init();
@@ -378,7 +381,7 @@ static void MX_DAC1_Init(void)
   /** DAC channel OUT1 config
   */
   sConfig.DAC_SampleAndHold = DAC_SAMPLEANDHOLD_DISABLE;
-  sConfig.DAC_Trigger = DAC_TRIGGER_NONE;
+  sConfig.DAC_Trigger = DAC_TRIGGER_T5_TRGO;
   sConfig.DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;
   sConfig.DAC_ConnectOnChipPeripheral = DAC_CHIPCONNECT_DISABLE;
   sConfig.DAC_UserTrimming = DAC_TRIMMING_FACTORY;
@@ -798,14 +801,15 @@ static void MX_TIM3_Init(void)
 
   TIM_ClockConfigTypeDef sClockSourceConfig = {0};
   TIM_MasterConfigTypeDef sMasterConfig = {0};
+  TIM_OC_InitTypeDef sConfigOC = {0};
 
   /* USER CODE BEGIN TIM3_Init 1 */
 
   /* USER CODE END TIM3_Init 1 */
   htim3.Instance = TIM3;
-  htim3.Init.Prescaler = 0;
+  htim3.Init.Prescaler = 3;
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim3.Init.Period = 65535;
+  htim3.Init.Period = 47999;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
@@ -817,15 +821,36 @@ static void MX_TIM3_Init(void)
   {
     Error_Handler();
   }
+  if (HAL_TIM_PWM_Init(&htim3) != HAL_OK)
+  {
+    Error_Handler();
+  }
   sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
   if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK)
   {
     Error_Handler();
   }
+  sConfigOC.OCMode = TIM_OCMODE_PWM1;
+  sConfigOC.Pulse = 0;
+  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+  if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
+  {
+    Error_Handler();
+  }
   /* USER CODE BEGIN TIM3_Init 2 */
 
   /* USER CODE END TIM3_Init 2 */
+  HAL_TIM_MspPostInit(&htim3);
 
 }
 
@@ -849,9 +874,9 @@ static void MX_TIM4_Init(void)
 
   /* USER CODE END TIM4_Init 1 */
   htim4.Instance = TIM4;
-  htim4.Init.Prescaler = 0;
+  htim4.Init.Prescaler = 9;
   htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim4.Init.Period = 65535;
+  htim4.Init.Period = 57657;
   htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
@@ -919,9 +944,9 @@ static void MX_TIM5_Init(void)
 
   /* USER CODE END TIM5_Init 1 */
   htim5.Instance = TIM5;
-  htim5.Init.Prescaler = 191;
+  htim5.Init.Prescaler = 3;
   htim5.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim5.Init.Period = 999999;
+  htim5.Init.Period = 999;
   htim5.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim5.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim5) != HAL_OK)
@@ -933,7 +958,7 @@ static void MX_TIM5_Init(void)
   {
     Error_Handler();
   }
-  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
   if (HAL_TIMEx_MasterConfigSynchronization(&htim5, &sMasterConfig) != HAL_OK)
   {
@@ -1090,6 +1115,22 @@ static void MX_USART3_UART_Init(void)
 }
 
 /**
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void)
+{
+
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA1_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA1_Stream0_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Stream0_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Stream0_IRQn);
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -1110,36 +1151,33 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOE, PYRO1_EN_Pin|PYRO2_EN_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(PYRO2_EN_GPIO_Port, PYRO2_EN_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, SPI2_CS2_Pin|SPI2_CS1_Pin|STATUS_LED_R_Pin|STATUS_LED_G_Pin
-                          |STATUS_LED_B_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, PYRO1_EN_Pin|SPI2_CS2_Pin|SPI2_CS1_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, GPIO_1_Pin|GPIO_HPSB_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIO_1_GPIO_Port, GPIO_1_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOD, GPIO_2_Pin|SPI3_CS2_Pin|SPI3_CS1_Pin|SPI1_CS2_Pin
                           |SPI1_CS1_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : PYRO1_EN_Pin PYRO2_EN_Pin */
-  GPIO_InitStruct.Pin = PYRO1_EN_Pin|PYRO2_EN_Pin;
+  /*Configure GPIO pins : PYRO2_STAT_Pin PYRO1_STAT_Pin */
+  GPIO_InitStruct.Pin = PYRO2_STAT_Pin|PYRO1_STAT_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PYRO2_EN_Pin */
+  GPIO_InitStruct.Pin = PYRO2_EN_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+  HAL_GPIO_Init(PYRO2_EN_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : PYRO1_STATUS_Pin */
-  GPIO_InitStruct.Pin = PYRO1_STATUS_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(PYRO1_STATUS_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : SPI2_CS2_Pin SPI2_CS1_Pin STATUS_LED_R_Pin STATUS_LED_G_Pin
-                           STATUS_LED_B_Pin */
-  GPIO_InitStruct.Pin = SPI2_CS2_Pin|SPI2_CS1_Pin|STATUS_LED_R_Pin|STATUS_LED_G_Pin
-                          |STATUS_LED_B_Pin;
+  /*Configure GPIO pins : PYRO1_EN_Pin SPI2_CS2_Pin SPI2_CS1_Pin */
+  GPIO_InitStruct.Pin = PYRO1_EN_Pin|SPI2_CS2_Pin|SPI2_CS1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -1151,12 +1189,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : GPIO_1_Pin GPIO_HPSB_Pin */
-  GPIO_InitStruct.Pin = GPIO_1_Pin|GPIO_HPSB_Pin;
+  /*Configure GPIO pin : GPIO_1_Pin */
+  GPIO_InitStruct.Pin = GPIO_1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIO_1_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : GPIO_2_Pin SPI3_CS2_Pin SPI3_CS1_Pin SPI1_CS2_Pin
                            SPI1_CS1_Pin */
@@ -1166,6 +1204,16 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PB7 */
+  GPIO_InitStruct.Pin = GPIO_PIN_7;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 

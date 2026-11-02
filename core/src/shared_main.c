@@ -12,6 +12,8 @@
 
 #define STACK_SIZE 4096
 
+#define DEBUG_PRINT(str) HAL_UART_Transmit(&debug_uart, (uint8_t *) (str), sizeof(str) - 1, HAL_MAX_DELAY)
+
 static void blink_led_1(void *_params);
 static void blink_led_2(void *_params);
 static void blink_led_3(void *_params);
@@ -126,6 +128,42 @@ static void blink_led_3(void *_params) {
         
 }
 
+#ifdef rgb_led_tim
+static void rgb_led_task(void *_params);
+
+StaticTask_t rgb_led_buffer;
+StackType_t rgb_led_stack[STACK_SIZE];
+
+static rgb_led_t status_led = {
+    .htim = &rgb_led_tim,
+    .ch_r = RGB_LED_CH_R,
+    .ch_g = RGB_LED_CH_G,
+    .ch_b = RGB_LED_CH_B,
+    .inverted = false,
+};
+
+static void rgb_led_task(void *_params) {
+    UNUSED(_params);
+
+    if (!rgb_led_init(&status_led)) {
+        DEBUG_PRINT("RGB LED init failed\r\n");
+        vTaskDelete(NULL);
+    }
+
+    while (true) {
+        rgb_led_set(&status_led, 64, 128, 192);
+        vTaskDelay(pdMS_TO_TICKS(100));
+        DEBUG_PRINT("RGB 64 128 192\r\n");
+        vTaskDelay(pdMS_TO_TICKS(400));
+
+        rgb_led_set(&status_led, 192, 64, 128);
+        vTaskDelay(pdMS_TO_TICKS(100));
+        DEBUG_PRINT("RGB 192 64 128\r\n");
+        vTaskDelay(pdMS_TO_TICKS(400));
+    }
+}
+#endif
+
 /** 
  * The main methods of all targets are expected to call this method once they are fully initialized
  */
@@ -134,7 +172,14 @@ static void blink_led_3(void *_params) {
     TaskHandle_t blink_led_2_task = xTaskCreateStatic(blink_led_2, "Blink LED 2", STACK_SIZE, NULL, tskIDLE_PRIORITY, blink_led_2_stack, &blink_led_2_buffer);
     TaskHandle_t blink_led_3_task = xTaskCreateStatic(blink_led_3, "Blink LED 3", STACK_SIZE, NULL, tskIDLE_PRIORITY, blink_led_3_stack, &blink_led_3_buffer);
 
-    if (blink_led_1_task && blink_led_2_task && blink_led_3_task) {
+    bool tasks_created = blink_led_1_task && blink_led_2_task && blink_led_3_task;
+
+#ifdef rgb_led_tim
+    TaskHandle_t rgb_led_task_handle = xTaskCreateStatic(rgb_led_task, "RGB LED", STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, rgb_led_stack, &rgb_led_buffer);
+    tasks_created = tasks_created && rgb_led_task_handle;
+#endif
+
+    if (tasks_created) {
         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Successfully created tasks, starting scheduler.\r\n", 50, HAL_MAX_DELAY);
         vTaskStartScheduler();
     } else {

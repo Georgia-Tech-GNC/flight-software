@@ -12,12 +12,12 @@
 #define DAC_DMA_BUFFER_LENGTH ((size_t)(DAC_FREQUENCY_HZ * DAC_DMA_BUFFER_LENGTH_S))
 static __attribute__((section(".dma"), aligned(32))) uint8_t dma_buffer[DAC_DMA_BUFFER_LENGTH];
 
-bool cpt9091a_init(DAC_HandleTypeDef* cpt9091a)
+bool cpt9091a_init(CPT9091A* cpt9091a)
 {
     // Fill dma_buffer with 0s
     cpt9091a_play_sin(cpt9091a, 0.0, 400.0);
     
-    if (HAL_DAC_Start_DMA(cpt9091a, DAC1_CHANNEL_1, (uint32_t*)dma_buffer, DAC_DMA_BUFFER_LENGTH, DAC_ALIGN_8B_R) != HAL_OK)
+    if (HAL_DAC_Start_DMA(cpt9091a->dac, DAC1_CHANNEL_1, (uint32_t*)dma_buffer, DAC_DMA_BUFFER_LENGTH, DAC_ALIGN_8B_R) != HAL_OK)
         return false;
     
     HAL_TIM_Base_Start(&htim1);
@@ -25,7 +25,7 @@ bool cpt9091a_init(DAC_HandleTypeDef* cpt9091a)
     return true;
 }
 
-void cpt9091a_play_square(DAC_HandleTypeDef* cpt9091a, double volume, double frequency)
+void cpt9091a_play_square(CPT9091A* cpt9091a, double volume, double frequency)
 {
     HAL_TIM_Base_Stop(&htim2);
     for (uint32_t i = 0; i < DAC_DMA_BUFFER_LENGTH; i++) 
@@ -36,15 +36,15 @@ void cpt9091a_play_square(DAC_HandleTypeDef* cpt9091a, double volume, double fre
     HAL_TIM_Base_Start(&htim2);
 }
 
-void cpt9091a_play_sin(DAC_HandleTypeDef* cpt9091a, double volume, double frequency)
+void cpt9091a_play_sin(CPT9091A* cpt9091a, double volume, double frequency)
 {
-    HAL_TIM_Base_Stop(&htim2);
+    HAL_TIM_Base_Stop(cpt9091a->tim);
     for (uint32_t i = 0; i < DAC_DMA_BUFFER_LENGTH; i++) 
     {
         const double time = (1.0 / DAC_FREQUENCY_HZ) * i;
         dma_buffer[i] = (uint8_t)(255.0 * volume * (sin(2.0 * M_PI * frequency * time) + 1) / 2.0);
     }
-    HAL_TIM_Base_Start(&htim2);
+    HAL_TIM_Base_Start(cpt9091a->tim);
 }
 
 // void cpt9091a_play_notes(DAC_HandleTypeDef* cpt9091a, double volume, CPT9091A_Note* notes, size_t size)

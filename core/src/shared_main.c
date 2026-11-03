@@ -143,8 +143,11 @@ static void blink_led_3(void *_params) {
     //     HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to create tasks\r\n", 25, HAL_MAX_DELAY);
     // }
     
-    cpt9091a_init(&hdac1);
-    cpt9091a_play_sin(&hdac1, 0.8, 800.0);
+    CPT9091A cpt9091a;
+    cpt9091a.dac = &buzzer_dac;
+    cpt9091a.tim = &buzzer_tim;
+    cpt9091a_init(&cpt9091a);
+    cpt9091a_play_sin(&cpt9091a, 0.8, 800.0);
     // cpt9091a_play_square(&hdac1, 1.0, 400.0);
     // cpt9091a_play_pattern_1(&hdac1, 1.0);
 

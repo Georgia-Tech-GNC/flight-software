@@ -5,13 +5,13 @@ bool servo_init(
     servo_t *servo,
     TIM_HandleTypeDef *htim,
     uint32_t channel,
-    uint32_t timer_freq_hz,
+    uint32_t timer_counter_freq_hz,
     float angle_range_deg,
     uint16_t min_pulse_us,
     uint16_t max_pulse_us,
     bool reversed
 ) {
-    if (servo == NULL || htim == NULL || timer_freq_hz == 0 || angle_range_deg <= 0.0f) {
+    if (servo == NULL || htim == NULL || timer_counter_freq_hz == 0 || angle_range_deg <= 0.0f) {
         return false;
     }
 
@@ -21,7 +21,7 @@ bool servo_init(
 
     servo->htim = htim;
     servo->tim_channel = channel;
-    servo->timer_freq_hz = timer_freq_hz;
+    servo->timer_counter_freq_hz = timer_counter_freq_hz;
 
     servo->min_pulse_us = min_pulse_us;
     servo->max_pulse_us = max_pulse_us;
@@ -78,7 +78,7 @@ bool servo_disable(servo_t *servo) {
 }
 
 bool servo_set_pulse_us(servo_t *servo, uint16_t pulse_us) {
-    if (servo == NULL || servo->htim == NULL || servo->timer_freq_hz == 0) {
+    if (servo == NULL || servo->htim == NULL || servo->timer_counter_freq_hz == 0) {
         return false;
     }
 
@@ -90,7 +90,7 @@ bool servo_set_pulse_us(servo_t *servo, uint16_t pulse_us) {
         pulse_us = servo->max_pulse_us;
     }
 
-    uint32_t counts = (uint32_t)roundf(((float)pulse_us * (float)servo->timer_freq_hz) / 1000000.0f);
+    uint32_t counts = (uint32_t)roundf(((float)pulse_us * (float)servo->timer_counter_freq_hz) / 1000000.0f);
 
     __HAL_TIM_SET_COMPARE(servo->htim, servo->tim_channel, counts);
 

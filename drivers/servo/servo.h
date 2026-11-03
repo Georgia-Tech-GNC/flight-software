@@ -5,8 +5,6 @@
 #include <stdint.h>
 #include "stm32h7xx_hal.h"
 
-#define SERVO_TIMER_FREQ_HZ 3200000
-
 typedef struct {
     TIM_HandleTypeDef *htim;
     uint32_t tim_channel;
@@ -16,7 +14,7 @@ typedef struct {
     uint16_t zero_pulse_us;
     float angle_range_deg;
 
-    uint32_t timer_freq_hz;
+    uint32_t timer_counter_freq_hz;
 
     float us_per_degree;
 
@@ -34,7 +32,7 @@ typedef struct {
  * @param servo Pointer to the servo instance to initialize.
  * @param htim Pointer to the configured HAL timer handle.
  * @param channel Timer PWM channel (TIM_CHANNEL_x).
- * @param timer_freq_hz freq_input_clock / (presc + 1), in Hz.
+ * @param timer_counter_freq_hz freq_input_clock / (presc + 1), in Hz.
  * @param angle_range_deg Total angular range in degrees (e.g. 90 for -45 to +45 degrees).
  * @param min_pulse_us Minimum allowed pulse width in microseconds.
  * @param max_pulse_us Maximum allowed pulse width in microseconds.
@@ -46,7 +44,7 @@ bool servo_init(
     servo_t *servo,
     TIM_HandleTypeDef *htim,
     uint32_t channel,
-    uint32_t timer_freq_hz,
+    uint32_t timer_counter_freq_hz,
     float angle_range_deg,
     uint16_t min_pulse_us,
     uint16_t max_pulse_us,

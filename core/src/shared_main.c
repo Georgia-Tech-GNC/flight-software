@@ -13,19 +13,26 @@
 #include "servo.h"
 
 #define STACK_SIZE 4096
+#define SERVO_COUNTER_FREQ_HZ (SERVO_TIM_CLK_HZ / (servo_tim.Instance->PSC + 1))
 
 static void blink_led_1(void *_params);
 static void blink_led_2(void *_params);
 static void blink_led_3(void *_params);
-void servo_set_angle(TIM_HandleTypeDef *htim, uint16_t channel, float angle);
-void tim_set_us(TIM_HandleTypeDef *htim, uint16_t channel, float us, uint32_t base_freq_hz);
-void tim_set_duty(TIM_HandleTypeDef *htim, uint16_t channel, float duty);
 
-static void servo_test(void *__params);
-servo_t test_servo;
-StaticTask_t servo_test_buffer;
-StackType_t servo_test_stack[STACK_SIZE];
-extern TIM_HandleTypeDef htim1;
+// void servo_set_angle(TIM_HandleTypeDef *htim, uint16_t channel, float angle);
+// void tim_set_us(TIM_HandleTypeDef *htim, uint16_t channel, float us, uint32_t base_freq_hz);
+// void tim_set_duty(TIM_HandleTypeDef *htim, uint16_t channel, float duty);
+
+
+// static void servo_test(void *__params);
+// servo_t test_servo;
+// StaticTask_t servo_test_buffer;
+// StackType_t servo_test_stack[STACK_SIZE];
+// extern TIM_HandleTypeDef htim1;
+
+servo_t servo_yaw;
+servo_t servo_pitch;
+
 
 StaticTask_t blink_led_1_buffer;
 StackType_t blink_led_1_stack[STACK_SIZE];
@@ -60,132 +67,154 @@ static void blink_led_2(void *_params) {
     }
 }
 
-void servo_set_angle(TIM_HandleTypeDef *htim, uint16_t channel, float angle) {
-    float lerp = (angle - SERVO_MIN_ANGLE) / (SERVO_MAX_ANGLE - SERVO_MIN_ANGLE);
-    float us = lerp * (SERVO_MAX_PULSE_WIDTH_US - SERVO_MIN_PULSE_WIDTH_US) + SERVO_MIN_PULSE_WIDTH_US;
-    tim_set_us(htim, channel, us, SERVO_TIM_CLK_HZ);
-}
+// void servo_set_angle(TIM_HandleTypeDef *htim, uint16_t channel, float angle) {
+//     float lerp = (angle - SERVO_MIN_ANGLE) / (SERVO_MAX_ANGLE - SERVO_MIN_ANGLE);
+//     float us = lerp * (SERVO_MAX_PULSE_WIDTH_US - SERVO_MIN_PULSE_WIDTH_US) + SERVO_MIN_PULSE_WIDTH_US;
+//     tim_set_us(htim, channel, us, SERVO_TIM_CLK_HZ);
+// }
 
-void tim_set_duty(TIM_HandleTypeDef *htim, uint16_t channel, float duty) {
-    __HAL_TIM_SET_COMPARE(htim, channel, (uint16_t) ((float) htim->Instance->ARR * duty));
-}
+// void tim_set_duty(TIM_HandleTypeDef *htim, uint16_t channel, float duty) {
+//     __HAL_TIM_SET_COMPARE(htim, channel, (uint16_t) ((float) htim->Instance->ARR * duty));
+// }
 
-void tim_set_us(TIM_HandleTypeDef *htim, uint16_t channel, float us, uint32_t base_freq_hz) {
-    float count_hz = (float) base_freq_hz / (float) ((float) htim->Instance->PSC + 1);
-    float counts_per_us = count_hz / 1000000.0f;
+// void tim_set_us(TIM_HandleTypeDef *htim, uint16_t channel, float us, uint32_t base_freq_hz) {
+//     float count_hz = (float) base_freq_hz / (float) ((float) htim->Instance->PSC + 1);
+//     float counts_per_us = count_hz / 1000000.0f;
 
-    uint16_t counts = (uint16_t)(us * counts_per_us);
-    __HAL_TIM_SET_COMPARE(htim, channel, counts);
-}
+//     uint16_t counts = (uint16_t)(us * counts_per_us);
+//     __HAL_TIM_SET_COMPARE(htim, channel, counts);
+// }
 
 static void blink_led_3(void *_params) {
     UNUSED(_params);
 
-    HAL_TIM_PWM_Start(&servo_tim, servo_pitch_tim_channel);
-    HAL_TIM_PWM_Start(&servo_tim, servo_yaw_tim_channel);
-    HAL_TIM_PWM_Start(&rgb_led_tim, rgb_led_red_tim_channel);
-    HAL_TIM_PWM_Start(&rgb_led_tim, rgb_led_green_tim_channel);
-    HAL_TIM_PWM_Start(&rgb_led_tim, rgb_led_blue_tim_channel);
+    servo_init(&servo_yaw,
+               &servo_tim,
+               servo_yaw_tim_channel,
+               SERVO_COUNTER_FREQ_HZ,
+               SERVO_MAX_ANGLE*2.0f,
+               SERVO_MIN_PULSE_WIDTH_US,
+               SERVO_MAX_PULSE_WIDTH_US,
+               false);
+
+    servo_init(&servo_pitch,
+               &servo_tim,
+               servo_pitch_tim_channel,
+               SERVO_COUNTER_FREQ_HZ,
+               SERVO_MAX_ANGLE*2.0f,
+               SERVO_MIN_PULSE_WIDTH_US,
+               SERVO_MAX_PULSE_WIDTH_US,
+               false);
+
+    servo_enable(&servo_yaw);
+    servo_enable(&servo_pitch);
+    // HAL_TIM_PWM_Start(&servo_tim, servo_pitch_tim_channel);
+    // HAL_TIM_PWM_Start(&servo_tim, servo_yaw_tim_channel);
+
+    // HAL_TIM_PWM_Start(&rgb_led_tim, rgb_led_red_tim_channel);
+    // HAL_TIM_PWM_Start(&rgb_led_tim, rgb_led_green_tim_channel);
+    // HAL_TIM_PWM_Start(&rgb_led_tim, rgb_led_blue_tim_channel);
     
     while (true) {
-        vTaskDelay(400);
-                HAL_GPIO_TogglePin(PYRO2_EN_GPIO_PORT, PYRO2_EN_PIN);
+        // vTaskDelay(400);
+        //         HAL_GPIO_TogglePin(PYRO2_EN_GPIO_PORT, PYRO2_EN_PIN);
 
-        HAL_GPIO_WritePin(LED3_GPIO_PORT, LED3_PIN, GPIO_PIN_RESET);
-        uint8_t transmit_data[] = {0xAB, 0xBD, 0xEF};
-        uint8_t receive_data[3];
-        HAL_GPIO_WritePin(adis16500_spi_cs_port, adis16500_spi_cs_pin, GPIO_PIN_RESET);
-        HAL_SPI_TransmitReceive(&adis16500_spi, transmit_data, receive_data, 3, HAL_MAX_DELAY);
-        HAL_GPIO_WritePin(adis16500_spi_cs_port, adis16500_spi_cs_pin, GPIO_PIN_SET);
-        char buf[100];
-        snprintf(buf, 100, "Recieved SPI bytes (adis16500) 0x%02X, 0x%02X, 0x%02X\r\n", receive_data[0], receive_data[1], receive_data[2]);
-        HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, (uint16_t) strlen(buf), HAL_MAX_DELAY);
+        // HAL_GPIO_WritePin(LED3_GPIO_PORT, LED3_PIN, GPIO_PIN_RESET);
+        // uint8_t transmit_data[] = {0xAB, 0xBD, 0xEF};
+        // uint8_t receive_data[3];
+        // HAL_GPIO_WritePin(adis16500_spi_cs_port, adis16500_spi_cs_pin, GPIO_PIN_RESET);
+        // HAL_SPI_TransmitReceive(&adis16500_spi, transmit_data, receive_data, 3, HAL_MAX_DELAY);
+        // HAL_GPIO_WritePin(adis16500_spi_cs_port, adis16500_spi_cs_pin, GPIO_PIN_SET);
+        // char buf[100];
+        // snprintf(buf, 100, "Recieved SPI bytes (adis16500) 0x%02X, 0x%02X, 0x%02X\r\n", receive_data[0], receive_data[1], receive_data[2]);
+        // HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, (uint16_t) strlen(buf), HAL_MAX_DELAY);
 
-        HAL_GPIO_WritePin(lsm6dsv_spi_cs_port, lsm6dsv_spi_cs_pin, GPIO_PIN_RESET);
-        HAL_SPI_TransmitReceive(&lsm6dsv_spi, transmit_data, receive_data, 3, HAL_MAX_DELAY);
-        HAL_GPIO_WritePin(lsm6dsv_spi_cs_port, lsm6dsv_spi_cs_pin, GPIO_PIN_SET);
-        char buf3[100];
-        snprintf(buf3, 100, "Recieved SPI bytes (lsm6dsv) 0x%02X, 0x%02X, 0x%02X\r\n", receive_data[0], receive_data[1], receive_data[2]);
-        HAL_UART_Transmit(&debug_uart, (uint8_t *) buf3, (uint16_t) strlen(buf3), HAL_MAX_DELAY);
+        // HAL_GPIO_WritePin(lsm6dsv_spi_cs_port, lsm6dsv_spi_cs_pin, GPIO_PIN_RESET);
+        // HAL_SPI_TransmitReceive(&lsm6dsv_spi, transmit_data, receive_data, 3, HAL_MAX_DELAY);
+        // HAL_GPIO_WritePin(lsm6dsv_spi_cs_port, lsm6dsv_spi_cs_pin, GPIO_PIN_SET);
+        // char buf3[100];
+        // snprintf(buf3, 100, "Recieved SPI bytes (lsm6dsv) 0x%02X, 0x%02X, 0x%02X\r\n", receive_data[0], receive_data[1], receive_data[2]);
+        // HAL_UART_Transmit(&debug_uart, (uint8_t *) buf3, (uint16_t) strlen(buf3), HAL_MAX_DELAY);
 
-        uint8_t i2c_transmit_data[] = {0x12, 0x34, 0x56};
-        HAL_I2C_Master_Transmit(&lps25hbtr_i2c, lps25hbtr_i2c_addr << 1, i2c_transmit_data, 3, HAL_MAX_DELAY);
-        uint8_t i2c_receive_data[3];
-        HAL_I2C_Master_Receive(&lps25hbtr_i2c, lps25hbtr_i2c_addr << 1, i2c_receive_data, 3, HAL_MAX_DELAY);
-        char buf2[100];
-        snprintf(buf2, 100, "Recieved I2C bytes (lps25hbtr) 0x%02X, 0x%02X, 0x%02X\r\n", i2c_receive_data[0], i2c_receive_data[1], i2c_receive_data[2]);
-        HAL_UART_Transmit(&debug_uart, (uint8_t *) buf2, (uint16_t) strlen(buf2), HAL_MAX_DELAY);
+        // uint8_t i2c_transmit_data[] = {0x12, 0x34, 0x56};
+        // HAL_I2C_Master_Transmit(&lps25hbtr_i2c, lps25hbtr_i2c_addr << 1, i2c_transmit_data, 3, HAL_MAX_DELAY);
+        // uint8_t i2c_receive_data[3];
+        // HAL_I2C_Master_Receive(&lps25hbtr_i2c, lps25hbtr_i2c_addr << 1, i2c_receive_data, 3, HAL_MAX_DELAY);
+        // char buf2[100];
+        // snprintf(buf2, 100, "Recieved I2C bytes (lps25hbtr) 0x%02X, 0x%02X, 0x%02X\r\n", i2c_receive_data[0], i2c_receive_data[1], i2c_receive_data[2]);
+        // HAL_UART_Transmit(&debug_uart, (uint8_t *) buf2, (uint16_t) strlen(buf2), HAL_MAX_DELAY);
 
-        servo_set_angle(&servo_tim, servo_pitch_tim_channel, 30);
-        servo_set_angle(&servo_tim, servo_yaw_tim_channel, -20);
+        // servo_set_angle(&servo_tim, servo_pitch_tim_channel, 30);
+        // servo_set_angle(&servo_tim, servo_yaw_tim_channel, -20);
+        
+        servo_set_pos(&servo_pitch, -30);
+        servo_set_pos(&servo_yaw, -50);
+        vTaskDelay(1000);
 
-        tim_set_duty(&rgb_led_tim, rgb_led_red_tim_channel, 0.5f);
-        tim_set_duty(&rgb_led_tim, rgb_led_green_tim_channel, 0.3f);
-        tim_set_duty(&rgb_led_tim, rgb_led_blue_tim_channel, 0.7f);
+        // tim_set_duty(&rgb_led_tim, rgb_led_red_tim_channel, 0.5f);
+        // tim_set_duty(&rgb_led_tim, rgb_led_green_tim_channel, 0.3f);
+        // tim_set_duty(&rgb_led_tim, rgb_led_blue_tim_channel, 0.7f);
 
-        int pyro1_cont = HAL_GPIO_ReadPin(PYRO1_CONT_GPIO_PORT, PYRO1_CONT_PIN);
-        int pyro2_cont = HAL_GPIO_ReadPin(PYRO2_CONT_GPIO_PORT, PYRO2_CONT_PIN);
-        int pyro_global_en = HAL_GPIO_ReadPin(PYRO_GLOBAL_EN_GPIO_PORT, PYRO_GLOBAL_EN_PIN);
-        char buf4[200];
-        snprintf(buf4, 200, "Pyro 1 cont %d, pyro 2 cont: %d, pyro global en: %d\r\n", pyro1_cont, pyro2_cont, pyro_global_en);
-        HAL_UART_Transmit(&debug_uart, (uint8_t *) buf4, (uint16_t) strlen(buf4), HAL_MAX_DELAY);
+        // int pyro1_cont = HAL_GPIO_ReadPin(PYRO1_CONT_GPIO_PORT, PYRO1_CONT_PIN);
+        // int pyro2_cont = HAL_GPIO_ReadPin(PYRO2_CONT_GPIO_PORT, PYRO2_CONT_PIN);
+        // int pyro_global_en = HAL_GPIO_ReadPin(PYRO_GLOBAL_EN_GPIO_PORT, PYRO_GLOBAL_EN_PIN);
+        // char buf4[200];
+        // snprintf(buf4, 200, "Pyro 1 cont %d, pyro 2 cont: %d, pyro global en: %d\r\n", pyro1_cont, pyro2_cont, pyro_global_en);
+        // HAL_UART_Transmit(&debug_uart, (uint8_t *) buf4, (uint16_t) strlen(buf4), HAL_MAX_DELAY);
 
-        vTaskDelay(400);
-        HAL_GPIO_TogglePin(PYRO1_EN_GPIO_PORT, PYRO1_EN_PIN);
+        // vTaskDelay(400);
+        // HAL_GPIO_TogglePin(PYRO1_EN_GPIO_PORT, PYRO1_EN_PIN);
 
-        HAL_UART_Transmit(&debug_uart, (uint8_t *) "Blink 3\r\n", 10, HAL_MAX_DELAY);
+        // HAL_UART_Transmit(&debug_uart, (uint8_t *) "Blink 3\r\n", 10, HAL_MAX_DELAY);
 
-        vTaskDelay(400);
-        HAL_GPIO_WritePin(LED3_GPIO_PORT, LED3_PIN, GPIO_PIN_RESET);
-        vTaskDelay(400);
-        HAL_GPIO_WritePin(LED3_GPIO_PORT, LED3_PIN, GPIO_PIN_SET);
+        // vTaskDelay(400);
+        // HAL_GPIO_WritePin(LED3_GPIO_PORT, LED3_PIN, GPIO_PIN_RESET);
+        // vTaskDelay(400);
+        // HAL_GPIO_WritePin(LED3_GPIO_PORT, LED3_PIN, GPIO_PIN_SET);
     }
         
 }
 
-static void servo_test(void *__params) {
-    UNUSED(__params);
+// static void servo_test(void *__params) {
+//     UNUSED(__params);
 
-    if (!servo_init(
-        &test_servo,
-        &htim1,
-        TIM_CHANNEL_1,
-        SERVO_TIMER_FREQ_HZ,
-        120.0f,
-        920,
-        2120,
-        true
-    )) {
-        vTaskDelete(NULL);
-    }
+//     if (!servo_init(
+//         &test_servo,
+//         &htim1,
+//         TIM_CHANNEL_1,
+//         SERVO_COUNTER_FREQ_HZ,
+//         120.0f,
+//         920,
+//         2120,
+//         true
+//     )) {
+//         vTaskDelete(NULL);
+//     }
 
-    // Set initial position before enabling PWM
-    servo_set_pos(&test_servo, 0.0f);
+//     if (!servo_enable(&test_servo)) {
+//         vTaskDelete(NULL);
+//     }
 
-    if (!servo_enable(&test_servo)) {
-        vTaskDelete(NULL);
-    }
+//     while (true) {
+//         servo_set_pos(&test_servo, -45.0f);
+//         vTaskDelay(pdMS_TO_TICKS(1000));
 
-    while (true) {
-        servo_set_pos(&test_servo, -45.0f);
-        vTaskDelay(pdMS_TO_TICKS(1000));
+//         servo_set_pos(&test_servo, -30.0f);
+//         vTaskDelay(pdMS_TO_TICKS(1000));
 
-        servo_set_pos(&test_servo, -30.0f);
-        vTaskDelay(pdMS_TO_TICKS(1000));
+//         servo_set_pos(&test_servo, -15.0f);
+//         vTaskDelay(pdMS_TO_TICKS(1000));
 
-        servo_set_pos(&test_servo, -15.0f);
-        vTaskDelay(pdMS_TO_TICKS(1000));
+//         servo_set_pos(&test_servo, 0.0f);
+//         vTaskDelay(pdMS_TO_TICKS(1000));
 
-        servo_set_pos(&test_servo, 0.0f);
-        vTaskDelay(pdMS_TO_TICKS(1000));
+//         servo_set_pos(&test_servo, 45.0f);
+//         vTaskDelay(pdMS_TO_TICKS(1000));
 
-        servo_set_pos(&test_servo, 45.0f);
-        vTaskDelay(pdMS_TO_TICKS(1000));
-
-        servo_set_pos(&test_servo, 0.0f);
-        vTaskDelay(pdMS_TO_TICKS(1000));  
-    }
-}
+//         servo_set_pos(&test_servo, 0.0f);
+//         vTaskDelay(pdMS_TO_TICKS(1000));  
+//     }
+// }
 
 /** 
  * The main methods of all targets are expected to call this method once they are fully initialized
@@ -194,9 +223,9 @@ static void servo_test(void *__params) {
     TaskHandle_t blink_led_1_task = xTaskCreateStatic(blink_led_1, "Blink LED 1", STACK_SIZE, NULL, tskIDLE_PRIORITY, blink_led_1_stack, &blink_led_1_buffer);
     TaskHandle_t blink_led_2_task = xTaskCreateStatic(blink_led_2, "Blink LED 2", STACK_SIZE, NULL, tskIDLE_PRIORITY, blink_led_2_stack, &blink_led_2_buffer);
     TaskHandle_t blink_led_3_task = xTaskCreateStatic(blink_led_3, "Blink LED 3", STACK_SIZE, NULL, tskIDLE_PRIORITY, blink_led_3_stack, &blink_led_3_buffer);
-    TaskHandle_t servo_task = xTaskCreateStatic(servo_test, "Servo Test", STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, servo_test_stack, &servo_test_buffer);
+    // TaskHandle_t servo_task = xTaskCreateStatic(servo_test, "Servo Test", STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, servo_test_stack, &servo_test_buffer);
 
-    if (blink_led_1_task && blink_led_2_task && blink_led_3_task && servo_task) {
+    if (blink_led_1_task && blink_led_2_task && blink_led_3_task) {
         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Successfully created tasks, starting scheduler.\r\n", 50, HAL_MAX_DELAY);
         vTaskStartScheduler();
     } else {

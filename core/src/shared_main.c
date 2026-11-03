@@ -6,6 +6,7 @@
 #include "shared_main.h"
 #include "FreeRTOS.h"
 #include "task.h"
+#include "rgb_led.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -136,9 +137,9 @@ StackType_t rgb_led_stack[STACK_SIZE];
 
 static rgb_led_t status_led = {
     .htim = &rgb_led_tim,
-    .ch_r = RGB_LED_CH_R,
-    .ch_g = RGB_LED_CH_G,
-    .ch_b = RGB_LED_CH_B,
+    .ch_r = rgb_led_red_tim_channel,
+    .ch_g = rgb_led_green_tim_channel,
+    .ch_b = rgb_led_blue_tim_channel,
     .inverted = false,
 };
 

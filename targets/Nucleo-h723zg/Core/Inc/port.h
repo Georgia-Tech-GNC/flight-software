@@ -8,11 +8,6 @@
 
 extern UART_HandleTypeDef huart3;
 #define debug_uart huart3
-#define rgb_led_tim htim4
-
-#define RGB_LED_CH_R TIM_CHANNEL_1
-#define RGB_LED_CH_G TIM_CHANNEL_2
-#define RGB_LED_CH_B TIM_CHANNEL_3
 
 extern SPI_HandleTypeDef hspi1;
 #define adis16500_spi hspi1

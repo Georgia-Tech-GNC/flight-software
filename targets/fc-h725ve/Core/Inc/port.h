@@ -26,8 +26,8 @@ extern TIM_HandleTypeDef htim3, htim4, htim5;
 #define debug_uart huart3
 #define rgb_led_tim htim3
 
-#define RGB_LED_CH_R TIM_CHANNEL_1
-#define RGB_LED_CH_G TIM_CHANNEL_2
-#define RGB_LED_CH_B TIM_CHANNEL_3
+#define rgb_led_red_tim_channel TIM_CHANNEL_1
+#define rgb_led_green_tim_channel TIM_CHANNEL_2
+#define rgb_led_blue_tim_channel TIM_CHANNEL_3
 
 #endif

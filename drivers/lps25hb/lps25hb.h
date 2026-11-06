@@ -8,7 +8,7 @@
  * "If the SA0 pad is connected to the voltage supply, LSb is ‘1’ (address 1011101b), 
  * otherwise if the SA0 pad is connected to ground, the LSb value is ‘0’ (address 1011100b)" (Pg 25)
  */
-#define LPS25HB_ADDRESS 0b101110
+// #define LPS25HB_ADDRESS 0b101110
 
 typedef enum {
     LPS25HB_REGISTER_WHO_AM_I = 0x0F,
@@ -23,14 +23,16 @@ typedef enum {
 #define LPS25HB_REGISTER_WHO_AM_I_VALUE 0xBD
 
 #define LPS25HB_T_sens 480.0f
+#define LPS25HB_P_sens 4096.0f
 
 typedef struct {
     I2C_HandleTypeDef* i2c_handle;
+    uint8_t i2c_address;
     float reference_pressure;
     float reference_temperature;
 } lps25hb_data;
 
-bool lps25hb_initialize(lps25hb_data* lps25hb, I2C_HandleTypeDef* i2c_handle);
+bool lps25hb_initialize(lps25hb_data* lps25hb, I2C_HandleTypeDef* i2c_handle, uint8_t i2c_address);
 void lps25hb_set_reference(lps25hb_data* lps25hb);
 
 
@@ -39,8 +41,8 @@ float lps25hb_get_pressure(lps25hb_data* lps25hb);
 float lps25hb_get_altitude(lps25hb_data* lps25hb);
 
 
-bool lps25hb_read_register(I2C_HandleTypeDef* i2c_handle, LPS25HB_Register reg, uint8_t* data, uint16_t size);
-bool lps25hb_write_register(I2C_HandleTypeDef* i2c_handle, LPS25HB_Register reg, const uint8_t* data, uint16_t size);
+bool lps25hb_read_register(lps25hb_data* lps25hb, LPS25HB_Register reg, uint8_t* data, uint16_t size);
+bool lps25hb_write_register(lps25hb_data* lps25hb, LPS25HB_Register reg, const uint8_t* data, uint16_t size);
 
 
 #endif

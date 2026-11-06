@@ -4,17 +4,69 @@ using Antmicro.Renode.Peripherals.Sensor;
 using Antmicro.Renode.Peripherals.I2C;
 
 using System;
+using System.Text;
 using System.Collections.Generic;
 
 namespace Antmicro.Renode.Peripherals.Sensors
 {
     public class LPS25HBTR : II2CPeripheral
     {
+        private class Register {
+            public static Register WhoAmI = new Register(0x0F, 1, new byte[] { 0xBD });
+            public static Register Temperature = new Register(0x2B, 2, new byte[2]);
+            public static Register Pressure = new Register(0x28, 3, new byte[3]);
+            
+            public readonly byte Address;
+            
+            private byte[] _Value;
+            public byte[] Value { get => _Value; set {
+                if (_Value is not null && _Value.Length != Size) {
+                    Logger.Log(LogLevel.Error, $"i2c1.lps25hbtr: Register {Address:X} was attempted to be written to with incorrect length. Expected value.Length = {Size}, got value.Length = {value.Length}");
+                    return;
+                }
+                
+                _Value = value;
+            }}
+            
+            public readonly int Size;
+            
+            public Register(byte address, int size, byte[] value) {
+                Address = address;
+                Size = size;
+                Value = value;
+            }
+        }
+        
+        private const byte Address = 89;
+        
+        private const float TemperatureSensitivity = 480.0f; // LSB / degree celsius
+        private const float TemperatureNativeToCelsius =  1.0f / TemperatureSensitivity;
+        private const float TemperatureCelsiusToNative = TemperatureSensitivity;
+        
+        private const float PressureSensitivity = 4096.0f; // LSB / hPa
+        private const float PressureNativeToHectopascals = 1.0f / PressureSensitivity;
+        private const float PressureHectopascalsToNative = PressureSensitivity;
+        
+        public float Temperature { 
+            get => BytesToTemperature(Register.Temperature.Value);
+            set => Register.Temperature.Value = TemperatureToBytes(value);
+            // {
+            //     Register.Temperature.Value = TemperatureToBytes(value);
+            //     this.Log(LogLevel.Info, $"Temperature Set: value={value} -> Temperature={Temperature}, Tolerance={1.0 / TemperatureSensitivity}");
+            // }
+        }
+        
+        public float Pressure {
+            get => BytesToPressure(Register.Pressure.Value);
+            set => Register.Pressure.Value = PressureToBytes(value);
+        }
+        
         private readonly LinkedList<byte> _deque = new LinkedList<byte>();
-
+        
         public LPS25HBTR()
         {
-            
+            Temperature = 50.0f;
+            Pressure = 1013.25f;
         }
 
         public byte[] Read(int count = 1)
@@ -41,19 +93,53 @@ namespace Antmicro.Renode.Peripherals.Sensors
                 result[i] = _deque.First.Value;
                 _deque.RemoveFirst(); // Pop from the front
             }
-
+            
             return result;
         }
 
         public void Write(byte[] data)
         {
             if (data == null || data.Length == 0) return;
-
-            foreach (byte b in data)
-            {
-                this.Log(LogLevel.Info, $"Received byte 0x{b:X2}");
-                _deque.AddLast(b); // Push to the back of the deque
+            
+            foreach (byte b in data) {
+                this.Log(LogLevel.Info, $"Byte: {b:X2}");
             }
+            
+            byte addr = (byte)(data[0] & 0x7F);
+            
+            if (data[1] != (Address << 1 | 1)) {
+                this.Log(LogLevel.Error, $"Invalid read. Expected data[1] = SAD+R = 0x{((Address << 1) | 1):X2}, got 0x{data[1]:X2}.");
+                
+                return;
+            }
+            
+            if (addr == Register.WhoAmI.Address)
+                AddBytes(Register.WhoAmI.Value);
+                
+            if (addr == Register.Temperature.Address)
+            {
+                this.Log(LogLevel.Info, $"Register.Temperature.Value.Length: {Register.Temperature.Value.Length}");
+                this.Log(LogLevel.Info, $"Register.Temperature.Value: {FormatArray(Register.Temperature.Value)}");
+                AddBytes(Register.Temperature.Value);
+                // foreach (byte b in Register.Temperature.Value) {
+                //     this.Log(LogLevel.Info, $"Val: {b:X}");
+                // }
+                this.Log(LogLevel.Info, $"Temperature read: {Temperature} celsius, {BitConverter.ToUInt16(Register.Temperature.Value):X4}");
+            }
+            
+            if (addr == Register.Pressure.Address)
+            {
+                this.Log(LogLevel.Info, $"Register.Pressure.Value.Length: {Register.Pressure.Value.Length}");
+                this.Log(LogLevel.Info, $"Register.Pressure.Value: {FormatArray(Register.Pressure.Value)}");
+                AddBytes(Register.Pressure.Value);
+                this.Log(LogLevel.Info, $"Pressure read: {Pressure} hPa, {BitConverter.ToUInt16(Register.Pressure.Value):X4}");
+            }
+
+            // foreach (byte b in data)
+            // {
+            //     this.Log(LogLevel.Info, $"Received byte 0x{b:X2}");
+            //     _deque.AddLast(b); // Push to the back of the deque
+            // }
         }
 
         public void FinishTransmission()
@@ -62,6 +148,76 @@ namespace Antmicro.Renode.Peripherals.Sensors
 
         public void Reset()
         {
+        }
+        
+        private byte[] TemperatureToBytes(float temperature) {
+            UInt16 native = (UInt16)(temperature * TemperatureCelsiusToNative);
+            UInt16 nativeTwosComplement = (UInt16)unchecked(~native + 1);
+            
+            this.Log(LogLevel.Info, $"Native={native}, NativeTwosComplement={nativeTwosComplement}");
+            
+            return BitConverter.GetBytes(nativeTwosComplement);
+        }
+        
+        private float BytesToTemperature(byte[] bytes) {
+            if (bytes.Length != 2)
+            {
+                this.Log(LogLevel.Error, $"BytesToTemperature: byte array must be of length 2. bytes.Length = {bytes.Length}");
+                
+                return 0.0f;
+            }
+            
+            UInt16 native = (UInt16)unchecked(~BitConverter.ToUInt16(bytes) + 1);
+            return native * TemperatureNativeToCelsius;
+        }
+        
+        private byte[] PressureToBytes(float pressure) 
+        {
+            UInt32 native = (UInt32)(pressure * PressureHectopascalsToNative);
+            UInt32 nativeTwosComplement = unchecked(~native + 1);
+            
+            byte[] bytes = BitConverter.GetBytes(nativeTwosComplement)[0..3];
+            this.Log(LogLevel.Info, $"PressureToBytes {FormatArray(bytes)}");
+            
+            return bytes;
+        }
+        
+        private float BytesToPressure(byte[] bytes)
+        {
+            if (bytes.Length != 3) 
+            {
+                this.Log(LogLevel.Error, $"BytesToPressure: byte array must be of length 3. bytes.Length = {bytes.Length}");
+                
+                return 0.0f;
+            }
+            
+            byte[] fourBytes = new byte[] { bytes[0], bytes[1], bytes[2], 0x00 };
+                
+            UInt32 native = unchecked(~BitConverter.ToUInt32(fourBytes) + 1) & 0x00FFFFFF;
+            
+            return native * PressureNativeToHectopascals;
+        }
+        
+        private void AddBytes(byte[] bytes) {
+            foreach (byte b in bytes) {
+                _deque.AddLast(b);
+            }
+        }
+        
+        private String FormatArray(byte[] bytes) {
+            StringBuilder sb = new StringBuilder();
+            
+            sb.Append("[");
+            for (int i = 0; i < bytes.Length; i++) {
+                if (i < bytes.Length - 1) {
+                    sb.Append($"0x{bytes[i]:X2}, ");
+                }
+                else {
+                    sb.Append($"0x{bytes[i]:X2}]");
+                }
+            }
+            
+            return sb.ToString();
         }
     }
 }

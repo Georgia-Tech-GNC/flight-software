@@ -158,8 +158,8 @@ static void uart_send_message(const char* str) {
     HAL_GPIO_WritePin(LED1_GPIO_PORT, LED1_PIN, GPIO_PIN_SET);
     uart_send_message("Before Init.\r\n");
     
-    lps25hb_data lps25hb_data;
-    bool result = lps25hb_initialize(&lps25hb_data, &lps25hbtr_i2c, lps25hbtr_i2c_addr);
+    lps25hb_data lps25hb;
+    bool result = lps25hb_initialize(&lps25hb, &lps25hbtr_i2c, lps25hbtr_i2c_addr);
     
     if (result) {
         uart_send_message("After Init (success).\r\n");
@@ -168,17 +168,18 @@ static void uart_send_message(const char* str) {
         uart_send_message("After Init (failed).\r\n");
     }
     
-    lps25hb_set_reference(&lps25hb_data);
+    lps25hb_set_reference(&lps25hb);
     while (true) {
         HAL_Delay(1000);
-        // float temp = lps25hb_get_temperature(&lps25hb_data);
-        // float pressure = lps25hb_get_pressure(&lps25hb_data);
-        float alt = lps25hb_get_altitude(&lps25hb_data);
+        float temp = lps25hb_get_temperature(&lps25hb);
+        float pressure = lps25hb_get_pressure(&lps25hb);
+        float alt = lps25hb_get_altitude(&lps25hb);
     
-        char altStr[50];
-        npf_snprintf(altStr, sizeof(altStr), "Alt: %f\r\n", alt);
-        uart_send_message(altStr);
+        char str[100];
+        npf_snprintf(str, sizeof(str), "Temp=%f, Pressure=%f, Alt=%f\r\n", temp, pressure, alt);
+        uart_send_message(str);
     }
+    
     HAL_GPIO_WritePin(LED1_GPIO_PORT, LED1_PIN, GPIO_PIN_RESET);
 
     while (true) __asm__ volatile (""); // No return

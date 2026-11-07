@@ -11,7 +11,8 @@ namespace Antmicro.Renode.Peripherals.Sensors
 {
     public class LPS25HBTR : II2CPeripheral
     {
-        private class Register {
+        private class Register 
+        {
             public static Register WhoAmI = new Register(0x0F, 1, new byte[] { 0xBD });
             public static Register Temperature = new Register(0x2B, 2, new byte[2]);
             public static Register Pressure = new Register(0x28, 3, new byte[3]);
@@ -19,18 +20,30 @@ namespace Antmicro.Renode.Peripherals.Sensors
             public readonly byte Address;
             
             private byte[] _Value;
-            public byte[] Value { get => _Value; set {
-                if (_Value is not null && _Value.Length != Size) {
-                    Logger.Log(LogLevel.Error, $"i2c1.lps25hbtr: Register {Address:X} was attempted to be written to with incorrect length. Expected value.Length = {Size}, got value.Length = {value.Length}");
-                    return;
+            public byte[] Value 
+            { 
+                get => _Value; 
+                set 
+                {
+                    if (_Value is not null && _Value.Length != Size)
+                    {
+                        Logger.Log(
+                            LogLevel.Error, 
+                            $"i2c1.lps25hbtr: Register {Address:X} was attempted to be written to with incorrect length. " 
+                                + $"Expected value.Length = {Size}, got value.Length = {value.Length}."
+                        );
+                        
+                        return;
+                    }
+                    
+                    _Value = value;
                 }
-                
-                _Value = value;
-            }}
+            }
             
             public readonly int Size;
             
-            public Register(byte address, int size, byte[] value) {
+            public Register(byte address, int size, byte[] value) 
+            {
                 Address = address;
                 Size = size;
                 Value = value;
@@ -39,24 +52,20 @@ namespace Antmicro.Renode.Peripherals.Sensors
         
         private const byte Address = 89;
         
-        private const float TemperatureSensitivity = 480.0f; // LSB / degree celsius
-        private const float TemperatureNativeToCelsius =  1.0f / TemperatureSensitivity;
-        private const float TemperatureCelsiusToNative = TemperatureSensitivity;
+        private const float TemperatureCelsiusToNative = 480.0f;
+        private const float TemperatureNativeToCelsius =  1.0f / TemperatureCelsiusToNative;
         
-        private const float PressureSensitivity = 4096.0f; // LSB / hPa
-        private const float PressureNativeToHectopascals = 1.0f / PressureSensitivity;
-        private const float PressureHectopascalsToNative = PressureSensitivity;
+        private const float PressureHectopascalsToNative = 4096.0f;
+        private const float PressureNativeToHectopascals = 1.0f / PressureHectopascalsToNative;
         
-        public float Temperature { 
+        public float Temperature
+        { 
             get => BytesToTemperature(Register.Temperature.Value);
             set => Register.Temperature.Value = TemperatureToBytes(value);
-            // {
-            //     Register.Temperature.Value = TemperatureToBytes(value);
-            //     this.Log(LogLevel.Info, $"Temperature Set: value={value} -> Temperature={Temperature}, Tolerance={1.0 / TemperatureSensitivity}");
-            // }
         }
         
-        public float Pressure {
+        public float Pressure
+        {
             get => BytesToPressure(Register.Pressure.Value);
             set => Register.Pressure.Value = PressureToBytes(value);
         }
@@ -81,7 +90,11 @@ namespace Antmicro.Renode.Peripherals.Sensors
             // 2. Check if the deque has enough items, warning the user if it doesn't
             if (count > _deque.Count)
             {
-                this.Log(LogLevel.Warning, $"Requested {count} bytes, but only {_deque.Count} bytes are available. Returning partial data.");
+                this.Log(
+                    LogLevel.Warning, 
+                    $"Requested {count} bytes, but only {_deque.Count} bytes are available."
+                        + "Returning partial data."
+                );
                 // Cap the count to what is actually available to avoid crashes
                 count = _deque.Count;
             }
@@ -101,56 +114,68 @@ namespace Antmicro.Renode.Peripherals.Sensors
         {
             if (data == null || data.Length == 0) return;
             
-            foreach (byte b in data) {
-                this.Log(LogLevel.Info, $"Byte: {b:X2}");
-            }
+            this.Log(LogLevel.Info, $"Written Bytes: {FormatArray(data)}");
             
             byte addr = (byte)(data[0] & 0x7F);
             
-            if (data[1] != (Address << 1 | 1)) {
-                this.Log(LogLevel.Error, $"Invalid read. Expected data[1] = SAD+R = 0x{((Address << 1) | 1):X2}, got 0x{data[1]:X2}.");
+            if (data[1] != (Address << 1 | 1))
+            {
+                this.Log(
+                    LogLevel.Error,
+                    $"Invalid read. Expected data[1] = SAD+R = 0x{((Address << 1) | 1):X2}"
+                        + $", got 0x{data[1]:X2}."
+                );
                 
                 return;
             }
             
             if (addr == Register.WhoAmI.Address)
+            {
+                this.Log(
+                    LogLevel.Info,
+                    $"WhoAmI requested. Register.WhoAmI.Value: {FormatArray(Register.WhoAmI.Value)}"
+                );
+                
                 AddBytes(Register.WhoAmI.Value);
+                
+                return;
+            }
                 
             if (addr == Register.Temperature.Address)
             {
-                this.Log(LogLevel.Info, $"Register.Temperature.Value.Length: {Register.Temperature.Value.Length}");
-                this.Log(LogLevel.Info, $"Register.Temperature.Value: {FormatArray(Register.Temperature.Value)}");
+                this.Log(
+                    LogLevel.Info, 
+                    $"Temperature requested. Register.Temperature.Value: {FormatArray(Register.Temperature.Value)} "
+                        + $"= {Temperature} celsius"
+                );
+                
                 AddBytes(Register.Temperature.Value);
-                // foreach (byte b in Register.Temperature.Value) {
-                //     this.Log(LogLevel.Info, $"Val: {b:X}");
-                // }
-                this.Log(LogLevel.Info, $"Temperature read: {Temperature} celsius, {BitConverter.ToUInt16(Register.Temperature.Value):X4}");
+                
+                return;
             }
             
             if (addr == Register.Pressure.Address)
             {
-                this.Log(LogLevel.Info, $"Register.Pressure.Value.Length: {Register.Pressure.Value.Length}");
-                this.Log(LogLevel.Info, $"Register.Pressure.Value: {FormatArray(Register.Pressure.Value)}");
+                this.Log(
+                    LogLevel.Info,
+                    $"Pressure requested. Register.Pressure.Value: {FormatArray(Register.Pressure.Value)} "
+                        + $"= {Pressure} hPa"
+                );
+                
                 AddBytes(Register.Pressure.Value);
-                this.Log(LogLevel.Info, $"Pressure read: {Pressure} hPa, {BitConverter.ToUInt16(Register.Pressure.Value):X4}");
+                
+                return;
             }
-
-            // foreach (byte b in data)
-            // {
-            //     this.Log(LogLevel.Info, $"Received byte 0x{b:X2}");
-            //     _deque.AddLast(b); // Push to the back of the deque
-            // }
+            
+            this.Log(LogLevel.Warning, $"Unrecognized address ({addr:X})");
         }
 
-        public void FinishTransmission()
-        {
-        }
+        public void FinishTransmission() {}
 
-        public void Reset()
-        {
-        }
+        public void Reset() {}
         
-        private byte[] TemperatureToBytes(float temperature) {
+        private byte[] TemperatureToBytes(float temperature)
+        {
             UInt16 native = (UInt16)(temperature * TemperatureCelsiusToNative);
             UInt16 nativeTwosComplement = (UInt16)unchecked(~native + 1);
             
@@ -159,10 +184,14 @@ namespace Antmicro.Renode.Peripherals.Sensors
             return BitConverter.GetBytes(nativeTwosComplement);
         }
         
-        private float BytesToTemperature(byte[] bytes) {
+        private float BytesToTemperature(byte[] bytes)
+        {
             if (bytes.Length != 2)
             {
-                this.Log(LogLevel.Error, $"BytesToTemperature: byte array must be of length 2. bytes.Length = {bytes.Length}");
+                this.Log(
+                    LogLevel.Error, 
+                    $"BytesToTemperature: byte array must be of length 2. bytes.Length = {bytes.Length}"
+                );
                 
                 return 0.0f;
             }
@@ -177,7 +206,6 @@ namespace Antmicro.Renode.Peripherals.Sensors
             UInt32 nativeTwosComplement = unchecked(~native + 1);
             
             byte[] bytes = BitConverter.GetBytes(nativeTwosComplement)[0..3];
-            this.Log(LogLevel.Info, $"PressureToBytes {FormatArray(bytes)}");
             
             return bytes;
         }
@@ -186,7 +214,10 @@ namespace Antmicro.Renode.Peripherals.Sensors
         {
             if (bytes.Length != 3) 
             {
-                this.Log(LogLevel.Error, $"BytesToPressure: byte array must be of length 3. bytes.Length = {bytes.Length}");
+                this.Log(
+                    LogLevel.Error,
+                    $"BytesToPressure: byte array must be of length 3. bytes.Length = {bytes.Length}"
+                );
                 
                 return 0.0f;
             }
@@ -198,23 +229,18 @@ namespace Antmicro.Renode.Peripherals.Sensors
             return native * PressureNativeToHectopascals;
         }
         
-        private void AddBytes(byte[] bytes) {
-            foreach (byte b in bytes) {
-                _deque.AddLast(b);
-            }
-        }
+        private void AddBytes(byte[] bytes) { foreach (byte b in bytes) _deque.AddLast(b); }
         
-        private String FormatArray(byte[] bytes) {
+        private static String FormatArray(byte[] bytes) {
             StringBuilder sb = new StringBuilder();
             
             sb.Append("[");
-            for (int i = 0; i < bytes.Length; i++) {
-                if (i < bytes.Length - 1) {
+            for (int i = 0; i < bytes.Length; i++) 
+            {
+                if (i < bytes.Length - 1) 
                     sb.Append($"0x{bytes[i]:X2}, ");
-                }
-                else {
+                else 
                     sb.Append($"0x{bytes[i]:X2}]");
-                }
             }
             
             return sb.ToString();

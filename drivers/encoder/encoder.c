@@ -5,7 +5,11 @@ bool encoder_init(
     TIM_HandleTypeDef *htim,
     uint32_t period_channel,
     uint32_t pulse_channel,
-    uint32_t timer_freq_hz
+    uint32_t timer_freq_hz,
+    float angle_range_deg,
+    uint16_t min_pulse_us,
+    uint16_t max_pulse_us,
+    uint16_t zero_pulse_us
 ) {
     if (encoder == NULL || htim == NULL) {
         return false;
@@ -15,6 +19,9 @@ bool encoder_init(
     encoder->period_channel = period_channel;
     encoder->pulse_channel = pulse_channel;
     encoder->timer_freq_hz = timer_freq_hz;
+
+    encoder->zero_pulse_us = zero_pulse_us;
+    encoder->us_per_degree = (max_pulse_us - min_pulse_us) / angle_range_deg;
 
     encoder->period_counts = 0;
     encoder->pulse_counts = 0;
@@ -75,6 +82,21 @@ bool encoder_get_pulse_us(encoder_t *encoder, float *pulse_us) {
     }
 
     *pulse_us = ((float)encoder->pulse_counts * 1000000.0f)/ (float)encoder->timer_freq_hz;
+
+    return true;
+}
+
+bool encoder_get_angle(encoder_t *encoder, float *degrees) {
+    if (encoder == NULL || degrees == NULL || encoder->us_per_degree == 0.0f) {
+        return false;
+    }
+
+    float pulse_us;
+    if (!encoder_get_pulse_us(encoder, &pulse_us)) {
+        return false;
+    }
+
+    *degrees = (pulse_us - encoder->zero_pulse_us) / encoder->us_per_degree;
 
     return true;
 }

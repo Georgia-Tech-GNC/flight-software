@@ -29,6 +29,11 @@ static encoder_t test_encoder;
 static StaticTask_t encoder_test_buffer;
 static StackType_t encoder_test_stack[STACK_SIZE];
 
+#define ENCODER_MIN_PULSE_WIDTH 500
+#define ENCODER_MAX_PULSE_WIDTH 2500
+#define ENCODER_ANGLE_RANGE 180
+#define ENCODER_ZERO_PULSE_WIDTH 1500
+
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
     if (htim == test_encoder.htim &&
         htim->Channel == TIM_ACTIVE_CHANNEL) {
@@ -120,7 +125,11 @@ static void blink_led_3(void *_params) {
         &htim2,
         ENCODER_PERIOD_CHANNEL,
         ENCODER_PULSE_CHANNEL,
-        ENCODER_TIMER_FREQ_HZ
+        ENCODER_TIMER_FREQ_HZ,
+        ENCODER_ANGLE_RANGE,
+        ENCODER_MIN_PULSE_WIDTH,
+        ENCODER_MAX_PULSE_WIDTH,
+        ENCODER_ZERO_PULSE_WIDTH
     );
 
     bool encoder_enabled = false;

@@ -20,6 +20,9 @@ typedef struct {
     uint32_t pulse_channel;
     uint32_t timer_freq_hz;
 
+    uint16_t zero_pulse_us;
+    uint16_t us_per_degree;
+
     volatile uint32_t period_counts;
     volatile uint32_t pulse_counts;
 
@@ -37,6 +40,10 @@ typedef struct {
  * @param period_channel Timer channel measuring the PWM period (TIM_CHANNEL_x).
  * @param pulse_channel Timer channel measuring the HIGH pulse width (TIM_CHANNEL_x).
  * @param timer_freq_hz Timer input clock / (prescaler + 1), in Hz.
+ * @param angle_range_deg Total angular range in degrees to be measured (e.g. 90 for -45 to +45 degrees).
+ * @param min_pulse_us Minimum pulse width in us.
+ * @param max_pulse_us Max pulse width in us.
+ * @param zero_pulse_us Zero position pulse width in us.
  *
  * @return true if initialization succeeds, false otherwise.
  */
@@ -45,7 +52,11 @@ bool encoder_init(
     TIM_HandleTypeDef *htim,
     uint32_t period_channel,
     uint32_t pulse_channel,
-    uint32_t timer_freq_hz
+    uint32_t timer_freq_hz,
+    float angle_range_deg,
+    uint16_t min_pulse_us,
+    uint16_t max_pulse_us,
+    uint16_t zero_pulse_us
 );
 
 /**
@@ -80,6 +91,17 @@ bool encoder_disable(encoder_t *encoder);
  * @return true if a valid measurement is available, false otherwise.
  */
 bool encoder_get_pulse_us(encoder_t *encoder, float *pulse_us);
+
+/**
+ * Get the measured angle in degrees.
+ *
+ * Converts the captured pulse counts into degrees
+ *
+ * @param encoder Pointer to the encoder instance.
+ * @param pulse_us Pointer to store the angle in degrees
+ * @return true if a valid measurement is available, false otherwise.
+ */
+bool encoder_get_angle(encoder_t *encoder, float *degrees);
 
 /**
  * Get the measured PWM signal frequency in Hz.

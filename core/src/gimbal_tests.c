@@ -147,9 +147,9 @@ static bool staircase_step(gimbal_test_context_t *ctx,float angle_deg,TickType_t
                 (double)angle_deg,
                 (double)pulse_us
             );
-        } 
 
-        HAL_UART_Transmit(&debug_uart,(uint8_t *)message,(uint16_t)strlen(message),HAL_MAX_DELAY);
+            HAL_UART_Transmit(&debug_uart,(uint8_t *)message,(uint16_t)strlen(message),HAL_MAX_DELAY);
+        } 
 
         vTaskDelayUntil(&last_wake, sample_ticks);
     }
@@ -289,9 +289,9 @@ static bool run_chirp(gimbal_test_context_t *ctx) {
                 (double)command_deg,
                 (double)pulse_us
             );
-        } 
 
-        HAL_UART_Transmit(&debug_uart,(uint8_t *)message,(uint16_t)strlen(message),HAL_MAX_DELAY);
+            HAL_UART_Transmit(&debug_uart,(uint8_t *)message,(uint16_t)strlen(message),HAL_MAX_DELAY);
+        } 
 
         vTaskDelayUntil(&last_wake, sample_ticks);
     }

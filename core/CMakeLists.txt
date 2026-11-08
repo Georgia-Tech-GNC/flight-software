@@ -1,7 +1,7 @@
 # When adding new source files to core, make sure to add those files to this list
 set(CORE_SOURCES
     src/shared_main.c
-    src/gimbal_test.c
+    src/gimbal_tests.c
 )
 
 # When adding new include's directories to core, make sure to add those files to this list 

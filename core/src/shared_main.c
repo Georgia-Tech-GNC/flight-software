@@ -22,8 +22,8 @@ static gimbal_test_context_t gimbal_context;
 
 encoder_t test_encoder;
 
-static void blink_led_1(void *_params);
-static void blink_led_2(void *_params);
+// static void blink_led_1(void *_params);
+// static void blink_led_2(void *_params);
 // static void blink_led_3(void *_params);
 
 // static void servo_test(void *__params);
@@ -36,38 +36,38 @@ static void blink_led_2(void *_params);
 // servo_t servo_pitch;
 
 
-StaticTask_t blink_led_1_buffer;
-StackType_t blink_led_1_stack[STACK_SIZE];
-StaticTask_t blink_led_2_buffer;
-StackType_t blink_led_2_stack[STACK_SIZE];
+// StaticTask_t blink_led_1_buffer;
+// StackType_t blink_led_1_stack[STACK_SIZE];
+// StaticTask_t blink_led_2_buffer;
+// StackType_t blink_led_2_stack[STACK_SIZE];
 // StaticTask_t blink_led_3_buffer;
 // StackType_t blink_led_3_stack[STACK_SIZE];
 
-static void blink_led_1(void *_params) {
-    UNUSED(_params);
+// static void blink_led_1(void *_params) {
+//     UNUSED(_params);
 
-    while (true) {
-        HAL_UART_Transmit(&debug_uart, (uint8_t *) "Blink 1\r\n", 10, HAL_MAX_DELAY);
+//     while (true) {
+//         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Blink 1\r\n", 10, HAL_MAX_DELAY);
 
-        vTaskDelay(100);
-        HAL_GPIO_WritePin(LED1_GPIO_PORT, LED1_PIN, GPIO_PIN_RESET);
-        vTaskDelay(100);
-        HAL_GPIO_WritePin(LED1_GPIO_PORT, LED1_PIN, GPIO_PIN_SET);
-    }
-}
+//         vTaskDelay(100);
+//         HAL_GPIO_WritePin(LED1_GPIO_PORT, LED1_PIN, GPIO_PIN_RESET);
+//         vTaskDelay(100);
+//         HAL_GPIO_WritePin(LED1_GPIO_PORT, LED1_PIN, GPIO_PIN_SET);
+//     }
+// }
 
-static void blink_led_2(void *_params) {
-    UNUSED(_params);
+// static void blink_led_2(void *_params) {
+//     UNUSED(_params);
 
-    while (true) {
-        HAL_UART_Transmit(&debug_uart, (uint8_t *) "Blink 2\r\n", 10, HAL_MAX_DELAY);
+//     while (true) {
+//         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Blink 2\r\n", 10, HAL_MAX_DELAY);
 
-        vTaskDelay(200);
-        HAL_GPIO_WritePin(LED2_GPIO_PORT, LED2_PIN, GPIO_PIN_RESET);
-        vTaskDelay(200);
-        HAL_GPIO_WritePin(LED2_GPIO_PORT, LED2_PIN, GPIO_PIN_SET);
-    }
-}
+//         vTaskDelay(200);
+//         HAL_GPIO_WritePin(LED2_GPIO_PORT, LED2_PIN, GPIO_PIN_RESET);
+//         vTaskDelay(200);
+//         HAL_GPIO_WritePin(LED2_GPIO_PORT, LED2_PIN, GPIO_PIN_SET);
+//     }
+// }
 
 // static void blink_led_3(void *_params) {
 //     UNUSED(_params);
@@ -164,7 +164,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
     servo_enable(&test_servo);
     gimbal_context.servo = &test_servo;
 
-    encoder_init(&test_encoder,&htim2,ENCODER_PERIOD_CHANNEL,ENCODER_PULSE_CHANNEL,ENCODER_TIMER_FREQ_HZ);
+    encoder_init(&test_encoder,&htim2,ENCODER_PERIOD_CHANNEL,ENCODER_PULSE_CHANNEL,ENCODER_TIMER_FREQ_HZ, ENCODER_ANGLE_RANGE, ENCODER_MIN_PULSE_WIDTH, ENCODER_MAX_PULSE_WIDTH, ENCODER_ZERO_PULSE_WIDTH);
     encoder_enable(&test_encoder);
     gimbal_context.encoder = &test_encoder;
 

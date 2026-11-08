@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include "port.h"
+
 
 #define TWO_PI 6.2831853071795864769f
 
@@ -54,18 +56,18 @@ static void run_doublet(gimbal_test_context_t *ctx,float amplitude_deg) {
             
             while ((xTaskGetTickCount() - start) < pdMS_TO_TICKS(DOUBLET_HOLD_MS)) {
 
-                float pulse_us;
+                float degrees;
 
                 uint32_t timestamp_ms = (uint32_t)pdTICKS_TO_MS(xTaskGetTickCount() - test_start);
 
-                bool valid = encoder_get_pulse_us(ctx->encoder,&pulse_us);
+                bool valid = encoder_get_angle(ctx->encoder,&degrees);
 
                 if (valid) {
                     snprintf(message,sizeof(message),
-                        "Time: %lu ms | Command: %.2f deg | Measured Pulse: %.2f us\r\n",
+                        "Time: %lu ms | Command: %.2f deg | Measured Angle: %.2f deg\r\n",
                         (unsigned long)timestamp_ms,
                         (double)command_deg,
-                        (double)pulse_us
+                        (double)degrees
                     );
 
                     HAL_UART_Transmit(&debug_uart,(uint8_t *)message,(uint16_t)strlen(message),HAL_MAX_DELAY);
@@ -131,21 +133,21 @@ static bool staircase_step(gimbal_test_context_t *ctx,float angle_deg,TickType_t
 
     while ((xTaskGetTickCount() - step_start) < hold_ticks) {
 
-        float pulse_us;
+        float degrees;
         char message[128];
 
         uint32_t timestamp_ms = (uint32_t)pdTICKS_TO_MS(xTaskGetTickCount() - test_start);
 
-        bool valid = encoder_get_pulse_us(ctx->encoder,&pulse_us);
+        bool valid = encoder_get_angle(ctx->encoder,&degrees);
 
         if (valid) {
             snprintf(
                 message,
                 sizeof(message),
-                "Time: %lu ms | Command: %.2f deg | Measured Pulse: %.2f us\r\n",
+                "Time: %lu ms | Command: %.2f deg | Measured Angle: %.2f deg\r\n",
                 (unsigned long)timestamp_ms,
                 (double)angle_deg,
-                (double)pulse_us
+                (double)degrees
             );
 
             HAL_UART_Transmit(&debug_uart,(uint8_t *)message,(uint16_t)strlen(message),HAL_MAX_DELAY);
@@ -277,17 +279,17 @@ static bool run_chirp(gimbal_test_context_t *ctx) {
             return false;
         }
 
-        float pulse_us;
-        bool valid = encoder_get_pulse_us(ctx->encoder,&pulse_us);
+        float degrees;
+        bool valid = encoder_get_pulse_us(ctx->encoder,&degrees);
 
         if (valid) {
             snprintf(
                 message,
                 sizeof(message),
-                "Time: %lu ms | Command: %.2f deg | Measured Pulse: %.2f us\r\n",
+                "Time: %lu ms | Command: %.2f deg | Measured Angle: %.2f deg\r\n",
                 (unsigned long)timestamp_ms,
                 (double)command_deg,
-                (double)pulse_us
+                (double)degrees
             );
 
             HAL_UART_Transmit(&debug_uart,(uint8_t *)message,(uint16_t)strlen(message),HAL_MAX_DELAY);

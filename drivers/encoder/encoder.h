@@ -21,7 +21,7 @@ typedef struct {
     uint32_t timer_freq_hz;
 
     uint16_t zero_pulse_us;
-    uint16_t us_per_degree;
+    float us_per_degree;
 
     volatile uint32_t period_counts;
     volatile uint32_t pulse_counts;

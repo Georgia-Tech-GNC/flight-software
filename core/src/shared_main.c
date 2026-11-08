@@ -11,18 +11,20 @@
 #include <stdlib.h>
 #include <string.h>
 #include "servo.h"
+#include "gimbal_tests.h"
 
 #define STACK_SIZE 4096
 #define SERVO_COUNTER_FREQ_HZ (SERVO_TIM_CLK_HZ / (servo_tim.Instance->PSC + 1))
 
+static StaticTask_t gimbal_test_buffer;
+static StackType_t gimbal_test_stack[TEST_STACK_SIZE];
+static gimbal_test_context_t gimbal_context;
+
+encoder_t test_encoder;
+
 static void blink_led_1(void *_params);
 static void blink_led_2(void *_params);
-static void blink_led_3(void *_params);
-
-// void servo_set_angle(TIM_HandleTypeDef *htim, uint16_t channel, float angle);
-// void tim_set_us(TIM_HandleTypeDef *htim, uint16_t channel, float us, uint32_t base_freq_hz);
-// void tim_set_duty(TIM_HandleTypeDef *htim, uint16_t channel, float duty);
-
+// static void blink_led_3(void *_params);
 
 // static void servo_test(void *__params);
 // servo_t test_servo;
@@ -30,16 +32,16 @@ static void blink_led_3(void *_params);
 // StackType_t servo_test_stack[STACK_SIZE];
 // extern TIM_HandleTypeDef htim1;
 
-servo_t servo_yaw;
-servo_t servo_pitch;
+// servo_t servo_yaw;
+// servo_t servo_pitch;
 
 
 StaticTask_t blink_led_1_buffer;
 StackType_t blink_led_1_stack[STACK_SIZE];
 StaticTask_t blink_led_2_buffer;
 StackType_t blink_led_2_stack[STACK_SIZE];
-StaticTask_t blink_led_3_buffer;
-StackType_t blink_led_3_stack[STACK_SIZE];
+// StaticTask_t blink_led_3_buffer;
+// StackType_t blink_led_3_stack[STACK_SIZE];
 
 static void blink_led_1(void *_params) {
     UNUSED(_params);
@@ -67,113 +69,37 @@ static void blink_led_2(void *_params) {
     }
 }
 
-// void servo_set_angle(TIM_HandleTypeDef *htim, uint16_t channel, float angle) {
-//     float lerp = (angle - SERVO_MIN_ANGLE) / (SERVO_MAX_ANGLE - SERVO_MIN_ANGLE);
-//     float us = lerp * (SERVO_MAX_PULSE_WIDTH_US - SERVO_MIN_PULSE_WIDTH_US) + SERVO_MIN_PULSE_WIDTH_US;
-//     tim_set_us(htim, channel, us, SERVO_TIM_CLK_HZ);
-// }
+// static void blink_led_3(void *_params) {
+//     UNUSED(_params);
 
-// void tim_set_duty(TIM_HandleTypeDef *htim, uint16_t channel, float duty) {
-//     __HAL_TIM_SET_COMPARE(htim, channel, (uint16_t) ((float) htim->Instance->ARR * duty));
-// }
+//     servo_init(&servo_yaw,
+//                &servo_tim,
+//                servo_yaw_tim_channel,
+//                SERVO_COUNTER_FREQ_HZ,
+//                SERVO_MAX_ANGLE*2.0f,
+//                SERVO_MIN_PULSE_WIDTH_US,
+//                SERVO_MAX_PULSE_WIDTH_US,
+//                false);
 
-// void tim_set_us(TIM_HandleTypeDef *htim, uint16_t channel, float us, uint32_t base_freq_hz) {
-//     float count_hz = (float) base_freq_hz / (float) ((float) htim->Instance->PSC + 1);
-//     float counts_per_us = count_hz / 1000000.0f;
+//     servo_init(&servo_pitch,
+//                &servo_tim,
+//                servo_pitch_tim_channel,
+//                SERVO_COUNTER_FREQ_HZ,
+//                SERVO_MAX_ANGLE*2.0f,
+//                SERVO_MIN_PULSE_WIDTH_US,
+//                SERVO_MAX_PULSE_WIDTH_US,
+//                false);
 
-//     uint16_t counts = (uint16_t)(us * counts_per_us);
-//     __HAL_TIM_SET_COMPARE(htim, channel, counts);
-// }
-
-static void blink_led_3(void *_params) {
-    UNUSED(_params);
-
-    servo_init(&servo_yaw,
-               &servo_tim,
-               servo_yaw_tim_channel,
-               SERVO_COUNTER_FREQ_HZ,
-               SERVO_MAX_ANGLE*2.0f,
-               SERVO_MIN_PULSE_WIDTH_US,
-               SERVO_MAX_PULSE_WIDTH_US,
-               false);
-
-    servo_init(&servo_pitch,
-               &servo_tim,
-               servo_pitch_tim_channel,
-               SERVO_COUNTER_FREQ_HZ,
-               SERVO_MAX_ANGLE*2.0f,
-               SERVO_MIN_PULSE_WIDTH_US,
-               SERVO_MAX_PULSE_WIDTH_US,
-               false);
-
-    servo_enable(&servo_yaw);
-    servo_enable(&servo_pitch);
-    // HAL_TIM_PWM_Start(&servo_tim, servo_pitch_tim_channel);
-    // HAL_TIM_PWM_Start(&servo_tim, servo_yaw_tim_channel);
-
-    // HAL_TIM_PWM_Start(&rgb_led_tim, rgb_led_red_tim_channel);
-    // HAL_TIM_PWM_Start(&rgb_led_tim, rgb_led_green_tim_channel);
-    // HAL_TIM_PWM_Start(&rgb_led_tim, rgb_led_blue_tim_channel);
+//     servo_enable(&servo_yaw);
+//     servo_enable(&servo_pitch);
     
-    while (true) {
-        // vTaskDelay(400);
-        //         HAL_GPIO_TogglePin(PYRO2_EN_GPIO_PORT, PYRO2_EN_PIN);
-
-        // HAL_GPIO_WritePin(LED3_GPIO_PORT, LED3_PIN, GPIO_PIN_RESET);
-        // uint8_t transmit_data[] = {0xAB, 0xBD, 0xEF};
-        // uint8_t receive_data[3];
-        // HAL_GPIO_WritePin(adis16500_spi_cs_port, adis16500_spi_cs_pin, GPIO_PIN_RESET);
-        // HAL_SPI_TransmitReceive(&adis16500_spi, transmit_data, receive_data, 3, HAL_MAX_DELAY);
-        // HAL_GPIO_WritePin(adis16500_spi_cs_port, adis16500_spi_cs_pin, GPIO_PIN_SET);
-        // char buf[100];
-        // snprintf(buf, 100, "Recieved SPI bytes (adis16500) 0x%02X, 0x%02X, 0x%02X\r\n", receive_data[0], receive_data[1], receive_data[2]);
-        // HAL_UART_Transmit(&debug_uart, (uint8_t *) buf, (uint16_t) strlen(buf), HAL_MAX_DELAY);
-
-        // HAL_GPIO_WritePin(lsm6dsv_spi_cs_port, lsm6dsv_spi_cs_pin, GPIO_PIN_RESET);
-        // HAL_SPI_TransmitReceive(&lsm6dsv_spi, transmit_data, receive_data, 3, HAL_MAX_DELAY);
-        // HAL_GPIO_WritePin(lsm6dsv_spi_cs_port, lsm6dsv_spi_cs_pin, GPIO_PIN_SET);
-        // char buf3[100];
-        // snprintf(buf3, 100, "Recieved SPI bytes (lsm6dsv) 0x%02X, 0x%02X, 0x%02X\r\n", receive_data[0], receive_data[1], receive_data[2]);
-        // HAL_UART_Transmit(&debug_uart, (uint8_t *) buf3, (uint16_t) strlen(buf3), HAL_MAX_DELAY);
-
-        // uint8_t i2c_transmit_data[] = {0x12, 0x34, 0x56};
-        // HAL_I2C_Master_Transmit(&lps25hbtr_i2c, lps25hbtr_i2c_addr << 1, i2c_transmit_data, 3, HAL_MAX_DELAY);
-        // uint8_t i2c_receive_data[3];
-        // HAL_I2C_Master_Receive(&lps25hbtr_i2c, lps25hbtr_i2c_addr << 1, i2c_receive_data, 3, HAL_MAX_DELAY);
-        // char buf2[100];
-        // snprintf(buf2, 100, "Recieved I2C bytes (lps25hbtr) 0x%02X, 0x%02X, 0x%02X\r\n", i2c_receive_data[0], i2c_receive_data[1], i2c_receive_data[2]);
-        // HAL_UART_Transmit(&debug_uart, (uint8_t *) buf2, (uint16_t) strlen(buf2), HAL_MAX_DELAY);
-
-        // servo_set_angle(&servo_tim, servo_pitch_tim_channel, 30);
-        // servo_set_angle(&servo_tim, servo_yaw_tim_channel, -20);
+//     while (true) {       
+//         servo_set_pos(&servo_pitch, -30);
+//         servo_set_pos(&servo_yaw, -50);
+//         vTaskDelay(1000);
+//     }
         
-        servo_set_pos(&servo_pitch, -30);
-        servo_set_pos(&servo_yaw, -50);
-        vTaskDelay(1000);
-
-        // tim_set_duty(&rgb_led_tim, rgb_led_red_tim_channel, 0.5f);
-        // tim_set_duty(&rgb_led_tim, rgb_led_green_tim_channel, 0.3f);
-        // tim_set_duty(&rgb_led_tim, rgb_led_blue_tim_channel, 0.7f);
-
-        // int pyro1_cont = HAL_GPIO_ReadPin(PYRO1_CONT_GPIO_PORT, PYRO1_CONT_PIN);
-        // int pyro2_cont = HAL_GPIO_ReadPin(PYRO2_CONT_GPIO_PORT, PYRO2_CONT_PIN);
-        // int pyro_global_en = HAL_GPIO_ReadPin(PYRO_GLOBAL_EN_GPIO_PORT, PYRO_GLOBAL_EN_PIN);
-        // char buf4[200];
-        // snprintf(buf4, 200, "Pyro 1 cont %d, pyro 2 cont: %d, pyro global en: %d\r\n", pyro1_cont, pyro2_cont, pyro_global_en);
-        // HAL_UART_Transmit(&debug_uart, (uint8_t *) buf4, (uint16_t) strlen(buf4), HAL_MAX_DELAY);
-
-        // vTaskDelay(400);
-        // HAL_GPIO_TogglePin(PYRO1_EN_GPIO_PORT, PYRO1_EN_PIN);
-
-        // HAL_UART_Transmit(&debug_uart, (uint8_t *) "Blink 3\r\n", 10, HAL_MAX_DELAY);
-
-        // vTaskDelay(400);
-        // HAL_GPIO_WritePin(LED3_GPIO_PORT, LED3_PIN, GPIO_PIN_RESET);
-        // vTaskDelay(400);
-        // HAL_GPIO_WritePin(LED3_GPIO_PORT, LED3_PIN, GPIO_PIN_SET);
-    }
-        
-}
+// }
 
 // static void servo_test(void *__params) {
 //     UNUSED(__params);
@@ -216,16 +142,43 @@ static void blink_led_3(void *_params) {
 //     }
 // }
 
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
+    if (htim == test_encoder.htim &&
+        htim->Channel == TIM_ACTIVE_CHANNEL) {
+
+        encoder_capture_callback(&test_encoder);
+    }
+}
+
 /** 
  * The main methods of all targets are expected to call this method once they are fully initialized
  */
 [[noreturn]] void shared_main(void) {
-    TaskHandle_t blink_led_1_task = xTaskCreateStatic(blink_led_1, "Blink LED 1", STACK_SIZE, NULL, tskIDLE_PRIORITY, blink_led_1_stack, &blink_led_1_buffer);
-    TaskHandle_t blink_led_2_task = xTaskCreateStatic(blink_led_2, "Blink LED 2", STACK_SIZE, NULL, tskIDLE_PRIORITY, blink_led_2_stack, &blink_led_2_buffer);
-    TaskHandle_t blink_led_3_task = xTaskCreateStatic(blink_led_3, "Blink LED 3", STACK_SIZE, NULL, tskIDLE_PRIORITY, blink_led_3_stack, &blink_led_3_buffer);
+    // TaskHandle_t blink_led_1_task = xTaskCreateStatic(blink_led_1, "Blink LED 1", STACK_SIZE, NULL, tskIDLE_PRIORITY, blink_led_1_stack, &blink_led_1_buffer);
+    // TaskHandle_t blink_led_2_task = xTaskCreateStatic(blink_led_2, "Blink LED 2", STACK_SIZE, NULL, tskIDLE_PRIORITY, blink_led_2_stack, &blink_led_2_buffer);
+    // TaskHandle_t blink_led_3_task = xTaskCreateStatic(blink_led_3, "Blink LED 3", STACK_SIZE, NULL, tskIDLE_PRIORITY, blink_led_3_stack, &blink_led_3_buffer);
     // TaskHandle_t servo_task = xTaskCreateStatic(servo_test, "Servo Test", STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, servo_test_stack, &servo_test_buffer);
+    
+    servo_t test_servo;
+    servo_init(&test_servo, &servo_tim, TIM_CHANNEL_1, SERVO_COUNTER_FREQ_HZ, SERVO_MAX_ANGLE*2.0f, SERVO_MIN_PULSE_WIDTH_US, SERVO_MAX_PULSE_WIDTH_US, false);
+    servo_enable(&test_servo);
+    gimbal_context.servo = &test_servo;
 
-    if (blink_led_1_task && blink_led_2_task && blink_led_3_task) {
+    encoder_init(&test_encoder,&htim2,ENCODER_PERIOD_CHANNEL,ENCODER_PULSE_CHANNEL,ENCODER_TIMER_FREQ_HZ);
+    encoder_enable(&test_encoder);
+    gimbal_context.encoder = &test_encoder;
+
+    // Test 1 and 2
+    TaskHandle_t gimbal_test_handle = xTaskCreateStatic(gimbal_test_1_task,"Gimbal Test 1",TEST_STACK_SIZE,&gimbal_context,tskIDLE_PRIORITY + 1,gimbal_test_stack,&gimbal_test_buffer);
+    
+    // Test 3
+    // TaskHandle_t gimbal_test_handle = xTaskCreateStatic(gimbal_test_3_task,"Gimbal Test 3",TEST_STACK_SIZE,&gimbal_context,tskIDLE_PRIORITY + 1,gimbal_test_stack,&gimbal_test_buffer);
+    
+    // Test 4
+    // TaskHandle_t gimbal_test_handle = xTaskCreateStatic(gimbal_test_4_task,"Gimbal Test 4",TEST_STACK_SIZE,&gimbal_context,tskIDLE_PRIORITY + 1,gimbal_test_stack,&gimbal_test_buffer);
+
+
+    if (gimbal_test_handle) {
         HAL_UART_Transmit(&debug_uart, (uint8_t *) "Successfully created tasks, starting scheduler.\r\n", 50, HAL_MAX_DELAY);
         vTaskStartScheduler();
     } else {

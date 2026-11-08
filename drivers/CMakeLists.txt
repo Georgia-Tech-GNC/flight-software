@@ -1,11 +1,13 @@
 # When adding new source files to core, make sure to add those files to this list
 set(DRIVER_SOURCES
     servo/servo.c
+    encoder/encoder.c
 )
 
 # When adding new include's directories to core, make sure to add those files to this list 
 set(DRIVER_INCLUDES
     servo/
+    encoder/
 )
 
 target_sources(${CMAKE_PROJECT_NAME} PUBLIC ${DRIVER_SOURCES})

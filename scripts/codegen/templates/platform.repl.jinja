@@ -53,6 +53,7 @@ rgb_led: Miscellaneous.RGBLed @ sysbus
     {{ platform.rgb_led.blue.renode_tim_channel }} -> rgb_led@2
 
 {{platform.buzzer.renode_timer_id}}:
+    frequency: {{ platform.buzzer.tim_clk_hz }}
     TRGO -> {{platform.buzzer.renode_dac_id}}@0
 
 piezo_buzzer: Analog.AnalogAudioRecorder @ {{platform.buzzer.renode_dac_id}}

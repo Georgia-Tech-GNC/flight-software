@@ -1,7 +1,10 @@
 #include "cpt9091a.h"
 
+#include "port.h"
+
 // Timer config, copy from CubeMX directly (don't add 1)
-#define DMA_TIM_BASE_FREQUENCY_HZ 96000000
+// #define DMA_TIM_BASE_FREQUENCY_HZ 192000000
+#define DMA_TIM_BASE_FREQUENCY_HZ buzzer_tim_clock_base_frequency
 #define DMA_TIM_PRESCALER 3
 #define DMA_TIM_COUNTER_PERIOD 499
 
@@ -12,7 +15,7 @@
 #define DAC_DMA_BUFFER_LENGTH ((size_t)(DAC_FREQUENCY_HZ * DAC_DMA_BUFFER_LENGTH_S))
 static __attribute__((section(".dma"), aligned(32))) uint8_t dma_buffer[DAC_DMA_BUFFER_LENGTH];
 
-bool cpt9091a_init(CPT9091A* cpt9091a)
+bool cpt9091a_init(cpt9091a_data* cpt9091a)
 {
     // Fill dma_buffer with 0s
     cpt9091a_play_sin(cpt9091a, 0.0, 400.0);
@@ -25,18 +28,18 @@ bool cpt9091a_init(CPT9091A* cpt9091a)
     return true;
 }
 
-void cpt9091a_play_square(CPT9091A* cpt9091a, double volume, double frequency)
+void cpt9091a_play_square(cpt9091a_data* cpt9091a, double volume, double frequency)
 {
-    HAL_TIM_Base_Stop(&htim2);
+    HAL_TIM_Base_Stop(cpt9091a->tim);
     for (uint32_t i = 0; i < DAC_DMA_BUFFER_LENGTH; i++) 
     {
         const double time = (1.0 / DAC_FREQUENCY_HZ) * i;
         dma_buffer[i] = (uint8_t)(255.0 * volume * (copysign(0.5, sin(2.0 * M_PI * frequency * time)) + 0.5));
     }
-    HAL_TIM_Base_Start(&htim2);
+    HAL_TIM_Base_Start(cpt9091a->tim);
 }
 
-void cpt9091a_play_sin(CPT9091A* cpt9091a, double volume, double frequency)
+void cpt9091a_play_sin(cpt9091a_data* cpt9091a, double volume, double frequency)
 {
     HAL_TIM_Base_Stop(cpt9091a->tim);
     for (uint32_t i = 0; i < DAC_DMA_BUFFER_LENGTH; i++) 

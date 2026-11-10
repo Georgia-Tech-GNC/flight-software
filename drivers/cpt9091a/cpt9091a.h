@@ -9,11 +9,11 @@
 typedef struct {
     DAC_HandleTypeDef* dac;
     TIM_HandleTypeDef* tim;
-} CPT9091A;
+} cpt9091a_data;
 
-bool cpt9091a_init(CPT9091A* cpt9091a);
-void cpt9091a_play_square(CPT9091A* cpt9091a, double volume, double frequency);
-void cpt9091a_play_sin(CPT9091A* cpt9091a, double volume, double frequency);
+bool cpt9091a_init(cpt9091a_data* cpt9091a);
+void cpt9091a_play_square(cpt9091a_data* cpt9091a, double volume, double frequency);
+void cpt9091a_play_sin(cpt9091a_data* cpt9091a, double volume, double frequency);
 // void cpt9091a_play_notes(DAC_HandleTypeDef* cpt9091a, double volume, CPT9091A_Note* notes, size_t size);
 /** Plays "The Iconic Intro Sequence" */
 // void cpt9091a_play_pattern_1(DAC_HandleTypeDef* cpt9091a, double volume);

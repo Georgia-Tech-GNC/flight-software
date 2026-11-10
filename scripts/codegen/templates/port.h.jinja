@@ -55,6 +55,7 @@ extern DAC_HandleTypeDef {{platform.buzzer.hal_dac_id}};
 
 extern TIM_HandleTypeDef {{platform.buzzer.hal_timer_id}};
 #define buzzer_tim {{platform.buzzer.hal_timer_id}}
+#define buzzer_tim_clock_base_frequency {{platform.buzzer.tim_clk_hz}}
 extern DMA_HandleTypeDef {{platform.buzzer.hal_dma_id}};
 
 #define PYRO_GLOBAL_EN_GPIO_PORT GPIO{{platform.pyro.global_en.gpio_port}}

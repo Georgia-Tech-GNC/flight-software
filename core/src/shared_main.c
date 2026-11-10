@@ -5,12 +5,13 @@
 #include "port.h"
 #include "shared_main.h"
 
-#include "cpt9091a.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+
+#include "cpt9091a.h"
 
 #define STACK_SIZE 4096
 
@@ -143,11 +144,11 @@ static void blink_led_3(void *_params) {
     //     HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to create tasks\r\n", 25, HAL_MAX_DELAY);
     // }
     
-    CPT9091A cpt9091a;
+    cpt9091a_data cpt9091a;
     cpt9091a.dac = &buzzer_dac;
     cpt9091a.tim = &buzzer_tim;
     cpt9091a_init(&cpt9091a);
-    cpt9091a_play_sin(&cpt9091a, 0.8, 800.0);
+    cpt9091a_play_sin(&cpt9091a, 0.8, 1200.0);
     // cpt9091a_play_square(&hdac1, 1.0, 400.0);
     // cpt9091a_play_pattern_1(&hdac1, 1.0);
 

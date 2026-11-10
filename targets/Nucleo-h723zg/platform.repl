@@ -65,6 +65,7 @@ timer2:
     2 -> rgb_led@2
 
 timer4:
+    frequency: 192000000
     TRGO -> dac1@0
 
 piezo_buzzer: Analog.AnalogAudioRecorder @ dac1

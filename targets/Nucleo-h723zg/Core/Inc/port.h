@@ -57,6 +57,7 @@ extern DAC_HandleTypeDef hdac1;
 
 extern TIM_HandleTypeDef htim4;
 #define buzzer_tim htim4
+#define buzzer_tim_clock_base_frequency 192000000
 extern DMA_HandleTypeDef hdma_dac1_ch1;
 
 #define PYRO_GLOBAL_EN_GPIO_PORT GPIOA

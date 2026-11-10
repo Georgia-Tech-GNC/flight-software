@@ -69,6 +69,7 @@ buzzer:
   hal_timer_id: htim4
   timer_clk_freq_hz: 192000000
   hal_dma_id: hdma_dac1_ch1
+  tim_clk_hz: 192000000
 pyro:
   global_en:
     gpio_port: A

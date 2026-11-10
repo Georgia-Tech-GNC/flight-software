@@ -20,6 +20,7 @@ namespace Antmicro.Renode.Peripherals.Miscellaneous
         NullRegistrationPointPeripheralContainer<IVoltageSink>,
         IDoubleWordPeripheral,
         IWordPeripheral,
+        IBytePeripheral,
         IKnownSize,
         IGPIOReceiver
     {
@@ -68,20 +69,43 @@ namespace Antmicro.Renode.Peripherals.Miscellaneous
         {
             registers.Write(offset, value);
         }
+        
+        public byte ReadByte(long offset) {
+            return (byte)registers.Read(offset);
+        }
+        
+        public void WriteByte(long offset, byte value) {
+            registers.Write(offset, value);
+        }
 
         public long Size => 0x400;
 
         private void DefineRegisters()
         {
-            registers.DefineRegister(0x08)
+            // 12-bit mode
+            // registers.DefineRegister(0x08)
+            //     .WithValueField(
+            //         0,
+            //         12,
+            //         out dacValue,
+            //         name: "DHR12R"
+            //     )
+            //     .WithWriteCallback((_, __) =>
+            //     {
+            //         this.Log(LogLevel.Info, "WriteCallback");
+            //         UpdateOutput();
+            //     });
+            // 8-bit right aligned
+            registers.DefineRegister(0x10)
                 .WithValueField(
                     0,
-                    12,
+                    8,
                     out dacValue,
                     name: "DHR12R"
                 )
                 .WithWriteCallback((_, __) =>
                 {
+                    this.Log(LogLevel.Info, "WriteCallback");
                     UpdateOutput();
                 });
             registers.DefineRegister(0x00)
@@ -92,10 +116,10 @@ namespace Antmicro.Renode.Peripherals.Miscellaneous
         }
 
         private void UpdateOutput()
-{
-    var voltage = 3.3 * dacValue.Value / 4096.0;
-    RegisteredPeripheral?.SetVoltage(voltage);
-}
+        {
+            var voltage = 3.3 * dacValue.Value / 4096.0;
+            RegisteredPeripheral?.SetVoltage(voltage);
+        }
 
         private readonly DoubleWordRegisterCollection registers;
 

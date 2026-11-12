@@ -1,0 +1,88 @@
+name: nucleo-h723zg
+base_renode_platform: renode/platforms/stm32h723.repl
+debug_uart:
+  hal_uart_id: huart3
+  renode_uart_id: sysbus.usart3
+led_1:
+  gpio_port: B
+  gpio_pin: 0
+led_2:
+  gpio_port: E
+  gpio_pin: 1
+led_3:
+  gpio_port: B
+  gpio_pin: 14
+adis16500:
+  renode_spi_id: spi1
+  hal_spi_id: hspi1
+  cs_gpio_port: D
+  cs_gpio_pin: 14
+lsm6dsv:
+  renode_spi_id: spi2
+  hal_spi_id: hspi2
+  cs_gpio_port: A
+  cs_gpio_pin: 9
+lps25hbtr:
+  renode_i2c_id: i2c1
+  hal_i2c_id: hi2c1
+  i2c_address: 0x59
+servo_config:
+  min_pulse_width_us: 500
+  max_pulse_width_us: 2500
+  min_angle: -90
+  max_angle: 90
+  expected_frequency_hz: 333
+  frequency_tolerance_percent: 5
+  renode_tim_id: timer1
+  hal_tim_id: htim1
+  tim_clk_hz: 192000000
+servos:
+  - name: pitch
+    renode_tim_channel: 0
+    hal_tim_channel: 1
+  - name: yaw
+    renode_tim_channel: 1
+    hal_tim_channel: 2
+rgb_led:
+  renode_tim_id: timer2
+  hal_tim_id: htim2
+  tim_clk_hz: 192000000
+  expected_frequency_hz: 1000
+  frequency_tolerance_percent: 5
+  red:
+    renode_tim_channel: 0
+    hal_tim_channel: 1
+  green:
+    renode_tim_channel: 1
+    hal_tim_channel: 2
+  blue:
+    renode_tim_channel: 2
+    hal_tim_channel: 3
+buzzer:
+  renode_dac_id: dac1
+  hal_dac_id: hdac1
+  hal_dac_channel: 1
+  renode_timer_id: timer4
+  hal_timer_id: htim4
+  hal_dma_id: hdma_dac1_ch1
+pyro:
+  global_en:
+    gpio_port: A
+    gpio_pin: 12
+  channel1:
+    enable:
+      gpio_port: A
+      gpio_pin: 11
+    continuity:
+      gpio_port: C
+      gpio_pin: 8
+  channel2:
+    enable:
+      gpio_port: A
+      gpio_pin: 10
+    continuity:
+      gpio_port: C
+      gpio_pin: 9
+feedback_adc:
+  hal_adc_id: hadc1
+

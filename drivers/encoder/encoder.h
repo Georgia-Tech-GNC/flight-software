@@ -10,12 +10,13 @@
 #define ENCODER_PULSE_CHANNEL TIM_CHANNEL_2
 #define TIM_ACTIVE_CHANNEL HAL_TIM_ACTIVE_CHANNEL_1
 
-// Timer counter frequency after prescaler, in Hz
-#define ENCODER_TIMER_FREQ_HZ 3200000U
+#define ENCODER_ANGLE_RANGE 180
 #define ENCODER_MIN_PULSE_WIDTH 500
 #define ENCODER_MAX_PULSE_WIDTH 2500
-#define ENCODER_ANGLE_RANGE 180
 #define ENCODER_ZERO_PULSE_WIDTH 1500
+
+// Timer counter frequency after prescaler, in Hz
+#define ENCODER_TIMER_FREQ_HZ 3200000U
 
 typedef struct {
     TIM_HandleTypeDef *htim;

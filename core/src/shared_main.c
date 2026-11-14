@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "servo.h"
+#include "encoder.h"
 #include "gimbal_tests.h"
 
 #define STACK_SIZE 4096

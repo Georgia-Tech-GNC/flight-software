@@ -129,6 +129,16 @@ static void blink_led_3(void *_params) {
         
 }
 
+// buzzer test method
+static void fill_next_chunk(uint8_t* data, uint32_t size, double length_s) {
+    const double frequency = 1200.0;
+    const double timestep = frequency * length_s / size;
+    
+    for (uint32_t i = 0; i < size; i++) {
+        data[i] = (uint8_t)(0xFF * (sin(2.0 * M_PI * timestep * i) + 1) / 2.0);
+    }
+}
+
 /** 
  * The main methods of all targets are expected to call this method once they are fully initialized
  */
@@ -144,11 +154,10 @@ static void blink_led_3(void *_params) {
     //     HAL_UART_Transmit(&debug_uart, (uint8_t *) "Failed to create tasks\r\n", 25, HAL_MAX_DELAY);
     // }
     
-    cpt9091a_data cpt9091a;
-    cpt9091a.dac = &buzzer_dac;
-    cpt9091a.tim = &buzzer_tim;
-    cpt9091a_init(&cpt9091a);
-    cpt9091a_play_sin(&cpt9091a, 0.8, 1200.0);
+    cpt9091a_init(&buzzer_dac, &buzzer_tim);
+    // cpt9091a_play_sin(0.8, 1200.0);
+    cpt9091a_play(fill_next_chunk);
+    cpt9091a_play_sin(0.8, 800.0);
     // cpt9091a_play_square(&hdac1, 1.0, 400.0);
     // cpt9091a_play_pattern_1(&hdac1, 1.0);
 

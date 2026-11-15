@@ -11,24 +11,22 @@
 
 typedef enum {
     LPS25HB_REGISTER_WHO_AM_I = 0x0F,
+    LPS25HB_REGISTER_CTRL_1 = 0x20,
     LPS25HB_REGISTER_PRESS_OUT_XL = 0x28,
     LPS25HB_REGISTER_TEMP_OUT_L = 0x2B
 } LPS25HB_Register;
 
 #define LPS25HB_REGISTER_WHO_AM_I_SIZE 1
+#define LPS25HB_REGISTER_CTRL_1_SIZE 1
 #define LPS25HB_REGISTER_PRESS_OUT_SIZE 3
 #define LPS25HB_REGISTER_TEMP_OUT_SIZE 2
 
-#define LPS25HB_REGISTER_WHO_AM_I_VALUE 0xBD
-
-#define LPS25HB_T_sens 480.0f
-#define LPS25HB_P_sens 4096.0f
 
 typedef struct {
     I2C_HandleTypeDef* i2c_handle;
     uint8_t i2c_address;
-    float reference_pressure;
-    float reference_temperature;
+    double reference_pressure;
+    double reference_temperature;
 } lps25hb_data;
 
 /**
@@ -51,14 +49,14 @@ void lps25hb_set_reference(lps25hb_data* lps25hb);
  * @param lps25hb an initialized instance of the device.
  * @return the measured temperature in Celsius.
  */
-float lps25hb_get_temperature(lps25hb_data* lps25hb);
+double lps25hb_get_temperature(lps25hb_data* lps25hb);
 
 /**
  * Gets the pressure measured by the lps25hb device.
  * @param lps25hb an initialized instance of the lps25hb device.
  * @return the measured pressure (in hPa).
  */
-float lps25hb_get_pressure(lps25hb_data* lps25hb);
+double lps25hb_get_pressure(lps25hb_data* lps25hb);
 
 /**
  * Calculates the altitude using the reference pressure, reference temperature, and current pressure.
@@ -66,7 +64,7 @@ float lps25hb_get_pressure(lps25hb_data* lps25hb);
  * @param lps25hb an initialized instance of the lps25hb device.
  * @return the altitude (in meters) relative to the reference altitude.
  */
-float lps25hb_get_altitude(lps25hb_data* lps25hb);
+double lps25hb_get_altitude(lps25hb_data* lps25hb);
 
 /**
  * Read a register from the lps25hb device.

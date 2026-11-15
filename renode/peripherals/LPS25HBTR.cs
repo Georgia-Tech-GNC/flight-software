@@ -74,7 +74,7 @@ namespace Antmicro.Renode.Peripherals.Sensors
         
         public LPS25HBTR()
         {
-            Temperature = 50.0f;
+            Temperature = 15.0f;
             Pressure = 1013.25f;
         }
 

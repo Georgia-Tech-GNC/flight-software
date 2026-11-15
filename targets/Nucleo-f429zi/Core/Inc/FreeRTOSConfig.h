@@ -167,6 +167,10 @@ standard names. */
 
 /* USER CODE BEGIN Defines */
 /* Section where parameter definitions can be added (for instance, to override default ones in FreeRTOS.h) */
+// void trace_recorder_send8(uint8_t channel, uint8_t value); 
+
+// #define traceTASK_SWITCHED_IN() trace_recorder_send8(0, 1);
+// #define traceTASK_SWITCHED_OUT() trace_recorder_send8(0, 2);
 /* USER CODE END Defines */
 
 #endif /* FREERTOS_CONFIG_H */

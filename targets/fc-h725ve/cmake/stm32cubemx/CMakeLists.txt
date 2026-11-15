@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.22)
 enable_language(C ASM)
 # STM32CubeMX generated symbols (macros)
 set(MX_Defines_Syms 
-	USE_PWR_DIRECT_SMPS_SUPPLY 
+	USE_PWR_LDO_SUPPLY 
 	USE_HAL_DRIVER 
 	STM32H725xx
     $<$<CONFIG:Debug>:DEBUG>

@@ -1,30 +1,167 @@
 #include "encoder.h"
 
-bool encoder_init(
-    encoder_t *encoder,
-    TIM_HandleTypeDef *htim,
-    uint32_t period_channel,
-    uint32_t pulse_channel,
-    uint32_t timer_freq_hz,
-    float angle_range_deg,
-    uint16_t min_pulse_us,
-    uint16_t max_pulse_us,
-    uint16_t zero_pulse_us
-) {
-    if (encoder == NULL || htim == NULL) {
+// bool encoder_init(
+//     encoder_t *encoder,
+//     TIM_HandleTypeDef *htim,
+//     uint32_t period_channel,
+//     uint32_t pulse_channel,
+//     uint32_t timer_freq_hz,
+//     float angle_range_deg,
+//     uint16_t min_pulse_us,
+//     uint16_t max_pulse_us,
+//     uint16_t zero_pulse_us
+// ) {
+//     if (encoder == NULL || htim == NULL) {
+//         return false;
+//     }
+
+//     encoder->htim = htim;
+//     encoder->period_channel = period_channel;
+//     encoder->pulse_channel = pulse_channel;
+//     encoder->timer_freq_hz = timer_freq_hz;
+
+//     encoder->zero_pulse_us = zero_pulse_us;
+//     encoder->us_per_degree = (max_pulse_us - min_pulse_us) / angle_range_deg;
+
+//     encoder->period_counts = 0;
+//     encoder->pulse_counts = 0;
+//     encoder->enabled = false;
+
+//     return true;
+// }
+
+// bool encoder_enable(encoder_t *encoder) {
+//     if (encoder == NULL) {
+//         return false;
+//     }
+
+//     // Start HIGH capture
+//     if (HAL_TIM_IC_Start(encoder->htim,encoder->pulse_channel) != HAL_OK) {
+//         return false;
+//     }
+
+//     // Start period capture 
+//     if (HAL_TIM_IC_Start_IT(encoder->htim, encoder->period_channel) != HAL_OK) {
+//         HAL_TIM_IC_Stop(encoder->htim, encoder->pulse_channel);
+//         return false;
+//     }
+
+//     encoder->enabled = true;
+//     return true;
+// }
+
+// bool encoder_disable(encoder_t *encoder) {
+//     if (encoder == NULL) {
+//         return false;
+//     }
+
+//     // Stop period capture 
+//     if (HAL_TIM_IC_Stop_IT(encoder->htim,encoder->period_channel) != HAL_OK) {
+//         return false;
+//     }
+
+//     // Stop HIGH capture
+//     if (HAL_TIM_IC_Stop(encoder->htim,encoder->pulse_channel) != HAL_OK) {
+//         return false;
+//     }
+
+//     encoder->enabled = false;
+//     encoder->period_counts = 0;
+//     encoder->pulse_counts = 0;
+
+//     return true;
+// }
+
+// bool encoder_get_pulse_us(encoder_t *encoder, float *pulse_us) {
+//     if (encoder == NULL || pulse_us == NULL) {
+//         return false;
+//     }
+
+//     if (encoder->period_counts == 0) {
+//         return false;
+//     }
+
+//     *pulse_us = ((float)encoder->pulse_counts * 1000000.0f)/ (float)encoder->timer_freq_hz;
+
+//     return true;
+// }
+
+// bool encoder_get_angle(encoder_t *encoder, float *degrees) {
+//     if (encoder == NULL || degrees == NULL || encoder->us_per_degree == 0.0f) {
+//         return false;
+//     }
+
+//     float pulse_us;
+//     if (!encoder_get_pulse_us(encoder, &pulse_us)) {
+//         return false;
+//     }
+
+//     *degrees = (pulse_us - encoder->zero_pulse_us) / encoder->us_per_degree;
+
+//     return true;
+// }
+
+// bool encoder_get_frequency(encoder_t *encoder, float *frequency_hz) {
+//     if (encoder == NULL || frequency_hz == NULL) {
+//         return false;
+//     }
+
+//     uint32_t period = encoder->period_counts;
+
+//     if (period == 0) {
+//         return false;
+//     }
+
+//     *frequency_hz = (float)encoder->timer_freq_hz / (float)period;
+
+//     return true;
+// }
+
+// bool encoder_get_duty_cycle(encoder_t *encoder, float *duty_cycle) {
+//     if (encoder == NULL || duty_cycle == NULL) {
+//         return false;
+//     }
+
+//     uint32_t period = encoder->period_counts;
+//     uint32_t pulse = encoder->pulse_counts;
+
+//     if (period == 0 || pulse > period) {
+//         return false;
+//     }
+
+//     *duty_cycle = ((float)pulse / (float)period) * 100.0f;
+
+//     return true;
+// }
+
+// bool encoder_capture_callback(encoder_t *encoder) {
+//     if (encoder == NULL || !encoder->enabled) {
+//         return false;
+//     }
+
+//     uint32_t period = HAL_TIM_ReadCapturedValue(encoder->htim, encoder->period_channel);
+
+//     uint32_t pulse = HAL_TIM_ReadCapturedValue(encoder->htim, encoder->pulse_channel);
+
+//     if (period == 0 || pulse > period) {
+//         return true;
+//     }
+
+//     encoder->pulse_counts = pulse;
+//     encoder->period_counts = period;
+
+//     return true;
+// }
+
+
+bool encoder_init(encoder_t *encoder, TIM_HandleTypeDef *htim, uint32_t counts_per_rev) {
+    if (encoder == NULL || htim == NULL || counts_per_rev == 0) {
         return false;
     }
 
     encoder->htim = htim;
-    encoder->period_channel = period_channel;
-    encoder->pulse_channel = pulse_channel;
-    encoder->timer_freq_hz = timer_freq_hz;
-
-    encoder->zero_pulse_us = zero_pulse_us;
-    encoder->us_per_degree = (max_pulse_us - min_pulse_us) / angle_range_deg;
-
-    encoder->period_counts = 0;
-    encoder->pulse_counts = 0;
+    encoder->counts_per_rev = counts_per_rev;
+    encoder->zero_count = 0;
     encoder->enabled = false;
 
     return true;
@@ -35,14 +172,11 @@ bool encoder_enable(encoder_t *encoder) {
         return false;
     }
 
-    // Start HIGH capture
-    if (HAL_TIM_IC_Start(encoder->htim,encoder->pulse_channel) != HAL_OK) {
-        return false;
+    if (encoder->enabled) {
+        return true;
     }
 
-    // Start period capture 
-    if (HAL_TIM_IC_Start_IT(encoder->htim, encoder->period_channel) != HAL_OK) {
-        HAL_TIM_IC_Stop(encoder->htim, encoder->pulse_channel);
+    if (HAL_TIM_Encoder_Start(encoder->htim, TIM_CHANNEL_ALL) != HAL_OK) {
         return false;
     }
 
@@ -55,100 +189,37 @@ bool encoder_disable(encoder_t *encoder) {
         return false;
     }
 
-    // Stop period capture 
-    if (HAL_TIM_IC_Stop_IT(encoder->htim,encoder->period_channel) != HAL_OK) {
-        return false;
-    }
-
-    // Stop HIGH capture
-    if (HAL_TIM_IC_Stop(encoder->htim,encoder->pulse_channel) != HAL_OK) {
+    if (HAL_TIM_Encoder_Stop(encoder->htim, TIM_CHANNEL_ALL) != HAL_OK) {
         return false;
     }
 
     encoder->enabled = false;
-    encoder->period_counts = 0;
-    encoder->pulse_counts = 0;
-
     return true;
 }
 
-bool encoder_get_pulse_us(encoder_t *encoder, float *pulse_us) {
-    if (encoder == NULL || pulse_us == NULL) {
-        return false;
-    }
-
-    if (encoder->period_counts == 0) {
-        return false;
-    }
-
-    *pulse_us = ((float)encoder->pulse_counts * 1000000.0f)/ (float)encoder->timer_freq_hz;
-
-    return true;
-}
-
-bool encoder_get_angle(encoder_t *encoder, float *degrees) {
-    if (encoder == NULL || degrees == NULL || encoder->us_per_degree == 0.0f) {
-        return false;
-    }
-
-    float pulse_us;
-    if (!encoder_get_pulse_us(encoder, &pulse_us)) {
-        return false;
-    }
-
-    *degrees = (pulse_us - encoder->zero_pulse_us) / encoder->us_per_degree;
-
-    return true;
-}
-
-bool encoder_get_frequency(encoder_t *encoder, float *frequency_hz) {
-    if (encoder == NULL || frequency_hz == NULL) {
-        return false;
-    }
-
-    uint32_t period = encoder->period_counts;
-
-    if (period == 0) {
-        return false;
-    }
-
-    *frequency_hz = (float)encoder->timer_freq_hz / (float)period;
-
-    return true;
-}
-
-bool encoder_get_duty_cycle(encoder_t *encoder, float *duty_cycle) {
-    if (encoder == NULL || duty_cycle == NULL) {
-        return false;
-    }
-
-    uint32_t period = encoder->period_counts;
-    uint32_t pulse = encoder->pulse_counts;
-
-    if (period == 0 || pulse > period) {
-        return false;
-    }
-
-    *duty_cycle = ((float)pulse / (float)period) * 100.0f;
-
-    return true;
-}
-
-bool encoder_capture_callback(encoder_t *encoder) {
+bool encoder_set_zero(encoder_t *encoder) {
     if (encoder == NULL || !encoder->enabled) {
         return false;
     }
 
-    uint32_t period = HAL_TIM_ReadCapturedValue(encoder->htim, encoder->period_channel);
+    encoder->zero_count = (int32_t)
+        __HAL_TIM_GET_COUNTER(encoder->htim);
 
-    uint32_t pulse = HAL_TIM_ReadCapturedValue(encoder->htim, encoder->pulse_channel);
+    return true;
+}
 
-    if (period == 0 || pulse > period) {
-        return true;
+bool encoder_get_angle(encoder_t *encoder,float *degrees) {
+    if (encoder == NULL || degrees == NULL ||
+        !encoder->enabled ||
+        encoder->counts_per_rev == 0) {
+        return false;
     }
 
-    encoder->pulse_counts = pulse;
-    encoder->period_counts = period;
+    uint32_t current_count = __HAL_TIM_GET_COUNTER(encoder->htim);
+
+    int32_t relative_count = (int32_t)(current_count - (uint32_t)encoder->zero_count);
+
+    *degrees = (float)relative_count * 360.0f / (float)encoder->counts_per_rev;
 
     return true;
 }

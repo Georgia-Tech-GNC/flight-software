@@ -18,7 +18,7 @@
 #define MainTaskStackSize 4096
 #define MainTaskPriority (tskIDLE_PRIORITY + 1)
 #define MessageBufferSize 256
-#define MainTaskPeriodTicks pdMS_TO_TICKS(333)
+#define MainTaskPeriodTicks pdMS_TO_TICKS(3)
 
 #define GRAVITY_MPS2 9.81f
 #define LAUNCH_ACCELERATION_MPS2 5.0f
@@ -39,18 +39,7 @@ StaticTask_t main_task_buffer;
 StackType_t main_task_stack[MainTaskStackSize];
 TickType_t last_fsm_change;
 
-typedef struct Vector3 {
-    float32_t x;
-    float32_t y;
-    float32_t z;
-} vector3_t;
 
-typedef struct StateEstimate {
-    float32_t orientation[4];
-    vector3_t velocity;
-    vector3_t position;
-    vector3_t linear_acceleration;
-} state_estimate_t;
 
 static state_estimate_t state_estimate = {
     .orientation = {1.0f, 0.0f, 0.0f, 0.0f},
@@ -160,19 +149,19 @@ static void process_imu_packet(const imu_packet_receive_t *packet) {
     world_acceleration.z -= GRAVITY_MPS2;
     state_estimate.linear_acceleration = world_acceleration;
 
-    vector3_t imu_velocity = {
-        packet->velocity[0],
-        packet->velocity[1],
-        packet->velocity[2],
+    vector3_t calculated_velocity = {
+        world_acceleration.x * dt_seconds + state_estimate.velocity.x,
+        world_acceleration.y * dt_seconds + state_estimate.velocity.y,
+        world_acceleration.z * dt_seconds + state_estimate.velocity.z,
     };
     state_estimate.position.x +=
-        imu_velocity.x * dt_seconds +
+        state_estimate.velocity.x * dt_seconds +
         0.5f * world_acceleration.x * dt_seconds * dt_seconds;
     state_estimate.position.y +=
-        imu_velocity.y * dt_seconds +
+        state_estimate.velocity.y * dt_seconds +
         0.5f * world_acceleration.y * dt_seconds * dt_seconds;
-    state_estimate.velocity.x = imu_velocity.x;
-    state_estimate.velocity.y = imu_velocity.y;
+    state_estimate.velocity.x = calculated_velocity.x;
+    state_estimate.velocity.y = calculated_velocity.y;
 
     if (altitude_filter.initialized) {
         altitude_kalman_filter_predict(
@@ -184,9 +173,9 @@ static void process_imu_packet(const imu_packet_receive_t *packet) {
         state_estimate.velocity.z = altitude_filter.vertical_velocity;
     } else {
         state_estimate.position.z +=
-            imu_velocity.z * dt_seconds +
+            state_estimate.velocity.z * dt_seconds +
             0.5f * world_acceleration.z * dt_seconds * dt_seconds;
-        state_estimate.velocity.z = imu_velocity.z;
+        state_estimate.velocity.z = calculated_velocity.z;
     }
 
     if (packet->barometer_valid) {
@@ -242,8 +231,8 @@ static void send_telemetry(const imu_packet_receive_t *latest_imu) {
     };
 
     if (latest_imu != NULL) {
-        (void)memcpy(packet.imu_velocity, latest_imu->velocity, sizeof(packet.imu_velocity));
         (void)memcpy(packet.imu_acceleration, latest_imu->acceleration, sizeof(packet.imu_acceleration));
+        (void)memcpy(packet.imu_angular_velocity, latest_imu->angular_velocity, sizeof(packet.imu_angular_velocity));
     }
 
     xMessageBufferSend(telemetry_buffer_handle, &packet, sizeof(packet), 0);
@@ -309,10 +298,10 @@ static void main_task(void *_params) {
 
         imu_packet_receive_t imu_packet;
         while (xMessageBufferReceive(
-                   imu_buffer_handle,
-                   &imu_packet,
-                   sizeof(imu_packet),
-                   MainTaskPeriodTicks) == sizeof(imu_packet)) {
+                    imu_buffer_handle,
+                    &imu_packet,
+                    sizeof(imu_packet),
+                    MainTaskPeriodTicks) == sizeof(imu_packet)) {
             process_imu_packet(&imu_packet);
             latest_imu = imu_packet;
             have_imu_sample = true;

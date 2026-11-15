@@ -2,7 +2,7 @@
 
 #define BAROMETER_MEASUREMENT_VARIANCE 4.0f
 #define ACCELERATION_NOISE_VARIANCE 4.0f
-
+//MUST BE INITIALIZED BEFORE MOVEMENT
 void altitude_kalman_filter_init(
     altitude_kalman_filter_t *filter,
     float32_t altitude_meters

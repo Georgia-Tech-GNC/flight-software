@@ -53,3 +53,6 @@ target_compile_definitions(nanoprintf PUBLIC
     NANOPRINTF_USE_DIVISION_FREE_CONVERSION=0
 )
 target_link_libraries(${CMAKE_PROJECT_NAME} nanoprintf)
+
+# CMSIS-DSP quaternion and matrix routines depend on libm symbols.
+target_link_libraries(${CMAKE_PROJECT_NAME} m)

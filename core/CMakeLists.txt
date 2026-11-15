@@ -1,5 +1,6 @@
 # When adding new source files to core, make sure to add those files to this list
 set(CORE_SOURCES
+    src/altitude_kalman_filter.c
     src/shared_main.c
 )
 

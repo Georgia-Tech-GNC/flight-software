@@ -54,6 +54,17 @@ else()
     message(FATAL_ERROR "Unknown target board: ${TARGET_BOARD}")
 endif()
 
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${TARGET_BOARD}/platform.yaml")
+    add_custom_target(autogen_platform
+        COMMAND ${UV_EXECUTABLE} run
+            ${CMAKE_SOURCE_DIR}/scripts/codegen/codegen.py
+            targets/${TARGET_BOARD}
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        VERBATIM
+        COMMENT "Generating platform files for ${TARGET_BOARD}"
+    )
+endif()
+
 # Mark cubemx as a system header to avoid warnings when including it
 get_target_property(CUBEMX_INCLUDES stm32cubemx INTERFACE_INCLUDE_DIRECTORIES)
 target_include_directories(${CMAKE_PROJECT_NAME} SYSTEM PRIVATE ${CUBEMX_INCLUDES})
@@ -62,4 +73,3 @@ target_link_libraries(${CMAKE_PROJECT_NAME} stm32cubemx freertos_kernel)
 # Disable warnings for items in targets
 get_target_property(SOURCE_LIST ${CMAKE_PROJECT_NAME} SOURCES)
 set_source_files_properties(${SOURCE_LIST} PROPERTIES COMPILE_OPTIONS "-w")
-

@@ -14,10 +14,10 @@ typedef enum {
     UNCONTROLLED,
     PYRO,
     EMERGENCY_STOP,
-} FSM_State;
+} fsm_state_t;
 
-typedef struct {
-    FSM_State state;
+typedef struct TelemetryPacketSend {
+    fsm_state_t state;
     uint64_t time_since_startup;
     float imu_velocity[3];
     float imu_acceleration[3];
@@ -27,16 +27,16 @@ typedef struct {
     float pyro;
     float servo1;
     float servo2;
-} Telemetry_Packet_Send;
+} telemetry_packet_send_t;
 
-typedef struct {
+typedef struct ImuPacketReceive {
     float velocity[3];
     float acceleration[3];
     float angular_velocity[3];
-    float dt_seconds;
+    uint64_t timestep;
     float barometer_altitude;
     bool barometer_valid;
-} Imu_Packet_Receive;
+} imu_packet_receive_t;
 
 extern MessageBufferHandle_t imu_buffer_handle;
 

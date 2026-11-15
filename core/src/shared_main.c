@@ -4,12 +4,13 @@
 
 #include "port.h"
 #include "shared_main.h"
+#include "altitude_kalman_filter.h"
 #include "FreeRTOS.h"
 #include "task.h"
 
 #include "message_buffer.h"
+#include <arm_math.h>
 #include <inttypes.h>
-#include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
@@ -21,8 +22,7 @@
 
 #define GRAVITY_MPS2 9.81f
 #define LAUNCH_ACCELERATION_MPS2 5.0f
-#define BAROMETER_MEASUREMENT_VARIANCE 4.0f
-#define ACCELERATION_NOISE_VARIANCE 4.0f
+#define TIMESTEP_MILLISECONDS_TO_SECONDS 0.001f
 
 MessageBufferHandle_t command_buffer_handle;
 MessageBufferHandle_t imu_buffer_handle;
@@ -39,218 +39,163 @@ StaticTask_t main_task_buffer;
 StackType_t main_task_stack[MainTaskStackSize];
 TickType_t last_fsm_change;
 
-typedef struct {
-    float x;
-    float y;
-    float z;
-} Vector3;
+typedef struct Vector3 {
+    float32_t x;
+    float32_t y;
+    float32_t z;
+} vector3_t;
 
-typedef struct {
-    float w;
-    float x;
-    float y;
-    float z;
-} Quaternion;
+typedef struct StateEstimate {
+    float32_t orientation[4];
+    vector3_t velocity;
+    vector3_t position;
+    vector3_t linear_acceleration;
+} state_estimate_t;
 
-typedef struct {
-    Quaternion orientation;
-    Vector3 velocity;
-    Vector3 position;
-    Vector3 linear_acceleration;
-} State_Estimate;
-
-typedef struct {
-    float altitude;
-    float vertical_velocity;
-    float covariance[2][2];
-    bool initialized;
-} Altitude_Kalman_Filter;
-
-static State_Estimate state_estimate = {
+static state_estimate_t state_estimate = {
     .orientation = {1.0f, 0.0f, 0.0f, 0.0f},
 };
-static Altitude_Kalman_Filter altitude_filter;
+static altitude_kalman_filter_t altitude_filter;
+static uint64_t last_imu_timestep;
+static bool have_last_imu_timestep;
 
-typedef enum {
+typedef enum TelemetryCommand {
     ARM,
     DISARM,
     UNCONTROLL,
     PYRO_DEPLOY,
     ESTOP
-} Telemetry_Command;
+} telemetry_command_t;
 
-FSM_State FSM = GROUND;
+fsm_state_t FSM = GROUND;
 
 static uint64_t get_time_from_startup(void) {
     return pdTICKS_TO_MS(xTaskGetTickCount());
 }
 
-static Quaternion quaternion_normalize(Quaternion quaternion) {
-    float magnitude = sqrtf(quaternion.w * quaternion.w +
-                            quaternion.x * quaternion.x +
-                            quaternion.y * quaternion.y +
-                            quaternion.z * quaternion.z);
-    if (magnitude == 0.0f) {
-        return (Quaternion) {1.0f, 0.0f, 0.0f, 0.0f};
-    }
-    return (Quaternion){
-        quaternion.w / magnitude,
-        quaternion.x / magnitude,
-        quaternion.y / magnitude,
-        quaternion.z / magnitude,
-    };
-}
+static void normalize_quaternion(float32_t quaternion[4]) {
+    float32_t norm;
 
-static Quaternion quaternion_multiply(Quaternion lhs, Quaternion rhs) {
-    return (Quaternion){
-        lhs.w * rhs.w - lhs.x * rhs.x - lhs.y * rhs.y - lhs.z * rhs.z,
-        lhs.w * rhs.x + lhs.x * rhs.w + lhs.y * rhs.z - lhs.z * rhs.y,
-        lhs.w * rhs.y - lhs.x * rhs.z + lhs.y * rhs.w + lhs.z * rhs.x,
-        lhs.w * rhs.z + lhs.x * rhs.y - lhs.y * rhs.x + lhs.z * rhs.w,
-    };
-}
-
-static Vector3 rotate_vector(Quaternion orientation, Vector3 vector) {
-    Quaternion vector_quaternion = {0.0f, vector.x, vector.y, vector.z};
-    Quaternion inverse = {
-        orientation.w, -orientation.x, -orientation.y, -orientation.z
-    };
-    Quaternion rotated = quaternion_multiply(
-        quaternion_multiply(orientation, vector_quaternion), inverse);
-    return (Vector3){rotated.x, rotated.y, rotated.z};
-}
-
-static void altitude_filter_predict(float acceleration_z, float dt_seconds) {
-    float dt_squared = dt_seconds * dt_seconds;
-    float dt_cubed = dt_squared * dt_seconds;
-    float dt_fourth = dt_cubed * dt_seconds;
-    float old_p00 = altitude_filter.covariance[0][0];
-    float old_p01 = altitude_filter.covariance[0][1];
-    float old_p10 = altitude_filter.covariance[1][0];
-    float old_p11 = altitude_filter.covariance[1][1];
-
-    altitude_filter.altitude +=
-        altitude_filter.vertical_velocity * dt_seconds +
-        0.5f * acceleration_z * dt_squared;
-    altitude_filter.vertical_velocity += acceleration_z * dt_seconds;
-    altitude_filter.covariance[0][0] =
-        old_p00 + dt_seconds * (old_p01 + old_p10) +
-        dt_squared * old_p11 +
-        ACCELERATION_NOISE_VARIANCE * dt_fourth * 0.25f;
-    altitude_filter.covariance[0][1] =
-        old_p01 + dt_seconds * old_p11 +
-        ACCELERATION_NOISE_VARIANCE * dt_cubed * 0.5f;
-    altitude_filter.covariance[1][0] =
-        old_p10 + dt_seconds * old_p11 +
-        ACCELERATION_NOISE_VARIANCE * dt_cubed * 0.5f;
-    altitude_filter.covariance[1][1] =
-        old_p11 + ACCELERATION_NOISE_VARIANCE * dt_squared;
-}
-
-static void update_altitude_filter(float altitude_meters) {
-    if (!altitude_filter.initialized) {
-        altitude_filter.altitude = altitude_meters;
-        altitude_filter.vertical_velocity = 0.0f;
-        altitude_filter.covariance[0][0] = BAROMETER_MEASUREMENT_VARIANCE;
-        altitude_filter.covariance[0][1] = 0.0f;
-        altitude_filter.covariance[1][0] = 0.0f;
-        altitude_filter.covariance[1][1] = 10.0f;
-        altitude_filter.initialized = true;
-    } else {
-        float innovation = altitude_meters - altitude_filter.altitude;
-        float innovation_variance =
-            altitude_filter.covariance[0][0] +
-            BAROMETER_MEASUREMENT_VARIANCE;
-        float gain_altitude =
-            altitude_filter.covariance[0][0] / innovation_variance;
-        float gain_velocity =
-            altitude_filter.covariance[1][0] / innovation_variance;
-        float old_p00 = altitude_filter.covariance[0][0];
-        float old_p01 = altitude_filter.covariance[0][1];
-
-        altitude_filter.altitude += gain_altitude * innovation;
-        altitude_filter.vertical_velocity += gain_velocity * innovation;
-        altitude_filter.covariance[0][0] =
-            (1.0f - gain_altitude) * old_p00;
-        altitude_filter.covariance[0][1] =
-            (1.0f - gain_altitude) * old_p01;
-        altitude_filter.covariance[1][0] =
-            altitude_filter.covariance[1][0] -
-            gain_velocity * old_p00;
-        altitude_filter.covariance[1][1] =
-            altitude_filter.covariance[1][1] -
-            gain_velocity * old_p01;
-    }
-
-    state_estimate.position.z = altitude_filter.altitude;
-    state_estimate.velocity.z = altitude_filter.vertical_velocity;
-}
-
-static void process_imu_packet(const Imu_Packet_Receive *packet) {
-    if (packet->dt_seconds <= 0.0f) {
+    arm_quaternion_norm_f32(quaternion, &norm, 1);
+    if (norm <= 0.0f) {
+        quaternion[0] = 1.0f;
+        quaternion[1] = 0.0f;
+        quaternion[2] = 0.0f;
+        quaternion[3] = 0.0f;
         return;
     }
 
-    Vector3 body_acceleration = {
+    float32_t normalized[4];
+    arm_quaternion_normalize_f32(quaternion, normalized, 1);
+    (void)memcpy(quaternion, normalized, sizeof(normalized));
+}
+
+static vector3_t rotate_vector(
+    const float32_t orientation[4],
+    vector3_t vector
+) {
+    float32_t rotation_data[9];
+    float32_t vector_data[3] = {vector.x, vector.y, vector.z};
+    float32_t rotated_data[3];
+    arm_matrix_instance_f32 rotation_matrix;
+
+    arm_quaternion2rotation_f32(orientation, rotation_data, 1);
+    arm_mat_init_f32(&rotation_matrix, 3, 3, rotation_data);
+    arm_mat_vec_mult_f32(&rotation_matrix, vector_data, rotated_data);
+
+    return (vector3_t){
+        rotated_data[0],
+        rotated_data[1],
+        rotated_data[2],
+    };
+}
+
+static void process_imu_packet(const imu_packet_receive_t *packet) {
+    if (!have_last_imu_timestep) {
+        last_imu_timestep = packet->timestep;
+        have_last_imu_timestep = true;
+        if (packet->barometer_valid) {
+            altitude_kalman_filter_update(
+                &altitude_filter,
+                packet->barometer_altitude
+            );
+            state_estimate.position.z = altitude_filter.altitude;
+            state_estimate.velocity.z = altitude_filter.vertical_velocity;
+        }
+        return;
+    }
+    if (packet->timestep <= last_imu_timestep) {
+        return;
+    }
+    float32_t dt_seconds =
+        (float32_t)(packet->timestep - last_imu_timestep) *
+        TIMESTEP_MILLISECONDS_TO_SECONDS;
+    last_imu_timestep = packet->timestep;
+
+    vector3_t body_acceleration = {
         packet->acceleration[0],
         packet->acceleration[1],
         packet->acceleration[2],
     };
-    Quaternion angular_rate = {
+    float32_t angular_rate[4] = {
         0.0f,
         packet->angular_velocity[0],
         packet->angular_velocity[1],
         packet->angular_velocity[2],
     };
-    Quaternion derivative = quaternion_multiply(
-        state_estimate.orientation, angular_rate);
+    float32_t derivative[4];
+    arm_quaternion_product_single_f32(
+        state_estimate.orientation,
+        angular_rate,
+        derivative
+    );
+    for (size_t index = 0; index < 4; index++) {
+        state_estimate.orientation[index] +=
+            0.5f * derivative[index] * dt_seconds;
+    }
+    normalize_quaternion(state_estimate.orientation);
 
-    state_estimate.orientation = quaternion_normalize((Quaternion){
-        state_estimate.orientation.w + 0.5f * derivative.w *
-            packet->dt_seconds,
-        state_estimate.orientation.x + 0.5f * derivative.x *
-            packet->dt_seconds,
-        state_estimate.orientation.y + 0.5f * derivative.y *
-            packet->dt_seconds,
-        state_estimate.orientation.z + 0.5f * derivative.z *
-            packet->dt_seconds,
-    });
-
-    Vector3 world_acceleration =
+    vector3_t world_acceleration =
         rotate_vector(state_estimate.orientation, body_acceleration);
     world_acceleration.z -= GRAVITY_MPS2;
     state_estimate.linear_acceleration = world_acceleration;
 
-    Vector3 imu_velocity = {
+    vector3_t imu_velocity = {
         packet->velocity[0],
         packet->velocity[1],
         packet->velocity[2],
     };
     state_estimate.position.x +=
-        imu_velocity.x * packet->dt_seconds +
-        0.5f * world_acceleration.x * packet->dt_seconds *
-            packet->dt_seconds;
+        imu_velocity.x * dt_seconds +
+        0.5f * world_acceleration.x * dt_seconds * dt_seconds;
     state_estimate.position.y +=
-        imu_velocity.y * packet->dt_seconds +
-        0.5f * world_acceleration.y * packet->dt_seconds *
-            packet->dt_seconds;
+        imu_velocity.y * dt_seconds +
+        0.5f * world_acceleration.y * dt_seconds * dt_seconds;
     state_estimate.velocity.x = imu_velocity.x;
     state_estimate.velocity.y = imu_velocity.y;
 
     if (altitude_filter.initialized) {
-        altitude_filter_predict(world_acceleration.z, packet->dt_seconds);
+        altitude_kalman_filter_predict(
+            &altitude_filter,
+            world_acceleration.z,
+            dt_seconds
+        );
         state_estimate.position.z = altitude_filter.altitude;
         state_estimate.velocity.z = altitude_filter.vertical_velocity;
     } else {
         state_estimate.position.z +=
-            imu_velocity.z * packet->dt_seconds +
-            0.5f * world_acceleration.z * packet->dt_seconds *
-                packet->dt_seconds;
+            imu_velocity.z * dt_seconds +
+            0.5f * world_acceleration.z * dt_seconds * dt_seconds;
         state_estimate.velocity.z = imu_velocity.z;
     }
 
     if (packet->barometer_valid) {
-        update_altitude_filter(packet->barometer_altitude);
+        altitude_kalman_filter_update(
+            &altitude_filter,
+            packet->barometer_altitude
+        );
+        state_estimate.position.z = altitude_filter.altitude;
+        state_estimate.velocity.z = altitude_filter.vertical_velocity;
     }
 }
 
@@ -267,22 +212,22 @@ static bool move_fsm_forward(void) {
     return false;
 }
 
-static void set_fsm_state(FSM_State state) {
+static void set_fsm_state(fsm_state_t state) {
     if (state <= EMERGENCY_STOP) {
         FSM = state;
         last_fsm_change = xTaskGetTickCount();
     }
 }
 
-static void send_telemetry(const Imu_Packet_Receive *latest_imu) {
-    Telemetry_Packet_Send packet = {
+static void send_telemetry(const imu_packet_receive_t *latest_imu) {
+    telemetry_packet_send_t packet = {
         .state = FSM,
         .time_since_startup = get_time_from_startup(),
         .orientation = {
-            state_estimate.orientation.w,
-            state_estimate.orientation.x,
-            state_estimate.orientation.y,
-            state_estimate.orientation.z,
+            state_estimate.orientation[0],
+            state_estimate.orientation[1],
+            state_estimate.orientation[2],
+            state_estimate.orientation[3],
         },
         .velocity = {
             state_estimate.velocity.x,
@@ -305,7 +250,7 @@ static void send_telemetry(const Imu_Packet_Receive *latest_imu) {
 }
 
 static void process_commands(void) {
-    Telemetry_Command command;
+    telemetry_command_t command;
     while (xMessageBufferReceive(command_buffer_handle, &command, sizeof(command), 0) == sizeof(command)) {
         switch (command) {
             case ARM:
@@ -327,7 +272,7 @@ static void process_commands(void) {
     }
 }
 
-static void process_fsm(const Imu_Packet_Receive *latest_imu) {
+static void process_fsm(const imu_packet_receive_t *latest_imu) {
     switch (FSM) {
         case GROUND:
             break;
@@ -356,14 +301,18 @@ static void process_fsm(const Imu_Packet_Receive *latest_imu) {
 
 static void main_task(void *_params) {
     UNUSED(_params);
-    Imu_Packet_Receive latest_imu = {0};
+    imu_packet_receive_t latest_imu = {0};
     bool have_imu_sample = false;
 
     while (true) {
         process_commands();
 
-        Imu_Packet_Receive imu_packet;
-        while (xMessageBufferReceive(imu_buffer_handle, &imu_packet, sizeof(imu_packet), 3) == sizeof(imu_packet)) {
+        imu_packet_receive_t imu_packet;
+        while (xMessageBufferReceive(
+                   imu_buffer_handle,
+                   &imu_packet,
+                   sizeof(imu_packet),
+                   MainTaskPeriodTicks) == sizeof(imu_packet)) {
             process_imu_packet(&imu_packet);
             latest_imu = imu_packet;
             have_imu_sample = true;

@@ -23,6 +23,6 @@ extern TIM_HandleTypeDef htim3, htim4, htim5;
 #define LED3_GPIO_PORT STATUS_LED_B_GPIO_Port
 #define LED3_PIN STATUS_LED_B_Pin
 
-#define debug_uart huart3
+#define debug_uart huart7
 
 #endif

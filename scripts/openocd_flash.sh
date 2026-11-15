@@ -10,6 +10,10 @@ case "$1" in
         echo "Flashing STM32F429..."
         openocd -f interface/stlink.cfg -f target/stm32f4x.cfg -c "program build/ncl-f429-dev/flight-software.elf verify reset exit"
         ;;
+    "fc-h725")
+        echo "Flashing STM32H725..."
+        openocd -f interface/stlink.cfg -f target/stm32h7x.cfg -c "program build/fc-h725-dev/flight-software.elf verify reset exit"
+        ;;
     *)
         exit 1
         ;;

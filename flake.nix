@@ -83,7 +83,6 @@
               gcc-arm-embedded
               openocd
               git
-              pre-commit
               picocom
               cmakeCurses
               dotnet-sdk_10
@@ -107,7 +106,6 @@
               export UV_PYTHON_PREFERENCE="only-managed"
 
               uv sync
-              pre-commit install
             '';
           };
         });

@@ -24,9 +24,9 @@ static void blink_led_1(void *_params) {
     UNUSED(_params);
 
     while (true) {
-        HAL_Delay(100);
+        vTaskDelay(100);
         HAL_GPIO_WritePin(LED1_GPIO_PORT, LED1_PIN, GPIO_PIN_RESET);
-        HAL_Delay(100);
+        vTaskDelay(100);
         HAL_GPIO_WritePin(LED1_GPIO_PORT, LED1_PIN, GPIO_PIN_SET);
     }
 }
@@ -35,9 +35,9 @@ static void blink_led_2(void *_params) {
     UNUSED(_params);
 
     while (true) {
-        HAL_Delay(200);
+        vTaskDelay(200);
         HAL_GPIO_WritePin(LED2_GPIO_PORT, LED2_PIN, GPIO_PIN_RESET);
-        HAL_Delay(200);
+        vTaskDelay(200);
         HAL_GPIO_WritePin(LED2_GPIO_PORT, LED2_PIN, GPIO_PIN_SET);
     }
 }
@@ -46,9 +46,9 @@ static void blink_led_3(void *_params) {
     UNUSED(_params);
 
     while (true) {
-        HAL_Delay(400);
+        vTaskDelay(400);
         HAL_GPIO_WritePin(LED3_GPIO_PORT, LED3_PIN, GPIO_PIN_RESET);
-        HAL_Delay(400);
+        vTaskDelay(400);
         HAL_GPIO_WritePin(LED3_GPIO_PORT, LED3_PIN, GPIO_PIN_SET);
     }
 }

@@ -20,7 +20,6 @@
 #define MessageBufferSize 256
 #define MainTaskPeriodTicks pdMS_TO_TICKS(3)
 
-#define GRAVITY_MPS2 9.81f
 #define LAUNCH_ACCELERATION_MPS2 5.0f
 #define TIMESTEP_MILLISECONDS_TO_SECONDS 0.001f
 
@@ -146,7 +145,6 @@ static void process_imu_packet(const imu_packet_receive_t *packet) {
 
     vector3_t world_acceleration =
         rotate_vector(state_estimate.orientation, body_acceleration);
-    world_acceleration.z -= GRAVITY_MPS2;
     state_estimate.linear_acceleration = world_acceleration;
 
     vector3_t calculated_velocity = {
@@ -188,7 +186,7 @@ static void process_imu_packet(const imu_packet_receive_t *packet) {
     }
 }
 
-static float get_acceleration(void) {
+static float get_acceleration_z(void) {
     return state_estimate.linear_acceleration.z;
 }
 
@@ -266,7 +264,7 @@ static void process_fsm(const imu_packet_receive_t *latest_imu) {
         case GROUND:
             break;
         case ARMED:
-            if (get_acceleration() > LAUNCH_ACCELERATION_MPS2) {
+            if (get_acceleration_z() > LAUNCH_ACCELERATION_MPS2) {
                 move_fsm_forward();
             }
             break;

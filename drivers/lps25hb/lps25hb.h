@@ -13,13 +13,15 @@ typedef enum {
     LPS25HB_REGISTER_WHO_AM_I = 0x0F,
     LPS25HB_REGISTER_CTRL_1 = 0x20,
     LPS25HB_REGISTER_PRESS_OUT_XL = 0x28,
-    LPS25HB_REGISTER_TEMP_OUT_L = 0x2B
+    LPS25HB_REGISTER_TEMP_OUT_L = 0x2B,
+    LPS25HB_REGISTER_PRESS_OFFSET = 0x39
 } LPS25HB_Register;
 
 #define LPS25HB_REGISTER_WHO_AM_I_SIZE 1
 #define LPS25HB_REGISTER_CTRL_1_SIZE 1
 #define LPS25HB_REGISTER_PRESS_OUT_SIZE 3
 #define LPS25HB_REGISTER_TEMP_OUT_SIZE 2
+#define LPS25HB_REGISTER_PRESS_OFFSET_SIZE 2
 
 
 typedef struct {
@@ -86,6 +88,6 @@ bool lps25hb_read_register(lps25hb_data* lps25hb, LPS25HB_Register reg, uint8_t*
  * @param size the size of the register to write to.
  * @return true if successful.
  */
-bool lps25hb_write_register(lps25hb_data* lps25hb, LPS25HB_Register reg, const uint8_t* data, uint16_t size);
+bool lps25hb_write_register(lps25hb_data* lps25hb, LPS25HB_Register reg, uint8_t* data, uint16_t size);
 
 #endif

@@ -9,3 +9,4 @@ build/
 
 CMakeCache.txt
 CmakeFiles/
+test-results/

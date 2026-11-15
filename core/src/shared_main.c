@@ -292,16 +292,14 @@ static void main_task(void *_params) {
     UNUSED(_params);
     imu_packet_receive_t latest_imu = {0};
     bool have_imu_sample = false;
-
+    if (!altitude_filter.initialized) {
+        altitude_kalman_filter_init(&altitude_filter,0.0f);
+    }
     while (true) {
         process_commands();
 
         imu_packet_receive_t imu_packet;
-        while (xMessageBufferReceive(
-                    imu_buffer_handle,
-                    &imu_packet,
-                    sizeof(imu_packet),
-                    MainTaskPeriodTicks) == sizeof(imu_packet)) {
+        while (xMessageBufferReceive(imu_buffer_handle, &imu_packet, sizeof(imu_packet), MainTaskPeriodTicks) == sizeof(imu_packet)) {
             process_imu_packet(&imu_packet);
             latest_imu = imu_packet;
             have_imu_sample = true;

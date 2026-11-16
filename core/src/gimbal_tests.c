@@ -8,11 +8,83 @@
 #include <string.h>
 #include <math.h>
 #include "port.h"
-
-
-#define TWO_PI 6.2831853071795864769f
+#include "nanoprintf.h"
 
 extern UART_HandleTypeDef debug_uart;
+#define TWO_PI 6.2831853071795864769f
+
+// #define SAMPLE_RATE_HZ 3000U
+// #define MAX_SAMPLES 60000U
+
+// typedef struct {
+//     uint32_t timestamp_ticks;
+//     float command_deg;
+//     float encoder_deg;
+// } gimbal_sample_t;
+
+// static gimbal_sample_t samples[MAX_SAMPLES];
+// static uint32_t sample_count = 0;
+
+// static bool record_sample(gimbal_test_context_t *ctx, TickType_t test_start, float command_deg) {
+//     if (sample_count >= MAX_SAMPLES) {
+//         return false;
+//     }
+
+//     float encoder_deg;
+
+//     uint32_t timestamp = (uint32_t)(xTaskGetTickCount() - test_start);
+
+//     if (!encoder_get_angle(ctx->encoder, &encoder_deg)) {
+//         return false;
+//     }
+
+//     samples[sample_count].timestamp_ticks = timestamp;
+//     samples[sample_count].command_deg = command_deg;
+//     samples[sample_count].encoder_deg = encoder_deg;
+
+//     sample_count++;
+
+//     return true;
+// }
+// static void transmit_samples(void)
+// {
+//     char message[128];
+
+//     const char header[] =
+//         "timestamp_s,command_deg,encoder_deg\r\n";
+
+//     HAL_UART_Transmit(
+//         &debug_uart,
+//         (uint8_t *)header,
+//         sizeof(header) - 1,
+//         HAL_MAX_DELAY
+//     );
+
+//     for (uint32_t i = 0; i < sample_count; i++) {
+
+//         float timestamp_s =
+//             (float)samples[i].timestamp_ticks /
+//             (float)configTICK_RATE_HZ;
+
+//         int len = npf_snprintf(
+//             message,
+//             sizeof(message),
+//             "%.4f,%.2f,%.2f\r\n",
+//             (double)timestamp_s,
+//             (double)samples[i].command_deg,
+//             (double)samples[i].encoder_deg
+//         );
+
+//         if (len > 0 && len < (int)sizeof(message)) {
+//             HAL_UART_Transmit(
+//                 &debug_uart,
+//                 (uint8_t *)message,
+//                 (uint16_t)len,
+//                 HAL_MAX_DELAY
+//             );
+//         }
+//     }
+// }
 
 /**
  * Doublet command sequence.
@@ -29,7 +101,7 @@ static void run_doublet(gimbal_test_context_t *ctx,float amplitude_deg) {
 
     char message[128];
 
-    snprintf(
+    npf_snprintf(
         message,
         sizeof(message),
         "\r\nStarting doublet test: +/-%.2f deg | %lu cycles\r\n",
@@ -63,7 +135,7 @@ static void run_doublet(gimbal_test_context_t *ctx,float amplitude_deg) {
                 bool valid = encoder_get_angle(ctx->encoder,&degrees);
 
                 if (valid) {
-                    snprintf(message,sizeof(message),
+                    npf_snprintf(message,sizeof(message),
                         "Time: %lu ms | Command: %.2f deg | Measured Angle: %.2f deg\r\n",
                         (unsigned long)timestamp_ms,
                         (double)command_deg,
@@ -141,7 +213,7 @@ static bool staircase_step(gimbal_test_context_t *ctx,float angle_deg,TickType_t
         bool valid = encoder_get_angle(ctx->encoder,&degrees);
 
         if (valid) {
-            snprintf(
+            npf_snprintf(
                 message,
                 sizeof(message),
                 "Time: %lu ms | Command: %.2f deg | Measured Angle: %.2f deg\r\n",
@@ -236,7 +308,7 @@ void gimbal_test_3_task(void *params) {
 static bool run_chirp(gimbal_test_context_t *ctx) {
     char message[128];
 
-    snprintf(
+    npf_snprintf(
         message,
         sizeof(message),
         "\r\nStarting chirp: %.2f-%.2f Hz | Amplitude: +/-%.2f deg | Duration: %.2f s\r\n",
@@ -280,10 +352,10 @@ static bool run_chirp(gimbal_test_context_t *ctx) {
         }
 
         float degrees;
-        bool valid = encoder_get_pulse_us(ctx->encoder,&degrees);
+        bool valid = encoder_get_angle(ctx->encoder,&degrees);
 
         if (valid) {
-            snprintf(
+            npf_snprintf(
                 message,
                 sizeof(message),
                 "Time: %lu ms | Command: %.2f deg | Measured Angle: %.2f deg\r\n",

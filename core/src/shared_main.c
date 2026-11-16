@@ -143,14 +143,6 @@ encoder_t test_encoder;
 //     }
 // }
 
-void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
-    if (htim == test_encoder.htim &&
-        htim->Channel == TIM_ACTIVE_CHANNEL) {
-
-        encoder_capture_callback(&test_encoder);
-    }
-}
-
 /** 
  * The main methods of all targets are expected to call this method once they are fully initialized
  */
@@ -165,7 +157,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
     servo_enable(&test_servo);
     gimbal_context.servo = &test_servo;
 
-    encoder_init(&test_encoder,&htim2,ENCODER_PERIOD_CHANNEL,ENCODER_PULSE_CHANNEL,ENCODER_TIMER_FREQ_HZ, ENCODER_ANGLE_RANGE, ENCODER_MIN_PULSE_WIDTH, ENCODER_MAX_PULSE_WIDTH, ENCODER_ZERO_PULSE_WIDTH);
+    encoder_init(&test_encoder,&htim2, ENCODER_COUNTS_PER_REV);
     encoder_enable(&test_encoder);
     gimbal_context.encoder = &test_encoder;
 

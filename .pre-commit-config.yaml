@@ -1,0 +1,13 @@
+repos:
+  - repo: local
+    hooks:
+      - id: verify-autogen (ncl-h723-dev)
+        name: Run and Verify Autogen (verify-autogen (ncl-h723-dev))
+        entry: .github/scripts/run_pre_commit.sh ncl-h723-dev
+        language: system
+        pass_filenames: false
+      - id: verify-autogen (fc-h725-dev)
+        name: Run and Verify Autogen (verify-autogen (fc-h725-dev))
+        entry: .github/scripts/run_pre_commit.sh fc-h725-dev
+        language: system
+        pass_filenames: false

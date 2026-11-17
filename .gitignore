@@ -8,4 +8,6 @@ build/
 **/*.pyc
 
 CMakeCache.txt
-CmakeFiles/
+CMakeFiles/
+test-results/
+.venv/

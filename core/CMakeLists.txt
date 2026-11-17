@@ -1,5 +1,7 @@
 # When adding new source files to core, make sure to add those files to this list
 set(CORE_SOURCES
+    src/example_task.c
+    src/init_task.c
     src/shared_main.c
 )
 

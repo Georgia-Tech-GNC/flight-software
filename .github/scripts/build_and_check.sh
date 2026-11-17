@@ -1,7 +1,9 @@
 #!/usr/bin/env sh
+set -euo pipefail
 
 cmake --preset $1 -DCMAKE_C_FLAGS="-Werror" -DCMAKE_CXX_FLAGS="-Werror"
 cmake --build --preset $1
+cmake --build --preset $1 --target renode-test
 
 cppcheck \
         --project=build/$1/compile_commands.json \

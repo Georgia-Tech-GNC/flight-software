@@ -9,14 +9,6 @@
             "cacheVariables": { }
         },
         {
-            "name": "default-nucleo-f429zi",
-            "inherits": "default",
-            "toolchainFile": "${sourceDir}/targets/Nucleo-f429zi/cmake/gcc-arm-none-eabi.cmake",
-            "cacheVariables": {
-                "TARGET_BOARD": "Nucleo-f429zi"
-            }
-        },
-        {
             "name": "default-nucleo-h723zg",
             "inherits": "default",
             "toolchainFile": "${sourceDir}/targets/Nucleo-h723zg/cmake/gcc-arm-none-eabi.cmake",
@@ -30,20 +22,6 @@
             "toolchainFile": "${sourceDir}/targets/fc-h725ve/cmake/gcc-arm-none-eabi.cmake",
             "cacheVariables": {
                 "TARGET_BOARD": "fc-h725ve"
-            }
-        },
-        {
-            "name": "ncl-f429-dev",
-            "inherits": "default-nucleo-f429zi",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug"
-            }
-        },
-        {
-            "name": "ncl-f429-release",
-            "inherits": "default-nucleo-f429zi",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
             }
         },
         {
@@ -83,14 +61,6 @@
         }
     ],
     "buildPresets": [
-        {
-            "name": "ncl-f429-dev",
-            "configurePreset": "ncl-f429-dev"
-        },
-        {
-            "name": "ncl-f429-release",
-            "configurePreset": "ncl-f429-release"
-        },
         {
             "name": "ncl-h723-dev",
             "configurePreset": "ncl-h723-dev"

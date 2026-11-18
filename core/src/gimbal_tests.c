@@ -16,14 +16,15 @@ extern UART_HandleTypeDef debug_uart;
 // #define SAMPLE_RATE_HZ 3000U
 // #define MAX_SAMPLES 60000U
 
+// static gimbal_sample_t samples[MAX_SAMPLES];
+// static uint32_t sample_count = 0;
+
 // typedef struct {
 //     uint32_t timestamp_ticks;
 //     float command_deg;
 //     float encoder_deg;
 // } gimbal_sample_t;
 
-// static gimbal_sample_t samples[MAX_SAMPLES];
-// static uint32_t sample_count = 0;
 
 // static bool record_sample(gimbal_test_context_t *ctx, TickType_t test_start, float command_deg) {
 //     if (sample_count >= MAX_SAMPLES) {
@@ -86,6 +87,72 @@ extern UART_HandleTypeDef debug_uart;
 //     }
 // }
 
+#define CHUNK_SIZE 10000
+
+typedef struct {
+    uint32_t timestamp_ticks;
+    float command_deg;
+    float encoder_deg;
+} gimbal_sample_t;
+
+static gimbal_sample_t chunk[CHUNK_SIZE];
+static uint32_t chunk_count = 0;
+
+static void transmit_chunk(void)
+{
+    HAL_UART_Transmit(&debug_uart, (uint8_t *) "Starting data trasmision...\r\n", 30, HAL_MAX_DELAY);
+
+    char message[128];
+
+    for (uint32_t i = 0; i < chunk_count; i++) {
+
+        float timestamp_s =
+            (float)chunk[i].timestamp_ticks /
+            (float)configTICK_RATE_HZ;
+
+        int len = npf_snprintf(
+            message,
+            sizeof(message),
+            "%.4f,%.2f,%.2f\r\n",
+            (double)timestamp_s,
+            (double)chunk[i].command_deg,
+            (double)chunk[i].encoder_deg
+        );
+
+        if (len > 0 && len < (int)sizeof(message)) {
+            HAL_UART_Transmit(
+                &debug_uart,
+                (uint8_t *)message,
+                (uint16_t)len,
+                HAL_MAX_DELAY
+            );
+        }
+    }
+
+    chunk_count = 0;
+}
+
+static bool record_sample(gimbal_test_context_t *ctx,TickType_t test_start, float command_deg) {
+    float encoder_deg;
+
+    if (!encoder_get_angle(ctx->encoder, &encoder_deg)) {
+        return false;
+    }
+    
+    chunk[chunk_count].timestamp_ticks = (uint32_t)(xTaskGetTickCount() - test_start);
+
+    chunk[chunk_count].command_deg = command_deg;
+    chunk[chunk_count].encoder_deg = encoder_deg;
+
+    chunk_count++;
+
+    if (chunk_count == CHUNK_SIZE) {
+        transmit_chunk();
+    }
+
+    return true;
+}
+
 /**
  * Doublet command sequence.
  *
@@ -128,26 +195,28 @@ static void run_doublet(gimbal_test_context_t *ctx,float amplitude_deg) {
             
             while ((xTaskGetTickCount() - start) < pdMS_TO_TICKS(DOUBLET_HOLD_MS)) {
 
-                float degrees;
+                // float degrees;
 
-                uint32_t timestamp_ms = (uint32_t)pdTICKS_TO_MS(xTaskGetTickCount() - test_start);
+                // uint32_t timestamp_ms = (uint32_t)pdTICKS_TO_MS(xTaskGetTickCount() - test_start);
 
-                bool valid = encoder_get_angle(ctx->encoder,&degrees);
+                // bool valid = encoder_get_angle(ctx->encoder,&degrees);
 
-                if (valid) {
-                    npf_snprintf(message,sizeof(message),
-                        "Time: %lu ms | Command: %.2f deg | Measured Angle: %.2f deg\r\n",
-                        (unsigned long)timestamp_ms,
-                        (double)command_deg,
-                        (double)degrees
-                    );
+                // if (valid) {
+                //     npf_snprintf(message,sizeof(message),
+                //         "Time: %lu ms | Command: %.2f deg | Measured Angle: %.2f deg\r\n",
+                //         (unsigned long)timestamp_ms,
+                //         (double)command_deg,
+                //         (double)degrees
+                //     );
+                // 
+                //     HAL_UART_Transmit(&debug_uart,(uint8_t *)message,(uint16_t)strlen(message),HAL_MAX_DELAY);
+                // }
 
-                    HAL_UART_Transmit(&debug_uart,(uint8_t *)message,(uint16_t)strlen(message),HAL_MAX_DELAY);
-                }
-
+                record_sample(ctx, test_start, command_deg);
                 vTaskDelayUntil(&last_wake, pdMS_TO_TICKS(TEST_SAMPLE_MS));
             }
         }   
+        // transmit_chunk();
     }
 }
 
@@ -161,12 +230,21 @@ static void run_doublet(gimbal_test_context_t *ctx,float amplitude_deg) {
  */
 void gimbal_test_1_task(void *params) {
     gimbal_test_context_t *ctx = (gimbal_test_context_t *)params;
+    // Return to zero position
+    servo_set_pos(ctx->servo, 0.0f);
 
     // Small doublet response
+    encoder_set_zero(ctx->encoder);
     run_doublet(ctx, SMALL_STEP_DEG);
+    transmit_chunk();
+
+    // Return to zero position
+    servo_set_pos(ctx->servo, 0.0f);
 
     // Large doublet response
+    encoder_set_zero(ctx->encoder);
     run_doublet(ctx, THETA_MAX_DEG);
+    transmit_chunk();
 
     // Return to zero position
     servo_set_pos(ctx->servo, 0.0f);
@@ -205,28 +283,30 @@ static bool staircase_step(gimbal_test_context_t *ctx,float angle_deg,TickType_t
 
     while ((xTaskGetTickCount() - step_start) < hold_ticks) {
 
-        float degrees;
-        char message[128];
+        // float degrees;
+        // char message[128];
 
-        uint32_t timestamp_ms = (uint32_t)pdTICKS_TO_MS(xTaskGetTickCount() - test_start);
+        // uint32_t timestamp_ms = (uint32_t)pdTICKS_TO_MS(xTaskGetTickCount() - test_start);
 
-        bool valid = encoder_get_angle(ctx->encoder,&degrees);
+        // bool valid = encoder_get_angle(ctx->encoder,&degrees);
 
-        if (valid) {
-            npf_snprintf(
-                message,
-                sizeof(message),
-                "Time: %lu ms | Command: %.2f deg | Measured Angle: %.2f deg\r\n",
-                (unsigned long)timestamp_ms,
-                (double)angle_deg,
-                (double)degrees
-            );
+        // if (valid) {
+        //     npf_snprintf(
+        //         message,
+        //         sizeof(message),
+        //         "Time: %lu ms | Command: %.2f deg | Measured Angle: %.2f deg\r\n",
+        //         (unsigned long)timestamp_ms,
+        //         (double)angle_deg,
+        //         (double)degrees
+        //     );
 
-            HAL_UART_Transmit(&debug_uart,(uint8_t *)message,(uint16_t)strlen(message),HAL_MAX_DELAY);
-        } 
+        //     HAL_UART_Transmit(&debug_uart,(uint8_t *)message,(uint16_t)strlen(message),HAL_MAX_DELAY);
+        // } 
+        record_sample(ctx, test_start, angle_deg);
 
         vTaskDelayUntil(&last_wake, sample_ticks);
     }
+    // transmit_chunk();
 
     return true;
 }
@@ -255,6 +335,7 @@ static bool run_staircase(gimbal_test_context_t *ctx) {
             return false;
         }
     }
+    transmit_chunk();
 
     // +4.5 to -5 degrees
     for (int32_t i = 9; i >= -10; i--) {
@@ -262,6 +343,7 @@ static bool run_staircase(gimbal_test_context_t *ctx) {
             return false;
         }
     }
+    transmit_chunk();
 
     // -4.5 to 0 degrees
     for (int32_t i = -9; i <= 0; i++) {
@@ -269,6 +351,7 @@ static bool run_staircase(gimbal_test_context_t *ctx) {
             return false;
         }
     }
+    transmit_chunk();
 
     return true;
 }
@@ -283,6 +366,9 @@ static bool run_staircase(gimbal_test_context_t *ctx) {
  */
 void gimbal_test_3_task(void *params) {
     gimbal_test_context_t *ctx = (gimbal_test_context_t *)params;
+    servo_set_pos(ctx->servo, 0.0f);
+    encoder_set_zero(ctx->encoder);
+
     run_staircase(ctx);
 
     // Return to zero position
@@ -351,25 +437,27 @@ static bool run_chirp(gimbal_test_context_t *ctx) {
             return false;
         }
 
-        float degrees;
-        bool valid = encoder_get_angle(ctx->encoder,&degrees);
+        // float degrees;
+        // bool valid = encoder_get_angle(ctx->encoder,&degrees);
 
-        if (valid) {
-            npf_snprintf(
-                message,
-                sizeof(message),
-                "Time: %lu ms | Command: %.2f deg | Measured Angle: %.2f deg\r\n",
-                (unsigned long)timestamp_ms,
-                (double)command_deg,
-                (double)degrees
-            );
+        // if (valid) {
+        //     npf_snprintf(
+        //         message,
+        //         sizeof(message),
+        //         "Time: %lu ms | Command: %.2f deg | Measured Angle: %.2f deg\r\n",
+        //         (unsigned long)timestamp_ms,
+        //         (double)command_deg,
+        //         (double)degrees
+        //     );
 
-            HAL_UART_Transmit(&debug_uart,(uint8_t *)message,(uint16_t)strlen(message),HAL_MAX_DELAY);
-        } 
+        //     HAL_UART_Transmit(&debug_uart,(uint8_t *)message,(uint16_t)strlen(message),HAL_MAX_DELAY);
+        // } 
+        record_sample(ctx, test_start, command_deg);
 
         vTaskDelayUntil(&last_wake, sample_ticks);
     }
 
+    transmit_chunk();
     return true;
 }
 
@@ -383,6 +471,9 @@ static bool run_chirp(gimbal_test_context_t *ctx) {
  */
 void gimbal_test_4_task(void *params) {
     gimbal_test_context_t *ctx = (gimbal_test_context_t *)params;
+    servo_set_pos(ctx->servo, 0.0f);
+    encoder_set_zero(ctx->encoder);
+    
     run_chirp(ctx);
 
     // Return to zero position

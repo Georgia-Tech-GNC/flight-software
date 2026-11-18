@@ -6,7 +6,7 @@
 
 // FreeRTOS configuration
 #define TEST_STACK_SIZE 512
-#define TEST_SAMPLE_MS 10 // MS to check the encoder
+#define TEST_SAMPLE_MS 2 // MS to check the encoder
 
 // Test #1 and #2: Doublet response
 #define DOUBLET_HOLD_MS 1500 // MS To hold position

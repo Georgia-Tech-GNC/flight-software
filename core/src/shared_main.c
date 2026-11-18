@@ -155,6 +155,7 @@ encoder_t test_encoder;
     servo_t test_servo;
     servo_init(&test_servo, &servo_tim, TIM_CHANNEL_1, SERVO_COUNTER_FREQ_HZ, SERVO_MAX_ANGLE*2.0f, SERVO_MIN_PULSE_WIDTH_US, SERVO_MAX_PULSE_WIDTH_US, false);
     servo_enable(&test_servo);
+    servo_set_pos(&test_servo, 10);
     gimbal_context.servo = &test_servo;
 
     encoder_init(&test_encoder,&htim2, ENCODER_COUNTS_PER_REV);

@@ -2,6 +2,7 @@
 set(CORE_SOURCES
     src/altitude_kalman_filter.c
     src/shared_main.c
+    src/state_estimation.c
 )
 
 # When adding new include's directories to core, make sure to add those files to this list 

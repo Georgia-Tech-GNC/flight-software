@@ -3,9 +3,7 @@
 
 #include "FreeRTOS.h"
 #include "message_buffer.h"
-#include <arm_math_types.h>
-#include <stdbool.h>
-#include <stdint.h>
+#include "state_estimation.h"
 
 typedef enum {
     GROUND,
@@ -16,19 +14,6 @@ typedef enum {
     PYRO,
     EMERGENCY_STOP,
 } fsm_state_t;
-
-typedef struct Vector3 {
-    float32_t x;
-    float32_t y;
-    float32_t z;
-} vector3_t;
-
-typedef struct StateEstimate {
-    float32_t orientation[4];
-    vector3_t velocity;
-    vector3_t position;
-    vector3_t linear_acceleration;
-} state_estimate_t;
 
 typedef struct TelemetryPacketSend {
     fsm_state_t state;
@@ -43,16 +28,9 @@ typedef struct TelemetryPacketSend {
     float servo2;
 } telemetry_packet_send_t;
 
-typedef struct ImuPacketReceive {
-    float acceleration[3];
-    float angular_velocity[3];
-    uint64_t timestep;
-    float barometer_altitude;
-    bool barometer_valid;
-} imu_packet_receive_t;
-
 extern MessageBufferHandle_t imu_buffer_handle;
+extern MessageBufferHandle_t barometer_buffer_handle;
 
-[[noreturn]] void shared_main();
+[[noreturn]] void shared_main(void);
 
 #endif

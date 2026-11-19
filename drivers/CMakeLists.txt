@@ -1,11 +1,11 @@
 # When adding new source files to core, make sure to add those files to this list
 set(DRIVER_SOURCES
-    lps25hb/lps25hb.c
+    lps25hbtr/lps25hbtr.c
 )
 
 # When adding new include's directories to core, make sure to add those files to this list 
 set(DRIVER_INCLUDES
-    lps25hb
+    lps25hbtr
 )
 
 target_sources(${CMAKE_PROJECT_NAME} PUBLIC ${DRIVER_SOURCES})

@@ -1,4 +1,4 @@
-#include "lps25hb.h"
+#include "lps25hbtr.h"
 
 #include <string.h>
 
@@ -44,20 +44,25 @@ static void uart_send_message(const char* str) {
     const uint16_t length = (uint16_t)strlen(str);
     const uint16_t size = sizeof(char) * length;
     
-    HAL_UART_Transmit(&debug_uart, (const uint8_t*)str, size, HAL_MAX_DELAY);
+    WITH_UART(debug,
+        HAL_UART_Transmit(uart, (const uint8_t*)str, size, HAL_MAX_DELAY);
+    );
 }
 
-bool lps25hb_read_register(lps25hb_data* lps25hb, LPS25HB_Register reg, uint8_t* data, uint16_t size) {
+bool lps25hbtr_read_register(LPS25HBTR_Register reg, uint8_t* data, uint16_t size) {
     uint8_t rx[3] = { 0, 0, 0 };
     
-    HAL_StatusTypeDef status = HAL_I2C_Mem_Read(
-        lps25hb->i2c_handle, 
-        (uint16_t)(lps25hb->i2c_address << 1),
-        0x80 | (uint16_t)reg, 
-        I2C_MEMADD_SIZE_8BIT, 
-        rx, 
-        size, 
-        HAL_MAX_DELAY
+    HAL_StatusTypeDef status;
+    WITH_I2C(lps25hbtr,
+        status = HAL_I2C_Mem_Read(
+            i2c, 
+            (uint16_t)(lps25hbtr_i2c_addr << 1),
+            0x80 | (uint16_t)reg, 
+            I2C_MEMADD_SIZE_8BIT, 
+            rx, 
+            size, 
+            HAL_MAX_DELAY
+        );
     );
     
     if (status != HAL_OK)
@@ -68,53 +73,54 @@ bool lps25hb_read_register(lps25hb_data* lps25hb, LPS25HB_Register reg, uint8_t*
     return true;
 }
 
-bool lps25hb_write_register(lps25hb_data* lps25hb, LPS25HB_Register reg, uint8_t* data, uint16_t size) {
-    HAL_StatusTypeDef status = HAL_I2C_Mem_Write(
-        lps25hb->i2c_handle, 
-        (uint16_t)(lps25hb->i2c_address << 1),
-        0x80 | (uint16_t)reg, 
-        I2C_MEMADD_SIZE_8BIT, 
-        data, 
-        size, 
-        HAL_MAX_DELAY
+bool lps25hbtr_write_register(LPS25HBTR_Register reg, uint8_t* data, uint16_t size) {
+    HAL_StatusTypeDef status;
+    WITH_I2C(lps25hbtr,
+        status = HAL_I2C_Mem_Write(
+            i2c, 
+            (uint16_t)(lps25hbtr_i2c_addr << 1),
+            0x80 | (uint16_t)reg, 
+            I2C_MEMADD_SIZE_8BIT, 
+            data, 
+            size, 
+            HAL_MAX_DELAY
+        );
     );
     
     return status == HAL_OK;
 }
 
 
-bool lps25hb_initialize(lps25hb_data* lps25hb, I2C_HandleTypeDef* i2c_handle, uint8_t i2c_address) {
-    lps25hb->i2c_handle = i2c_handle;
-    lps25hb->i2c_address = i2c_address;
-    lps25hb->reference_pressure = BARO_P_0;
-    lps25hb->reference_temperature = BARO_T_M_0;
+bool lps25hbtr_initialize(lps25hbtr_data* lps25hbtr) {
+    lps25hbtr->reference_pressure = BARO_P_0;
+    lps25hbtr->reference_temperature = BARO_T_M_0;
 
     uint8_t result = 0;
-    if (!lps25hb_read_register(lps25hb, LPS25HB_REGISTER_WHO_AM_I, &result, LPS25HB_REGISTER_WHO_AM_I_SIZE))
+    if (!lps25hbtr_read_register(LPS25HBTR_REGISTER_WHO_AM_I, &result, LPS25HBTR_REGISTER_WHO_AM_I_SIZE))
         return false;
     
     if (result != LPS25HB_REGISTER_WHO_AM_I_VALUE)
         return false;
     
     uint8_t ctrl_1 = LPS25HB_REGISTER_CTRL_1_VALUE;
-    if (!lps25hb_write_register(lps25hb, LPS25HB_REGISTER_CTRL_1, &ctrl_1, LPS25HB_REGISTER_CTRL_1_SIZE))
+    if (!lps25hbtr_write_register(LPS25HBTR_REGISTER_CTRL_1, &ctrl_1, LPS25HBTR_REGISTER_CTRL_1_SIZE))
         return false;
     
     int16_t press_offset_native = LPS25HB_REGISTER_PRESS_OFFSET_VALUE;
-    if (!lps25hb_write_register(lps25hb, LPS25HB_REGISTER_PRESS_OFFSET, (uint8_t*)(&press_offset_native), LPS25HB_REGISTER_PRESS_OFFSET_SIZE))
+    if (!lps25hbtr_write_register(LPS25HBTR_REGISTER_PRESS_OFFSET, (uint8_t*)(&press_offset_native), LPS25HBTR_REGISTER_PRESS_OFFSET_SIZE))
        return false;
     
     return true;
 }
 
-void lps25hb_set_reference(lps25hb_data* lps25hb) {
-    lps25hb->reference_pressure = lps25hb_get_pressure(lps25hb);
-    lps25hb->reference_temperature = lps25hb_get_temperature(lps25hb);
+void lps25hbtr_set_reference(lps25hbtr_data* lps25hbtr) {
+    lps25hbtr->reference_pressure = lps25hbtr_get_pressure();
+    lps25hbtr->reference_temperature = lps25hbtr_get_temperature(lps25hbtr);
 }
 
-double lps25hb_get_temperature(lps25hb_data* lps25hb) {
-    uint8_t data[LPS25HB_REGISTER_TEMP_OUT_SIZE] = { 0, 0 };
-    bool result = lps25hb_read_register(lps25hb, LPS25HB_REGISTER_TEMP_OUT_L, data, LPS25HB_REGISTER_TEMP_OUT_SIZE);
+double lps25hbtr_get_temperature(lps25hbtr_data* lps25hbtr) {
+    uint8_t data[LPS25HBTR_REGISTER_TEMP_OUT_SIZE] = { 0, 0 };
+    bool result = lps25hbtr_read_register(LPS25HBTR_REGISTER_TEMP_OUT_L, data, LPS25HBTR_REGISTER_TEMP_OUT_SIZE);
     if (!result) {
         uart_send_message("lps25hb_get_temperature, BAD\r\n");
     }
@@ -132,9 +138,9 @@ double lps25hb_get_temperature(lps25hb_data* lps25hb) {
     return temp;
 }
 
-double lps25hb_get_pressure(lps25hb_data* lps25hb) {
-    uint8_t data[LPS25HB_REGISTER_PRESS_OUT_SIZE] = { 0, 0, 0 };
-    lps25hb_read_register(lps25hb, LPS25HB_REGISTER_PRESS_OUT_XL, data, LPS25HB_REGISTER_PRESS_OUT_SIZE);
+double lps25hbtr_get_pressure() {
+    uint8_t data[LPS25HBTR_REGISTER_PRESS_OUT_SIZE] = { 0, 0, 0 };
+    lps25hbtr_read_register(LPS25HBTR_REGISTER_PRESS_OUT_XL, data, LPS25HBTR_REGISTER_PRESS_OUT_SIZE);
     
     const uint8_t high = data[2];
     const uint8_t med = data[1];
@@ -146,10 +152,10 @@ double lps25hb_get_pressure(lps25hb_data* lps25hb) {
     return pressure;
 }
 
-double lps25hb_get_altitude(lps25hb_data* lps25hb) {
-    const double pressure = lps25hb_get_pressure(lps25hb);
-    const double pressure_ratio = pressure / lps25hb->reference_pressure;
-    const double reference_temperature = lps25hb->reference_temperature + 273.15;
+double lps25hbtr_get_altitude(lps25hbtr_data* lps25hbtr) {
+    const double pressure = lps25hbtr_get_pressure();
+    const double pressure_ratio = pressure / lps25hbtr->reference_pressure;
+    const double reference_temperature = lps25hbtr->reference_temperature + 273.15;
 
     constexpr double exponent = (-BARO_R_star * BARO_L_M_0) / (BARO_G_0 * BARO_M_0);
     

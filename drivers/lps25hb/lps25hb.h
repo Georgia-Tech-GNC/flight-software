@@ -3,12 +3,6 @@
 
 #include "main.h"
 
-/**
- * "If the SA0 pad is connected to the voltage supply, LSb is ‘1’ (address 1011101b), 
- * otherwise if the SA0 pad is connected to ground, the LSb value is ‘0’ (address 1011100b)" (Pg 25)
- */
-// #define LPS25HB_ADDRESS 0b101110
-
 typedef enum {
     LPS25HB_REGISTER_WHO_AM_I = 0x0F,
     LPS25HB_REGISTER_CTRL_1 = 0x20,

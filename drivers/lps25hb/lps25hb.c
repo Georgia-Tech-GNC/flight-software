@@ -48,74 +48,6 @@ static void uart_send_message(const char* str) {
 }
 
 bool lps25hb_read_register(lps25hb_data* lps25hb, LPS25HB_Register reg, uint8_t* data, uint16_t size) {
-    // uint8_t tx[] = { 0x80 | (uint8_t)reg, (uint8_t)(lps25hb->i2c_address << 1) | 1 };
-    // 
-    // uart_send_message("1.1\r\n");
-    // 
-    // HAL_StatusTypeDef status = HAL_I2C_Master_Transmit(
-    //     lps25hb->i2c_handle, 
-    //     (uint16_t)(lps25hb->i2c_address << 1), 
-    //     tx, 
-    //     sizeof(tx), 
-    //     HAL_MAX_DELAY
-    // );
-    // 
-    // uart_send_message("1.2\r\n");
-    // switch (status) {
-    // case HAL_OK:
-    //     uart_send_message("HAL_OK\r\n");
-    //     
-    //     break;
-    // case HAL_ERROR:
-    //     uart_send_message("HAL_ERROR\r\n");
-    //     
-    //     break;
-    // case HAL_BUSY:
-    //     uart_send_message("HAL_BUSY\r\n");
-    //     
-    //     break;
-    // case HAL_TIMEOUT:
-    //     uart_send_message("HAL_TIMEOUT\r\n");
-    //     
-    //     break;
-    // default:
-    //     uart_send_message("default\r\n");
-    //     
-    //     break;
-    // }
-    // 
-    // if (status != HAL_OK)
-    //     return false;
-    // 
-    // uart_send_message("1.3\r\n");
-
-    // uint8_t rx[3] =  { 0, 0, 0 };
-    // 
-    // status = HAL_I2C_Master_Receive(
-    //     lps25hb->i2c_handle, 
-    //     (uint16_t)(lps25hb->i2c_address << 1 | 1), 
-    //     rx, 
-    //     size, 
-    //     HAL_MAX_DELAY
-    // );
-    // 
-    // uart_send_message("1.4\r\n");
-    // 
-    // if (status != HAL_OK)
-    //     return false;
-    // 
-    // uart_send_message("1.5\r\n");
-    // 
-    // for (int i = 0; i < 3; i++) {
-    //     char str[20];
-    //     npf_snprintf(str, 20, "rx[%d]: %d.\r\n", i, rx[i]);
-    //     uart_send_message(str);
-    // }
-    // 
-    // memcpy(data, &rx[0], size >= sizeof(rx) ? sizeof(rx) : size);
-    // 
-    // return true;
-    
     uint8_t rx[3] = { 0, 0, 0 };
     
     HAL_StatusTypeDef status = HAL_I2C_Mem_Read(
@@ -137,20 +69,6 @@ bool lps25hb_read_register(lps25hb_data* lps25hb, LPS25HB_Register reg, uint8_t*
 }
 
 bool lps25hb_write_register(lps25hb_data* lps25hb, LPS25HB_Register reg, uint8_t* data, uint16_t size) {
-    // TODO: make tx larger?
-    // uint8_t tx[3] = { 0x80 | (uint8_t)reg, 0, 0 };
-    // memcpy(&tx[2], data, size > sizeof(tx) - 2 ? sizeof(tx) - 2 : size);
-    // 
-    // HAL_StatusTypeDef status = HAL_I2C_Master_Transmit(
-    //     lps25hb->i2c_handle, 
-    //     (uint16_t)(lps25hb->i2c_address << 1), 
-    //     tx, 
-    //     sizeof(tx), 
-    //     HAL_MAX_DELAY
-    // );
-    // 
-    // return status == HAL_OK;
-    
     HAL_StatusTypeDef status = HAL_I2C_Mem_Write(
         lps25hb->i2c_handle, 
         (uint16_t)(lps25hb->i2c_address << 1),
@@ -170,15 +88,6 @@ bool lps25hb_initialize(lps25hb_data* lps25hb, I2C_HandleTypeDef* i2c_handle, ui
     lps25hb->i2c_address = i2c_address;
     lps25hb->reference_pressure = BARO_P_0;
     lps25hb->reference_temperature = BARO_T_M_0;
-    
-    // TODO: HAL_Delay(T_on)?
-
-    // #warning "I2C1_CS_GPIO_Port not configured"
-    // #warning "I2C1_CS_Pin not configured"
-    // HAL_GPIO_WritePin(0, 0, GPIO_PIN_SET);
-    // TODO: delay_us?
-    // HAL_Delay(1);
-    
 
     uint8_t result = 0;
     if (!lps25hb_read_register(lps25hb, LPS25HB_REGISTER_WHO_AM_I, &result, LPS25HB_REGISTER_WHO_AM_I_SIZE))
@@ -191,18 +100,9 @@ bool lps25hb_initialize(lps25hb_data* lps25hb, I2C_HandleTypeDef* i2c_handle, ui
     if (!lps25hb_write_register(lps25hb, LPS25HB_REGISTER_CTRL_1, &ctrl_1, LPS25HB_REGISTER_CTRL_1_SIZE))
         return false;
     
-    // int16_t press_offset_native = 0;
-    // if (!lps25hb_read_register(lps25hb, LPS25HB_REGISTER_PRESS_OFFSET, (uint8_t*)(&press_offset_native), LPS25HB_REGISTER_PRESS_OFFSET_SIZE))
-    //     return false;
-    // 
-    // char str[50];
-    // npf_snprintf(str, sizeof(str), "press_offset_native: %d\r\n", press_offset_native);
-    // uart_send_message(str);
-    
     int16_t press_offset_native = LPS25HB_REGISTER_PRESS_OFFSET_VALUE;
-    // int16_t press_offset_native = -80 + 16;
     if (!lps25hb_write_register(lps25hb, LPS25HB_REGISTER_PRESS_OFFSET, (uint8_t*)(&press_offset_native), LPS25HB_REGISTER_PRESS_OFFSET_SIZE))
-        return false;
+       return false;
     
     return true;
 }
@@ -240,7 +140,6 @@ double lps25hb_get_pressure(lps25hb_data* lps25hb) {
     const uint8_t med = data[1];
     const uint8_t low = data[0];
     int32_t native = (int32_t)((uint32_t)high << 16 | (uint32_t)med << 8 | low);
-    // native = native & 0x00FFFFFF;
     
     const double pressure = native / LPS25HB_P_sens;
     

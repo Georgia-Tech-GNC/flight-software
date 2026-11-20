@@ -43,7 +43,3 @@ void cpt9091a_play_sin(double volume, double frequency);
  * @param fill_next_chunk a pointer to cpt9091a_fill_next_chunk_callback
  */
 void cpt9091a_play(cpt9091a_fill_next_chunk_callback fill_next_chunk);
-
-// void cpt9091a_play_notes(DAC_HandleTypeDef* cpt9091a, double volume, CPT9091A_Note* notes, size_t size);
-/** Plays "The Iconic Intro Sequence" */
-// void cpt9091a_play_pattern_1(DAC_HandleTypeDef* cpt9091a, double volume);

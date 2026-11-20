@@ -95,6 +95,7 @@ namespace Antmicro.Renode.Peripherals.Miscellaneous
             //         this.Log(LogLevel.Info, "WriteCallback");
             //         UpdateOutput();
             //     });
+            
             // 8-bit right aligned
             registers.DefineRegister(0x10)
                 .WithValueField(
@@ -105,7 +106,6 @@ namespace Antmicro.Renode.Peripherals.Miscellaneous
                 )
                 .WithWriteCallback((_, __) =>
                 {
-                    this.Log(LogLevel.Info, "WriteCallback");
                     UpdateOutput();
                 });
             registers.DefineRegister(0x00)

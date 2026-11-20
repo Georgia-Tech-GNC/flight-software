@@ -115,10 +115,10 @@ bool lps25hbtr_initialize(lps25hbtr_data* lps25hbtr) {
 
 void lps25hbtr_set_reference(lps25hbtr_data* lps25hbtr) {
     lps25hbtr->reference_pressure = lps25hbtr_get_pressure();
-    lps25hbtr->reference_temperature = lps25hbtr_get_temperature(lps25hbtr);
+    lps25hbtr->reference_temperature = lps25hbtr_get_temperature();
 }
 
-double lps25hbtr_get_temperature(lps25hbtr_data* lps25hbtr) {
+double lps25hbtr_get_temperature() {
     uint8_t data[LPS25HBTR_REGISTER_TEMP_OUT_SIZE] = { 0, 0 };
     bool result = lps25hbtr_read_register(LPS25HBTR_REGISTER_TEMP_OUT_L, data, LPS25HBTR_REGISTER_TEMP_OUT_SIZE);
     if (!result) {

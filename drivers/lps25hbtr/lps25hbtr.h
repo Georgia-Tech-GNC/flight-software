@@ -38,16 +38,15 @@ bool lps25hbtr_initialize(lps25hbtr_data* lps25hbtr);
 void lps25hbtr_set_reference(lps25hbtr_data* lps25hbtr);
 
 /**
- * @param lps25hbtr an initialized instance of the device.
  * @return the measured temperature in Celsius.
  */
-double lps25hbtr_get_temperature(lps25hbtr_data* lps25hbtr);
+double lps25hbtr_get_temperature();
 
 /**
  * Gets the pressure measured by the lps25hb device.
  * @return the measured pressure (in hPa).
  */
-double lps25hbtr_get_pressure(void);
+double lps25hbtr_get_pressure();
 
 /**
  * Calculates the altitude using the reference pressure, reference temperature, and current pressure.

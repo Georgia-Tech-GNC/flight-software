@@ -113,8 +113,6 @@ namespace Antmicro.Renode.Peripherals.Sensors
             }
         }
         
-        public double PressureOffsetNative => BytesToPressureOffsetNative(Register.PressureOffset.Value);
-        
         private readonly LinkedList<byte> _deque = new LinkedList<byte>();
         
         private Register _PendingReadWrite = null;
@@ -262,7 +260,7 @@ namespace Antmicro.Renode.Peripherals.Sensors
             return BitConverter.GetBytes(native);
         }
         
-        private Int16 BytesToPressureOffsetNative(byte[] bytes)
+        private double BytesToPressureOffset(byte[] bytes)
         {
             if (bytes.Length != 2) 
             {
@@ -273,12 +271,7 @@ namespace Antmicro.Renode.Peripherals.Sensors
             
             Int16 native = BitConverter.ToInt16(bytes);
             
-            return native;
-        }
-        
-        private double BytesToPressureOffset(byte[] bytes)
-        {
-            return BytesToPressureOffsetNative(bytes) / PressureOffsetHectopascalsToNative;
+            return native / PressureOffsetHectopascalsToNative;
         }
         
         private void AddBytes(byte[] bytes) { foreach (byte b in bytes) _deque.AddLast(b); }

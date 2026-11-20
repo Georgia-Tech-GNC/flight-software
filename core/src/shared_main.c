@@ -9,6 +9,7 @@
 #include "FreeRTOS.h"
 #include "isr.h"
 #include "task.h"
+#include "zed_f9p.h"
 
 #define STACK_SIZE 1024
 
@@ -33,6 +34,5 @@ TaskHandle_t init_task_handle;
     if (init_task_handle && example_task_handle) {
         vTaskStartScheduler();
     }
-
     while (true) __asm__ volatile (""); // No return
 } 

@@ -14,4 +14,5 @@ cppcheck \
         --suppress=unmatchedSuppression \
         --suppress=checkersReport \
         --error-exitcode=1 \
+        --check-level=exhaustive \
         -i targets -i lib/FreeRTOS-Kernel -i lib/CMSIS-DSP -i lib/nanoprintf

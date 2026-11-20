@@ -10,6 +10,7 @@
 #include "isr.h"
 #include "task.h"
 
+
 #define STACK_SIZE 1024
 
 StaticTask_t example_task_buffer;

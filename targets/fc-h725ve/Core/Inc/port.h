@@ -109,10 +109,10 @@ extern I2C_HandleTypeDef hi2c2;
 #define lsm6dsv_i2c_addr 106
 #define lps25hbtr_i2c_addr 92
 
-#define SERVO_MIN_PULSE_WIDTH_US 500
-#define SERVO_MAX_PULSE_WIDTH_US 2500
-#define SERVO_MIN_ANGLE -90
-#define SERVO_MAX_ANGLE 90
+#define SERVO_MIN_PULSE_WIDTH_US 800
+#define SERVO_MAX_PULSE_WIDTH_US 2200
+#define SERVO_MIN_ANGLE -75
+#define SERVO_MAX_ANGLE 75
 #define SERVO_TIM_CLK_HZ 192000000
 extern TIM_HandleTypeDef htim4;
 #define servo_tim htim4

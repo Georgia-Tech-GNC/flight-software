@@ -28,10 +28,10 @@ void example_task(void *_params) {
     servo_enable(&servo_pitch);
 
     while (true) {
-        servo_set_pos(&servo_pitch, -90);
-        vTaskDelay(400);
-        servo_set_pos(&servo_pitch, 90);
-        vTaskDelay(400);
+        servo_set_pos(&servo_pitch, -60);
+        vTaskDelay(2000);
+        servo_set_pos(&servo_pitch, 60);
+        vTaskDelay(2000);
         // WITH_UART(debug,
         //     HAL_UART_Transmit(uart, (uint8_t *) "Hello, world!\r\n", (uint16_t) 15, HAL_MAX_DELAY);
         // );        

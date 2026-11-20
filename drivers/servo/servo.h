@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "stm32h7xx_hal.h"
+#include "port.h"
 
 typedef struct {
     TIM_HandleTypeDef *htim;

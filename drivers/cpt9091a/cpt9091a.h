@@ -1,3 +1,4 @@
+
 #pragma once
 
 #include "main.h"
@@ -11,7 +12,7 @@
 typedef void (*cpt9091a_fill_next_chunk_callback)(uint8_t* data, uint32_t size, double length_s);
 
 /**
- * 
+ *
  * @param dac the handle to the DAC associated with the buzzer.
  * @param tim the timer handle that controls the DMA transfers.
  * @return true if the device was successfully initialized.

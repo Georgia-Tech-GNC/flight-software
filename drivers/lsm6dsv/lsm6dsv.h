@@ -51,6 +51,7 @@ typedef struct {
     lsm6dsv_accel_fs_t accel_fs;
     lsm6dsv_odr_t gyro_odr;
     lsm6dsv_gyro_fs_t gyro_fs;
+    bool batch_raw;
 } lsm6dsv_config_t;
 
 #define LSM6DSV_DEFAULT_CONFIG                                                                                         \
@@ -59,6 +60,7 @@ typedef struct {
         .accel_fs = LSM6DSV_ACCEL_FS_16G,                                                                              \
         .gyro_odr = LSM6DSV_ODR_960_HZ,                                                                                \
         .gyro_fs = LSM6DSV_GYRO_FS_2000DPS,                                                                            \
+        .batch_raw = true,                                                                                             \
     })
 
 /*Device handle */
@@ -70,6 +72,8 @@ typedef struct {
     float accel_mps2_per_lsb;
     float gyro_rads_per_lsb;
     float timestamp_s_per_tick;
+    float accel_sample_period_s;
+    float gyro_sample_period_s;
 } lsm6dsv_t;
 
 /*One reading of the output registers*/
@@ -78,6 +82,17 @@ typedef struct {
     float gyro_rads[3];
     float temperature_c;
 } lsm6dsv_imu_data_t;
+
+#define LSM6DSV_MAX_RAW_SAMPLES 64U
+
+typedef struct {
+    float gyro_rads[LSM6DSV_MAX_RAW_SAMPLES][3];
+    float accel_mps2[LSM6DSV_MAX_RAW_SAMPLES][3];
+    uint16_t gyro_count;
+    uint16_t accel_count;
+    bool dropped;
+    bool overrun;
+} lsm6dsv_raw_samples_t;
 
 /*results of lsm6dsv_self_test()*/
 typedef struct {
@@ -92,6 +107,8 @@ bool lsm6dsv_init(lsm6dsv_t *dev, const lsm6dsv_config_t *config);
 
 /*reads the latest accelerometer, gyroscope, temperature outputs*/
 bool lsm6dsv_read_imu(const lsm6dsv_t *dev, lsm6dsv_imu_data_t *out);
+
+bool lsm6dsv_read_fifo(const lsm6dsv_t *dev, lsm6dsv_raw_samples_t *raw);
 
 /*reads the free running timestamp counter*/
 bool lsm6dsv_read_timestamp(const lsm6dsv_t *dev, uint32_t *ticks);

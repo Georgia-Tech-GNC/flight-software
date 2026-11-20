@@ -9,6 +9,8 @@
 #include <math.h>
 #include <string.h>
 
+#define REG_FIFO_CTRL3 0x09U
+#define REG_FIFO_CTRL4 0x0AU
 #define REG_WHO_AM_I 0x0FU
 #define REG_CTRL1 0x10U
 #define REG_CTRL2 0x11U
@@ -16,6 +18,7 @@
 #define REG_CTRL6 0x15U
 #define REG_CTRL8 0x17U
 #define REG_CTRL10 0x19U
+#define REG_FIFO_STATUS1 0x1BU
 #define REG_STATUS 0x1EU
 #define REG_OUT_TEMP_L 0x20U
 #define REG_OUTX_L_G 0x22U
@@ -23,6 +26,7 @@
 #define REG_TIMESTAMP0 0x40U
 #define REG_INTERNAL_FREQ_FINE 0x4FU
 #define REG_FUNCTIONS_ENABLE 0x50U
+#define REG_FIFO_DATA_OUT_TAG 0x78U
 
 #define CTRL3_BDU 0x40U
 #define CTRL3_IF_INC 0x04U
@@ -33,7 +37,20 @@
 #define CTRL10_ST_G_POSITIVE 0x04U
 #define STATUS_XLDA 0x01U
 #define STATUS_GDA 0x02U
+#define FIFO_STATUS2_OVR_IA 0x40U
+#define FIFO_STATUS2_OVR_LATCHED 0x08U
+#define FIFO_STATUS2_DIFF_FIFO_8 0x01U
+#define FIFO_MODE_BYPASS 0x00U
+#define FIFO_MODE_CONTINUOUS 0x06U
 #define FUNCTIONS_ENABLE_TIMESTAMP_EN 0x40U
+
+#define FIFO_TAG_SHIFT 3U
+#define FIFO_TAG_GYRO_NC 0x01U
+#define FIFO_TAG_ACCEL_NC 0x02U
+#define FIFO_CTRL3_BDR_GY_SHIFT 4U
+#define ODR_7_5_HZ 7.5f
+#define FIFO_WORD_BYTES 7U
+#define FIFO_MAX_WORDS 511U
 
 #define I2C_TIMEOUT_MS 10U
 #define I2C_BUSY_RETRIES 10U
@@ -159,13 +176,34 @@ static bool software_reset(const lsm6dsv_t *dev) {
     return false;
 }
 
+static bool stop_raw_batching(const lsm6dsv_t *dev) {
+    return lsm6dsv_write_reg(dev, REG_FIFO_CTRL4, FIFO_MODE_BYPASS);
+}
+
+static bool start_raw_batching(const lsm6dsv_t *dev) {
+    const lsm6dsv_config_t *config = &dev->config;
+    uint8_t bdr =
+        (uint8_t) (((unsigned int) config->gyro_odr << FIFO_CTRL3_BDR_GY_SHIFT) | (unsigned int) config->accel_odr);
+    return lsm6dsv_write_reg(dev, REG_FIFO_CTRL3, bdr) && lsm6dsv_write_reg(dev, REG_FIFO_CTRL4, FIFO_MODE_CONTINUOUS);
+}
+
+static float sample_period_s(const lsm6dsv_t *dev, lsm6dsv_odr_t odr) {
+    if (odr < LSM6DSV_ODR_7_5_HZ) {
+        return 0.0f;
+    }
+    float nominal_hz = ODR_7_5_HZ * (float) (1U << ((unsigned int) odr - (unsigned int) LSM6DSV_ODR_7_5_HZ));
+    return TIMESTAMP_BASE_HZ * dev->timestamp_s_per_tick / nominal_hz;
+}
+
 static bool apply_config(lsm6dsv_t *dev) {
     const lsm6dsv_config_t *config = &dev->config;
 
     dev->accel_mps2_per_lsb = accel_mg_per_lsb(config->accel_fs) * 0.001f * STANDARD_GRAVITY;
     dev->gyro_rads_per_lsb = gyro_mdps_per_lsb(config->gyro_fs) * 0.001f * DEG_TO_RAD;
+    dev->accel_sample_period_s = sample_period_s(dev, config->accel_odr);
+    dev->gyro_sample_period_s = sample_period_s(dev, config->gyro_odr);
 
-    return lsm6dsv_write_reg(dev, REG_CTRL3, CTRL3_BDU | CTRL3_IF_INC)
+    bool ok = lsm6dsv_write_reg(dev, REG_CTRL3, CTRL3_BDU | CTRL3_IF_INC)
               && update_bits(dev, REG_CTRL8, CTRL8_FS_XL_MASK, (uint8_t) config->accel_fs)
               && update_bits(dev, REG_CTRL6, CTRL6_FS_G_MASK, (uint8_t) config->gyro_fs)
               && lsm6dsv_write_reg(dev, REG_CTRL10, 0)
@@ -173,6 +211,8 @@ static bool apply_config(lsm6dsv_t *dev) {
               /*high-performance mode */
               && lsm6dsv_write_reg(dev, REG_CTRL1, (uint8_t) config->accel_odr)
               && lsm6dsv_write_reg(dev, REG_CTRL2, (uint8_t) config->gyro_odr);
+
+    return ok && (!config->batch_raw || start_raw_batching(dev));
 }
 
 bool lsm6dsv_init(lsm6dsv_t *dev, const lsm6dsv_config_t *config) {
@@ -223,6 +263,60 @@ bool lsm6dsv_read_timestamp(const lsm6dsv_t *dev, uint32_t *ticks) {
         return false;
     }
     *ticks = (uint32_t) raw[0] | ((uint32_t) raw[1] << 8U) | ((uint32_t) raw[2] << 16U) | ((uint32_t) raw[3] << 24U);
+    return true;
+}
+
+static void store_raw_sample(float samples[][3], uint16_t *count, const uint8_t *data, float scale, bool *dropped) {
+    if (*count >= LSM6DSV_MAX_RAW_SAMPLES) {
+        *dropped = true;
+        return;
+    }
+    for (size_t axis = 0; axis < 3U; axis++) {
+        samples[*count][axis] = (float) le_i16(&data[2U * axis]) * scale;
+    }
+    *count = (uint16_t) (*count + 1U);
+}
+
+static void decode_fifo_word(const lsm6dsv_t *dev, const uint8_t word[FIFO_WORD_BYTES], lsm6dsv_raw_samples_t *raw) {
+    const uint8_t *data = &word[1];
+
+    switch (word[0] >> FIFO_TAG_SHIFT) {
+    case FIFO_TAG_GYRO_NC:
+        store_raw_sample(raw->gyro_rads, &raw->gyro_count, data, dev->gyro_rads_per_lsb, &raw->dropped);
+        break;
+    case FIFO_TAG_ACCEL_NC:
+        store_raw_sample(raw->accel_mps2, &raw->accel_count, data, dev->accel_mps2_per_lsb, &raw->dropped);
+        break;
+    default:
+        break;
+    }
+}
+
+bool lsm6dsv_read_fifo(const lsm6dsv_t *dev, lsm6dsv_raw_samples_t *raw) {
+    uint8_t status[2] = {0};
+
+    raw->gyro_count = 0;
+    raw->accel_count = 0;
+    raw->dropped = false;
+    raw->overrun = false;
+
+    if (!lsm6dsv_read_regs(dev, REG_FIFO_STATUS1, status, sizeof(status))) {
+        return false;
+    }
+    uint16_t count = (uint16_t) ((uint16_t) status[0] | (uint16_t) ((status[1] & FIFO_STATUS2_DIFF_FIFO_8) << 8U));
+    raw->overrun = (status[1] & (FIFO_STATUS2_OVR_IA | FIFO_STATUS2_OVR_LATCHED)) != 0U;
+
+    if (count > FIFO_MAX_WORDS) {
+        count = FIFO_MAX_WORDS;
+    }
+
+    for (uint16_t i = 0; i < count; i++) {
+        uint8_t word[FIFO_WORD_BYTES] = {0};
+        if (!lsm6dsv_read_regs(dev, REG_FIFO_DATA_OUT_TAG, word, sizeof(word))) {
+            return false;
+        }
+        decode_fifo_word(dev, word, raw);
+    }
     return true;
 }
 
@@ -330,7 +424,8 @@ bool lsm6dsv_self_test(lsm6dsv_t *dev, lsm6dsv_self_test_t *result) {
 
     memset(result, 0, sizeof(*result));
 
-    bool ok = run_self_test(dev, &ACCEL_SELF_TEST, accel_delta) && run_self_test(dev, &GYRO_SELF_TEST, gyro_delta);
+    bool ok = stop_raw_batching(dev) && run_self_test(dev, &ACCEL_SELF_TEST, accel_delta)
+              && run_self_test(dev, &GYRO_SELF_TEST, gyro_delta);
 
     for (size_t axis = 0; axis < 3U; axis++) {
         result->accel_delta_mg[axis] = accel_delta[axis] * ACCEL_4G_MG_PER_LSB;

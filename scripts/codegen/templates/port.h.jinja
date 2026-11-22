@@ -153,6 +153,7 @@ extern DMA_HandleTypeDef {{platform.buzzer.hal_dma_id}};
 
 extern ADC_HandleTypeDef {{platform.feedback_adc.hal_adc_id}};
 #define feedback_adc {{platform.feedback_adc.hal_adc_id}}
-
+#define feedback_vbat_adc_channel ADC_CHANNEL_{{platform.feedback_adc.vbat_adc_channel}}
+#define feedback_current_adc_channel ADC_CHANNEL_{{platform.feedback_adc.current_adc_channel}}
 
 #endif

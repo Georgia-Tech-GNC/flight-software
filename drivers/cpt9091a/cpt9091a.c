@@ -12,8 +12,8 @@
 #define DMA_TIM_FREQUENCY_HZ (DMA_TIM_BASE_FREQUENCY_HZ / (DMA_TIM_PRESCALER + 1))
 
 #define DAC_FREQUENCY_HZ (DMA_TIM_FREQUENCY_HZ / (DMA_TIM_COUNTER_PERIOD + 1))
-#define DAC_DMA_BUFFER_LENGTH_S 0.01
-#define DAC_DMA_BUFFER_LENGTH ((size_t)(DAC_FREQUENCY_HZ * DAC_DMA_BUFFER_LENGTH_S))
+#define DAC_DMA_BUFFER_LENGTH_MS 10
+#define DAC_DMA_BUFFER_LENGTH ((DAC_FREQUENCY_HZ * DAC_DMA_BUFFER_LENGTH_MS) / 1000)
 
 static __attribute__((section(".dma"), aligned(32))) uint8_t dma_buffer[DAC_DMA_BUFFER_LENGTH];
 
@@ -30,7 +30,7 @@ static void cpt9091a_half_cmplt_callback(DAC_HandleTypeDef* dac) {
         cpt9091a.fill_next_chunk(
             dma_buffer,
             DAC_DMA_BUFFER_LENGTH / 2,
-            DAC_DMA_BUFFER_LENGTH_S / 2.0
+            DAC_DMA_BUFFER_LENGTH_MS / 2000.0
         );
     }
 }
@@ -40,7 +40,7 @@ static void cpt9091a_cmplt_callback(DAC_HandleTypeDef* dac) {
         cpt9091a.fill_next_chunk(
             &dma_buffer[DAC_DMA_BUFFER_LENGTH / 2],
             DAC_DMA_BUFFER_LENGTH / 2,
-            DAC_DMA_BUFFER_LENGTH_S / 2.0
+            DAC_DMA_BUFFER_LENGTH_MS / 2000.0
         );
     }
 }
@@ -67,7 +67,7 @@ bool cpt9091a_init(DAC_HandleTypeDef* dac, TIM_HandleTypeDef* tim) {
     status = HAL_DAC_Start_DMA(
         cpt9091a.dac,
         DAC1_CHANNEL_1,
-        (uint32_t*)dma_buffer,
+        (uint32_t*)(void*)dma_buffer,
         DAC_DMA_BUFFER_LENGTH,
         DAC_ALIGN_8B_R
     );

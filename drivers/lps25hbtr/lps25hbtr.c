@@ -152,7 +152,7 @@ double lps25hbtr_get_pressure() {
     return pressure;
 }
 
-double lps25hbtr_get_altitude(lps25hbtr_data* lps25hbtr) {
+double lps25hbtr_get_altitude(const lps25hbtr_data* lps25hbtr) {
     const double pressure = lps25hbtr_get_pressure();
     const double pressure_ratio = pressure / lps25hbtr->reference_pressure;
     const double reference_temperature = lps25hbtr->reference_temperature + 273.15;

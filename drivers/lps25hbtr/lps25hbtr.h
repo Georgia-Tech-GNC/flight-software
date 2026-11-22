@@ -54,7 +54,7 @@ double lps25hbtr_get_pressure();
  * @param lps25hbtr an initialized instance of the lps25hb device.
  * @return the altitude (in meters) relative to the reference altitude.
  */
-double lps25hbtr_get_altitude(lps25hbtr_data* lps25hbtr);
+double lps25hbtr_get_altitude(const lps25hbtr_data* lps25hbtr);
 
 /**
  * Read a register from the lps25hb device.

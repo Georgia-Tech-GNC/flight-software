@@ -4,6 +4,19 @@
 
 #define TIMESTEP_MILLISECONDS_TO_SECONDS 0.001f
 
+static bool imu_packet_is_valid(const imu_packet_receive_t *packet) {
+    if (packet == NULL) {
+        return false;
+    }
+    for (size_t index = 0; index < 3; index++) {
+        if (!isfinite(packet->acceleration[index]) ||
+            !isfinite(packet->angular_velocity[index])) {
+            return false;
+        }
+    }
+    return true;
+}
+
 static void normalize_quaternion(float32_t quaternion[4]) {
     float32_t norm;
 
@@ -87,6 +100,10 @@ bool process_imu_packet(
     altitude_kalman_filter_t *altitude_filter,
     const imu_packet_receive_t *packet
 ) {
+    if (state_estimate == NULL || altitude_filter == NULL ||
+        !imu_packet_is_valid(packet)) {
+        return false;
+    }
     if (!state_estimate->have_last_imu_timestep) {
         state_estimate->last_imu_timestep = packet->timestep;
         state_estimate->have_last_imu_timestep = true;
@@ -99,6 +116,9 @@ bool process_imu_packet(
     float32_t dt_seconds =
         (float32_t)(packet->timestep - state_estimate->last_imu_timestep) *
         TIMESTEP_MILLISECONDS_TO_SECONDS;
+    if (!isfinite(dt_seconds) || dt_seconds <= 0.0f) {
+        return false;
+    }
     state_estimate->last_imu_timestep = packet->timestep;
 
     update_orientation_and_acceleration(state_estimate, packet, dt_seconds);
@@ -139,6 +159,9 @@ void process_barometer_packet(
     altitude_kalman_filter_t *altitude_filter,
     const barometer_packet_receive_t *packet
 ) {
+    if (state_estimate == NULL || altitude_filter == NULL || packet == NULL) {
+        return;
+    }
     if (!packet->barometer_valid || !isfinite(packet->barometer_altitude)) {
         return;
     }

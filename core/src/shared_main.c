@@ -162,7 +162,6 @@ static void main_task(void *_params) {
     while (true) {
         process_commands();
 
-        // Bound each drain so one busy producer cannot starve the other.
         for (size_t i = 0; i < MessageBufferSize / sizeof(imu_packet_receive_t); i++) {
             imu_packet_receive_t packet;
             if (xMessageBufferReceive(imu_buffer_handle, &packet, sizeof(packet), 0) != sizeof(packet)) {

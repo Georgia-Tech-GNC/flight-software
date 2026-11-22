@@ -2,6 +2,7 @@
 #define STATE_ESTIMATION_H
 
 #include "altitude_kalman_filter.h"
+#include "arm_math.h"
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -12,14 +13,14 @@ typedef struct Vector3 {
 } vector3_t;
 
 typedef struct BarometerPacketReceive {
-    float barometer_altitude;
+    float32_t barometer_altitude;
     bool barometer_valid;
 } barometer_packet_receive_t;
 
 
 typedef struct ImuPacketReceive {
-    float acceleration[3];
-    float angular_velocity[3];
+    float32_t acceleration[3];
+    float32_t angular_velocity[3];
     uint64_t timestep;  // Milliseconds on the IMU sample clock.
 } imu_packet_receive_t;
 

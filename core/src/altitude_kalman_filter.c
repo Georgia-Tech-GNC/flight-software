@@ -1,4 +1,5 @@
 #include "altitude_kalman_filter.h"
+#include <math.h>
 
 #define BAROMETER_MEASUREMENT_VARIANCE 4.0f
 #define ACCELERATION_NOISE_VARIANCE 4.0f
@@ -7,6 +8,13 @@ void altitude_kalman_filter_init(
     altitude_kalman_filter_t *filter,
     float32_t altitude_meters
 ) {
+    if (filter == NULL) {
+        return;
+    }
+    filter->initialized = false;
+    if (!isfinite(altitude_meters)) {
+        return;
+    }
     filter->altitude = altitude_meters;
     filter->vertical_velocity = 0.0f;
     filter->covariance[0][0] = BAROMETER_MEASUREMENT_VARIANCE;
@@ -21,6 +29,11 @@ void altitude_kalman_filter_predict(
     float32_t acceleration_z,
     float32_t dt_seconds
 ) {
+    if (filter == NULL || !filter->initialized ||
+        !isfinite(acceleration_z) || !isfinite(dt_seconds) ||
+        dt_seconds <= 0.0f) {
+        return;
+    }
     float32_t dt_squared = dt_seconds * dt_seconds;
     float32_t dt_cubed = dt_squared * dt_seconds;
     float32_t dt_fourth = dt_cubed * dt_seconds;
@@ -51,6 +64,9 @@ void altitude_kalman_filter_update(
     altitude_kalman_filter_t *filter,
     float32_t altitude_meters
 ) {
+    if (filter == NULL || !isfinite(altitude_meters)) {
+        return;
+    }
     if (!filter->initialized) {
         altitude_kalman_filter_init(filter, altitude_meters);
         return;

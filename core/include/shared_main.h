@@ -5,7 +5,7 @@
 #include "message_buffer.h"
 #include "state_estimation.h"
 
-typedef enum {
+typedef enum FSMState {
     GROUND,
     ARMED,
     FAST_ASCENT,

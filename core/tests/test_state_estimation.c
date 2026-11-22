@@ -117,10 +117,34 @@ static void test_first_barometer_fix_after_imu(void) {
     CHECK(near(filter.vertical_velocity, 2.0f));
 }
 
+static void test_rejects_invalid_packets(void) {
+    state_estimate_t state;
+    altitude_kalman_filter_t filter;
+    state_estimation_init(&state, &filter);
+
+    imu_packet_receive_t imu = {
+        .acceleration = {0.0f, 0.0f, NAN},
+        .timestep = 1000,
+    };
+    CHECK(!process_imu_packet(&state, &filter, &imu));
+    CHECK(!state.have_last_imu_timestep);
+
+    imu.acceleration[2] = 2.0f;
+    CHECK(process_imu_packet(&state, &filter, &imu));
+
+    barometer_packet_receive_t barometer = {
+        .barometer_altitude = INFINITY,
+        .barometer_valid = true,
+    };
+    process_barometer_packet(&state, &filter, &barometer);
+    CHECK(!filter.initialized);
+}
+
 int main(void) {
     test_imu_timestamps();
     test_imu_rotation();
     test_barometer_prediction_and_correction();
     test_first_barometer_fix_after_imu();
+    test_rejects_invalid_packets();
     return EXIT_SUCCESS;
 }

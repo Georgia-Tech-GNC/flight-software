@@ -31,10 +31,10 @@ extern I2C_HandleTypeDef hi2c1;
 #define LED3_GPIO_PORT GPIOB
 #define LED3_PIN GPIO_PIN_14
 
-#define SERVO_MIN_PULSE_WIDTH_US 500
-#define SERVO_MAX_PULSE_WIDTH_US 2500
-#define SERVO_MIN_ANGLE -90
-#define SERVO_MAX_ANGLE 90
+#define SERVO_MIN_PULSE_WIDTH_US 800
+#define SERVO_MAX_PULSE_WIDTH_US 2190
+#define SERVO_MIN_ANGLE -67.5
+#define SERVO_MAX_ANGLE 67.5
 #define SERVO_TIM_CLK_HZ 192000000
 extern TIM_HandleTypeDef htim1;
 #define servo_tim htim1

@@ -1,5 +1,7 @@
 #include "servo.h"
 #include <stdbool.h>
+#include "nanoprintf.h"
+#include "port.h"
 
 bool servo_init(
     servo_t *servo,
@@ -116,6 +118,22 @@ bool servo_set_pos(servo_t *servo, float angle_deg) {
     if (pulse_us > servo->max_pulse_us) {
         pulse_us = servo->max_pulse_us;
     }
+
+    // char message[120];
+
+    // int len = npf_snprintf(
+    //         message,
+    //         sizeof(message),
+    //         "%f\r\n",
+    //         pulse_us
+    // );
+
+    // HAL_UART_Transmit(
+    //     &debug_uart,
+    //     (uint8_t *)message,
+    //     (uint16_t)len,
+    //     HAL_MAX_DELAY
+    // );
 
     return servo_set_pulse_us(servo, (uint16_t)roundf(pulse_us));
 }

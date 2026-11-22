@@ -13,6 +13,7 @@
 #include "servo.h"
 #include "encoder.h"
 #include "gimbal_tests.h"
+#include "nanoprintf.h"
 
 #define STACK_SIZE 4096
 #define SERVO_COUNTER_FREQ_HZ (SERVO_TIM_CLK_HZ / (servo_tim.Instance->PSC + 1))
@@ -22,6 +23,7 @@ static StackType_t gimbal_test_stack[TEST_STACK_SIZE];
 static gimbal_test_context_t gimbal_context;
 
 encoder_t test_encoder;
+servo_t test_servo;
 
 // static void blink_led_1(void *_params);
 // static void blink_led_2(void *_params);
@@ -152,24 +154,64 @@ encoder_t test_encoder;
     // TaskHandle_t blink_led_3_task = xTaskCreateStatic(blink_led_3, "Blink LED 3", STACK_SIZE, NULL, tskIDLE_PRIORITY, blink_led_3_stack, &blink_led_3_buffer);
     // TaskHandle_t servo_task = xTaskCreateStatic(servo_test, "Servo Test", STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, servo_test_stack, &servo_test_buffer);
     
-    servo_t test_servo;
-    servo_init(&test_servo, &servo_tim, TIM_CHANNEL_1, SERVO_COUNTER_FREQ_HZ, SERVO_MAX_ANGLE*2.0f, SERVO_MIN_PULSE_WIDTH_US, SERVO_MAX_PULSE_WIDTH_US, false);
+    CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+    DWT->CYCCNT = 0;
+    DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+    
+
+    servo_init(&test_servo, &servo_tim, TIM_CHANNEL_1, SERVO_COUNTER_FREQ_HZ, SERVO_MAX_ANGLE*2.0f, SERVO_MIN_PULSE_WIDTH_US, SERVO_MAX_PULSE_WIDTH_US, true);
     servo_enable(&test_servo);
-    servo_set_pos(&test_servo, 10);
+    servo_set_pos(&test_servo, 0);
+    // servo_set_pulse_us(&test_servo, 800);
     gimbal_context.servo = &test_servo;
+
+    HAL_Delay(1000);
+
 
     encoder_init(&test_encoder,&htim2, ENCODER_COUNTS_PER_REV);
     encoder_enable(&test_encoder);
+    encoder_set_zero(&test_encoder);
     gimbal_context.encoder = &test_encoder;
 
+    // char message[120];
+    
+
+    // for (int i = 800; i < 2200; i+=10) {
+    //     servo_set_pulse_us(&test_servo, i);
+
+    //     HAL_Delay(100);
+
+    //     float encoder_deg;
+    //     encoder_get_angle(&test_encoder, &encoder_deg);
+
+    //     int len = npf_snprintf(
+    //         message,
+    //         sizeof(message),
+    //         "%i, %f\r\n",
+    //         i,
+    //         (double)encoder_deg
+    //     );
+
+    //     HAL_UART_Transmit(
+    //             &debug_uart,
+    //             (uint8_t *)message,
+    //             (uint16_t)len,
+    //             HAL_MAX_DELAY
+    //     );
+    // }
+
+    // while (true) {
+
+    // }
+
     // Test 1 and 2
-    TaskHandle_t gimbal_test_handle = xTaskCreateStatic(gimbal_test_1_task,"Gimbal Test 1",TEST_STACK_SIZE,&gimbal_context,tskIDLE_PRIORITY + 1,gimbal_test_stack,&gimbal_test_buffer);
+    // TaskHandle_t gimbal_test_handle = xTaskCreateStatic(gimbal_test_1_task,"Gimbal Test 1",TEST_STACK_SIZE,&gimbal_context,tskIDLE_PRIORITY + 1,gimbal_test_stack,&gimbal_test_buffer);
     
     // Test 3
     // TaskHandle_t gimbal_test_handle = xTaskCreateStatic(gimbal_test_3_task,"Gimbal Test 3",TEST_STACK_SIZE,&gimbal_context,tskIDLE_PRIORITY + 1,gimbal_test_stack,&gimbal_test_buffer);
     
     // Test 4
-    // TaskHandle_t gimbal_test_handle = xTaskCreateStatic(gimbal_test_4_task,"Gimbal Test 4",TEST_STACK_SIZE,&gimbal_context,tskIDLE_PRIORITY + 1,gimbal_test_stack,&gimbal_test_buffer);
+    TaskHandle_t gimbal_test_handle = xTaskCreateStatic(gimbal_test_4_task,"Gimbal Test 4",TEST_STACK_SIZE,&gimbal_context,tskIDLE_PRIORITY + 1,gimbal_test_stack,&gimbal_test_buffer);
 
 
     if (gimbal_test_handle) {

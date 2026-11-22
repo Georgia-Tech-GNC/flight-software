@@ -9,6 +9,7 @@
 #include <math.h>
 #include "port.h"
 #include "nanoprintf.h"
+#include "math.h"
 
 extern UART_HandleTypeDef debug_uart;
 #define TWO_PI 6.2831853071795864769f
@@ -98,6 +99,21 @@ typedef struct {
 static gimbal_sample_t chunk[CHUNK_SIZE];
 static uint32_t chunk_count = 0;
 
+static uint32_t loop_count = 0;
+static uint32_t last_count = 0;
+
+static uint32_t get_us(void) {
+    uint64_t cycle_count = DWT->CYCCNT;
+    if (cycle_count < last_count) {
+        loop_count++;
+    }
+
+    cycle_count += (1ULL<<32) * loop_count;
+    last_count = (uint32_t)cycle_count;
+
+    return (uint32_t) (cycle_count / 192);
+}
+
 static void transmit_chunk(void)
 {
     HAL_UART_Transmit(&debug_uart, (uint8_t *) "Starting data trasmision...\r\n", 30, HAL_MAX_DELAY);
@@ -113,7 +129,7 @@ static void transmit_chunk(void)
         int len = npf_snprintf(
             message,
             sizeof(message),
-            "%.4f,%.2f,%.2f\r\n",
+            "%.4f,%.2f,%.4f\r\n",
             (double)timestamp_s,
             (double)chunk[i].command_deg,
             (double)chunk[i].encoder_deg
@@ -132,17 +148,21 @@ static void transmit_chunk(void)
     chunk_count = 0;
 }
 
-static bool record_sample(gimbal_test_context_t *ctx,TickType_t test_start, float command_deg) {
+static bool record_sample(gimbal_test_context_t *ctx,uint32_t test_start, float command_deg) {
     float encoder_deg;
 
     if (!encoder_get_angle(ctx->encoder, &encoder_deg)) {
         return false;
     }
     
-    chunk[chunk_count].timestamp_ticks = (uint32_t)(xTaskGetTickCount() - test_start);
+    chunk[chunk_count].timestamp_ticks = (uint32_t)(get_us() - test_start);
 
     chunk[chunk_count].command_deg = command_deg;
     chunk[chunk_count].encoder_deg = encoder_deg;
+
+    if (chunk_count > 0 && fabs(chunk[chunk_count - 1].encoder_deg - encoder_deg) < 0.00001) {
+        return true;
+    }
 
     chunk_count++;
 
@@ -178,10 +198,12 @@ static void run_doublet(gimbal_test_context_t *ctx,float amplitude_deg) {
 
     HAL_UART_Transmit(&debug_uart,(uint8_t *)message,(uint16_t)strlen(message),HAL_MAX_DELAY);
 
-    TickType_t test_start = xTaskGetTickCount();
+    // TickType_t test_start = xTaskGetTickCount();
+    uint32_t test_start = get_us(); 
 
     for (uint32_t cycle = 0; cycle < DOUBLET_CYCLES; cycle++) {
         for (uint32_t step = 0; step < 4; step++) {
+            // HAL_UART_Transmit(&debug_uart,(uint8_t *)"step\r\n",6,HAL_MAX_DELAY);
 
             float command_deg = positions[step];
 
@@ -190,10 +212,11 @@ static void run_doublet(gimbal_test_context_t *ctx,float amplitude_deg) {
             }
 
             TickType_t start = xTaskGetTickCount();
-            TickType_t last_wake = start;
+            // TickType_t last_wake = start;
 
             
             while ((xTaskGetTickCount() - start) < pdMS_TO_TICKS(DOUBLET_HOLD_MS)) {
+                // HAL_UART_Transmit(&debug_uart,(uint8_t *)"hold\r\n",6,HAL_MAX_DELAY);
 
                 // float degrees;
 
@@ -213,7 +236,12 @@ static void run_doublet(gimbal_test_context_t *ctx,float amplitude_deg) {
                 // }
 
                 record_sample(ctx, test_start, command_deg);
-                vTaskDelayUntil(&last_wake, pdMS_TO_TICKS(TEST_SAMPLE_MS));
+                uint32_t curr_wake = get_us();
+
+                while (get_us() < curr_wake + 1000) {
+
+                }
+                // vTaskDelayUntil(&last_wake, pdMS_TO_TICKS(TEST_SAMPLE_MS));
             }
         }   
         // transmit_chunk();
@@ -233,10 +261,15 @@ void gimbal_test_1_task(void *params) {
     // Return to zero position
     servo_set_pos(ctx->servo, 0.0f);
 
-    // Small doublet response
-    encoder_set_zero(ctx->encoder);
-    run_doublet(ctx, SMALL_STEP_DEG);
-    transmit_chunk();
+    // // Small doublet response
+    // encoder_set_zero(ctx->encoder);
+    // run_doublet(ctx, SMALL_STEP_DEG);
+
+    // HAL_UART_Transmit(&debug_uart,(uint8_t *)"finish test\r\n",(uint16_t)13,HAL_MAX_DELAY);
+
+    // transmit_chunk();
+
+    // HAL_UART_Transmit(&debug_uart,(uint8_t *)"finish chunk\r\n",(uint16_t)14,HAL_MAX_DELAY);
 
     // Return to zero position
     servo_set_pos(ctx->servo, 0.0f);
@@ -272,7 +305,8 @@ static bool staircase_step(gimbal_test_context_t *ctx,float angle_deg,TickType_t
     }
 
     TickType_t step_start = xTaskGetTickCount();
-    TickType_t last_wake = step_start;
+    // TickType_t last_wake = step_start;
+
 
     const TickType_t sample_ticks = pdMS_TO_TICKS(TEST_SAMPLE_MS);
     const TickType_t hold_ticks = pdMS_TO_TICKS(STAIRCASE_HOLD_MS);
@@ -304,7 +338,13 @@ static bool staircase_step(gimbal_test_context_t *ctx,float angle_deg,TickType_t
         // } 
         record_sample(ctx, test_start, angle_deg);
 
-        vTaskDelayUntil(&last_wake, sample_ticks);
+        uint32_t curr_wake = get_us();
+
+        while (get_us() < curr_wake + 1000) {
+
+        }
+
+        // vTaskDelayUntil(&last_wake, sample_ticks);
     }
     // transmit_chunk();
 
@@ -327,7 +367,8 @@ static bool run_staircase(gimbal_test_context_t *ctx) {
 
     HAL_UART_Transmit(&debug_uart,(uint8_t *)message,(uint16_t)strlen(message),HAL_MAX_DELAY);
 
-    TickType_t test_start = xTaskGetTickCount();
+    // TickType_t test_start = xTaskGetTickCount();
+    uint32_t test_start = get_us(); 
 
     // 0 to +5 degrees
     for (int32_t i = 0; i <= 10; i++) {
@@ -335,7 +376,7 @@ static bool run_staircase(gimbal_test_context_t *ctx) {
             return false;
         }
     }
-    transmit_chunk();
+    // transmit_chunk();
 
     // +4.5 to -5 degrees
     for (int32_t i = 9; i >= -10; i--) {
@@ -343,7 +384,7 @@ static bool run_staircase(gimbal_test_context_t *ctx) {
             return false;
         }
     }
-    transmit_chunk();
+    // transmit_chunk();
 
     // -4.5 to 0 degrees
     for (int32_t i = -9; i <= 0; i++) {
@@ -406,11 +447,11 @@ static bool run_chirp(gimbal_test_context_t *ctx) {
 
     HAL_UART_Transmit(&debug_uart,(uint8_t *)message,(uint16_t)strlen(message),HAL_MAX_DELAY);
 
-    const TickType_t sample_ticks = pdMS_TO_TICKS(TEST_SAMPLE_MS);
+    // const TickType_t sample_ticks = pdMS_TO_TICKS(TEST_SAMPLE_MS);
 
-    if (sample_ticks == 0) {
-        return false;
-    }
+    // if (sample_ticks == 0) {
+    //     return false;
+    // }
 
     const float sweep_rate = (SWEEP_END_HZ - SWEEP_START_HZ) / SWEEP_DURATION_S;
 
@@ -454,7 +495,14 @@ static bool run_chirp(gimbal_test_context_t *ctx) {
         // } 
         record_sample(ctx, test_start, command_deg);
 
-        vTaskDelayUntil(&last_wake, sample_ticks);
+        
+        uint32_t curr_wake = get_us();
+
+        while (get_us() < curr_wake + 1000) {
+
+        }
+
+        // vTaskDelayUntil(&last_wake, sample_ticks);
     }
 
     transmit_chunk();

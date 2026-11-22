@@ -143,7 +143,7 @@
 
 // HB5M-1024 encoder
 #define ENCODER_CPR 1024U
-#define ENCODER_COUNTS_PER_REV (ENCODER_CPR * 4U)
+#define ENCODER_COUNTS_PER_REV (ENCODER_CPR * 2U)
 
 typedef struct {
     TIM_HandleTypeDef *htim;

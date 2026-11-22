@@ -152,6 +152,7 @@ extern DMA_HandleTypeDef hdma_dac1_ch1;
 
 extern ADC_HandleTypeDef hadc1;
 #define feedback_adc hadc1
-
+#define feedback_vbat_adc_channel ADC_CHANNEL_10
+#define feedback_current_adc_channel ADC_CHANNEL_11
 
 #endif

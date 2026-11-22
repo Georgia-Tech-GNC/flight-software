@@ -25,7 +25,7 @@ typedef struct {
 
 static cpt9091a_handle cpt9091a;
 
-static void cpt9091a_half_cmplt_callback(DAC_HandleTypeDef* dac) {
+static void cpt9091a_half_cmplt_callback(const DAC_HandleTypeDef* dac) {
     if (dac == cpt9091a.dac && cpt9091a.fill_next_chunk != NULL) {
         cpt9091a.fill_next_chunk(
             dma_buffer,
@@ -35,7 +35,7 @@ static void cpt9091a_half_cmplt_callback(DAC_HandleTypeDef* dac) {
     }
 }
 
-static void cpt9091a_cmplt_callback(DAC_HandleTypeDef* dac) {
+static void cpt9091a_cmplt_callback(const DAC_HandleTypeDef* dac) {
     if (dac == cpt9091a.dac && cpt9091a.fill_next_chunk != NULL) {
         cpt9091a.fill_next_chunk(
             &dma_buffer[DAC_DMA_BUFFER_LENGTH / 2],
@@ -54,10 +54,10 @@ bool cpt9091a_init(DAC_HandleTypeDef* dac, TIM_HandleTypeDef* tim) {
 
     HAL_StatusTypeDef status;
 
-    status = HAL_DAC_RegisterCallback(cpt9091a.dac, HAL_DAC_CH1_HALF_COMPLETE_CB_ID, cpt9091a_half_cmplt_callback);
+    status = HAL_DAC_RegisterCallback(cpt9091a.dac, HAL_DAC_CH1_HALF_COMPLETE_CB_ID, (pDAC_CallbackTypeDef)cpt9091a_half_cmplt_callback);
     if (status != HAL_OK)
         return false;
-    status = HAL_DAC_RegisterCallback(cpt9091a.dac, HAL_DAC_CH1_COMPLETE_CB_ID, cpt9091a_cmplt_callback);
+    status = HAL_DAC_RegisterCallback(cpt9091a.dac, HAL_DAC_CH1_COMPLETE_CB_ID, (pDAC_CallbackTypeDef)cpt9091a_cmplt_callback);
     if (status != HAL_OK)
         return false;
 

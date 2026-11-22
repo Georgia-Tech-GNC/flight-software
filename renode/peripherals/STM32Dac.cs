@@ -82,19 +82,19 @@ namespace Antmicro.Renode.Peripherals.Miscellaneous
 
         private void DefineRegisters()
         {
-            // 12-bit mode
-            // registers.DefineRegister(0x08)
-            //     .WithValueField(
-            //         0,
-            //         12,
-            //         out dacValue,
-            //         name: "DHR12R"
-            //     )
-            //     .WithWriteCallback((_, __) =>
-            //     {
-            //         this.Log(LogLevel.Info, "WriteCallback");
-            //         UpdateOutput();
-            //     });
+            // 12-bit right aligned
+            registers.DefineRegister(0x08)
+                .WithValueField(
+                    0,
+                    12,
+                    out dacValue,
+                    name: "DHR12R1"
+                )
+                .WithWriteCallback((_, __) =>
+                {
+                    this.Log(LogLevel.Info, "WriteCallback");
+                    UpdateOutput();
+                });
             
             // 8-bit right aligned
             registers.DefineRegister(0x10)
@@ -102,22 +102,25 @@ namespace Antmicro.Renode.Peripherals.Miscellaneous
                     0,
                     8,
                     out dacValue,
-                    name: "DHR12R"
+                    name: "DHR8R1"
                 )
                 .WithWriteCallback((_, __) =>
                 {
                     UpdateOutput();
                 });
+
+            // CR
             registers.DefineRegister(0x00)
                 .WithValueField(0, 32, FieldMode.Read, valueProviderCallback: _ => 0);
 
+            // SR
             registers.DefineRegister(0x34)
                 .WithValueField(0, 32, FieldMode.Read, valueProviderCallback: _ => 0);
         }
 
         private void UpdateOutput()
         {
-            var voltage = 3.3 * dacValue.Value / 4096.0;
+            var voltage = 3.3 * dacValue.Value / 256.0;
             RegisteredPeripheral?.SetVoltage(voltage);
         }
 

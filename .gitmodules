@@ -10,3 +10,6 @@
 [submodule "lib/nanoprintf"]
 	path = lib/nanoprintf
 	url = https://github.com/charlesnicholson/nanoprintf.git
+[submodule "lib/renode"]
+	path = lib/renode
+	url = https://github.com/Georgia-Tech-GNC/renode.git

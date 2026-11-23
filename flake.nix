@@ -25,55 +25,6 @@ in {
         then "DYLD_LIBRARY_PATH"
         else "LD_LIBRARY_PATH";
 
-      renode-17 = pkgs.stdenv.mkDerivation {
-        pname = "renode";
-        version = "1.17.0";
-
-        src = pkgs.fetchurl {
-          url = "https://builds.renode.io/renode-1.17.0.multiplatform.zip";
-          hash = "sha256-us1hpfebrTxPDWLQjp29fHDQbeTqUaLbGJdDsrdMyCY=";
-        };
-
-        nativeBuildInputs = [
-          pkgs.unzip
-          pkgs.patchelf
-        ] ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
-          pkgs.darwin.sigtool
-        ];
-
-        unpackPhase = ''
-          unzip "$src"
-        '';
-
-        installPhase = ''
-          runHook preInstall
-
-          mkdir -p "$out/bin" "$out/share"
-          cp -r renode_1.17.0-multiplatform/. "$out/share/"
-
-          ${pkgs.lib.optionalString pkgs.stdenv.hostPlatform.isDarwin ''
-            codesign --force --sign - \
-              "$out/share/bin/platform-lib/osx-arm64/renode-ui"
-
-            ln -s /tmp/renode-ui-tmp \
-              "$out/share/bin/platform-lib/osx-arm64/.tmp"
-          ''}
-
-          ${pkgs.lib.optionalString (pkgs.stdenv.hostPlatform.isLinux && pkgs.stdenv.hostPlatform.isx86_64) ''
-            UI="$out/share/bin/platform-lib/linux-x64/renode-ui"
-
-            patchelf \
-              --set-interpreter "${pkgs.stdenv.cc.bintools.dynamicLinker}" \
-              "$UI"
-
-            ln -s /tmp/renode-ui-tmp \
-              "$out/share/bin/platform-lib/linux-x64/.tmp"
-          ''}
-
-          runHook postInstall
-        '';
-      };
-
       fontsConf = pkgs.makeFontsConf {
         fontDirectories = with pkgs; [
           dejavu_fonts
@@ -81,22 +32,6 @@ in {
           noto-fonts
         ];
       };
-
-      renode = pkgs.writeShellScriptBin "renode" ''
-        export RENODE_ROOT=${renode-17}/share/renode
-        export PATH=${renode-17}/share/renode:$PATH
-        ${pkgs.lib.optionalString pkgs.stdenv.hostPlatform.isLinux ''
-          export GDK_BACKEND=x11
-          export LIBGL_ALWAYS_SOFTWARE=1
-        ''}
-        exec ${renode-17}/share/renode "$@"
-      '';
-
-      renode-test = pkgs.writeShellScriptBin "renode-test" ''
-        exec ${pkgs.uv}/bin/uv run \
-          --with-requirements ${renode-17}/share/tests/requirements.txt \
-          ${renode-17}/share/renode-test "$@"
-      '';
 
     in {
       default = pkgs.mkShell {
@@ -112,9 +47,6 @@ in {
           cppcheck
           python3
           ninja
-          renode-17
-          renode
-          renode-test
           gcc-arm-embedded
           openocd
           git
@@ -126,6 +58,9 @@ in {
           mesa
           libglvnd
           ffmpeg
+          nodejs_24
+          bashInteractive
+          parallel
         ] ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isLinux [
           libxcb
           libX11

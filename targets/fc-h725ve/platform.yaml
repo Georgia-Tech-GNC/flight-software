@@ -1,5 +1,5 @@
 name: fc-h725ve
-base_renode_platform: renode/platforms/stm32h72x.repl
+base_renode_platform: platforms/cpus/stm32h7.repl
 
 uart:
   - hal_uart_id: huart7

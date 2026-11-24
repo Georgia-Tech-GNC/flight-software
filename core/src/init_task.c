@@ -3,8 +3,12 @@
 #include "tasks.h"
 #include "FreeRTOS.h"
 #include "task.h"
+#include "servo.h"
 
 static void init(void);
+
+servo_t servo_pitch;
+servo_t servo_yaw;
 
 void init_task(void *_params) {
     UNUSED(_params);
@@ -25,4 +29,21 @@ void init_task(void *_params) {
 
 void init(void) {
     //TODO: Driver initialization logic goes here
+    servo_init(&servo_pitch,
+               &servo_tim,
+               servo_pitch_tim_channel,
+               SERVO_TIM_CLK_HZ/(servo_tim.Instance->PSC + 1),
+               SERVO_MAX_ANGLE*2.0,
+               SERVO_MIN_PULSE_WIDTH_US,
+               SERVO_MAX_PULSE_WIDTH_US,
+               false);
+
+    servo_init(&servo_yaw,
+        &servo_tim,
+        servo_yaw_tim_channel,
+        SERVO_TIM_CLK_HZ/(servo_tim.Instance->PSC + 1),
+        SERVO_MAX_ANGLE*2.0,
+        SERVO_MIN_PULSE_WIDTH_US,
+        SERVO_MAX_PULSE_WIDTH_US,
+        false);
 }

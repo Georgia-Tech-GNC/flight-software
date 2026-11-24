@@ -6,10 +6,6 @@
 #include <stdio.h>
 #include "isr.h"
 
-void adis16500_data_ready_callback(void) {
-    HAL_GPIO_TogglePin(PYRO2_EN_GPIO_PORT, PYRO2_EN_PIN);
-}
-
 void example_task(void *_params) {
     UNUSED(_params);
 

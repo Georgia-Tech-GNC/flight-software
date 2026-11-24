@@ -89,4 +89,5 @@ pyro:
       gpio_pin: 2
 feedback_adc:
   hal_adc_id: hadc1
-
+  vbat_adc_channel: 10
+  current_adc_channel: 11

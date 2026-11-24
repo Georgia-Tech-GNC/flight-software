@@ -14,6 +14,7 @@ void example_task(void *_params) {
     UNUSED(_params);
 
     while (true) {
+        vTaskDelay(400);
         WITH_UART(debug,
             HAL_UART_Transmit(uart, (uint8_t *) "Hello, world!\r\n", (uint16_t) 15, HAL_MAX_DELAY);
         );        

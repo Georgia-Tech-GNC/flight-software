@@ -33,7 +33,7 @@ void init(void) {
                &servo_tim,
                servo_pitch_tim_channel,
                SERVO_TIM_CLK_HZ/(servo_tim.Instance->PSC + 1),
-               SERVO_MAX_ANGLE*2.0f,
+               SERVO_MAX_ANGLE*2.0,
                SERVO_MIN_PULSE_WIDTH_US,
                SERVO_MAX_PULSE_WIDTH_US,
                false);
@@ -42,7 +42,7 @@ void init(void) {
         &servo_tim,
         servo_yaw_tim_channel,
         SERVO_TIM_CLK_HZ/(servo_tim.Instance->PSC + 1),
-        SERVO_MAX_ANGLE*2.0f,
+        SERVO_MAX_ANGLE*2.0,
         SERVO_MIN_PULSE_WIDTH_US,
         SERVO_MAX_PULSE_WIDTH_US,
         false);

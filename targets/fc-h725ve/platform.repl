@@ -13,9 +13,9 @@ lsm6dsv: Sensors.LSM6DSV @ i2c2 106
 
 servo_pitch: Sensors.Servo @ sysbus
     minPulseWidthUs: 800
-    maxPulseWidthUs: 2200
-    minAngle: -75
-    maxAngle: 75
+    maxPulseWidthUs: 2190
+    minAngle: -67.5
+    maxAngle: 67.5
     expectedFrequencyHz: 333
     frequencyTolerancePercent: 5
 
@@ -25,9 +25,9 @@ timer4:
 
 servo_yaw: Sensors.Servo @ sysbus
     minPulseWidthUs: 800
-    maxPulseWidthUs: 2200
-    minAngle: -75
-    maxAngle: 75
+    maxPulseWidthUs: 2190
+    minAngle: -67.5
+    maxAngle: 67.5
     expectedFrequencyHz: 333
     frequencyTolerancePercent: 5
 

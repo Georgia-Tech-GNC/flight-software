@@ -20,6 +20,7 @@ namespace Antmicro.Renode.Peripherals.Miscellaneous
         NullRegistrationPointPeripheralContainer<IVoltageSink>,
         IDoubleWordPeripheral,
         IWordPeripheral,
+        IBytePeripheral,
         IKnownSize,
         IGPIOReceiver
     {
@@ -68,34 +69,60 @@ namespace Antmicro.Renode.Peripherals.Miscellaneous
         {
             registers.Write(offset, value);
         }
+        
+        public byte ReadByte(long offset) {
+            return (byte)registers.Read(offset);
+        }
+        
+        public void WriteByte(long offset, byte value) {
+            registers.Write(offset, value);
+        }
 
         public long Size => 0x400;
 
         private void DefineRegisters()
         {
+            // 12-bit right aligned
             registers.DefineRegister(0x08)
                 .WithValueField(
                     0,
                     12,
                     out dacValue,
-                    name: "DHR12R"
+                    name: "DHR12R1"
+                )
+                .WithWriteCallback((_, __) =>
+                {
+                    this.Log(LogLevel.Info, "WriteCallback");
+                    UpdateOutput();
+                });
+            
+            // 8-bit right aligned
+            registers.DefineRegister(0x10)
+                .WithValueField(
+                    0,
+                    8,
+                    out dacValue,
+                    name: "DHR8R1"
                 )
                 .WithWriteCallback((_, __) =>
                 {
                     UpdateOutput();
                 });
+
+            // CR
             registers.DefineRegister(0x00)
                 .WithValueField(0, 32, FieldMode.Read, valueProviderCallback: _ => 0);
 
+            // SR
             registers.DefineRegister(0x34)
                 .WithValueField(0, 32, FieldMode.Read, valueProviderCallback: _ => 0);
         }
 
         private void UpdateOutput()
-{
-    var voltage = 3.3 * dacValue.Value / 4096.0;
-    RegisteredPeripheral?.SetVoltage(voltage);
-}
+        {
+            var voltage = 3.3 * dacValue.Value / 256.0;
+            RegisteredPeripheral?.SetVoltage(voltage);
+        }
 
         private readonly DoubleWordRegisterCollection registers;
 

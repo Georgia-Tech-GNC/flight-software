@@ -31,9 +31,9 @@ i2c:
         i2c_address: 0x5C
 servo_config:
   min_pulse_width_us: 800
-  max_pulse_width_us: 2200
-  min_angle: -75
-  max_angle: 75
+  max_pulse_width_us: 2190
+  min_angle: -67.5
+  max_angle: 67.5
   expected_frequency_hz: 333
   frequency_tolerance_percent: 5
   renode_tim_id: timer4

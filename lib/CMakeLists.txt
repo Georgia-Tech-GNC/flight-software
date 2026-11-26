@@ -53,3 +53,41 @@ target_compile_definitions(nanoprintf PUBLIC
     NANOPRINTF_USE_DIVISION_FREE_CONVERSION=0
 )
 target_link_libraries(${CMAKE_PROJECT_NAME} nanoprintf)
+
+
+############################################### renode ###############################################
+
+set(RENODE_DIR "${CMAKE_SOURCE_DIR}/lib/renode")
+set(RENODE_BIN_DIR "${RENODE_DIR}/output/bin/Release")
+
+ExternalProject_Add(renode_external
+    SOURCE_DIR "${RENODE_DIR}"
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND bash build.sh --ui
+    BUILD_IN_SOURCE TRUE
+    BUILD_ALWAYS FALSE
+    INSTALL_COMMAND ""
+    EXCLUDE_FROM_ALL TRUE
+    USES_TERMINAL_BUILD TRUE
+)
+
+add_custom_target(renode-package
+    COMMAND ${CMAKE_COMMAND} -E env
+        "RENODE_SRC=${RENODE_DIR}"
+        "RENODE_BIN=${RENODE_BIN_DIR}"
+        nix build --impure ".#renode"
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    DEPENDS renode_external
+    USES_TERMINAL
+    VERBATIM
+)
+
+add_custom_target(renode
+    COMMAND "${CMAKE_SOURCE_DIR}/result/bin/renode" --ui
+        -e "i @targets/${TARGET_BOARD}/init.resc"
+        -e "sysbus LoadELF @${PROJECT_BINARY_DIR}/flight-software.elf"
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    DEPENDS ${CMAKE_PROJECT_NAME} renode-package
+    USES_TERMINAL
+    VERBATIM
+)

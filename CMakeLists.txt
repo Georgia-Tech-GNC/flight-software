@@ -30,6 +30,7 @@ add_subdirectory(targets)
 add_subdirectory(core)
 add_subdirectory(drivers)
 add_subdirectory(lib)
+add_subdirectory(tests)
 
 set_source_files_properties(${STRICT_WARNINGS_WHITELIST} PROPERTIES COMPILE_OPTIONS "${WARNING_FLAGS}")
 

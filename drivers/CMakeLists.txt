@@ -1,6 +1,7 @@
 # When adding new source files to core, make sure to add those files to this list
 set(DRIVER_SOURCES
     servo/servo.c
+    rgb-led/rgb_led.c
     lps25hbtr/lps25hbtr.c
     cpt9091a/cpt9091a.c
     mfc/mfc.c
@@ -9,6 +10,7 @@ set(DRIVER_SOURCES
 # When adding new include's directories to core, make sure to add those files to this list 
 set(DRIVER_INCLUDES
     servo/
+    rgb-led/
     lps25hbtr
     cpt9091a
     mfc

@@ -25,8 +25,6 @@ set(STRICT_WARNINGS_WHITELIST) # List of source files where all warnings should 
 
 enable_language(C ASM)
 
-include(CTest)
-
 ########################################## Build Submodules ##########################################
 add_subdirectory(targets)
 add_subdirectory(core)
